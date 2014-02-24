@@ -1,0 +1,29 @@
+!
+! This file is protected by Copyright. Please refer to the COPYRIGHT file
+! distributed with this source distribution.
+!
+! This file is part of REDHAWK.
+!
+! REDHAWK is free software: you can redistribute it and/or modify it
+! under the terms of the GNU Lesser General Public License as published by the
+! Free Software Foundation, either version 3 of the License, or (at your
+! option) any later version.
+!
+! REDHAWK is distributed in the hope that it will be useful, but WITHOUT
+! ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+! FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+! for more details.
+!
+! You should have received a copy of the GNU Lesser General Public License
+! along with this program.  If not, see http://www.gnu.org/licenses/.
+!
+
+{TYPE=POS,X=745,Y=626,W=700,H=500}
+{TYPE=BORDERS,MASK=0x00000001}
+{TYPE=LINE,INDEX=1,DIR=1,X=0.0,Y=0.5,I1=0,I2=0,FP=150}
+{TYPE=LINE,INDEX=2,DIR=1,X=1.0,Y=0.5,I1=0,I2=0,FP=50}
+{TYPE=LINE,INDEX=3,DIR=2,X=0.5,Y=0.0,I1=1,I2=2,FP=50}
+{TYPE=LINE,INDEX=4,DIR=2,X=0.5,Y=1.0,I1=1,I2=2,FP=50}
+{TYPE=LINE,INDEX=5,DIR=2,X=0.21546961,Y=0.5020576,I1=1,I2=2,FP=0}
+{TYPE=PANE,INDEX=1,NAME=PLOT0,TITLE=Input,TH=12,IX1=1,IX2=2,IY1=3,IY2=5}
+{TYPE=PANE,INDEX=2,NAME=PLOT1,TITLE=Output,TH=12,IX1=1,IX2=2,IY1=5,IY2=4}
