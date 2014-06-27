@@ -18,24 +18,27 @@
 # License along with this program.  If not, see http://www.gnu.org/licenses/.
 #
  
-AM_CXXFLAGS = -DINTERNAL_UUID_LIB=0 -DINTERNAL_FLOAT16_LIB=1 -O3 -msse3 -Wall -fPIC -lpthread -Ivrt_src/cpp_src/vrt/lib -Ivrt_src/cpp_src/vrt/libm -luuid -rdynamic
+AM_CXXFLAGS = -DINTERNAL_UUID_LIB=0 -DINTERNAL_FLOAT16_LIB=1 -O3 -msse3 -Wall -fPIC -Ivrt_src/cpp_src/vrt/lib -Ivrt_src/cpp_src/vrt/libm -rdynamic
+libVITA49_v1_la_LIBADD = -lpthread -luuid
+
 
 ACLOCAL_AMFLAGS = -I ../aclocal.d
 
-ossieName = libVITA49
-lib_LTLIBRARIES = libVITA49.la 
+lib_LTLIBRARIES = libVITA49_v1.la 
 libdir = $(spkg_libdir)
-
+pkgconfigdir = $(spkg_pkgconfig_dir)/
+#references the actual pc file to be created by the configure - defined in the configure.ac AC_CONFIG_FILES
+pkgconfig_DATA = VITA49_v1.pc
 
 xmldir = $(spkg_dir)/
-dist_xml_DATA = libVITA49.spd.xml
+#references the actual spd file to be created by the configure - defined in the configure.ac AC_CONFIG_FILES
+dist_xml_DATA = VITA49_v1.spd.xml
 
 datadir = $(spkg_impldir)
-dist_data_DATA = libVITA49.pc
 
 incdir = $(spkg_includedir)
 
-libVITA49_la_SOURCES = \
+libVITA49_v1_la_SOURCES = \
 	$(vrt)
 
 vrt = \

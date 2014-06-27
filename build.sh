@@ -29,10 +29,10 @@ if [ "$1" == "rpm" ]; then
     if [ -e redhawk-libVITA49.spec ]; then
         mydir=`dirname $0`
         tmpdir=`mktemp -d`
-        cp -r ${mydir} ${tmpdir}/redhawk-libVITA49-1.0.0
-        tar czf ${tmpdir}/redhawk-libVITA49-1.0.0.tar.gz --exclude=".svn" -C ${tmpdir} redhawk-libVITA49-1.0.0
-        rpmbuild -ta ${tmpdir}/redhawk-libVITA49-1.0.0.tar.gz
-        rm -rf $tmpdir
+        cp -r ${mydir} ${tmpdir}/redhawk-libVITA49_v1-1.0.0
+        tar czf ${tmpdir}/redhawk-libVITA49_v1-1.0.0.tar.gz --exclude=".svn" -C ${tmpdir} redhawk-libVITA49_v1-1.0.0
+	rpmbuild -ta ${tmpdir}/redhawk-libVITA49_v1-1.0.0.tar.gz
+	rm -rf $tmpdir
     else
         echo "Missing RPM spec file in" `pwd`
         exit 1

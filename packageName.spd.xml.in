@@ -22,26 +22,16 @@ program.  If not, see http://www.gnu.org/licenses/.
   <author>
     <name>REDHAWK</name>
   </author>
-  <implementation id="@spkg_base@_i686">
+  <implementation id="@spkg_base@">
     <description>This is the VITA49 library.</description>
     <code type="SharedLibrary">
-      <localfile name="./@spkg_base@_i686/lib"/>
+      <localfile name="./@spkg_base@/lib"/>
     </code>
     <compiler name="/usr/bin/gcc" version="4.1.2"/>
     <programminglanguage name="C++"/>
     <humanlanguage name="EN"/>
     <os name="@OS_NAME@"/>
     <processor name="x86"/>
-  </implementation>
-<implementation id="@spkg_base@_x86_64">
-    <description>This is the VITA49 library.</description>
-    <code type="SharedLibrary">
-      <localfile name="./@spkg_base@_x86_64/lib"/>
-    </code>
-    <compiler name="/usr/bin/gcc" version="4.1.2"/>
-    <programminglanguage name="C++"/>
-    <humanlanguage name="EN"/>
-    <os name="@OS_NAME@"/>
     <processor name="x86_64"/>
   </implementation>
 </softpkg>

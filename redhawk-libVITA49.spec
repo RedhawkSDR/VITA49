@@ -21,10 +21,11 @@
 # Define default SDRROOT
 %define _sdrroot    /var/redhawk/sdr
 %define _prefix    %{_sdrroot}
-
-Name:		libVITA49
-Version:	1.0.0
-Release:	4%{?dist}
+#reflects the name in the configure.ac file
+Name:		redhawk-libVITA49_v1
+#must match the version number in the configure.ac file
+Version:	2.0.0
+Release:	1%{?dist}
 Summary:	A VITA49 library for REDHAWK components
 Prefix:		%{_sdrroot}
 
@@ -33,10 +34,9 @@ License:	LGPLv3+
 URL:		http://redhawksdr.org/	
 Source0:	%{name}-%{version}.tar.gz
 
-AutoReqProv: No
+AutoReqProv: yes
 
 BuildRequires:	autoconf automake libtool
-BuildRequires:	java-devel >= 1.6
 
 %if "%{?rhel}" == "6"
 Requires: libuuid
@@ -84,100 +84,54 @@ rm -rf %{buildroot}
 
 %files
 %defattr(-,redhawk,redhawk)
-%dir %{_prefix}/dom/sharedPkgs/libVITA49
-%{_prefix}/dom/sharedPkgs/libVITA49/libVITA49.spd.xml
-%ifarch x86_64
-%dir %{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64
-%dir %{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/lib
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/lib/libVITA49.so.*
-%else
-%dir %{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686
-%dir %{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/lib
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/lib/libVITA49.so.*
-%endif
+%dir %{_prefix}/dom/deps/VITA49_v1
+%{_prefix}/dom/deps/VITA49_v1/VITA49_v1.spd.xml
+%dir %{_prefix}/dom/deps/VITA49_v1/cpp
+%dir %{_prefix}/dom/deps/VITA49_v1/cpp/lib
+%dir %{_prefix}/dom/deps/VITA49_v1/cpp/lib/pkgconfig/VITA49_v1.pc
+%{_prefix}/dom/deps/VITA49_v1/cpp/lib/libVITA49_v1.so*
+
 
 %files devel
 %defattr(-,redhawk,redhawk)
-%ifarch x86_64
-%dir %{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/libVITA49.pc
-%dir %{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/AbstractPacketFactory.h 
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/AbstractVRAFile.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/BasicContextPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/BasicDataPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/BasicVRAFile.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/BasicVRLFrame.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/BasicVRTPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/BasicVRTState.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/HasFields.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/InetAddress.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/LeapSeconds.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/MetadataBlock.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/Record.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/StandardDataPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/TimeStamp.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/Utilities.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/UUID.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/Value.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/VRTConfig.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/VRTMath.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/VRTObject.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/PacketFactory.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/PackUnpack.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/PacketIterator.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/EphemerisPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/NoDataPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/ReferencePointPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/StandardContextPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/StreamStatePacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/include/TimestampAccuracyPacket.h
-%dir %{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/lib
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/lib/libVITA49.a
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/lib/libVITA49.la
-#%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/lib/libVITA49.so.0.0.0
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/lib/libVITA49.so
-#%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_x86_64/lib/libVITA49.so.0
-%else
-%dir %{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/libVITA49.pc
-%dir %{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/AbstractPacketFactory.h 
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/AbstractVRAFile.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/BasicContextPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/BasicDataPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/BasicVRAFile.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/BasicVRLFrame.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/BasicVRTPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/BasicVRTState.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/HasFields.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/InetAddress.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/LeapSeconds.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/MetadataBlock.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/Record.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/StandardDataPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/TimeStamp.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/Utilities.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/UUID.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/Value.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/VRTConfig.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/VRTMath.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/VRTObject.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/PacketFactory.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/PackUnpack.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/EphemerisPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/NoDataPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/ReferencePointPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/StandardContextPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/StreamStatePacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/TimestampAccuracyPacket.h
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/include/PacketIterator.h
+%dir %{_prefix}/dom/deps/VITA49_v1/cpp
+%dir %{_prefix}/dom/deps/VITA49_v1/cpp/include
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/AbstractPacketFactory.h 
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/AbstractVRAFile.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/BasicContextPacket.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/BasicDataPacket.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/BasicVRAFile.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/BasicVRLFrame.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/BasicVRTPacket.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/BasicVRTState.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/HasFields.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/InetAddress.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/LeapSeconds.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/MetadataBlock.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/Record.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/StandardDataPacket.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/TimeStamp.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/Utilities.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/UUID.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/Value.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/VRTConfig.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/VRTMath.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/VRTObject.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/PacketFactory.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/PackUnpack.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/PacketIterator.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/EphemerisPacket.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/NoDataPacket.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/ReferencePointPacket.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/StandardContextPacket.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/StreamStatePacket.h
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/TimestampAccuracyPacket.h
+%dir %{_prefix}/dom/deps/VITA49_v1/cpp/lib
+%{_prefix}/dom/deps/VITA49_v1/cpp/lib/libVITA49_v1.a
+%{_prefix}/dom/deps/VITA49_v1/cpp/lib/libVITA49_v1.la
+%{_prefix}/dom/deps/VITA49_v1/cpp/lib/libVITA49_v1.so*
+%dir %{_prefix}/dom/deps/VITA49_v1/cpp/lib/pkgconfig/
+%{_prefix}/dom/deps/VITA49_v1/cpp/lib/pkgconfig/VITA49_v1.pc
 
-%dir %{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/lib
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/lib/libVITA49.a
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/lib/libVITA49.la
-#%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/lib/libVITA49.so.0.0.0
-%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/lib/libVITA49.so
-#%{_prefix}/dom/sharedPkgs/libVITA49/default_impl_i686/lib/libVITA49.so.0
-%endif
+
 %changelog

@@ -114,9 +114,9 @@ int64_t StandardDataPacket::toClassID (const PayloadFormat &pf) {
   int64_t fmtSz = bits & __INT64_C(0x00000FE000000000);
 
   if ((itmSz << 6) != fmtSz) {
-    return ERROR;
+   std::cout << "WARNING: DOUBLE SUPPORPT DOES NOT WORK - TODO: Fix this!" << std::endl;
   }
-  else if (check == __INT64_C(0x0000000000000000)) {
+  if (check == __INT64_C(0x0000000000000000)) {
     return SIZE_TO_TYPE[(int)(itmSz>>32)]                  // Type size
          | ((bits >> 41) & __INT64_C(0x00380000))          // Real/Complex + Signed/Unsigned
          | ((bits      ) & __INT64_C(0x0000FFFF));         // Vector Size

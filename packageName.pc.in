@@ -31,9 +31,9 @@ spkg_impldir=@spkg_impldir@
 spkg_libdir=@spkg_libdir@
 spkg_includedir=@spkg_includedir@
 
-Name: libVITA49
+Name: @PACKAGE_NAME@_@spkg_variation@
 Description: Libraries for use with component development
 Requires:
 Version: @VERSION@
-Libs: -L${spkg_libdir} -lVITA49
+Libs: -L${spkg_libdir} -l@PACKAGE_NAME@_@spkg_variation@
 Cflags: -I${spkg_includedir} 
