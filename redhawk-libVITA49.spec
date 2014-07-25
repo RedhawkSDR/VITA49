@@ -25,7 +25,7 @@
 Name:		redhawk-libVITA49_v1
 #must match the version number in the configure.ac file
 Version:	2.0.0
-Release:	1%{?dist}
+Release:	9%{?dist}
 Summary:	A VITA49 library for REDHAWK components
 Prefix:		%{_sdrroot}
 
@@ -45,6 +45,8 @@ BuildRequires: libuuid-devel
 Requires: e2fsprogs
 BuildRequires: e2fsprogs-devel
 %endif
+
+Requires(pre):  redhawk
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
