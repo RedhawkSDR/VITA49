@@ -25,7 +25,7 @@
 Name:		redhawk-libVITA49_v1
 #must match the version number in the configure.ac file
 Version:	2.0.0
-Release:	9%{?dist}
+Release:	10%{?dist}
 Summary:	A VITA49 library for REDHAWK components
 Prefix:		%{_sdrroot}
 
