@@ -118,7 +118,7 @@ namespace vrt {
     private: static const int32_t INVALID_FRAME   = -3; // Special return value from getPacketLength(..)
 
 
-    private: vector<char> bbuf;
+    public: vector<char> bbuf;
     private: bool         readOnly;  // Is this instance read-only?
 
     /**  Basic destructor for the class. */
