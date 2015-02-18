@@ -14,9 +14,9 @@ config.sub
 configure
 depcomp
 install-sh
-libVITA49.la
-libVITA49.pc
-libVITA49.spd.xml
+libVITA49_v1.la
+VITA49_v1.pc
+VITA49_v1.spd.xml
 libtool
 ltmain.sh
 missing
