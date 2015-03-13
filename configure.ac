@@ -18,7 +18,7 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 #
 
-AC_INIT(VITA49, 1.0.0)
+AC_INIT(VITA49, 3.0.0)
 AM_INIT_AUTOMAKE([nostdinc])
 LT_INIT
 

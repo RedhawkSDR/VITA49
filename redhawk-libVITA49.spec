@@ -24,14 +24,14 @@
 #reflects the name in the configure.ac file
 Name:		redhawk-libVITA49_v1
 #must match the version number in the configure.ac file
-Version:	2.0.0
-Release:	10%{?dist}
+Version:       3.0.0
+Release:       1%{?dist}
 Summary:	A VITA49 library for REDHAWK components
 Prefix:		%{_sdrroot}
 
 Group:		Applications/Engineering
 License:	LGPLv3+
-URL:		http://redhawksdr.org/	
+URL:		http://redhawksdr.org/
 Source0:	%{name}-%{version}.tar.gz
 
 AutoReqProv: yes
@@ -51,7 +51,7 @@ Requires(pre):  redhawk
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
-VITA49 Packet Processing Library for REDHAWK.  Uses VITA49 Library version 2759.  
+VITA49 Packet Processing Library for REDHAWK.  Uses VITA49 Library version 2759.
  * Commit: __REVISION__
  * Source Date/Time: __DATETIME__
 
@@ -73,7 +73,7 @@ Development headers and libraries for VITA49 Processing. Uses VITA49 Library ver
 %build
 ./reconf
 SDRROOT=%{_sdrroot} %configure
-make 
+make
 
 
 %install
@@ -98,7 +98,7 @@ rm -rf %{buildroot}
 %defattr(-,redhawk,redhawk)
 %dir %{_prefix}/dom/deps/VITA49_v1/cpp
 %dir %{_prefix}/dom/deps/VITA49_v1/cpp/include
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/AbstractPacketFactory.h 
+%{_prefix}/dom/deps/VITA49_v1/cpp/include/AbstractPacketFactory.h
 %{_prefix}/dom/deps/VITA49_v1/cpp/include/AbstractVRAFile.h
 %{_prefix}/dom/deps/VITA49_v1/cpp/include/BasicContextPacket.h
 %{_prefix}/dom/deps/VITA49_v1/cpp/include/BasicDataPacket.h
