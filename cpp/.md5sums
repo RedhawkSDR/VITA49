@@ -1,0 +1,8 @@
+c99df9fa4ab0cd042eac42fcee6441c3  reconf
+4cc94b564483c2e9df66a29c1ed745ce  rh.VITA49.pc.in
+539e980d117f47b1ce97894060eb2e62  src/VITA49.cpp
+82af12d20c2329649292b8a39829e9eb  configure.ac
+f431707f90dc8e02e00a8b705c595976  Makefile.am
+81924124f972f09dd2781d89c44aa38b  Makefile.am.ide
+aa9029fae16d3629f19344fefecb240b  include/VITA49.h
+b87651ea3565402473fb088004430fbf  build.sh

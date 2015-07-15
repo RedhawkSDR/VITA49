@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 
 # This file is protected by Copyright. Please refer to the COPYRIGHT file
@@ -19,36 +19,41 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
-
-config_ac='configure.ac'
-make_am='Makefile.am'
-makefile='Makefile'
-
-if [ "$1" == "rpm" ]; then
+if [ "$1" = "rpm" ]; then
     # A very simplistic RPM build scenario
-    if [ -e redhawk-libVITA49.spec ]; then
+    if [ -e rh.VITA49.spec ]; then
         mydir=`dirname $0`
         tmpdir=`mktemp -d`
-        cp -r ${mydir} ${tmpdir}/redhawk-libVITA49_v1-3.0.0
-        tar czf ${tmpdir}/redhawk-libVITA49_v1-3.0.0.tar.gz --exclude=".svn" -C ${tmpdir} redhawk-libVITA49_v1-3.0.0
-	rpmbuild -ta ${tmpdir}/redhawk-libVITA49_v1-3.0.0.tar.gz
-	rm -rf $tmpdir
+        cp -r ${mydir} ${tmpdir}/rh.VITA49-3.0.0
+        tar czf ${tmpdir}/rh.VITA49-3.0.0.tar.gz --exclude=".svn" -C ${tmpdir} rh.VITA49-3.0.0
+        rpmbuild -ta ${tmpdir}/rh.VITA49-3.0.0.tar.gz
+        rm -rf $tmpdir
     else
         echo "Missing RPM spec file in" `pwd`
         exit 1
     fi
-elif [ -e build.sh ]; then
-    if [ "$1" == 'clean' ]; then
-            make clean
-    else
-    # Checks if build is newer than makefile (based on modification time)
-        if [[ $config_ac -nt $makefile || $make_am -nt $makefile ]]; then
-            ./reconf
-            ./configure
-        fi
-            make
-            exit 0
-    fi
 else
-    echo "No build.sh found for $impl"
+    for impl in cpp ; do
+        cd $impl
+        if [ -e build.sh ]; then
+            if [ $# == 1 ]; then
+                if [ $1 == 'clean' ]; then
+                    rm -f Makefile
+                    rm -f config.*
+                    ./build.sh distclean
+                else
+                    ./build.sh $*
+                fi
+            else
+                ./build.sh $*
+            fi
+        elif [ -e Makefile ] && [ Makefile.am -ot Makefile ]; then
+            make $*
+        elif [ -e reconf ]; then
+            ./reconf && ./configure && make $*
+        else
+            echo "No build.sh found for $impl"
+        fi
+        cd -
+    done
 fi

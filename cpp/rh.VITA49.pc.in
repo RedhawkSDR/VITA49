@@ -22,18 +22,10 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
-ARCH=@ARCH@
-spkg_base=@spkg_base@
-spkg_dir=@spkg_dir@
-spkg_impl=@spkg_impl2@
-spkg_lib=@spkg_lib@
-spkg_impldir=@spkg_impldir@
-spkg_libdir=@spkg_libdir@
-spkg_includedir=@spkg_includedir@
 
-Name: @PACKAGE_NAME@_@spkg_variation@
-Description: Libraries for use with component development
+Name: rh.VITA49
+Description: This is the REDHAWK VITA49 shared library.
 Requires:
-Version: @VERSION@
-Libs: -L${spkg_libdir} -l@PACKAGE_NAME@_@spkg_variation@
-Cflags: -I${spkg_includedir} 
+Version: 3.0.0
+Libs: -L${libdir} -lVITA49
+Cflags: -I${includedir}
