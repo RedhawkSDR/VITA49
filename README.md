@@ -1,8 +1,8 @@
-# REDHAWK USRP UHD
+# REDHAWK Basic Components rh.VITA49
  
 ## Description
 
-Contains the source and build scripts for the VITA49 Libraries
+Contains the source and build scripts for the VITA49 libraries
 There is source for both C++ and JAVA.
  
 ## REDHAWK Documentation
