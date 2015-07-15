@@ -17,123 +17,85 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 #
+# By default, the RPM will install to the standard REDHAWK SDR root location (/var/redhawk/sdr)
+%{!?_sdrroot: %define _sdrroot /var/redhawk/sdr}
+%define _prefix %{_sdrroot}/dom/deps/rh/VITA49
 
-# Define default SDRROOT
-%define _sdrroot    /var/redhawk/sdr
-%define _prefix    %{_sdrroot}
-#reflects the name in the configure.ac file
-Name:		redhawk-libVITA49_v1
-#must match the version number in the configure.ac file
-Version:       3.0.0
-Release:       1%{?dist}
-Summary:	A VITA49 library for REDHAWK components
-Prefix:		%{_sdrroot}
+# Point install paths to locations within our target SDR root
+%define _libdir        %{_prefix}/cpp/lib
+%define _sysconfdir    %{_prefix}/etc
+%define _localstatedir %{_prefix}/var
+%define _mandir        %{_prefix}/man
+%define _infodir       %{_prefix}/info
 
-Group:		Applications/Engineering
-License:	LGPLv3+
-URL:		http://redhawksdr.org/
-Source0:	%{name}-%{version}.tar.gz
+Name:           rh.VITA49
+Version:        3.0.0
+Release:        1%{?dist}
+Summary:        REDHAWK shared library %{name}
 
-AutoReqProv: yes
+Group:          REDHAWK/Shared Libraries
+License:        LGPLv3+
+Source0:        %{name}-%{version}.tar.gz
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:	autoconf automake libtool
+BuildRequires:  redhawk-devel >= 2.0
+BuildRequires:  libuuid-devel
+BuildRequires:  autoconf automake libtool
 
-%if "%{?rhel}" == "6"
-Requires: libuuid
-BuildRequires: libuuid-devel
-%else
-Requires: e2fsprogs
-BuildRequires: e2fsprogs-devel
-%endif
 
-Requires(pre):  redhawk
-
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
-VITA49 Packet Processing Library for REDHAWK.  Uses VITA49 Library version 2759.
+REDHAWK shared library %{name}. VITA49 packet processing library for REDHAWK. Uses VITA49 Library version 2759.
  * Commit: __REVISION__
  * Source Date/Time: __DATETIME__
 
-
 %package devel
-Summary: REDHAWK VITA49 development package
-Group: Development/Languages
-AutoReqProv: No
-Requires: %{name}
+Summary:        REDHAWK Shared library %{name}
+Group:          REDHAWK/Shared Libraries
+Requires:       %{name} = %{version}-%{release}
 
 %description devel
-Development headers and libraries for VITA49 Processing. Uses VITA49 Library version 2759.
-
+Libraries and header files for REDHAWK shared library %{name}
 
 %prep
 %setup -q
 
 
 %build
+# Implementation cpp
+pushd cpp
 ./reconf
-SDRROOT=%{_sdrroot} %configure
-make
+%configure
+make %{?_smp_mflags}
+popd
 
 
 %install
-rm -rf %{buildroot}
-make install DESTDIR=%{buildroot}
+rm -rf $RPM_BUILD_ROOT
+# Implementation cpp
+pushd cpp
+make install DESTDIR=$RPM_BUILD_ROOT
+popd
+
 
 %clean
-rm -rf %{buildroot}
+rm -rf $RPM_BUILD_ROOT
 
 
 %files
-%defattr(-,redhawk,redhawk)
-%dir %{_prefix}/dom/deps/VITA49_v1
-%{_prefix}/dom/deps/VITA49_v1/VITA49_v1.spd.xml
-%dir %{_prefix}/dom/deps/VITA49_v1/cpp
-%dir %{_prefix}/dom/deps/VITA49_v1/cpp/lib
-%dir %{_prefix}/dom/deps/VITA49_v1/cpp/lib/pkgconfig/VITA49_v1.pc
-%{_prefix}/dom/deps/VITA49_v1/cpp/lib/libVITA49_v1.so*
-
+%defattr(-,redhawk,redhawk,-)
+%dir %{_sdrroot}/dom/deps/rh
+%dir %{_sdrroot}/dom/deps/rh/VITA49
+%{_prefix}/VITA49.spd.xml
+%{_prefix}/cpp
+%exclude %{_libdir}/libVITA49.la
+%exclude %{_libdir}/libVITA49.so
+%exclude %{_libdir}/pkgconfig
 
 %files devel
-%defattr(-,redhawk,redhawk)
-%dir %{_prefix}/dom/deps/VITA49_v1/cpp
-%dir %{_prefix}/dom/deps/VITA49_v1/cpp/include
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/AbstractPacketFactory.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/AbstractVRAFile.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/BasicContextPacket.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/BasicDataPacket.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/BasicVRAFile.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/BasicVRLFrame.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/BasicVRTPacket.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/BasicVRTState.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/HasFields.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/InetAddress.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/LeapSeconds.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/MetadataBlock.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/Record.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/StandardDataPacket.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/TimeStamp.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/Utilities.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/UUID.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/Value.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/VRTConfig.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/VRTMath.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/VRTObject.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/PacketFactory.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/PackUnpack.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/PacketIterator.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/EphemerisPacket.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/NoDataPacket.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/ReferencePointPacket.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/StandardContextPacket.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/StreamStatePacket.h
-%{_prefix}/dom/deps/VITA49_v1/cpp/include/TimestampAccuracyPacket.h
-%dir %{_prefix}/dom/deps/VITA49_v1/cpp/lib
-%{_prefix}/dom/deps/VITA49_v1/cpp/lib/libVITA49_v1.a
-%{_prefix}/dom/deps/VITA49_v1/cpp/lib/libVITA49_v1.la
-%{_prefix}/dom/deps/VITA49_v1/cpp/lib/libVITA49_v1.so*
-%dir %{_prefix}/dom/deps/VITA49_v1/cpp/lib/pkgconfig/
-%{_prefix}/dom/deps/VITA49_v1/cpp/lib/pkgconfig/VITA49_v1.pc
+%defattr(-,redhawk,redhawk,-)
+%{_libdir}/libVITA49.la
+%{_libdir}/libVITA49.so
+%{_libdir}/pkgconfig
+%{_prefix}/include
 
-
-%changelog
