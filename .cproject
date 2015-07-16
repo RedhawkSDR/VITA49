@@ -49,8 +49,8 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.238715317.1633315440" name="test.cc" rcbsApplicability="disable" resourcePath="cpp/vrt_src/cpp_src/vrt/lib/test.cc" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1235954103.881229465">
-						<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1235954103.881229465" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1235954103"/>
+					<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.238715317.54845023" name="test.cc" rcbsApplicability="disable" resourcePath="cpp/vrt_src/cpp_src/vrt/lib/test.cc" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1235954103.209813760">
+						<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1235954103.209813760" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1235954103"/>
 					</fileInfo>
 					<sourceEntries>
 						<entry excluding="vrt_src/cpp_src/vrt/lib/test.cc|vrt_src/cpp_src/vrt/net|vrt_src/c_src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="cpp"/>

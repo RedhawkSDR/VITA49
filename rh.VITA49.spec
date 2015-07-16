@@ -65,7 +65,7 @@ Libraries and header files for REDHAWK shared library %{name}
 # Implementation cpp
 pushd cpp
 ./reconf
-%configure
+%configure --with-sdr=%{_sdrroot}
 make %{?_smp_mflags}
 popd
 
