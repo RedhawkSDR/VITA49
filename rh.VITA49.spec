@@ -39,9 +39,7 @@ Source0:        %{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  redhawk-devel >= 2.0
-BuildRequires:  libuuid-devel
-BuildRequires:  autoconf automake libtool
-
+Obsoletes:      redhawk-libVITA49_v1 < 3.0.0
 
 
 %description
@@ -53,6 +51,7 @@ REDHAWK shared library %{name}. VITA49 packet processing library for REDHAWK. Us
 Summary:        REDHAWK Shared library %{name}
 Group:          REDHAWK/Shared Libraries
 Requires:       %{name} = %{version}-%{release}
+Obsoletes:      redhawk-libVITA49_v1-devel < 3.0.0
 
 %description devel
 Libraries and header files for REDHAWK shared library %{name}
