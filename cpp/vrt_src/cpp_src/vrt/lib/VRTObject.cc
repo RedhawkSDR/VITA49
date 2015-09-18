@@ -49,8 +49,8 @@ static vector<string> getBacktrace () {
     // to:
     //    libvrt.so(vrt::VRTException::VRTException(char const*, ...)+0x3a4) [0x2b1766564234]
     vector<string> trace;
-    for (int i = 2; i < nptrs; i++) {
-      string s = strings[i];
+    for (int ii = 2; ii < nptrs; ii++) {
+      string s = strings[ii];
       size_t i = s.rfind("(");
       size_t j = s.rfind("+");
       
