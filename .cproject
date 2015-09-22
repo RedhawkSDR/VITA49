@@ -27,8 +27,8 @@
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.1172298054" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.141450824" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${OssieHome}/include&quot;"/>
-									<listOptionValue builtIn="false" value="/usr/include/omniORB4"/>
 									<listOptionValue builtIn="false" value="/usr/include/omnithread"/>
+									<listOptionValue builtIn="false" value="/usr/include/omniORB4"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.369708348" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -49,11 +49,8 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.238715317.54845023" name="test.cc" rcbsApplicability="disable" resourcePath="cpp/vrt_src/cpp_src/vrt/lib/test.cc" toolsToInvoke="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1235954103.209813760">
-						<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1235954103.209813760" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1235954103"/>
-					</fileInfo>
 					<sourceEntries>
-						<entry excluding="vrt_src/cpp_src/vrt/lib/test.cc|vrt_src/cpp_src/vrt/net|vrt_src/c_src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="cpp"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="cpp"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -89,8 +86,8 @@
 								<option id="gnu.cpp.compiler.exe.release.option.debugging.level.741127113" name="Debug Level" superClass="gnu.cpp.compiler.exe.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.include.paths.1395324947" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${OssieHome}/include&quot;"/>
-									<listOptionValue builtIn="false" value="/usr/include/omniORB4"/>
 									<listOptionValue builtIn="false" value="/usr/include/omnithread"/>
+									<listOptionValue builtIn="false" value="/usr/include/omniORB4"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2141175857" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>

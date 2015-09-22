@@ -2,8 +2,10 @@
 *.so
 *.lo
 *.la
+.dirstamp
 .deps/
 .libs/
+m4/
 Makefile
 Makefile.in
 rh.VITA49.pc
