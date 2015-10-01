@@ -5,13 +5,9 @@
 Contains the source and build scripts for the VITA49 libraries
 There is source for both C++ and JAVA.
  
-## REDHAWK Documentation
+## Installation Instructions
 
-REDHAWK Website: [www.redhawkSDR.org](http://www.redhawksdr.org)
-
-Overview and Getting Started Guide: [PDF](http://sourceforge.net/projects/redhawksdr/files/redhawk-doc/1.8.6/REDHAWK_Overview_v1.8.6.pdf/download "PDF") [HTML](http://redhawksdr.github.com/Documentation/gettingstarted/main.html "HTML")
-
-Full REDHAWK Manual: [PDF](http://sourceforge.net/projects/redhawksdr/files/redhawk-doc/1.8.6/REDHAWK_Manual_v1.8.6.pdf/download "PDF") [HTML](http://redhawksdr.github.com/Documentation/main.html "HTML")
+To build from source, run the `build.sh` script found at the top level directory. To install to the system, run `sudo ./build.sh install`.
  
 ## Copyrights
 
