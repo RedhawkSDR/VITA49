@@ -1,4 +1,4 @@
-# REDHAWK Basic Components rh.VITA49
+# REDHAWK Basic Components rh.VITA49 shared library
  
 ## Description
 
