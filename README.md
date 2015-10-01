@@ -2,12 +2,11 @@
  
 ## Description
 
-Contains the source and build scripts for the VITA49 libraries
-There is source for both C++ and JAVA.
+Contains the source and build script for the REDHAWK Basic Components rh.VITA49 shared library.
  
 ## Installation Instructions
 
-To build from source, run the `build.sh` script found at the top level directory. To install to the system, run `sudo ./build.sh install`.
+To build from source, run the `build.sh` script found at the top level directory. To install to $SDRROOT run, `build.sh install`.
  
 ## Copyrights
 
@@ -15,6 +14,6 @@ This work is protected by Copyright. Please refer to the [Copyright File](COPYRI
 
 ## License
 
-The VITA49 Libraries are licensed under the GNU Lesser General Public License (LGPL).
+REDHAWK Basic Components rh.VITA49 shared library is licensed under the GNU Lesser General Public License (LGPL).
 
 
