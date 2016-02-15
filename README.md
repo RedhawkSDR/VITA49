@@ -6,7 +6,7 @@ Contains the source and build script for the REDHAWK Basic Components rh.VITA49 
  
 ## Installation Instructions
 
-To build from source, run the `build.sh` script found at the top level directory. To install to $SDRROOT run, `build.sh install`.
+To build from source, run the `build.sh` script found at the top level directory. To install to $SDRROOT, run `build.sh install`.
  
 ## Copyrights
 
