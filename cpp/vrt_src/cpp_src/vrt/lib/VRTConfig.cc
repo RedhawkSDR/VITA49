@@ -28,7 +28,7 @@
 #include "stdlib.h"     // required for getenv(..) on GCC4.4/libc6 2.11.1
 
 
-#define _libraryVersion = "0.9.0";
+#define _libraryVersion "0.9.0";
 
 using namespace std;
 using namespace vrt;
