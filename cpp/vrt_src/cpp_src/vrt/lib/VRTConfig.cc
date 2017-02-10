@@ -31,10 +31,8 @@ using namespace std;
 using namespace vrt;
 
 bool                     _initDone             = false;
-string                   _libraryVersion       = "0.9.0";
 bool                     _quickTest            = true;
 bool                     _strict               = false;
-string                   _leapSecondsFile      = "";
 bool                     _noradLeapSecCounted  = true;
 VRTConfig::VITAVersion   _vrtVersion           = VRTConfig::VITAVersion_V49;
 void                    *_packetFactory        = NULL;
@@ -76,12 +74,9 @@ static inline string getProperty (const string &name, const string &def) {
 /** <b>Internal use only:</b> Initializes the values for VRTConfig. */
 static void _init () {
   string vrthome = getProperty("VRTHOME", "");
-
   _initDone            = true;
   _quickTest           = Utilities::toBooleanValue(getProperty("VRT_QUICK_TEST","true"));
   _strict              = Utilities::toBooleanValue(getProperty("VRT_STRICT","false"));
-  _leapSecondsFile     = (vrthome == "")? getProperty("VRT_LEAP_SECONDS", "")
-                                        : getProperty("VRT_LEAP_SECONDS", vrthome+"/cpp_lib/tai-utc.dat");
   _noradLeapSecCounted = Utilities::toBooleanValue(getProperty("VRT_NORAD_LS_COUNTED","true"));
   _packetFactory       = NULL;
 
@@ -118,6 +113,7 @@ static void _init () {
 }
 
 string VRTConfig::getLibraryVersion () {
+  string _libraryVersion = "0.9.0";
   if (!_initDone) _init();
   return _libraryVersion;
 }
@@ -138,6 +134,12 @@ bool VRTConfig::getStrict () {
 }
 
 string VRTConfig::getLeapSecondsFile () {
+  static string _leapSecondsFile      = "";
+  if (_leapSecondsFile=="") {
+	  string vrthome = getProperty("VRTHOME", "");
+	  _leapSecondsFile     = (vrthome == "")? getProperty("VRT_LEAP_SECONDS", "")
+	                                        : getProperty("VRT_LEAP_SECONDS", vrthome+"/cpp_lib/tai-utc.dat");
+  }
   if (!_initDone) _init();
   return _leapSecondsFile;
 }
