@@ -36,6 +36,7 @@ rh.VITA49.pc
 cpp/vrt_src/bin/
 cpp/vrt_src/cpp_doc/
 cpp/vrt_src/cpp_lib/
+cpp/vrt_src/java_doc/
 cpp/vrt_src/java_lib/
 cpp/vrt_src/java_src/nxm/vrt/libm/EphemerisPacket.java
 cpp/vrt_src/java_src/nxm/vrt/libm/NoDataPacket.java
