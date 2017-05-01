@@ -1,14 +1,10 @@
-*.o
-*.so
-*.lo
-*.la
+# Ignore automake/etc generated files
 .dirstamp
 .deps/
 .libs/
 m4/
 Makefile
 Makefile.in
-rh.VITA49.pc
 acinclude.m4
 aclocal.m4
 autom4te.cache/
@@ -23,3 +19,35 @@ depcomp
 install-sh
 ltmain.sh
 missing
+
+# Ignore vim/gvim temporary files
+*.swp
+
+# Ignore Firefox debug log
+*debuglog.txt*
+
+# Ignore Generated Files
+rh.VITA49.pc
+*.o
+*.so
+*.lo
+*.la
+*.class
+cpp/vrt_src/bin/
+cpp/vrt_src/cpp_doc/
+cpp/vrt_src/cpp_lib/
+cpp/vrt_src/java_lib/
+cpp/vrt_src/java_src/nxm/vrt/libm/EphemerisPacket.java
+cpp/vrt_src/java_src/nxm/vrt/libm/NoDataPacket.java
+cpp/vrt_src/java_src/nxm/vrt/libm/ReferencePointPacket.java
+cpp/vrt_src/java_src/nxm/vrt/libm/StandardContextPacket.java
+cpp/vrt_src/java_src/nxm/vrt/libm/StreamStatePacket.java
+cpp/vrt_src/java_src/nxm/vrt/libm/TimestampAccuracyPacket.java
+cpp/vrt_src/pkt_doc/EphemerisPacket.html
+cpp/vrt_src/pkt_doc/NoDataPacket.html
+cpp/vrt_src/pkt_doc/ReferencePointPacket.html
+cpp/vrt_src/pkt_doc/StandardContextPacket.html
+cpp/vrt_src/pkt_doc/StandardDataPacket.html
+cpp/vrt_src/pkt_doc/StreamStatePacket.html
+cpp/vrt_src/pkt_doc/TimestampAccuracyPacket.html
+cpp/vrt_src/pkt_doc/index_AppendixA.html
