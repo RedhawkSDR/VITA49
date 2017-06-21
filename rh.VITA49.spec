@@ -98,3 +98,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig
 %{_prefix}/include
 
+%changelog
+* Wed Jun 21 2017 Ryan Bauman - 3.0.2-1
+- Update version post release
+* Wed Jun 21 2017 Ryan Bauman - 3.0.1-2
+- Mass rebuild for REDHAWK 2.1.1
+
