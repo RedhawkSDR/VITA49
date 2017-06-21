@@ -30,7 +30,7 @@
 
 Name:           rh.VITA49
 Version:        3.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        REDHAWK shared library %{name}
 
 Group:          REDHAWK/Shared Libraries
@@ -97,4 +97,8 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libVITA49.so
 %{_libdir}/pkgconfig
 %{_prefix}/include
+
+%changelog
+* Wed Jun 21 2017 Ryan Bauman - 3.0.1-2
+- Mass rebuild for REDHAWK 2.1.1
 
