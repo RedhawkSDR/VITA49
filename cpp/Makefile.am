@@ -39,7 +39,7 @@ distclean-local:
 include $(srcdir)/Makefile.am.ide
 libVITA49_la_SOURCES = $(redhawk_SOURCES_auto)
 libVITA49_la_LIBADD = $(SOFTPKG_LIBS) $(REDHAWK_LIBS)
-libVITA49_la_CPPFLAGS = -I $(srcdir)/vrt_src/cpp_src/vrt/lib -I $(srcdir)/vrt_src/cpp_src/vrt/libm $(SOFTPKG_CFLAGS) $(REDHAWK_CFLAGS) $(BOOST_CPPFLAGS)
+libVITA49_la_CPPFLAGS = -I $(srcdir)/include $(SOFTPKG_CFLAGS) $(REDHAWK_CFLAGS) $(BOOST_CPPFLAGS)
 libVITA49_la_CXXFLAGS = -Wall
 
 redhawk_HEADERS_auto ?= $(filter %.h,$(redhawk_SOURCES_auto))

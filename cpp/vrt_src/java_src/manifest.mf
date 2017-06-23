@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Class-Path: jaxen.jar jdom.jar saxpath.jar
-
