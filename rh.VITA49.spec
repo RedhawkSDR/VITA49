@@ -29,7 +29,7 @@
 %define _infodir       %{_prefix}/info
 
 Name:           rh.VITA49
-Version:        3.0.2
+Version:        4.0.0
 Release:        1%{?dist}
 Summary:        REDHAWK shared library %{name}
 

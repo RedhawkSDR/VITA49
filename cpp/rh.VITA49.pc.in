@@ -26,6 +26,6 @@ includedir=@includedir@
 Name: rh.VITA49
 Description: This is the REDHAWK VITA49 shared library.
 Requires: 
-Version: 3.0.0
+Version: 4.0.0
 Libs: -L${libdir} -lVITA49
 Cflags: -I${includedir}
