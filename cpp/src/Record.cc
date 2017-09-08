@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "Record.h"
@@ -23,6 +24,7 @@
 using namespace vrt;
 
 Record::Record (const Record &r) :
+  VRTObject(r), // <-- Used to avoid warnings under GCC with -Wextra turned on
   strictEquality(r.strictEquality),
   buf(r.buf)
 {
@@ -44,11 +46,11 @@ void Record::setByteLength (int32_t len, int32_t off) {
     buf.resize(len, 0);
   }
   else if ((size_t)len < buf.size()) {
-    int32_t delta = len - buf.size();
+    int32_t delta = (int32_t)(len - buf.size());
     buf.erase(buf.begin()+off, buf.begin()+off+delta);
   }
   else {
-    int32_t delta = len - buf.size();
+    int32_t delta = (int32_t)(len - buf.size());
     buf.reserve(len);
     buf.insert(buf.begin()+off, delta, 0);
   }
@@ -64,6 +66,7 @@ bool Record::equals (const VRTObject &o) const {
     return (memcmp(&buf[0], &r.buf[0], buf.size()) == 0);
   }
   catch (bad_cast &e) {
+    UNUSED_VARIABLE(e);
     return false;
   }
 }
@@ -99,9 +102,11 @@ ValueType Record::getFieldType (int32_t id) const {
 }
 
 Value* Record::getField (int32_t id) const {
+  UNUSED_VARIABLE(id);
   return new Value(); // null value
 }
 
 void Record::setField (int32_t id, const Value* val) {
+  UNUSED_VARIABLE(val);
   throw VRTException("Invalid field #%d in %s", id, getClassName().c_str());
 }

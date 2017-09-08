@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -16,6 +16,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #ifndef _StandardDataPacket_h
@@ -132,8 +133,6 @@ namespace vrt {
    *  top diagram) that could be used and a number of additional data types and real/complex
    *  indicators available. However, the "Fixed Value" bits are permanently fixed at zero as
    *  some users have already been using other parts of the "FF-FF-FA" for other uses.
-   *
-   *  @author         
    */
   class StandardDataPacket : public BasicDataPacket {
     /** Mask and check value used for determining if a given class ID matches one used for a
@@ -154,20 +153,23 @@ namespace vrt {
     /** Basic destructor for the class. */
     public: ~StandardDataPacket () { }
 
+    // TODO FIXME - add back constructor from old VRT to work with SinkVITA49
+    // TODO FIXME - can SinkVITA49 be updated to use a different constructor?
     public: StandardDataPacket( const int32_t pktsize) : BasicDataPacket(pktsize) {}
+    // End TODO FIXME
 
     /** Basic copy constructor for the class. */
     public: StandardDataPacket (const BasicDataPacket &p) : BasicDataPacket(p) { }
 
     /** Creates a new instance accessing the given data buffer. Note that when the buffer lengths
      *  are given, only the most minimal of error checking is done. Users should call
-     *  {@link #isPacketValid()} to verify that the packet is valid. Invalid packets can result
+     *  <tt>isPacketValid()</tt> to verify that the packet is valid. Invalid packets can result
      *  unpredictable behavior, but this is explicitly allowed (to the extent possible) so that
      *  applications creating packets can use this class even if the packet isn't yet "valid".
      *  @param buf      The data buffer to use.
-     *  @param readOnly Should users of this instance be able to modify the underlying data buffer?
+     *  @param readonly Should users of this instance be able to modify the underlying data buffer?
      */
-    public: StandardDataPacket (const vector<char> &buf, bool readOnly) : BasicDataPacket(buf,readOnly) { }
+    public: StandardDataPacket (const vector<char> &buf, bool readonly) : BasicDataPacket(buf,readonly) { }
 
     /** Creates a new instance that can be written to.
         @param type        The numeric type (one of: Int4, Int8, Int16, Int32, Int64, Float, Double, etc.).
@@ -258,5 +260,5 @@ namespace vrt {
       return pf;
     }
   };
-};
+} END_NAMESPACE
 #endif /* _StandardDataPacket_h */

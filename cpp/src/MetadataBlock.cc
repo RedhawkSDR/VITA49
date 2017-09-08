@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "MetadataBlock.h"
@@ -40,6 +41,7 @@ static inline int32_t max (int32_t a, size_t b) {
 }
 
 MetadataEntry::MetadataEntry (const MetadataEntry &m)  :
+  VRTObject(m), // <-- Used to avoid warnings under GCC with -Wextra turned on
   level(m.level),
   key(m.key),
   val(m.val)
@@ -207,6 +209,7 @@ int32_t MetadataEntry::readBytes (const vector<char> &buf, int32_t off, int32_t 
 
 
 MetadataBlock::MetadataBlock (const MetadataBlock &m) :
+  VRTObject(m), // <-- Used to avoid warnings under GCC with -Wextra turned on
   entries(m.entries)
 {
   // done

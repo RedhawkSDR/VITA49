@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "BasicVRTPacket.h"
@@ -23,6 +24,14 @@
 #include <stdlib.h>         // required for atoi(..) on GCC4.4/libc6 2.11.1
 
 using namespace vrt;
+
+const BasicVRTPacket BasicVRTPacket::NULL_PACKET = BasicVRTPacket(vector<char>(0), true);
+
+static const vector<char> NULL_TRAILER(BasicVRTPacket::MAX_TRAILER_LENGTH); // only used by trailerEquals(..)
+
+static const char CLASS_ID_BIT = 0x8;  // Class ID present bit in buf[0]
+static const char TRAILER_BIT  = 0x4;  // Trailer present bit in buf[0]
+static const char TSM_BIT      = 0x1;  // TimeStamp Mode bit in buf[0]
 
 // Flags for getOffset(..). These values are in the form:
 //   AABBaabb         AA - Bit mask to apply to bbuf[0] indicating flag is present
@@ -157,40 +166,31 @@ string operator+(string &s, DataType val) {
   return str.str();
 }
 
-static const vector<char> NULL_TRAILER(BasicVRTPacket::MAX_TRAILER_LENGTH); // only used by trailerEquals(..)
-
-static const char CLASS_ID_BIT = 0x8;  // Class ID present bit in buf[0]
-static const char TRAILER_BIT  = 0x4;  // Trailer present bit in buf[0]
-static const char TSM_BIT      = 0x1;  // TimeStamp Mode bit in buf[0]
-
-
-/**  Creates the default header for the packet. This is defined separate from the class to account
- *  for the systems/compilers that disallow calling of subclass methods from the constructor.
- */
-static inline vector<char> BasicVRTPacket_createDefaultPacket () {
-  vector<char> buf(BasicVRTPacket::MAX_HEADER_LENGTH);
-  buf[0] = 0x18;
-  buf[1] = 0x60;
-  buf[2] = 0x00;
-  buf[3] = 0x07;
-  return buf;
-}
-
-/*void BasicVRTPacket::setPacket(std::vector<char> &ref) {
-	std::_Vector_base<char, _seqVector::seqVectorAllocator<char> >::_Vector_impl *vectorPointer = (std::_Vector_base<char, _seqVector::seqVectorAllocator<char> >::_Vector_impl *) ((void*) & bbuf);
-	vectorPointer->_M_start = &ref[0];//const_cast<PortTypes::UshortSequence*>(&data)->get_buffer(1);
-	vectorPointer->_M_finish = vectorPointer->_M_start + ref.size();
-	vectorPointer->_M_end_of_storage = vectorPointer->_M_finish;
-}
-*/
 BasicVRTPacket::BasicVRTPacket () :
-  bbuf(BasicVRTPacket_createDefaultPacket()),
+  bbuf(7*4/*=MAX_HEADER_LENGTH*/),
   readOnly(false)
 {
+  // Initializes a default header for the packet.
+  bbuf[0] = 0x18;
+  bbuf[1] = 0x60;
+  bbuf[2] = 0x00;
+  bbuf[3] = 0x07;
   // done
 }
 
+BasicVRTPacket::BasicVRTPacket (int32_t bufsize) :
+  bbuf(max(7*4/*=MAX_HEADER_LENGTH*/, bufsize)),
+  readOnly(false)
+{
+  // Initializes a default header for the packet.
+  bbuf[0] = 0x18;
+  bbuf[1] = 0x60;
+  bbuf[2] = 0x00;
+  bbuf[3] = 0x07;
+}
+
 BasicVRTPacket::BasicVRTPacket (const BasicVRTPacket &p) :
+  VRTObject(p), // <-- Used to avoid warnings under GCC with -Wextra turned on
   bbuf(p.bbuf),
   readOnly(p.readOnly)
 {
@@ -198,10 +198,18 @@ BasicVRTPacket::BasicVRTPacket (const BasicVRTPacket &p) :
 }
 
 BasicVRTPacket::BasicVRTPacket (const void *buf, size_t len, bool readOnly) :
-  bbuf(vector<char>((char*)buf, &((char*)buf)[len])),
   readOnly(readOnly)
 {
-  // done
+  if (len < 4) {
+    // If user accidentally calls with 'BasicVRTPacket(buf, false)' there will
+    // be no compile-time warning (C++ changes false/true to 0/1), but there
+    // will be a segfault later when they try to do stuff. As such we should
+    // check for this and issue an error.
+    throw VRTException("Attempt to create BasicVRTPacket with invalid length of %d "
+                       "(possible call to constructor with false/true in wrong "
+                       "argument position)", (int)len);
+  }
+  bbuf.assign((char*)buf, &((char*)buf)[len]);
 }
 
 BasicVRTPacket::BasicVRTPacket (vector<char> *buf_ptr, bool readOnly) :
@@ -210,13 +218,6 @@ BasicVRTPacket::BasicVRTPacket (vector<char> *buf_ptr, bool readOnly) :
 {
   // done
 }
-
-BasicVRTPacket::BasicVRTPacket (const int32_t pktsize) :
-  bbuf(pktsize),
-  readOnly(false)
-{
-  // done
- }
 
 BasicVRTPacket::BasicVRTPacket (const vector<char> &buf, bool readOnly) :
   bbuf(buf),
@@ -254,16 +255,21 @@ BasicVRTPacket::BasicVRTPacket (const BasicVRTPacket &p, PacketType type, int64_
 }
 
 int64_t BasicVRTPacket::getStreamCode () const {
-  int32_t type = bbuf[0] & 0xF0;
-
-  if ((type == 0x00) || (type == 0x20)) {
-    return ((int64_t)type) << 56; // no stream identifier
-  }
-  else {
-    return VRTMath::unpackLong(bbuf, 0) & __INT64_C(0xF0000000FFFFFFFF);
+  switch (bbuf[0] & 0xF0) {
+    case 0x00: return __INT64_C(0x0000000000000000); // no stream identifier
+    case 0x20: return __INT64_C(0x2000000000000000); // no stream identifier
+    default:   return VRTMath::unpackLong(bbuf, 0) & __INT64_C(0xF0000000FFFFFFFF);
   }
 }
 
+int64_t BasicVRTPacket::getStreamCode (const void *ptr) {
+  const char *bbuf = (const char*)ptr;
+  switch (bbuf[0] & 0xF0) {
+    case 0x00: return __INT64_C(0x0000000000000000); // no stream identifier
+    case 0x20: return __INT64_C(0x2000000000000000); // no stream identifier
+    default:   return VRTMath::unpackLong(bbuf, 0) & __INT64_C(0xF0000000FFFFFFFF);
+  }
+}
 
 void BasicVRTPacket::toStringStream (ostringstream &str) const {
   str << getClassName() << ":";
@@ -321,14 +327,33 @@ bool BasicVRTPacket::trailerEquals (const BasicVRTPacket &p2, bool exact) const 
 }
 
 bool BasicVRTPacket::equals (const BasicVRTPacket &p2) const {
+  if (isNullValue()   ) return p2.isNullValue();
+  if (p2.isNullValue()) return false;
+
   int32_t pLen = getPacketLength();
   if (pLen != p2.getPacketLength()) return false;
   return (memcmp(&bbuf[0], &p2.bbuf[0], pLen) == 0);
 }
 
+string BasicVRTPacket::toString () const {
+  if (isNullValue()) return getClassName()+": <null>";
+
+  try {
+    string err = getPacketValid(false);
+    if (err != "") return getClassName()+": <"+err+">";
+
+    ostringstream str;
+    toStringStream(str);
+    return str.str();
+  }
+  catch (VRTException e) {
+    return getClassName()+": <Invalid VRTPacket: "+e.toString()+">";
+  }
+}
+
 int32_t __attribute__((hot)) BasicVRTPacket::getOffset (int32_t field) const {
   int32_t a0  = (bbuf[0] | 0x02) & 0xFF;
-  int32_t b0  = (bbuf[1] & 0xFF);
+  int32_t b0  = (bbuf[1]       ) & 0xFF;
   int32_t a   = a0 & (field >> 8);
   int32_t b   = b0 & (field     );
   int32_t sgn = ~(-((a0 & (field >> 24))    // If any bits in mask -> "N>0", otherwise "N=0",
@@ -370,16 +395,24 @@ int32_t BasicVRTPacket::shiftPayload (int32_t off, int32_t bytes, bool add) {
     setPacketLength(getPacketLength()+bytes);
   }
   else {
-    bbuf.erase(bbuf.begin()+hlen+offset+bytes, bbuf.begin()+hlen+offset);
+    bbuf.erase(bbuf.begin()+hlen+offset, bbuf.begin()+hlen+offset+bytes);
     setPacketLength(getPacketLength()-bytes);
   }
   return offset;
 }
 
 void BasicVRTPacket::shiftTrailer (int32_t bytes) {
-  int32_t len = getPacketLength();
-  bbuf.resize(len+bytes, 0);
-  setPacketLength(len+bytes);
+  int32_t oldLen = getPacketLength();
+  int32_t newLen = oldLen + bytes;
+
+  bbuf.resize(newLen, 0);
+  if (bytes < 0) {
+    bbuf[0] &= ~TRAILER_BIT;
+  }
+  else {
+    bbuf[0] |= TRAILER_BIT;
+  }
+  setPacketLength(newLen);
 }
 
 boolNull BasicVRTPacket::getStateEventBit (const vector<char> &buf, int32_t off, int32_t enable, int32_t indicator) {
@@ -400,16 +433,16 @@ void BasicVRTPacket::setStateEventBit (vector<char> &buf, int32_t off, int32_t e
   int32_t iBit  = 0x1 << (indicator % 8);
 
   if (value == _NULL) {
-    buf[off+eByte] &= ~eBit;
-    buf[off+iByte] &= ~iBit;
+    buf[off+eByte] &= (char)~eBit;
+    buf[off+iByte] &= (char)~iBit;
   }
   else if (value == _TRUE) {
-    buf[off+eByte] |= eBit;
-    buf[off+iByte] |= iBit;
+    buf[off+eByte] |= (char)eBit;
+    buf[off+iByte] |= (char)iBit;
   }
   else { // _FALSE
-    buf[off+eByte] |=  eBit;
-    buf[off+iByte] &= ~iBit;
+    buf[off+eByte] |= (char) eBit;
+    buf[off+iByte] &= (char)~iBit;
   }
 }
 
@@ -457,22 +490,20 @@ string BasicVRTPacket::getPacketValid (bool strict, int32_t length) const {
   }
 }
 
-
-
 int32_t BasicVRTPacket::getPadBitCount () const {
   // This function optimizes out the "isData()" and "VRT_VERSION == V49b" checks since all other
   // uses require the bits to be set to zero (which matches the required return value for this
   // function in those situations). The isPacketValid() check will allert the user if the bits
   // were incorrectly set.
   int32_t cid = getOffset(CLASS_ID);
-  
+
   return (cid > 0)? ((bbuf[cid] >> 3) & 0x1F) : 0;
 }
 
 void BasicVRTPacket::setPadBitCount (int32_t bits, int32_t bitsPerSample) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   int32_t cid = getOffset(CLASS_ID);
-  
+
   // bits==0 is most common case so check that first
   if (bits == 0) {
     // If a ClassID is present, make sure the bits are set to 0 (this works with both
@@ -561,10 +592,6 @@ int32_t BasicVRTPacket::getHeaderLength () const {
   return getOffset(PAYLOAD);
 }
 
-int32_t BasicVRTPacket::getPacketLength () const {
-  return ((0xFF & ((int32_t)bbuf[2])) << 10) | ((0xFF & ((int32_t)bbuf[3])) << 2);
-}
-
 void BasicVRTPacket::setPacketLength (int32_t v) {
   VRTMath::packShort(bbuf, 2, v/4); // divide by 4 to convert bytes to words
 }
@@ -623,8 +650,14 @@ void BasicVRTPacket::setTimeStamp (const TimeStamp &ts) {
 
 void BasicVRTPacket::setPacketCount (int32_t v) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  if ((v < 0) || (v > 15)) throw VRTException("Invalid packet count "+v);
+  if ((v < 0) || (v > 15)) throw VRTException("Invalid packet count %d",v);
   bbuf[1] = (char)((bbuf[1] & 0xF0) | v);
+}
+
+void BasicVRTPacket::setPacketCount (void *ptr, int32_t v) {
+  char *buf = (char*)ptr;
+  if ((v < 0) || (v > 15)) throw VRTException("Invalid packet count %d",v);
+  buf[1] = (char)((buf[1] & 0xF0) | v);
 }
 
 void BasicVRTPacket::setPayloadLength (int32_t v) {
@@ -712,20 +745,20 @@ void BasicVRTPacket::setClassIdentifier (int64_t v) {
   if ((v != INT64_NULL) && ((v & __INT64_C(0xFF00000000000000)) != 0)) {
     throw VRTException("Invalid OUI in ClassIdentifier 0x" PRIx64, v);
   }
-  
+
   int32_t oldCID   = getOffset(CLASS_ID);
-  char    saveBits = (oldCID < 0)? 0 : bbuf[oldCID];
-  
+  char    saveBits = (oldCID < 0)? (char)0 : bbuf[oldCID];
+
   if ((v == INT64_NULL) && (saveBits != 0)) {
     throw VRTException("Can not set ClassIdentifier to null when PadBitCount=%d", getPadBitCount());
   }
-  
+
   shiftHeader(CLASS_ID, 8, (v != INT64_NULL));
   if (v != INT64_NULL) {
     bbuf[0] |= CLASS_ID_BIT;
 
     int32_t newCID = getOffset(CLASS_ID);
-    
+
     VRTMath::packLong(bbuf, newCID, v);
     bbuf[newCID] = saveBits;
   }
@@ -741,16 +774,17 @@ void BasicVRTPacket::setClassIdentifier (int32_t oui, int16_t icc, int16_t pcc) 
   setClassIdentifier(_oui|_icc|_pcc);
 }
 
-void *BasicVRTPacket::getPacketPointer () {
+char* BasicVRTPacket::getPacketPointer () {
   return &bbuf[0];
 }
 
-vector<char> BasicVRTPacket::getPacketVector(){
-  return bbuf;
+char* BasicVRTPacket::getPayloadPointer () {
+  return &bbuf[getHeaderLength()];
 }
 
-void *BasicVRTPacket::getPayloadPointer () {
-  return &bbuf[getHeaderLength()];
+vector<char> BasicVRTPacket::getPacket () const {
+  const char *p = &bbuf[0];
+  return vector<char>(p, p+getPacketLength());
 }
 
 vector<char> BasicVRTPacket::getPayload () const {
@@ -830,6 +864,7 @@ PayloadFormat::PayloadFormat () :
 }
 
 PayloadFormat::PayloadFormat (const PayloadFormat &pf) :
+  VRTObject(pf), // <-- Used to avoid warnings under GCC with -Wextra turned on
   hi(pf.hi),
   lo(pf.lo)
 {
@@ -989,7 +1024,7 @@ void PayloadFormat::setDataType (DataType type) {
     case DataType_UInt64:     size = 64; setDataItemFormat(DataItemFormat_UnsignedInt); break; // long
     case DataType_Float:      size = 32; setDataItemFormat(DataItemFormat_Float      ); break; // int
     case DataType_Double:     size = 64; setDataItemFormat(DataItemFormat_Double     ); break; // long
-    default:                  throw VRTException("Unsupported data type "+type);
+    default:                  throw VRTException("Unsupported data type %d", type);
   }
   setItemPackingFieldSize(size);
   setDataItemSize(size);

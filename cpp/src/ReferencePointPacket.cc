@@ -64,8 +64,8 @@ ReferencePointPacket::ReferencePointPacket () :
  // done
 }
 
-ReferencePointPacket::ReferencePointPacket (const vector<char> &bbuf, bool readOnly) :
-  BasicVRTPacket(bbuf, readOnly)
+ReferencePointPacket::ReferencePointPacket (const vector<char> &_bbuf, bool _readOnly) :
+  BasicVRTPacket(_bbuf, _readOnly)
 {
  // done
 }
@@ -110,7 +110,7 @@ void ReferencePointPacket::toStringStream (ostringstream &str) const {
   BasicVRTPacket::toStringStream(str);
   str << " RefPointID=" << getRefPointID();
   str << " Name='" << getName() << "'";
-  str << " Description='" << getDescription() << "'";
+  str << " Description='" << Utilities::fromUTF8(getDescription()) << "'";
 }
 
 int32_t ReferencePointPacket::getFieldCount () const {

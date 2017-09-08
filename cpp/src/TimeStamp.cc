@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,31 +11,40 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "TimeStamp.h"
-#include <ctime>
 #include <stdlib.h>     // required for atoi(..), atoll(..) on GCC4.4/libc6 2.11.1
 #include <sys/time.h>
 
 using namespace vrt;
 
-const TimeStamp TimeStamp::NO_TIME_STAMP = TimeStamp(IntegerMode_None,FractionalMode_None,INT64_NULL,INT64_NULL);
-const TimeStamp TimeStamp::Y2K_GPS       = TimeStamp::parseTime("2000-01-01T00:00:00.000Z",IntegerMode_GPS);
+#define toPicosecondString(n) LeapSeconds::toPicosecondString(n)
+
+const double      TimeStamp::ONE_PICOSECOND  = 1e-12;
+const double      TimeStamp::HALF_PICOSECOND = 0.500e-12;
+const int64_t     TimeStamp::ONE_SEC         = __INT64_C(1000000000000);
+const uint64_t    TimeStamp::ONE_SECOND      = __UINT64_C(1000000000000);
+const IntegerMode TimeStamp::UTC_EPOCH       = IntegerMode_UTC;
+const IntegerMode TimeStamp::GPS_EPOCH       = IntegerMode_GPS;
+const IntegerMode TimeStamp::NULL_EPOCH      = IntegerMode_None;
+const TimeStamp   TimeStamp::NO_TIME_STAMP   = TimeStamp(IntegerMode_None,FractionalMode_None,0,0);
+const TimeStamp   TimeStamp::Y2K_GPS         = TimeStamp::parseTime("2000-01-01T00:00:00.000Z",IntegerMode_GPS);
+const int32_t     TimeStamp::GPS2UTC         = 315964811;
+const int32_t     TimeStamp::MIDAS2POSIX     = 631152000;
+const int32_t     TimeStamp::GPS2PTP         = 315964819;
 
 const int64_t MAX_GPS2UTC     = __INT64_C(0xFFFFFFFF) - TimeStamp::GPS2UTC;
 const int64_t MIN_UTC2GPS     = TimeStamp::GPS2UTC;
 const int32_t ONE_YEAR_MAX    = 86400*366+12; // One year, in seconds with leap seconds
 const int32_t LAST_TWO_WEEKS  = 86400*351;    // Last 31 days of year (approx.)
 const int32_t FIRST_TWO_WEEKS = 86400*14;     // First 31 days of year (approx.)
-
-/** Delta between J1970 and J1950 epochs. */
-static const int32_t J1970TOJ1950 = 631152000;
 
 TimeStamp::TimeStamp (const TimeStamp &ts) :
   VRTObject(ts),
@@ -115,30 +124,20 @@ TimeStamp::TimeStamp (LeapSeconds *ls, IntegerMode tsiMode, FractionalMode tsfMo
 
 
 TimeStamp TimeStamp::getSystemTime (LeapSeconds *ls) {
-  struct timeval tv;
-
-  if (gettimeofday(&tv, NULL) == 0) {
-    // Must cast to int64_t below since some 32-bit systems will have a
-    // smaller type for tv_usec that will result in an overflow following
-    // the multiply.
-    int64_t s  = ((int64_t)tv.tv_sec);                       // POSIX seconds
-    int64_t ps = ((int64_t)tv.tv_usec) * __INT64_C(1000000); // picoseconds (POSIX/UTC/GPS)
-
-    return forTimePOSIX(s, ps, ls);
-  }
-  else {
-    throw VRTException("Unable to get current time using gettimeofday(..)");
-  }
+  int64_t sec;
+  int64_t ps;
+  Utilities::getCurrentSystemTime(sec, ps);
+  return forTimePOSIX(sec, ps, ls);
 }
 
 TimeStamp TimeStamp::toUTC () const {
   if (tsiMode == IntegerMode_UTC) return *this;
-  return TimeStamp(ls, IntegerMode_UTC, tsfMode, getUTCSeconds(), tsf);
+  return TimeStamp(ls, IntegerMode_UTC, tsfMode, getSecondsUTC(), tsf);
 }
-  
+
 TimeStamp TimeStamp::toGPS () const {
   if (tsiMode == IntegerMode_GPS) return *this;
-  return TimeStamp(ls, IntegerMode_GPS, tsfMode, getGPSSeconds(), tsf);
+  return TimeStamp(ls, IntegerMode_GPS, tsfMode, getSecondsGPS(), tsf);
 }
 
 TimeStamp TimeStamp::addTime (int64_t sec, int64_t fsec, double sr, bool fract) const {
@@ -159,29 +158,29 @@ TimeStamp TimeStamp::addTime (int64_t sec, int64_t fsec, double sr, bool fract) 
     return *this; // no change
     }
   else if (fsec == 0) {
-    return TimeStamp(ls, tsiMode, tsfMode, tsi+sec, tsf);
+    return TimeStamp(ls, tsiMode, tsfMode, (uint32_t)(tsi+sec), tsf);
   }
   else {
     if (tsfMode != FractionalMode_SampleCount) sr = ONE_SEC;
 
     // STEP 1: Add in the seconds plus seconds and fsec plus fsec, taking
     //         care to take any whole seconds in fsec and move them to seconds
-    int64_t s    = fsec / sr;
-    int64_t _sec = tsi + (sec + s);
-    int64_t _fsec  = tsf + (fsec  - (s * sr));
+    int64_t s     = fsec / sr;
+    int64_t _sec  = tsi + (sec + s);
+    int64_t _fsec = tsf + (fsec  - (s * sr));
 
     // STEP 2: There is a good chance _fsec has exceeded +/- sr, so fix it
     s    = _fsec / sr;
     _sec = _sec + s;
     _fsec  = _fsec  - (s * sr);
-    
+
     // STEP 3: If _fsec is negative, make it positive (i.e. -0.4 = -1.0 + 0.6)
     if (_fsec < 0) {
       _sec = _sec - 1;
       _fsec  = _fsec  + sr;
     }
 
-    return TimeStamp(ls, tsiMode, tsfMode, _sec, _fsec);
+    return TimeStamp(ls, tsiMode, tsfMode, (uint32_t)_sec, _fsec);
   }
 }
 
@@ -227,42 +226,41 @@ bool TimeStamp::equals (const VRTObject &o) const {
 
 string TimeStamp::toString () const {
   ostringstream str;
-  char picosecondString[32];
-  snprintf(picosecondString, 32, "0.%.12" PRIu64, tsf);
-
-  if (tsiMode == IntegerMode_None) {
-    switch (tsfMode) {
-      case FractionalMode_None:             str << "";                                         return str.str();
-      case FractionalMode_SampleCount:      str << tsf              << " (SampleCount)";       return str.str();
-      case FractionalMode_RealTime:         str << picosecondString << " (RealTime)";          return str.str();
-      case FractionalMode_FreeRunningCount: str << tsf              << " (FreeRunningCount)";  return str.str();
-    }
+  switch (tsiMode) {
+    case IntegerMode_None:
+      switch (tsfMode) {
+        case FractionalMode_None:             str << "";                                               return str.str();
+        case FractionalMode_SampleCount:      str << tsf                     << " (SampleCount)";      return str.str();
+        case FractionalMode_RealTime:         str << toPicosecondString(tsf) << " (RealTime)";         return str.str();
+        case FractionalMode_FreeRunningCount: str << tsf                     << " (FreeRunningCount)"; return str.str();
+      }
+      break;
+    case IntegerMode_UTC:
+      switch (tsfMode) {
+        case FractionalMode_None:             str << ls->toStringUTC(tsi)               << " (UTC)";                  return str.str();
+        case FractionalMode_SampleCount:      str << ls->toStringUTC(tsi) << "," << tsf << " (UTC,SampleCount)";      return str.str();
+        case FractionalMode_RealTime:         str << ls->toStringUTC(tsi,tsf)           << " (UTC)";                  return str.str();
+        case FractionalMode_FreeRunningCount: str << ls->toStringUTC(tsi) << "," << tsf << " (UTC,FreeRunningCount)"; return str.str();
+      }
+      break;
+    case IntegerMode_GPS:
+      switch (tsfMode) {
+        case FractionalMode_None:             str << LeapSeconds::toStringGPS(tsi)               << " (GPS)";                   return str.str();
+        case FractionalMode_SampleCount:      str << LeapSeconds::toStringGPS(tsi) << "," << tsf << " (GPS,SampleCount)";       return str.str();
+        case FractionalMode_RealTime:         str << LeapSeconds::toStringGPS(tsi,tsf)           << " (GPS)";                   return str.str();
+        case FractionalMode_FreeRunningCount: str << LeapSeconds::toStringGPS(tsi) << "," << tsf << " (GPS,FreeRunningCount)";  return str.str();
+      }
+      break;
+    case IntegerMode_Other:
+      switch (tsfMode) {
+        case FractionalMode_None:             str << tsi                                   << " (Other)";                   return str.str();
+        case FractionalMode_SampleCount:      str << tsi << "," << tsf                     << " (Other,SampleCount)";       return str.str();
+        case FractionalMode_RealTime:         str << tsi << "," << toPicosecondString(tsf) << " (Other,RealTime)";          return str.str();
+        case FractionalMode_FreeRunningCount: str << tsi << "," << tsf                     << " (Other,FreeRunningCount)";  return str.str();
+      }
+      break;
   }
-  if (tsiMode == IntegerMode_UTC) {
-    switch (tsfMode) {
-      case FractionalMode_None:             str << ls->utcToYMDHMS(tsi, __INT64_C(-1))               << " (UTC)";                   return str.str();
-      case FractionalMode_SampleCount:      str << ls->utcToYMDHMS(tsi, __INT64_C(-1)) << "," << tsf << " (UTC,SampleCount)";       return str.str();
-      case FractionalMode_RealTime:         str << ls->utcToYMDHMS(tsi, tsf          )               << " (UTC)";                   return str.str();
-      case FractionalMode_FreeRunningCount: str << ls->utcToYMDHMS(tsi, __INT64_C(-1)) << "," << tsf << " (UTC,FreeRunningCount)";  return str.str();
-    }
-  }
-  if (tsiMode == IntegerMode_GPS) {
-    switch (tsfMode) {
-      case FractionalMode_None:             str << ls->gpsToYMDHMS(tsi, __INT64_C(-1))               << " (GPS)";                   return str.str();
-      case FractionalMode_SampleCount:      str << ls->gpsToYMDHMS(tsi, __INT64_C(-1)) << "," << tsf << " (GPS,SampleCount)";       return str.str();
-      case FractionalMode_RealTime:         str << ls->gpsToYMDHMS(tsi, tsf          )               << " (GPS)";                   return str.str();
-      case FractionalMode_FreeRunningCount: str << ls->gpsToYMDHMS(tsi, __INT64_C(-1)) << "," << tsf << " (GPS,FreeRunningCount)";  return str.str();
-    }
-  }
-  if (tsiMode == IntegerMode_Other) {
-    switch (tsfMode) {
-      case FractionalMode_None:             str << tsi                            << " (Other)";                   return str.str();
-      case FractionalMode_SampleCount:      str << tsi << "," << tsf              << " (Other,SampleCount)";       return str.str();
-      case FractionalMode_RealTime:         str << tsi << "," << picosecondString << " (Other,RealTime)";          return str.str();
-      case FractionalMode_FreeRunningCount: str << tsi << "," << tsf              << " (Other,FreeRunningCount)";  return str.str();
-    }
-  }
-  throw VRTException("Invalid mode combination -- this should be impossible"); // should be impossible
+  throw VRTException("Invalid mode combination -- this should be impossible");
 }
 
 string TimeStamp::toStringUTC(string format) const {
@@ -275,17 +273,19 @@ string TimeStamp::toStringUTC(string format) const {
 }
 
 string TimeStamp::toStringUTC () const {
-  // We can't optimize this the same way as the Java due, so use the trivial approach
-  string str = toUTC().toString();
-  str.resize(str.length() - 6);
-  return str;
+  // Don't actually call toUTC() since we only need the number of seconds and
+  // want to avoid creating an extra TimeStamp object.
+  int64_t sec  = getUTCSeconds();
+  int64_t psec = (tsfMode == FractionalMode_None)? __INT64_C(-1) : (int64_t)getPicoSeconds();
+  return ls->toStringUTC(sec, psec);
 }
 
 string TimeStamp::toStringGPS () const {
-  // We can't optimize this the same way as the Java due, so use the trivial approach
-  string str = toGPS().toString();
-  str.resize(str.length() - 6);
-  return str;
+  // Don't actually call toGPS() since we only need the number of seconds and
+  // want to avoid creating an extra TimeStamp object.
+  int64_t sec  = getGPSSeconds();
+  int64_t psec = (tsfMode == FractionalMode_None)? __INT64_C(-1) : (int64_t)getPicoSeconds();
+  return LeapSeconds::toStringGPS(sec, psec);
 }
 
 IntegerMode TimeStamp::getEpoch () const {
@@ -337,7 +337,7 @@ int64_t TimeStamp::_getNORADSeconds (bool leapCounted) const {
 int64_t TimeStamp::getPOSIXSeconds () const {
   int64_t utc  = getUTCSeconds();
   int32_t leap = ls->getLeapSecondsUTC(utc);
-  
+
   return utc - leap;
 }
 
@@ -346,14 +346,14 @@ double TimeStamp::getDoubleSeconds (double sr) const {
     throw VRTException("Can not convert non-RealTime/SampleCount time stamp to fractional seconds.");
   }
   if (tsfMode == FractionalMode_SampleCount) {
-    if (!isnan(sr)) {
+    if (!isNull(sr)) {
       return (double)getSecondsUTC() + tsf / sr;
     }
     else {
       throw VRTException("Sampling Rate undefined, can not convert SaqmpleCount time stamp to fractional seconds without sampling rate.");
     }
   }
-  return (double)getSecondsUTC() + tsf / 1000000000000.0f;
+  return (double)getSecondsUTC() + tsf / 1000000000000.0;
 }
 
 double TimeStamp::getDoubleSeconds () const {
@@ -372,8 +372,8 @@ uint64_t TimeStamp::getPicoSeconds (double sr) const {
     throw VRTException("Can not convert non-RealTime/SampleCount time stamp to picoseconds.");
   }
   uint64_t picoSeconds = tsf;
-  if (tsfMode == FractionalMode_SampleCount && !isnan(sr)) {
-    if (!isnan(sr)) {
+  if (tsfMode == FractionalMode_SampleCount) {
+    if (!isNull(sr)) {
       picoSeconds = (uint64_t)(tsf * ONE_SEC/sr);
     }
     else {
@@ -395,17 +395,17 @@ uint64_t TimeStamp::getSampleCount () const {
 }
 
 TimeStamp TimeStamp::parseTime (string time, IntegerMode tsiMode, LeapSeconds *ls) {
-  int32_t t  = time.find('T');
-  int32_t d1 = time.find('-', 1);
-  int32_t d2 = time.find('-', d1+2);
-  int32_t c1 = time.find(':', t+2);
-  int32_t c2 = time.find(':', c1+2);
-  int32_t p  = time.find('.', c2+2);
-  int32_t tz = time.find('Z', c2+2);
+  int32_t t  = (int32_t)time.find('T');
+  int32_t d1 = (int32_t)time.find('-', 1);
+  int32_t d2 = (int32_t)time.find('-', d1+2);
+  int32_t c1 = (int32_t)time.find(':', t+2);
+  int32_t c2 = (int32_t)time.find(':', c1+2);
+  int32_t p  = (int32_t)time.find('.', c2+2);
+  int32_t tz = (int32_t)time.find('Z', c2+2);
 
-  if (tz < 0) tz = time.find('+', c2);
-  if (tz < 0) tz = time.find('-', c2);
-  if (tz < 0) tz = time.length();
+  if (tz < 0) tz = (int32_t)time.find('+', c2);
+  if (tz < 0) tz = (int32_t)time.find('-', c2);
+  if (tz < 0) tz = (int32_t)time.length();
 
   if ((t < 0) || (d1 < 0) || (d2 < 0) || (c1 < 0) || (c2 < 0)) {
     throw VRTException("Invalid time format");
@@ -432,7 +432,7 @@ TimeStamp TimeStamp::parseTime (string time, IntegerMode tsiMode, LeapSeconds *l
 
   string z = time.substr(tz);
   if ((z.size() > 0) && (z != "Z")) {
-    int c = z.find(':');
+    int32_t c = (int32_t)z.find(':');
     if (c < 0) {
       zone = 3600 * atoi(z.substr(1).c_str());
     }
@@ -475,7 +475,7 @@ TimeStamp TimeStamp::forTimePOSIX (int64_t seconds, int64_t picoseconds, LeapSec
   int32_t leap = ls->getLeapSecondsPOSIX(seconds);  // leap seconds to convert POSIX to UTC
   int64_t sec  = seconds + leap;                    // UTC seconds
 
-  return TimeStamp(ls, IntegerMode_UTC, FractionalMode_RealTime, sec, picoseconds);
+  return TimeStamp(ls, IntegerMode_UTC, FractionalMode_RealTime, (uint32_t)sec, picoseconds);
 }
 
 TimeStamp TimeStamp::_forTimeNORAD (int32_t seconds, int64_t picoseconds, bool leapCounted,
@@ -494,14 +494,14 @@ TimeStamp TimeStamp::_forTimeNORAD (int32_t seconds, int64_t picoseconds, bool l
     else if ((soy > LAST_TWO_WEEKS ) && (seconds < FIRST_TWO_WEEKS)) year = yr + 1; // Start of next year
     else                                                             year = yr;     // Current year
   }
-  
+
   if (leapCounted) {
     int64_t sec = ls->getStartOfYearUTC(year) + seconds;
-    return TimeStamp(IntegerMode_UTC, FractionalMode_RealTime, sec, picoseconds);
+    return TimeStamp(IntegerMode_UTC, FractionalMode_RealTime, (uint32_t)sec, picoseconds, ls);
   }
   else {
     int64_t sec = ls->getStartOfYearPOSIX(year) + seconds;
-    return TimeStamp::forTimePOSIX(sec, picoseconds);
+    return TimeStamp::forTimePOSIX(sec, picoseconds, ls);
   }
 }
 
@@ -591,5 +591,7 @@ Value* TimeStamp::getField (int32_t id) const {
 }
 
 void TimeStamp::setField (int32_t id, const Value* val) {
+  UNUSED_VARIABLE(id);
+  UNUSED_VARIABLE(val);
   throw VRTException("TimeStamp is read only");
 }

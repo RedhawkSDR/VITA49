@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "PacketIterator.h"
@@ -33,6 +34,7 @@ ConstPacketIterator::ConstPacketIterator (const PacketContainer *container, int6
 }
 
 ConstPacketIterator::ConstPacketIterator (const ConstPacketIterator &pi) :
+  VRTObject(pi), // <-- Used to avoid warnings under GCC with -Wextra turned on
   container(pi.container),
   resolve(pi.resolve),
   offset(pi.offset),
@@ -52,7 +54,7 @@ string ConstPacketIterator::toString () const {
 bool ConstPacketIterator::equals (const ConstPacketIterator &pi) const {
   const VRTObject *c1 = checked_dynamic_cast<const VRTObject*>(container);
   const VRTObject *c2 = checked_dynamic_cast<const VRTObject*>(pi.container);
-  
+
   return (c1       == c2        )
       && (offset   == pi.offset )
       && (resolve  == pi.resolve);

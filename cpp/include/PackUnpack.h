@@ -1,30 +1,33 @@
-/*
+//
+//  THIS FILE IS AUTO-GENERATED, DO NOT MODIFY
+//
+
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
- * This file is part of REDHAWK VITA49Libraries.
+ * This file is part of REDHAWK.
  *
- * REDHAWK VITA49Libraries is free software: you can redistribute it and/or modify it
+ * REDHAWK is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.
  *
- * REDHAWK VITA49Libraries is distributed in the hope that it will be useful, but WITHOUT
+ * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
-//
-//  THIS FILE IS AUTO-GENERATED, DO NOT MODIFY
-//
+
 #ifndef _PackUnpack_h
 #define _PackUnpack_h
 
-#include "VRTObject.h"
 #include "VRTMath.h"
+#include "VRTObject.h"
 #include "BasicVRTPacket.h"
 #include <vector>
 
@@ -125,11 +128,9 @@ namespace vrt {
    *  Regardless of the algorithm used herein, the accessing of IEEE-754
    *  floating-point values will always be faster than the accessing of VRT
    *  floating-point values since the former benefit from hardware acceleration.
-   * 
-   *  @author Auto-Generated   (source code)
-   *  @author  (code template)
    */
   namespace PackUnpack {
+#if NOT_USING_JNI
     /** <b>Internal Use Only:</b> Unpacks values with the given format specifier as
      *  an array of <tt>double</tt>. <br>
      *  <br>
@@ -170,6 +171,8 @@ namespace vrt {
      *  @param length (IN)  Number of elements to convert
      */
     void packAsDouble (PayloadFormat pf, void *ptr, int32_t off, const double *array, const int32_t *chan, const int32_t *evt, int32_t length);
+#endif /* NOT_USING_JNI */
+#if NOT_USING_JNI
     /** <b>Internal Use Only:</b> Unpacks values with the given format specifier as
      *  an array of <tt>float</tt>. <br>
      *  <br>
@@ -210,6 +213,8 @@ namespace vrt {
      *  @param length (IN)  Number of elements to convert
      */
     void packAsFloat (PayloadFormat pf, void *ptr, int32_t off, const float *array, const int32_t *chan, const int32_t *evt, int32_t length);
+#endif /* NOT_USING_JNI */
+#if NOT_USING_JNI
     /** <b>Internal Use Only:</b> Unpacks values with the given format specifier as
      *  an array of <tt>int64_t</tt>. <br>
      *  <br>
@@ -250,6 +255,8 @@ namespace vrt {
      *  @param length (IN)  Number of elements to convert
      */
     void packAsLong (PayloadFormat pf, void *ptr, int32_t off, const int64_t *array, const int32_t *chan, const int32_t *evt, int32_t length);
+#endif /* NOT_USING_JNI */
+#if NOT_USING_JNI
     /** <b>Internal Use Only:</b> Unpacks values with the given format specifier as
      *  an array of <tt>int32_t</tt>. <br>
      *  <br>
@@ -290,6 +297,8 @@ namespace vrt {
      *  @param length (IN)  Number of elements to convert
      */
     void packAsInt (PayloadFormat pf, void *ptr, int32_t off, const int32_t *array, const int32_t *chan, const int32_t *evt, int32_t length);
+#endif /* NOT_USING_JNI */
+#if NOT_USING_JNI
     /** <b>Internal Use Only:</b> Unpacks values with the given format specifier as
      *  an array of <tt>int16_t</tt>. <br>
      *  <br>
@@ -330,6 +339,8 @@ namespace vrt {
      *  @param length (IN)  Number of elements to convert
      */
     void packAsShort (PayloadFormat pf, void *ptr, int32_t off, const int16_t *array, const int32_t *chan, const int32_t *evt, int32_t length);
+#endif /* NOT_USING_JNI */
+#if NOT_USING_JNI
     /** <b>Internal Use Only:</b> Unpacks values with the given format specifier as
      *  an array of <tt>int8_t</tt>. <br>
      *  <br>
@@ -370,7 +381,8 @@ namespace vrt {
      *  @param length (IN)  Number of elements to convert
      */
     void packAsByte (PayloadFormat pf, void *ptr, int32_t off, const int8_t *array, const int32_t *chan, const int32_t *evt, int32_t length);
-  };
-};
+#endif /* NOT_USING_JNI */
+  } END_NAMESPACE
+} END_NAMESPACE
 #endif /* _PackUnpack_h */
 

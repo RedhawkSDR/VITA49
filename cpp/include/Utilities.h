@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,26 +11,54 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #ifndef _Utilities_h
 #define _Utilities_h
 
-#include <stdarg.h>
 #include "VRTObject.h"
+#include <stdarg.h>
 
 using namespace std;
 namespace vrt {
-  /** Various utility methods.
-   *
-   *  @author 
-   */
+  /** Various utility methods. */
   namespace Utilities {
+    /** <b>Internal Use Only:</b> Gets the current time at maximum resolution
+     *  (up to picoseconds). This function uses <tt>gettimeofday(..)</tt> *or*
+     *  <tt>clock_gettime(..)</tt> *or* another other similar function to get
+     *  the current system time in the "most optimal" manner. <br>
+     *  <br>
+     *  <b>General users should NOT use this function since it is subject to
+     *  change without notice. The <tt>currentTimeMillis()</tt> is provided
+     *  for more general use.</b>
+     */
+    void getCurrentSystemTime (int64_t &sec, int64_t &ps);
+
+    /** Gets the current time in milliseconds. This function provides an
+     *  interface that is fairly easy to use regardless of the platform
+     *  and is similar to <tt>System.currentTimeMillis()</tt> in Java.
+     */
+    int64_t currentTimeMillis ();
+
+    /** Sleeps for the given period and ignores any interrupted exceptions (EINTR).
+     *  @param ms The time to sleep in ms.
+     */
+    void sleep (int64_t ms);
+
+    /** Sleeps until the given system time and ignores any interrupted exceptions
+     *  (EINTR).
+     *  @param ms The system time in ms.
+     */
+    void sleepUntil (int64_t ms);
+
+    // Defined in TimeStamp.h:    void sleepUntil (TimeStamp ts);
+
     /** Creates a string based on a format specifier and values. This is
      *  essentially a variant of <tt>snprintf(..)</tt> that returns a new
      *  string rather than setting a <tt>char*</tt> buffer.
@@ -44,7 +72,7 @@ namespace vrt {
     _Intel_Pragma("__printf_args")
     string format (const char *fmt, ...) __attribute__((format(printf,1,2)));
 #endif
-    
+
     /** Appends a value, assuming it is not null.
      *  @param s      (OUT) The output stream.
      *  @param prefix (IN)  The prefix to include ("" if n/a).
@@ -52,7 +80,7 @@ namespace vrt {
      *  @param suffix (IN)  The suffix to include ("" if n/a).
      */
     template <typename T>
-    inline void append (ostream &s, const string &prefix, T val, const string &suffix=string("")) {
+    inline void append (ostream &s, const string &prefix, const T val, const string &suffix=string("")) {
       if (!isNull(val)) s << prefix << val << suffix;
     }
 
@@ -77,6 +105,48 @@ namespace vrt {
     inline void append (ostream &s, const string &prefix, const VRTObject &val, const string &suffix=string("")) {
       if (!isNull(val)) s << prefix << val << suffix;
     }
+
+    /** Appends a value, assuming it is not null.
+     *  @param s      (OUT) The output stream.
+     *  @param prefix (IN)  The prefix to include ("" if n/a).
+     *  @param val    (IN)  The value.
+     *  @param suffix (IN)  The suffix to include ("" if n/a).
+     */
+    template <typename T>
+    inline void append (ostream &s, const char *prefix, const T val, const char *suffix="") {
+      if (!isNull(val)) s << prefix << val << suffix;
+    }
+
+    /** Appends a value, assuming it is not null.
+     *  @param s      (OUT) The output stream.
+     *  @param prefix (IN)  The prefix to include ("" if n/a).
+     *  @param val    (IN)  The value.
+     *  @param suffix (IN)  The suffix to include ("" if n/a).
+     */
+    template <const string &>
+    inline void append (ostream &s, const char *prefix, const string &val, const char *suffix="") {
+      if (!isNull(val)) s << prefix << val << suffix;
+    }
+
+    /** Appends a value, assuming it is not null.
+     *  @param s      (OUT) The output stream.
+     *  @param prefix (IN)  The prefix to include ("" if n/a).
+     *  @param val    (IN)  The value.
+     *  @param suffix (IN)  The suffix to include ("" if n/a).
+     */
+    template <const VRTObject &>
+    inline void append (ostream &s, const char *prefix, const VRTObject &val, const char *suffix="") {
+      if (!isNull(val)) s << prefix << val << suffix;
+    }
+
+    /** Converts a UTF8 string to an ASCII string.
+     *  @param utf8        The UFT8 sequence to convert.
+     *  @param replacement The replacement character to use if a non-ASCII character is encountered
+     *                     (typically '?').
+     *  @return An applicable string.
+     *  @throws VRTException If <tt>replacement</tt> is null and a non-ASCII character is encountered.
+     */
+    string fromUTF8 (const wstring utf8, char replacement='?');
 
     /** Converts a "boolean" string to a boolean value. The following (case-insensitive) conversions
      *  are used:
@@ -113,6 +183,18 @@ namespace vrt {
      *  @return The trimmed output or <tt>str</tt> if no trimming is required.
      */
     string trim (const string &str);
+
+    /** Converts a string to lower-case.
+     *  @param str The input string.
+     *  @return The lower-case version of the given string.
+     */
+    string toLowerCase (const string &str);
+
+    /** Converts a string to upper-case.
+     *  @param str The input string.
+     *  @return The upper-case version of the given string.
+     */
+    string toUpperCase (const string &str);
 
     /** Quick conversion to hex string.
      *  @param val   The value to convert.
@@ -182,63 +264,19 @@ namespace vrt {
      *  @return The numeric form of the device identifier.
      */
     int64_t fromStringDeviceID (string id);
-    
+
     /** Normalizes an angle such that it is on the range of [0,360).
      *  @param deg The input angle in degrees.
      *  @return The corresponding angle in the range [0,360).
      */
     double normalizeAngle360 (double deg);
-    
+
     /** Normalizes an angle such that it is on the range of [-180,+180).
      *  @param deg The input angle in degrees.
      *  @return The corresponding angle in the range [-180,+180).
      */
     double normalizeAngle180 (double deg);
-    
-    /** Converts an IEEE-764 double into the corresponding 64-bits contained
-     *  in a 64-bit integer. <br>
-     *  <br>
-     *  The name of this function is patterned after the Java function (as this
-     *  provides some consistency between the Java and C++ version), but the
-     *  implementation is entirely different.
-     */
-    inline int64_t doubleToRawLongBits (double val) {
-      return *((int64_t*)(void*)&val);
-    }
-    
-    /** Converts an IEEE-764 float into the corresponding 32-bits contained
-     *  in a 32-bit integer. <br>
-     *  <br>
-     *  The name of this function is patterned after the Java function (as this
-     *  provides some consistency between the Java and C++ version), but the
-     *  implementation is entirely different.
-     */
-    inline int32_t floatToRawIntBits (float val) {
-      return *((int32_t*)(void*)&val);
-    }
 
-    /** Converts the 64-bits corresponding to an IEEE-764 double, as contained
-     *  in a 64-bit integer, into an IEEE-764 double. <br>
-     *  <br>
-     *  The name of this function is patterned after the Java function (as this
-     *  provides some consistency between the Java and C++ version), but the
-     *  implementation is entirely different.
-     */
-    inline double longBitsToDouble (int64_t bits) {
-      return *((double*)(void*)&bits);
-    }
-
-    /** Converts the 32-bits corresponding to an IEEE-764 float, as contained
-     *  in a 32-bit integer, into an IEEE-764 float. <br>
-     *  <br>
-     *  The name of this function is patterned after the Java function (as this
-     *  provides some consistency between the Java and C++ version), but the
-     *  implementation is entirely different.
-     */
-    inline float intBitsToFloat (int32_t bits) {
-      return *((float*)(void*)&bits);
-    }
-    
     /** Searches a vector for a specified element. <br>
      *  <br>
      *  The name of this function is patterned after the Java function (as this
@@ -251,7 +289,7 @@ namespace vrt {
      */
     template<typename T>
     inline int32_t binarySearch (const vector<T> &vec, T val) {
-      // TODO: Change this to a binary rather than linear search. 
+      // TODO: Change this to a binary rather than linear search.
       int32_t len = (int32_t)vec.size();
       for (int32_t i = 0; i < len; i++) {
         if (vec[i] == val) return i;
@@ -259,6 +297,6 @@ namespace vrt {
       }
       return -vec.size();
     }
-  };
-};
+  } END_NAMESPACE
+} END_NAMESPACE
 #endif /* _Utilities_h */

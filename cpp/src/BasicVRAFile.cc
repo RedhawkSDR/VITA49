@@ -1,21 +1,22 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
- *
+ * 
  * This file is part of REDHAWK.
- *
+ *  
  * REDHAWK is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.
- *
+ * 
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "BasicVRAFile.h"
@@ -58,6 +59,20 @@ static inline void fileSeek (FILE *file, string fname, int64_t off) {
   }
 }
 
+/** Supports appending a {@link FileMode} value to an output stream. */
+static inline string _toString (vrt::FileMode mode) {
+  switch (mode) {
+    case FileMode_Read:               return "Read";
+    case FileMode_ReadWrite:          return "ReadWrite";
+    case FileMode_Write:              return "Write";
+    case FileMode_ReadWriteSynchAll:  return "ReadWriteSynchAll";
+    case FileMode_ReadWriteSynchData: return "ReadWriteSynchData";
+    case FileMode_WriteSynchAll:      return "WriteSynchAll";
+    case FileMode_WriteSynchData:     return "WriteSynchData";
+    default: return Utilities::format("Unknown FileMode (%d)", (int32_t)mode);
+  }
+}
+
 /** Converts FileMode to applicable fopen(..) flags. */
 static inline const char* getOpenFlags (FileMode mode) {
   switch (mode) {
@@ -68,38 +83,19 @@ static inline const char* getOpenFlags (FileMode mode) {
     case FileMode_ReadWriteSynchData: return "rb+";
     case FileMode_WriteSynchAll:      return "wb+";
     case FileMode_WriteSynchData:     return "wb+";
-    default: throw VRTException("Unknown FileMode "+mode);
+    default: throw VRTException(string("Unknown FileMode ")+_toString(mode));
   }
 }
 
 /** Supports appending a {@link FileMode} value to a string. */
 ostream& operator<< (ostream &s, vrt::FileMode mode) {
-  switch (mode) {
-    case FileMode_Read:               return s << "Read";
-    case FileMode_ReadWrite:          return s << "ReadWrite";
-    case FileMode_Write:              return s << "Write";
-    case FileMode_ReadWriteSynchAll:  return s << "ReadWriteSynchAll";
-    case FileMode_ReadWriteSynchData: return s << "ReadWriteSynchData";
-    case FileMode_WriteSynchAll:      return s << "WriteSynchAll";
-    case FileMode_WriteSynchData:     return s << "WriteSynchData";
-    default: return s << Utilities::format("Unknown FileMode (%d)", (int32_t)mode);
-  }
+  return s << _toString(mode);
 }
 
 /** Supports appending a {@link FileMode} value to an output stream. */
 string operator+  (string  &s, vrt::FileMode mode) {
-  switch (mode) {
-    case FileMode_Read:               return s + "Read";
-    case FileMode_ReadWrite:          return s + "ReadWrite";
-    case FileMode_Write:              return s + "Write";
-    case FileMode_ReadWriteSynchAll:  return s + "ReadWriteSynchAll";
-    case FileMode_ReadWriteSynchData: return s + "ReadWriteSynchData";
-    case FileMode_WriteSynchAll:      return s + "WriteSynchAll";
-    case FileMode_WriteSynchData:     return s + "WriteSynchData";
-    default: return s + Utilities::format("Unknown FileMode (%d)", (int32_t)mode);
-  }
+  return s + _toString(mode);
 }
-
 
 /** Converts file name to URI. */
 static string toURI (string fname) {
@@ -160,8 +156,7 @@ BasicVRAFile::BasicVRAFile (string fname, FileMode fmode, bool isSetSize, bool i
 
 
 void BasicVRAFile::open () {
-
-#if (_POSIX_SYNCHRONIZED_IO > 0)
+#if (_POSIX_SYNCHRONIZED_IO > 0)  || (defined(__APPLE__) && defined(__MACH__))
   // Use of the synch flags is OK.
 #else
   // No support for the synch flags. This isn't strictly true, the check here
@@ -173,7 +168,7 @@ void BasicVRAFile::open () {
   if (((mode & FileMode_SYNCH_DATA) != 0) || ((mode & FileMode_SYNCH_META) != 0)) {
     throw VRTException(string("Use of synchronized file I/O is disabled, use of "
                               "BasicVRAFile restricted to Read/Write/ReadWrite, "
-                              "given ")+mode+" for use with "+fname);
+                              "given ")+_toString(mode)+" for use with "+fname);
   }
 #endif
   
@@ -216,6 +211,13 @@ void BasicVRAFile::flush (bool force) {
         throw VRTException("Unable to synch data for %s: %s", fname.c_str(), ERRNO_STR);
       }
     }
+#elif (defined(__APPLE__) && defined(__MACH__))
+    if ((mode & FileMode_SYNCH_META) || (mode & FileMode_SYNCH_DATA)) {
+      int f = fileno(file);
+      if ((f == -1) || (fsync(f) != 0)) {
+        throw VRTException("Unable to synch data+metadata for %s: %s", fname.c_str(), ERRNO_STR);
+      }
+    }
 #endif
   }
 }
@@ -241,7 +243,7 @@ int32_t BasicVRAFile::read (int64_t off, void *ptr, int32_t len) const {
   fileSeek(file, fname, off);
   size_t count = fread(ptr, sizeof(char), len, file); // <-- Returns N<=0 on Error *or* EOF
   if (count > 0) {
-    return count;
+    return (int32_t)count;
   }
   else if (feof(file)) {
     clearerr(file);

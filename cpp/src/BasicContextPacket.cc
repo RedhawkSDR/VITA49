@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "BasicContextPacket.h"
@@ -34,7 +35,7 @@ using namespace private_BasicContextPacket;
  *    References:
  *     [1] Wikipedia. "Hamming Weight." http://en.wikipedia.org/wiki/Hamming_weight
  *         (Last Accessed 23 April 2013)
- * 
+ *
  *     [2] Dalke, Andrew. "Update: Faster population counts." 2 November 2011.
  *         http://www.dalkescientific.com/writings/diary/archive/2011/11/02/faster_popcount_update.html
  *         (Last Accessed 23 April 2013)
@@ -65,21 +66,23 @@ static inline vector<char> BasicContextPacket_createDefaultPacket () {
   buf[3] = 0x08;
   return buf;
 }
-BasicContextPacket::BasicContextPacket (const int32_t pktsize) :
-  BasicVRTPacket(pktsize) // done
-{
-}
 
 BasicContextPacket::BasicContextPacket (const BasicVRTPacket &p) :
   BasicVRTPacket(p)
 {
-  if (getPacketType() != PacketType_Context) {
+  if (!isNullValue() && (getPacketType() != PacketType_Context)) {
     throw VRTException("Can not create ContextPacket from given packet");
   }
 }
 
 BasicContextPacket::BasicContextPacket (const void *buf, size_t len, bool readOnly) :
   BasicVRTPacket(buf,len,readOnly)
+{
+  // done
+}
+
+BasicContextPacket::BasicContextPacket (int32_t bufsize) :
+  BasicVRTPacket(bufsize)
 {
   // done
 }
@@ -172,67 +175,30 @@ bool BasicContextPacket::resetForResend (const TimeStamp &t) {
   return true;
 }
 
-void BasicContextPacket::setRecord (int32_t bit, Record val, int32_t oldLen) {
+void BasicContextPacket::setRecord (int32_t bit, const Record *val, int32_t oldLen) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   int32_t off = getOffset(bit);
 
-  if ((isNull(val)) && (off < 0)) return; // not present, no change
+  if ((val == NULL) && (off < 0)) return; // not present, no change
 
-  if (off >= 0) {
-    // remove the old one
-    setContextIndicatorFieldBit(bit, false);
-    shiftPayload(off, oldLen, false);
-    off = -off;
-  }
-
-  if (!isNull(val)) {
-    setContextIndicatorFieldBit(bit, true);
-    off = shiftPayload(off, val.getByteLength(), true);
-    packPayloadRecord(off, val);
-  }
-}
-
-Ephemeris BasicContextPacket::getEphemerisECEF () const {
-  int32_t   off = getOffset(ECEF_EPHEM);
-  int32_t   adj = getOffset(ECEF_EPHEM_ADJ);
-  Ephemeris val;
-  
-  if (off >= 0) unpackPayloadRecord(off, val);
-  if (adj >= 0) unpackPayloadRecord(adj, val.getAdjunctRef());
-
-  return val;
-}
-
-Ephemeris BasicContextPacket::getEphemerisRelative () const {
-  int32_t   off = getOffset(REL_EPHEM);
-  int32_t   adj = getOffset(REL_EPHEM_ADJ);
-  Ephemeris val;
-
-  if (off >= 0) unpackPayloadRecord(off, val);
-  if (adj >= 0) unpackPayloadRecord(adj, val.getAdjunctRef());
-
-  return val;
-}
-
-void BasicContextPacket::setEphemerisECEF (const Ephemeris &val) {
-  setRecord(ECEF_EPHEM, val);
-
-  if ((VRTConfig::getVRTVersion() == VRTConfig::VITAVersion_V49b) && val.getAdjunct().isAnythingSet()) {
-    setRecord(ECEF_EPHEM_ADJ, val.getAdjunct());
+  int32_t newLen = (val == NULL)? 0 : val->getByteLength();
+  if ((off >= 0) && (val != NULL) && (oldLen == newLen)) {
+    // present, no change in size
+    packPayloadRecord(off, *val);
   }
   else {
-    setRecord(ECEF_EPHEM_ADJ, EphemerisAdjunct()); // null value
-  }
-}
+    if (off >= 0) {
+      // remove the old one
+      setContextIndicatorFieldBit(bit, false);
+      shiftPayload(off, oldLen, false);
+      off = -off;
+    }
 
-void BasicContextPacket::setEphemerisRelative (const Ephemeris &val) {
-  setRecord(REL_EPHEM, val);
-
-  if ((VRTConfig::getVRTVersion() == VRTConfig::VITAVersion_V49b) && val.getAdjunct().isAnythingSet()) {
-    setRecord(REL_EPHEM_ADJ, val.getAdjunct());
-  }
-  else {
-    setRecord(ECEF_EPHEM_ADJ, EphemerisAdjunct()); // null value
+    if (val != NULL) {
+      setContextIndicatorFieldBit(bit, true);
+      off = shiftPayload(off, newLen, true);
+      packPayloadRecord(off, *val);
+    }
   }
 }
 
@@ -344,7 +310,6 @@ void BasicContextPacket::setStateEventBit (int32_t enable, int32_t indicator, bo
 int32_t BasicContextPacket::getFieldLen (int32_t field) const {
   if ((field & CTX_4_OCTETS ) != 0) return  4;
   if ((field & CTX_8_OCTETS ) != 0) return  8;
-  if ((field & CTX_36_OCTETS) != 0) return 36;
   if ((field & CTX_44_OCTETS) != 0) return 44;
   if ((field & CTX_52_OCTETS) != 0) return 52;
   if (field == GPS_ASCII) {
@@ -393,7 +358,7 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int32_t field) const
   // from [1] (section 2-1) to set the field bit and all bits to the right, and
   // then inverts it to get all bits left of 'field' to be set.
   int32_t mask = ~(field ^ (field - 1));
-  
+
   // For efficiency we compute the offset based on an applied bit mask and a few
   // multiplies. For *52 we do an *8 plus *44 to avoid the overhead of an extra
   // bitCount(..). In the below code, we the CTX_8_OCTETS|CTX_52_OCTETS and the
@@ -415,7 +380,7 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int32_t field) const
     if ((cif & GPS_ASCII) != 0) {
       off += VRTMath::unpackInt(bbuf, h+off+4)*4+8;
     }
-    
+
     // CONTEXT_ASOC length is also variable, since it comes after GPS_ASCII
     // we nest it here so the check can be skipped in the 80% use case. Note
     // that off= should not point to the start of the CONTEXT_ASOC field.
@@ -428,10 +393,6 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int32_t field) const
         if ((VRTMath::unpackShort(bbuf, h+6+off) & 0x8000) != 0) asynch *= 2;
         off += (source + system + vector + asynch)*4+8;
       }
-      
-      // The two V49.0b entries come after CONTEXT_ASOC, so we nest it here so
-      // it can be skipped in the 90% use case.
-      off += (bitCount(m & (CTX_36_OCTETS)) * 36);
     }
   }
   return ((cif & field) != 0)? off : -off;  // -off if not present
@@ -758,15 +719,13 @@ void Geolocation::setField (int32_t id, const Value* val) {
 }
 
 Ephemeris::Ephemeris () :
-  AbstractGeolocation(52),
-  adjunct()
+  AbstractGeolocation(52)
 {
   // done
 }
 
 Ephemeris::Ephemeris (const Ephemeris &r) :
-  AbstractGeolocation(r),
-  adjunct(r.adjunct)
+  AbstractGeolocation(r)
 {
   // done
 }
@@ -783,7 +742,6 @@ string Ephemeris::toString () const {
   Utilities::append(str, " VelocityX=",     getVelocityX());
   Utilities::append(str, " VelocityY=",     getVelocityY());
   Utilities::append(str, " VelocityZ=",     getVelocityZ());
-  str << adjunct.toString();
   return str.str();
 }
 
@@ -802,15 +760,6 @@ string Ephemeris::getFieldName (int32_t id) const {
     case  6: return "VelocityX";
     case  7: return "VelocityY";
     case  8: return "VelocityZ";
-    case  9: return "RotationalVelocityAlpha";
-    case 10: return "RotationalVelocityBeta";
-    case 11: return "RotationalVelocityPhi";
-    case 12: return "AccelerationX";
-    case 13: return "AccelerationY";
-    case 14: return "AccelerationZ";
-    case 15: return "RotationalAccelerationAlpha";
-    case 16: return "RotationalAccelerationBeta";
-    case 17: return "RotationalAccelerationPhi";
     default: return AbstractGeolocation::getFieldName(id);
   }
 }
@@ -826,15 +775,6 @@ ValueType Ephemeris::getFieldType (int32_t id) const {
     case  6: return ValueType_Double;
     case  7: return ValueType_Double;
     case  8: return ValueType_Double;
-    case  9: return ValueType_Double;
-    case 10: return ValueType_Double;
-    case 11: return ValueType_Double;
-    case 12: return ValueType_Double;
-    case 13: return ValueType_Double;
-    case 14: return ValueType_Double;
-    case 15: return ValueType_Double;
-    case 16: return ValueType_Double;
-    case 17: return ValueType_Double;
     default: return AbstractGeolocation::getFieldType(id);
   }
 }
@@ -850,15 +790,6 @@ Value* Ephemeris::getField (int32_t id) const {
     case  6: return new Value(getVelocityX());
     case  7: return new Value(getVelocityY());
     case  8: return new Value(getVelocityZ());
-    case  9: return new Value(getRotationalVelocityAlpha());
-    case 10: return new Value(getRotationalVelocityBeta());
-    case 11: return new Value(getRotationalVelocityPhi());
-    case 12: return new Value(getAccelerationX());
-    case 13: return new Value(getAccelerationY());
-    case 14: return new Value(getAccelerationZ());
-    case 15: return new Value(getRotationalAccelerationAlpha());
-    case 16: return new Value(getRotationalAccelerationBeta());
-    case 17: return new Value(getRotationalAccelerationPhi());
     default: return AbstractGeolocation::getField(id);
   }
 }
@@ -874,65 +805,8 @@ void Ephemeris::setField (int32_t id, const Value* val) {
     case  6: setVelocityX(                  val->as<double>()); return;
     case  7: setVelocityY(                  val->as<double>()); return;
     case  8: setVelocityZ(                  val->as<double>()); return;
-    case  9: setRotationalVelocityAlpha(    val->as<double>()); return;
-    case 10: setRotationalVelocityBeta(     val->as<double>()); return;
-    case 11: setRotationalVelocityPhi(      val->as<double>()); return;
-    case 12: setAccelerationX(              val->as<double>()); return;
-    case 13: setAccelerationY(              val->as<double>()); return;
-    case 14: setAccelerationZ(              val->as<double>()); return;
-    case 15: setRotationalAccelerationAlpha(val->as<double>()); return;
-    case 16: setRotationalAccelerationBeta( val->as<double>()); return;
-    case 17: setRotationalAccelerationPhi(  val->as<double>()); return;
     default: AbstractGeolocation::setField(id,val); return;
   }
-}
-
-EphemerisAdjunct::EphemerisAdjunct () :
-  Record(36)
-{
-  // Initialize everything to null to be compatible with cases where no adjunct is present
-  packInt( 0, 0x7FFFFFFF);
-  packInt( 4, 0x7FFFFFFF);
-  packInt( 8, 0x7FFFFFFF);
-  packInt(12, 0x7FFFFFFF);
-  packInt(16, 0x7FFFFFFF);
-  packInt(20, 0x7FFFFFFF);
-  packInt(24, 0x7FFFFFFF);
-  packInt(28, 0x7FFFFFFF);
-  packInt(32, 0x7FFFFFFF);
-}
-
-EphemerisAdjunct::EphemerisAdjunct (const EphemerisAdjunct& r) :
-  Record(r)
-{
-  // done
-}
-
-bool EphemerisAdjunct::isAnythingSet () const {
-      return (unpackInt( 0) != 0x7FFFFFFF)
-          || (unpackInt( 4) != 0x7FFFFFFF)
-          || (unpackInt( 8) != 0x7FFFFFFF)
-          || (unpackInt(12) != 0x7FFFFFFF)
-          || (unpackInt(16) != 0x7FFFFFFF)
-          || (unpackInt(20) != 0x7FFFFFFF)
-          || (unpackInt(24) != 0x7FFFFFFF)
-          || (unpackInt(28) != 0x7FFFFFFF)
-          || (unpackInt(32) != 0x7FFFFFFF);
-}
-
-string EphemerisAdjunct::toString () const {
-  ostringstream str;
-  str << Record::toString();
-  Utilities::append(str, " RotationalVelocityAlpha=",     getRotationalVelocityAlpha());
-  Utilities::append(str, " RotationalVelocityBeta=",      getRotationalVelocityBeta());
-  Utilities::append(str, " RotationalVelocityPhi=",       getRotationalVelocityPhi());
-  Utilities::append(str, " AccelerationX=",               getAccelerationX());
-  Utilities::append(str, " AccelerationY=",               getAccelerationY());
-  Utilities::append(str, " AccelerationZ=",               getAccelerationZ());
-  Utilities::append(str, " RotationalAccelerationAlpha=", getRotationalAccelerationAlpha());
-  Utilities::append(str, " RotationalAccelerationBeta=",  getRotationalAccelerationBeta());
-  Utilities::append(str, " RotationalAccelerationPhi=",   getRotationalAccelerationPhi());
-  return str.str();
 }
 
 string GeoSentences::toString () const {
@@ -1163,7 +1037,7 @@ Value* ContextAssocLists::getField (int32_t id) const {
 
 void ContextAssocLists::setField (int32_t id, const Value* val) {
   int n = (id - Record::getFieldCount());
-  
+
   if ((n >= 0) && (n <= 4)) {
     vector<int32_t> vec(val->size());
     for (size_t i = 0; i < val->size(); i++) {
@@ -1171,7 +1045,7 @@ void ContextAssocLists::setField (int32_t id, const Value* val) {
       vec[i] = *v;
       delete v;
     }
-  
+
     switch (n) {
       case  0: setSourceContext(vec); return;
       case  1: setSystemContext(vec); return;

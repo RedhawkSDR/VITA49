@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "HasFields.h"
@@ -23,13 +24,12 @@
 
 using namespace vrt;
 
-
 /** Internal use only: A parsed field name. */
 class ParsedFieldName {
   /** Internal use only. */ public: string  first;
   /** Internal use only. */ public: int32_t idx;
   /** Internal use only. */ public: string  next;
-  
+
   /** Internal use only. */
   public: ParsedFieldName (const string &name);
 };
@@ -41,7 +41,7 @@ ParsedFieldName::ParsedFieldName (const string &name) :
 {
   size_t dotIndex   = name.find(".");
   size_t startIndex = name.find("[");
-  
+
   if ((dotIndex == string::npos) && (startIndex == string::npos)) {
     first = name;
     idx   = -1;
@@ -54,13 +54,13 @@ ParsedFieldName::ParsedFieldName (const string &name) :
   }
   else if ((dotIndex == string::npos) ||  (startIndex < dotIndex)) {
     size_t endIndex = name.find("]");
-    
+
     if ((endIndex == string::npos) || (endIndex < startIndex)) {
       throw VRTException("Invalid field name '%s'", name.c_str());
     }
-    
+
     string num = name.substr(startIndex+1,endIndex-startIndex-2);
-    
+
     first = name.substr(0,startIndex);
     idx   = atoi(num.c_str());
     next  = name.substr(endIndex+1);
@@ -94,7 +94,7 @@ static inline void setValIn (Value *array, size_t i, const Value *value) {
     case -ValueType_String    : ((vector<string*   >*)array)->at(i) = const_cast<string*   >(((const string*   )(*value))); break;
     case -ValueType_WString   : ((vector<wstring*  >*)array)->at(i) = const_cast<wstring*  >(((const wstring*  )(*value))); break;
     case -ValueType_VRTObject : ((vector<VRTObject*>*)array)->at(i) = const_cast<VRTObject*>(((const VRTObject*)(*value))); break;
-    default                   : throw VRTException("Invalid array type "+array->getType());
+    default                   : throw VRTException("Invalid array type %d", array->getType());
   }
 }
 
@@ -102,12 +102,12 @@ Value* HasFields::getFieldByName (const string &name) const {
   ParsedFieldName pfn(name);
   int32_t         id  = getFieldID(pfn.first);
   Value          *val = getField(id);
-  
+
   if (val      == NULL  ) return new Value(); // <-- null value
   if (pfn.next == ""    ) return val;         // <-- use current value (may be null)
   if (val->isNullValue()) return val;         // <-- null value (already allocated)
   if (pfn.idx  >= 0     ) val = val->at(pfn.idx);
-  
+
   HasFields *hf  = val->as<HasFields*>();
   if (hf == NULL) {
     // Throw exception if trying to get a sub-field on something that doesn't
@@ -124,12 +124,12 @@ Value* HasFields::getFieldByName (const string &name) const {
 void HasFields::setFieldByName (const string &name, const Value* value) {
   ParsedFieldName pfn(name);
   int32_t         id = getFieldID(name);
-  
+
   if ((pfn.idx < 0) && (pfn.next == "")) { // no next, no idx
     setField(id, value);
     return;
   }
-  
+
   if (pfn.idx < 0) { // next only, no idx
     Value     *val = getField(id);
     HasFields *hf  = val->as<HasFields*>();
@@ -148,7 +148,7 @@ void HasFields::setFieldByName (const string &name, const Value* value) {
     delete val;
     return;
   }
-  
+
   if (pfn.next == "") { // idx only, no next
     Value *val = getField(id);
     setValIn(val, pfn.idx, value);
@@ -156,7 +156,7 @@ void HasFields::setFieldByName (const string &name, const Value* value) {
     delete val;
     return;
   }
-    
+
   // idx and next
   Value *val = getField(id);
   if (val == NULL) {

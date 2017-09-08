@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #ifndef _HasFields_h
@@ -35,16 +36,15 @@ namespace vrt {
    *  <br>
    *  <b>WARNING: This class is not intended for "general purpose" use as a super
    *  class and should only be extended by instances of {@link VRTObject}.</b>
-   *  @author  / 
    */
   class HasFields {
     public: virtual ~HasFields () { }
-    
+
     /** Gets the number of fields. */
     public: virtual inline int32_t getFieldCount () const {
       return 0;
     }
-    
+
     /** Gets the name of the given field. In 90% of cases the field name will be
      *  identical to the name used in the applicable get/set function except
      *  without the get/set prefix (e.g. "SourceContext" for "getSourceContext").
@@ -64,7 +64,7 @@ namespace vrt {
     public: virtual inline string getFieldName (int32_t id) const {
       throw VRTException("Unknown field ID #%d", id);
     }
-    
+
     /** Gets the type associated with a given field.
      *  @param id The field ID (on range <tt>[0,getFieldCount())</tt>).
      *  @return The field type (n &gt; 0) or -N if the field is a vector
@@ -81,7 +81,8 @@ namespace vrt {
      *  @param id The field ID (on range <tt>[0,getFieldCount())</tt>).
      *  @return Pointer to the given value.
      */
-    public: virtual inline Value* getField (int32_t id) const  {
+    public: virtual inline Value* getField (int32_t id)
+                                     const __attribute__((warn_unused_result)) {
       throw VRTException("Unknown field ID #%d", id);
     }
 
@@ -90,6 +91,7 @@ namespace vrt {
      *  @param val Pointer to the given value (must be of the applicable type).
      */
     public: virtual inline void setField (int32_t id, const Value* val) {
+      UNUSED_VARIABLE(val);
       throw VRTException("Unknown field ID #%d", id);
     }
 
@@ -100,7 +102,7 @@ namespace vrt {
     public: inline void setField (int32_t id, const Value &val) {
       setField(id, &val);
     }
-    
+
     /** Gets the ID of the given field. There is a 1:1 mapping of field ID's and
      *  names such that for all <tt>n = [0,getFieldCount())</tt>,
      *  <tt>n == getFieldID(getFieldName(n))</tt> is true.
@@ -109,7 +111,7 @@ namespace vrt {
      *  @throws VRTException if the field name is invalid.
      */
     public: int32_t getFieldID (const string &name) const;
-    
+
     /** Gets the value of a field, based on the field's name. This will accept
      *  array entries and sub-fields. Examples:
      *  <pre>
@@ -172,7 +174,8 @@ namespace vrt {
      *    delete val;
      *  </pre>
      */
-    public: Value* getFieldByName (const string &name) const;
+    public: Value* getFieldByName (const string &name) const
+                                            __attribute__((warn_unused_result));
 
     /** Sets the value of a field, based on the field's name. This will accept
      *  array entries and sub-fields similar to {@link #getFieldByName}.
@@ -190,13 +193,12 @@ namespace vrt {
       setFieldByName(name, &val);
     }
   };
-  
-  /** Checks to see if a {@link HasFields} pointer is null. This is the same as 
+
+  /** Checks to see if a {@link HasFields} pointer is null. This is the same as
    *  calling <tt>isNull(val)</tt> following a conversion to <tt>VRTObject*</tt>.
    */
   inline bool isNull (const HasFields *val) {
     return isNull(checked_dynamic_cast<const VRTObject*>(val));
   }
-}
-
+} END_NAMESPACE
 #endif /* _HasFields_h */

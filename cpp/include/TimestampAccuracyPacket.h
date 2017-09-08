@@ -1,22 +1,3 @@
-/*
- * This file is protected by Copyright. Please refer to the COPYRIGHT file
- * distributed with this source distribution.
- *
- * This file is part of REDHAWK VITA49Libraries.
- *
- * REDHAWK VITA49Libraries is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.
- *
- * REDHAWK VITA49Libraries is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
- */
 //
 //  This class was auto-generated, do not modify.
 //
@@ -41,7 +22,8 @@ namespace vrt {
    *  
    *          The "timestamp accuracy packet" provides details about the accuracy of
    *          the timing source. Use of this packet is required for all cases where
-   *          the Calibrated Time Indicator is enabled and set to one by Rule 6.1.7-1.<br><br>
+   *          the Calibrated Time Indicator is enabled and set to one by Rule 6.1.7-1
+   *          of "VITA 49 Spectrum Survey Profile".<br><br>
    *  
    *          For the purpose of this packet definition, "timestamp accuracy" is defined
    *          to be the maximal distance (measured in picoseconds) between any two
@@ -142,7 +124,7 @@ namespace vrt {
     public:    virtual int32_t   getFieldCount () const;
     public:    virtual string    getFieldName (int32_t id) const;
     public:    virtual ValueType getFieldType (int32_t id) const;
-    public:    virtual Value*    getField (int32_t id) const;
+    public:    virtual Value*    getField (int32_t id) const __attribute__((warn_unused_result));
     public:    virtual void      setField (int32_t id, const Value* val);
     //======================================================================
     // GET/SET METHODS
@@ -166,6 +148,6 @@ namespace vrt {
       packPayloadLong(0, val);
     }
   };
-};
+} END_NAMESPACE
 #endif /* _TimestampAccuracyPacket_h */
 

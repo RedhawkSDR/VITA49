@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "BasicVRTState.h"
@@ -47,7 +48,7 @@ BasicVRTState::BasicVRTState () :
   latestContext(),
   currentContextState()
 {
-
+  // done
 }
 
 BasicVRTState::BasicVRTState (const BasicContextPacket& ctx) :
@@ -138,7 +139,7 @@ int8_t BasicVRTState::copy(BasicContextPacket& dest, const BasicContextPacket& s
 
   }
   if (updated) currentContextState.cacheIndicator = currentContextState.cacheIndicator & ~field;
-  return (triggered ? TRIGGERED : 0) | (updated ? UPDATED : 0);
+  return (int8_t)(((triggered)? TRIGGERED : 0) | ((updated)? UPDATED : 0));
 }
 
 bool BasicVRTState::updateState(const BasicDataPacket& src) {
@@ -146,8 +147,6 @@ bool BasicVRTState::updateState(const BasicDataPacket& src) {
     lastUpdated = src.getTimeStamp();
     int32_t destOffset = currentContextState.getOffset(STATE_EVENT);
     int32_t fieldLen = src.getTrailerLength();
-    bool updated = false;
-    bool triggered = false;
     destOffset = currentContextState.shiftPayload(destOffset, fieldLen, true);
     currentContextState.setContextIndicatorFieldBit(STATE_EVENT, true);
 
@@ -157,8 +156,8 @@ bool BasicVRTState::updateState(const BasicDataPacket& src) {
     int32_t destBits = currentContextState.getL(STATE_EVENT);
     int32_t destEnable = destBits & ENABLE_MASK;
 
-    updated = (srcBits & destBits) != srcBits;
-    triggered = ((srcBits ^ destBits) & eventTrigger) != 0;
+    bool updated = (srcBits & destBits) != srcBits;
+    //bool triggered = ((srcBits ^ destBits) & eventTrigger) != 0;
     destBits = (destBits & ~(srcEnableMask)) | (srcBits & (srcEnableMask)) | srcEnable | destEnable;
     currentContextState.setL(STATE_EVENT, destBits);
 
@@ -171,6 +170,11 @@ bool BasicVRTState::updateState(const BasicDataPacket& src) {
     }
   }
 
+  return false;
+}
+
+bool BasicVRTState::updateState(const TimeStamp& ts) {
+  currentContextState.setTimeStamp(ts);
   return false;
 }
 
@@ -188,7 +192,7 @@ bool BasicVRTState::updateState(const BasicContextPacket& ctx) {
     int32_t field = j&cif;
     if (field > 0){
       int8_t copied = copy(currentContextState, ctx, field);
-      bool upd = (copied & UPDATED) != 0;
+      bool upd  = (copied & UPDATED  ) != 0;
       bool trig = (copied & TRIGGERED) != 0;
       triggered = triggered || trig;
       if (upd) {

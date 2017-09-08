@@ -1,22 +1,3 @@
-/*
- * This file is protected by Copyright. Please refer to the COPYRIGHT file
- * distributed with this source distribution.
- *
- * This file is part of REDHAWK VITA49Libraries.
- *
- * REDHAWK VITA49Libraries is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.
- *
- * REDHAWK VITA49Libraries is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
- */
 //
 //  This class was auto-generated, do not modify.
 //
@@ -40,7 +21,8 @@ namespace vrt {
   /** <b>A.3.\ Standard Context Packet</b>. 
    *  
    *          The "standard context packet" is simply an IF Context packet that can be
-   *          used in any generic IF Context Stream.
+   *          used in any generic IF Context Stream that conforms to the ""VITA 49
+   *          Spectrum Survey Profile"".
    *        
    */
   class StandardContextPacket : public BasicContextPacket {
@@ -99,12 +81,12 @@ namespace vrt {
     public:    virtual int32_t   getFieldCount () const;
     public:    virtual string    getFieldName (int32_t id) const;
     public:    virtual ValueType getFieldType (int32_t id) const;
-    public:    virtual Value*    getField (int32_t id) const;
+    public:    virtual Value*    getField (int32_t id) const __attribute__((warn_unused_result));
     public:    virtual void      setField (int32_t id, const Value* val);
     //======================================================================
     // GET/SET METHODS
     //======================================================================
   };
-};
+} END_NAMESPACE
 #endif /* _StandardContextPacket_h */
 

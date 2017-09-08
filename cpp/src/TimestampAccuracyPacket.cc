@@ -64,8 +64,8 @@ TimestampAccuracyPacket::TimestampAccuracyPacket () :
  // done
 }
 
-TimestampAccuracyPacket::TimestampAccuracyPacket (const vector<char> &bbuf, bool readOnly) :
-  BasicVRTPacket(bbuf, readOnly)
+TimestampAccuracyPacket::TimestampAccuracyPacket (const vector<char> &_bbuf, bool _readOnly) :
+  BasicVRTPacket(_bbuf, _readOnly)
 {
  // done
 }

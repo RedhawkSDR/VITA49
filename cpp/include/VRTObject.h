@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #ifndef _VRTObject_h
@@ -32,7 +33,9 @@
 #include <iostream>  // required for std::cerr
 #include <limits>    // required for numeric_limits(..) on GCC4.4/libc6 2.11.1
 #include <stdio.h>   // required for printf(..) on GCC4.4/libc6 2.11.1
-
+#include <pthread.h>
+#include <stdlib.h>  // required for free(..) under clang
+#include <math.h>    // required for isnan(..)
 
 #define __STDC_LIMIT_MACROS  1 /* Required to include the __INT64_C(..) macro in stdint.h */
 #define __STDC_FORMAT_MACROS 1 /* Required to include the PRI?64 constants in inttypes.h */
@@ -67,6 +70,14 @@
 # endif
 #endif
 
+/** Define __CLANG_COMPILER similar to that used with __GNU_COMPILER (see above). Note that we
+ *  explicitly avoid any use of __CLANG_VERSION to avoid confusion with __clang_version__ which
+ *  is a string.
+ */
+#ifdef __clang__
+# define __CLANG_COMPILER ((__clang_major__ * 10000) + (__clang_minor__ * 100) + __clang_patchlevel__)
+#endif
+
 /** This will enable/disable the automatic printing of all (non-null) exceptions when they
  *  are instantiated. This can be useful for debugging when an error is suspected within
  *  the exception handling code of either this library or the caller.
@@ -80,7 +91,26 @@
  *  compiler-specific and requires additional build flags (e.g. -rdynamic with GCC).
  */
 #ifndef INCLUDE_STACK_TRACE
-# define INCLUDE_STACK_TRACE 1
+# ifdef __CLANG_COMPILER
+   // The following line fails under Clang 2.8 due to a compiler bug:
+   // #define INCLUDE_STACK_TRACE __has_include(<cxxabi.h>)
+#  if __has_include(<cxxabi.h>)
+#    define INCLUDE_STACK_TRACE 1
+#   else
+#    define INCLUDE_STACK_TRACE 0
+#  endif
+# else
+#  define INCLUDE_STACK_TRACE 1
+# endif
+#endif
+
+/** Some of the code in VRTObject.h, VRTMath.h, and VRTMath.cc is reused when
+ *  building the native PackUnpack routines for Java. The USING_JNI constant
+ *  allows us to enable/disable the specific code blocks required to support
+ *  JNI usage.
+ */
+#ifndef NOT_USING_JNI
+# define NOT_USING_JNI 1
 #endif
 
 /** Enable GCC and Intel attributes/pragmas as appropriate. */
@@ -89,37 +119,72 @@
   // we set NO_PRAGMAS=1 when using doxygen to avoid issues. This is
   // not intended as a genearl-purpose flag, only one we use to work
   // around this issue.
-# define _GCC_Pragma(x)   // ignore
-# define _Intel_Pragma(x) // ignore
-# define __attribute__(x)
-# define __intelattr__(x)
+# define _Clang_Pragma(x) /* ignore */
+# define _GCC_Pragma(x)   /* ignore */
+# define _Intel_Pragma(x) /* ignore */
+# define __attribute__(x) /* ignore */
+# define __clangattr__(x) /* ignore */
+# define __intelattr__(x) /* ignore */
 #elif defined(__INTEL_COMPILER) && defined(__GNUC__)
   // Although the Intel compilers support GCC's __attribute__(..) on
   // Linux (and similar) platforms, their support for it is limited.
   // As a result we use __intelattr__(..) as a stand-in where it may
   // be appropriate. Blanket use of all of GCC's __attribute__(..)
   // flags simply gets us a lot of unnecessary warnings.
+# define _Clang_Pragma(x)
 # define _GCC_Pragma(x)
 # define _Intel_Pragma(x) _Pragma(x)
 # define __attribute__(x)
+# define __clangattr__(x)
 # define __intelattr__(x) __attribute__(x)
 #elif defined(__INTEL_COMPILER)
+# define _Clang_Pragma(x)
+  // Although the Clang support GCC's __attribute__(..), its support
+  // for is limited. As a result we use __clangattr__(..) as a
+  // stand-in where it may be appropriate. Blanket use of all of
+  // GCC's __attribute__(..) flags simply gets us a lot of
+  // unnecessary warnings.
+# define _Clang_Pragma(x)
 # define _GCC_Pragma(x)
 # define _Intel_Pragma(x) _Pragma(x)
 # define __attribute__(x)
+# define __clangattr__(x)
+# define __intelattr__(x)
+#elif defined(__CLANG_COMPILER)
+# define _Clang_Pragma(x) _Pragma(x)
+# define _GCC_Pragma(x)
+# define _Intel_Pragma(x)
+# define __attribute__(x)
+# define __clangattr__(x) __attribute__(x)
 # define __intelattr__(x)
 #elif defined(__GNUC__)
+# define _Clang_Pragma(x)
 # define _GCC_Pragma(x)   _Pragma(x)
 # define _Intel_Pragma(x)
 # define __attribute__(x) __attribute__(x)
+# define __clangattr__(x)
 # define __intelattr__(x)
 #else
   // Disable attributes/pragmas where we don't know compiler
+# define _Clang_Pragma(x)
 # define _GCC_Pragma(x)
 # define _Intel_Pragma(x)
 # define __attribute__(x)
+# define __clangattr__(x)
 # define __intelattr__(x)
 #endif
+
+/** Disables unused variable warnings on Clang and GCC. */
+#if __GNUC__ || __CLANG_COMPILER
+# define UNUSED_VARIABLE(x) ((void)x)
+#else
+# define UNUSED_VARIABLE(x) /* ignore */
+#endif
+
+/** Some style guides suggest a ';' at the end of a namespace, however this triggers a warning
+ *  under the Intel compiler with "-w3" warnings turned on.
+ */
+#define END_NAMESPACE /* ignore */
 
 using namespace std;
 
@@ -171,7 +236,7 @@ namespace vrt {
    */
   const double __attribute__((unused)) __intelattr__((unused)) DOUBLE_NAN = numeric_limits<float>::quiet_NaN();
 
-  
+#if NOT_USING_JNI
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   // VRTObject
   ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,19 +251,49 @@ namespace vrt {
      */
     string getClassName (const char *name);
   }
-  
+#endif
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  // MutexObj
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+#if NOT_USING_JNI
+  /** <b>Internal Use Only:</b> Holds a mutex object. This class is used (in part)
+   *  since the STL mutex object in C++ isn't available before C++11.
+   */
+  class MutexObj {
+    private: pthread_mutex_t mutexLock;  // the low-level lock
+    private: bool            isLocked;   // is it already locked?
+    private: pthread_t       mutexOwner; // the mutex owner (if locked)
+
+    /** Constructor for the class. */
+    public: MutexObj ();
+    /** Destructor for the class. */
+    public: virtual ~MutexObj ();
+    /** Locks the lock. */
+    public: MutexObj* lock ();
+    /** Unlocks the lock. */
+    public: void unlock ();
+  };
+#endif
+
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   // VRTObject
   ////////////////////////////////////////////////////////////////////////////////////////////////////
+#if NOT_USING_JNI
   /** A basic root-level object definition. This definition is extremely similar to the Java
    *  <tt>Object</tt> class and allows subclasses to more-closely follow their Java counterparts.
-   *  @author         
    */
   class VRTObject {
+    friend class MutexLock;
+
+    private: MutexObj mutexObj; // Mutex object to use
+
     /** Basic copy constructor. */
-    public: VRTObject(const VRTObject &o) { }
+    public: VRTObject (const VRTObject &o) { UNUSED_VARIABLE(o); }
+
     /** Basic no-argument constructor. */
-    public: VRTObject() { }
+    public: VRTObject () { }
+
     /** Basic destructor. */
     public: virtual ~VRTObject() { }
 
@@ -208,8 +303,37 @@ namespace vrt {
     /** Tests this object for equality with another one. */
     public: virtual bool equals (const VRTObject &o) const;
 
+    /** Tests this object for equality with another one. <br>
+     *  <br>
+     *  Since this function was added *after* the one that takes in a reference,
+     *  the default implementation is:
+     *  <pre>
+     *    bool VRTObject::equals (const VRTObject *o) const {
+     *      return (o != NULL) && equals(*o);
+     *    }
+     *  </pre>
+     *  @param o The unknown object.
+     *  @return true if they are identical, false otherwise.
+     */
+    public: virtual bool equals (const VRTObject *o) const;
+
+    /** Tests two VRTObjects for equality. */
+    public: static bool equal (const VRTObject &a, const VRTObject &b) {
+      return a.equals(b);
+    }
+
+    /** Tests two VRTObjects for equality. */
+    public: static bool equal (const VRTObject *a, const VRTObject *b) {
+      const void *_a = (const void*)a;
+      const void *_b = (const void*)b;
+      return (_a == NULL)? (_b == NULL) : a->equals(b);
+    }
+
     /** Gets the name of the class. */
     public: string getClassName () const;
+
+    /** <b>Internal Use Only:</b> Deletes the object */
+    public: void _delete ();
 
     /** Gets the type_info for the class. */
     public: inline const type_info &getClass () const {
@@ -221,8 +345,18 @@ namespace vrt {
       return equals(o);
     }
 
-    /** The == operator is the same as calling equals(..) */
+    /** The == operator is the same as calling !equals(..) */
     public: inline bool operator!= (const VRTObject &o) const {
+      return !equals(o);
+    }
+
+    /** The == operator is the same as calling equals(..) */
+    public: inline bool operator== (const VRTObject *o) const {
+      return equals(o);
+    }
+
+    /** The == operator is the same as calling !equals(..) */
+    public: inline bool operator!= (const VRTObject *o) const {
       return !equals(o);
     }
 
@@ -231,10 +365,79 @@ namespace vrt {
       return false;
     }
   };
+#endif
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  // MutexLock
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+#if NOT_USING_JNI
+  /** <b>Internal Use Only:</b> Holds a mutex lock. This class is used (in part)
+   *  since the STL mutex object in C++ isn't available before C++11.
+   */
+  class MutexLock {
+    private: MutexObj *mutexObj;
+    /** Constructor for the class. */
+    public: MutexLock (const VRTObject *obj);
+    /** Constructor for the class. */
+    public: MutexLock (const VRTObject &obj);
+    /** Destructor for the class. */
+    public: virtual ~MutexLock () { unlock(); }
+    /** Unlocks the lock. */
+    public: void unlock ();
+  };
+
+/** <b>Internal Use Only:</b> Obtains the given object's mutex lock and holds
+ *  it until the end of the function.
+ *  @param obj The object to lock on.
+ */
+#define SYNCHRONIZED(obj) \
+  MutexLock MutexLock_HOLD_LOCK(obj); // This relies on C++ deleting the obj at end of function
+
+/** <b>Internal Use Only:</b> Obtains the given object's mutex lock and holds
+ *  it until <tt>END_SYNCHRONIZED(n)</tt> is called.
+ *  @param n   The lock instance.
+ *  @param obj The object to lock on.
+ */
+#define START_SYNCHRONIZED(n,obj) \
+  MutexLock MutexLock_TEMP_LOCK_ ## n (obj); \
+  try {
+
+/** <b>Internal Use Only:</b> Releases the lock obtained with the previous
+ *  <tt>START_SYNCHRONIZED(n,..)</tt> call.
+ *  @param n   The lock instance.
+ *  @param obj The object to lock on.
+ */
+#define END_SYNCHRONIZED(n) \
+    MutexLock_TEMP_LOCK_ ## n .unlock(); \
+  } catch (VRTException e) { \
+    MutexLock_TEMP_LOCK_ ## n .unlock(); \
+    throw e; \
+  } catch (exception e) { \
+    MutexLock_TEMP_LOCK_ ## n .unlock(); \
+    throw e; \
+  }
+#endif
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   // VRTException
   ////////////////////////////////////////////////////////////////////////////////////////////////////
+#if NOT_USING_JNI
+  /** <b>Internal Use Only:</b> Minimal wrapper of <tt>std::exception</tt> that is used to avoid
+   *  "virtual base inaccessible" warnings when building under GCC with -Wextra turned on.
+   */
+  class _Exception : public exception {
+    public: _Exception () throw() : exception() { }
+    public: ~_Exception () throw() { }
+  };
+
+  /** <b>Internal Use Only:</b> Minimal wrapper of <tt>std::bad_cast</tt> that is used to avoid
+   *  "virtual base inaccessible" warnings when building under GCC with -Wextra turned on.
+   */
+  class _BadCast : public bad_cast {
+    public: _BadCast () throw() : bad_cast() { }
+    public: ~_BadCast () throw() { }
+  };
+
   /** Allows a formatted exception to be thrown. This usage is deprecated and any use of
    *  <tt>VRTEXCEPTION((..))</tt> should be replaced with <tt>VRTException(..)</tt>.
    */
@@ -246,25 +449,26 @@ namespace vrt {
   /** <b>Internal Use Only:</b> The value of <tt>errno</tt> converted to a
    *  <tt>char*</tt> string for use with the <tt>VRTException(..)</tt>
    *  constructors. Use of this may require inclusion of <tt>errno.h</tt>.
-
    */
   #define ERRNO_STR vrt::VRTException::getErrorMsgFor(errno).c_str()
 
   /** A basic exception definition. All exceptions thrown within this project will be an instance
    *  of this class. This differs from the Java version which allows much more differentiation among
    *  the exception types (e.g. <tt>NullPointerException</tt>, <tt>IllegalArgumentException</tt>, etc.).
-   *  @author 
    */
-  class VRTException : public virtual VRTObject, public virtual exception {
-    private: string         message;     // The error message
-    private: string         description; // Description of error with class name and message
-    private: vector<string> backtrace;   // The back-trace (if available)
-
-    /** Constructs an exception with the specified message. */
-    public: VRTException (string msg) throw();
+  class VRTException : public VRTObject, public virtual _Exception {
+    protected: string         message;     // The error message
+    protected: string         description; // Description of error with class name and message
+    protected: vector<string> backtrace;   // The back-trace (if available)
 
     /** Constructs a null exception. */
     public: VRTException () throw();
+
+    /** Copy constructor */
+    public: VRTException (const VRTException &e) throw();
+
+    /** Constructs an exception with the specified message. */
+    public: VRTException (string msg) throw();
 
     /** Constructs an exception with the specified message that follows <tt>printf</tt> formatting rules. */
     _Intel_Pragma("__printf_args")
@@ -279,33 +483,42 @@ namespace vrt {
 
     /** Constructs an exception with a message appropriate for the given errno. */
     public: VRTException (int errnum) throw();
-    
+
     /** Basic destructor for the class. */
     public: ~VRTException () throw() { }
-    
+
     /** <b>Internal Use Only:</b> Gets the error message that corresponds to the
      *  given <tt>errno</tt> value.
      */
     public: static string getErrorMsgFor (int errnum) throw();
-    
-    /** A variant of getClassName() that returns "UnknownExceptionType" rather
-     *  than throwing an exception.
-     */
-    private: string _getClassName () const throw();
 
     /** Gets the user-defined error message. */
-    public: string getMessage () const;
+    public: inline string getMessage () const {
+      return message;
+    }
 
-    /** Version of toString() without 'const' qualifier. */
-    private: virtual string _toString ();
+    public: virtual inline string toString () const {
+      return (isNullValue())? "<null>" : description;
+    }
 
-    public: virtual string toString () const;
+    /** Checks for equality with an unknown object.
+     *  @param o The unknown object.
+     *  @return true if they are identical, false otherwise.
+     */
+    public: virtual bool equals (const VRTException &o) const;
+
+    using VRTObject::equals;
+    public: virtual bool equals (const VRTObject &o) const;
 
     /** Is this object equal to null. */
-    public: virtual bool isNullValue () const;
+    public: virtual inline bool isNullValue () const {
+      return (description == "");
+    }
 
     /** This is identical to calling <tt>toString().c_str()</tt>. */
-    public: virtual const char* what () const throw();
+    public: virtual inline const char* what () const throw() {
+      return toString().c_str();
+    }
 
     /** Prints the "back trace" (also called the "stack trace") to the given
      *  output stream. Generally this will write to <tt>cerr</tt>.
@@ -322,58 +535,118 @@ namespace vrt {
     }
   };
 
-  /** The exception thrown when a <tt>checked_dynamic_cast</tt> fails.
-   *  @author 
-   */
-  class ClassCastException : public virtual VRTException, public virtual bad_cast {
+#else
+  /** A basic exception definition that can be used from JNI. */
+  class VRTException : public virtual exception {
+    protected: string message; // The error message
+
+    /** Constructs an exception with the specified message. */
+    public: VRTException (string msg) throw() : message(msg) { }
+
+    /** Basic destructor for the class. */
+    public: ~VRTException () throw() { }
+
+    /** This is identical to calling <tt>toString().c_str()</tt>. */
+    public: virtual inline const char* what () const throw() {
+      return message.c_str();
+    }
+  };
+#endif /* NOT_USING_JNI */
+
+#if NOT_USING_JNI
+  /** The exception thrown when a <tt>checked_dynamic_cast</tt> fails. */
+  class ClassCastException : public VRTException, public virtual _BadCast {
+    /** Constructs a null exception. */
+    public: ClassCastException () throw();
+
+    /** Copy constructor */
+    public: ClassCastException (const ClassCastException &e) throw();
+
     /** Constructs an exception with the specified message. */
     public: ClassCastException (string msg) throw();
 
-    /** Constructs a null exception. */
-    public: ClassCastException () throw();
-    
     /** Basic destructor for the class. */
     public: ~ClassCastException () throw() { }
-    
-    /** This is identical to calling <tt>toString().c_str()</tt>. */
-    public: inline virtual const char* what () const throw() {
-      // This function is here to avoid issues with ambiguous definitions from
-      // both bad_cast and exception (parent to VRTException) defining what()
-      return VRTException::what();
-    }
   };
+#endif
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   // Type casting methods
   ////////////////////////////////////////////////////////////////////////////////////////////////////
+#if NOT_USING_JNI
   /** A variant of <tt>dynamic_cast&lt;T&gt;(..)</tt> that will throw a <tt>ClassCastException</tt>
    *  any time the cast fails thereby eliminating the need to check for both <tt>bad_cast</tt> and
    *  a return value of <tt>NULL</tt>.
-   *  @param obj The object to cast.
+   *  @param ref The reference to cast.
    *  @return The cast version or NULL if the input is NULL.
    */
   template <typename T,typename C>
-  T checked_dynamic_cast (C ptr) {
+  T& checked_dynamic_cast (C& ref) {
+    // No reason to check anything, this should not return null
+    try {
+      return dynamic_cast<T&>(ref);
+    }
+    catch (bad_cast e) {
+      UNUSED_VARIABLE(e);
+      const char* srcName  = typeid(C&).name();
+      const char* destName = typeid(T&).name();
+      string msg  = VRTObject_private::getClassName(srcName)+" can not be cast to "
+                  + VRTObject_private::getClassName(destName);
+
+      throw ClassCastException(msg);
+    }
+  }
+  /** A variant of <tt>dynamic_cast&lt;T&gt;(..)</tt> that will throw a <tt>ClassCastException</tt>
+   *  any time the cast fails thereby eliminating the need to check for both <tt>bad_cast</tt> and
+   *  a return value of <tt>NULL</tt>.
+   *  @param ptr The pointer to cast.
+   *  @return The cast version or NULL if the input is NULL.
+   */
+  template <typename T,typename C>
+  T checked_dynamic_cast (C* ptr) {
     if (ptr == NULL) return (T)NULL;
     T p = NULL;
     try {
       p = dynamic_cast<T>(ptr);
     }
     catch (bad_cast e) {
+      UNUSED_VARIABLE(e);
       p = NULL;
     }
-    
+
     if (p == NULL) {
-      const char* srcName  = typeid(C).name();
+      const char* srcName  = typeid(C*).name();
       const char* destName = typeid(T).name();
       string msg  = VRTObject_private::getClassName(srcName)+" can not be cast to "
                   + VRTObject_private::getClassName(destName);
-      
+
       throw ClassCastException(msg);
     }
     return p;
   }
-  
+#endif
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  // The safe_delete function
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  /** Deletes a non-NULL reference and then sets the variable to NULL. */
+  template<typename T>
+  void safe_delete (T*& ptr) {
+    if (ptr != NULL) {
+      delete ptr;
+      ptr = NULL;
+    }
+  }
+
+  /** Frees a non-NULL reference and then sets the variable to NULL. */
+  template<typename T>
+  void safe_free (T*& ptr) {
+    if (ptr != NULL) {
+      ::free(ptr);
+      ptr = NULL;
+    }
+  }
+
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   // The isNull(..) Methods
   ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -391,16 +664,19 @@ namespace vrt {
    *  simple <tt>if (val == FLOAT_NAN)</tt> check is invalid since an equality check will always
    *  return false if either value is NaN.
    */
-  inline bool isNull (float            val) { return !(val == val); }
+  inline bool isNull (float            val) { return isnan(val); }
   /** Checks to see if a 64-bit floating-point value matches <tt>DOUBLE_NAN</tt>. Note that a
    *  simple <tt>if (val == FLOAT_NAN)</tt> check is invalid since an equality check will always
    *  return false if either value is NaN.
    */
-  inline bool isNull (double           val) { return !(val == val); }
+  inline bool isNull (double           val) { return isnan(val); }
+
+#if NOT_USING_JNI
   /** Checks to see if a {@link VRTObject} value is null.
    *  This is the same as calling <tt>val.isNullValue()</tt>.
    */
   inline bool isNull (const VRTObject &val) { return val.isNullValue(); }
+#endif
   /** Checks to see if a <tt>string</tt> value is null.
    *  This is the same as calling <tt>val.empty()</tt>.
    */
@@ -409,24 +685,24 @@ namespace vrt {
    *  This is the same as calling <tt>val.empty()</tt>.
    */
   inline bool isNull (const wstring   &val) { return val.empty(); }
-  
+
   /** Checks to see if an unsigned 8-bit integer value is null (it's not). */
-  inline bool isNull (uint8_t          val) { return false; }
+  inline bool isNull (uint8_t          val) { UNUSED_VARIABLE(val); return false; }
   /** Checks to see if a unsigned 16-bit integer value is null (it's not). */
-  inline bool isNull (uint16_t         val) { return false; }
+  inline bool isNull (uint16_t         val) { UNUSED_VARIABLE(val); return false; }
   /** Checks to see if a unsigned 32-bit integer value is null (it's not). */
-  inline bool isNull (uint32_t         val) { return false; }
+  inline bool isNull (uint32_t         val) { UNUSED_VARIABLE(val); return false; }
   /** Checks to see if a unsigned 64-bit integer value is null (it's not). */
-  inline bool isNull (uint64_t         val) { return false; }
+  inline bool isNull (uint64_t         val) { UNUSED_VARIABLE(val); return false; }
 
 #if (defined(__APPLE__) && defined(__MACH__))
   // Under OS X the definition of 'size_t' differs slightly from 'uint64_t' so
   // we need to include this to avoid issues when an isNull(..) check is done
   // on a 'size_t', as may occur when a template is used (this is particularly
   // true for the test cases).
-  
+
   /** Checks to see if a <tt>size_t</tt> value is null (it's not). */
-  inline bool isNull (size_t           val) { return false; }
+  inline bool isNull (size_t           val) { UNUSED_VARIABLE(val); return false; }
 #endif
 
   /** Checks to see if a pointer value matches <tt>NULL</tt>. */
@@ -439,18 +715,48 @@ namespace vrt {
    *  calling <tt>val.empty()</tt> following a check for a null pointer.
    */
   inline bool isNull (const wstring   *val) { return (val == NULL) || val->empty(); }
-  /** Checks to see if a {@link VRTObject} pointer is null. This is the same as 
+#if NOT_USING_JNI
+  /** Checks to see if a {@link VRTObject} pointer is null. This is the same as
    *  calling <tt>val->isNullValue()</tt> following a check for a null pointer.
    */
   inline bool isNull (const VRTObject *val) { return (val == NULL) || val->isNullValue(); }
-};
+#endif
+} END_NAMESPACE
 
 
+#if NOT_USING_JNI
 /** Supports appending a {@link VRTObject} value to a string. */
-inline ostream& operator<<(ostream &s, const vrt::VRTObject &o) { return s << o.toString(); }
+inline ostream& operator<< (ostream &s, const vrt::VRTObject &o) { return s << o.toString(); }
 
 /** Supports appending a {@link VRTObject} value to an output stream. */
-inline string   operator+ (string  &s, const vrt::VRTObject &o) { return s +  o.toString(); }
+inline string   operator+  (string  &s, const vrt::VRTObject &o) { return s +  o.toString(); }
+
+/** Supports appending a {@link VRTObject} value to a string. */
+inline ostream& operator<< (ostream &s, const vrt::VRTObject *o) { return s << ((o == NULL)? "NULL" : o->toString()); }
+
+/** Supports appending a {@link VRTObject} value to an output stream. */
+inline string   operator+  (string  &s, const vrt::VRTObject *o) { return s +  ((o == NULL)? "NULL" : o->toString()); }
+
+///** Supports comparing two {@link VRTObject} instances for equality. */
+//inline bool    operator==  (const vrt::VRTObject *a, const vrt::VRTObject *b) {
+//  return vrt::VRTObject::equal(a,b);
+//}
+//
+///** Supports comparing two {@link VRTObject} instances for equality. */
+//inline bool    operator==  (const vrt::VRTObject &a, const vrt::VRTObject &b) {
+//  return vrt::VRTObject::equal(a,b);
+//}
+///** Supports comparing two {@link VRTObject} instances for inequality. */
+//inline bool    operator!=  (const vrt::VRTObject *a, const vrt::VRTObject *b) {
+//  return !vrt::VRTObject::equal(a,b);
+//}
+//
+///** Supports comparing two {@link VRTObject} instances for inequality. */
+//inline bool    operator!=  (const vrt::VRTObject &a, const vrt::VRTObject &b) {
+//  return !vrt::VRTObject::equal(a,b);
+//}
+
+#endif
 
 /** Supports appending a {@link boolNull} value to a string. */
 inline string   operator+ (string  &s, vrt::boolNull val) {

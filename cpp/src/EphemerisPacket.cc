@@ -208,8 +208,8 @@ EphemerisPacket::EphemerisPacket () :
  // done
 }
 
-EphemerisPacket::EphemerisPacket (const vector<char> &bbuf, bool readOnly) :
-  BasicVRTPacket(bbuf, readOnly)
+EphemerisPacket::EphemerisPacket (const vector<char> &_bbuf, bool _readOnly) :
+  BasicVRTPacket(_bbuf, _readOnly)
 {
  // done
 }
@@ -257,14 +257,14 @@ void EphemerisPacket::toStringStream (ostringstream &str) const {
   str << " VelFixType=" << getVelFixType();
   str << " AccFixType=" << getAccFixType();
   str << " AttFixType=" << getAttFixType();
-  str << " FixTime=" << getFixTime();
+  str << " FixTime=[" << getFixTime().toString() << "]";
   str << " FixDelta=" << getFixDelta();
   { // Print up to 8 of the array entries
     str << " Points={";
     int32_t count = getPointCount();
     for (int32_t i = 0; (i < count) && (i < 8); i++) {
       if (i > 0) str << ", ";
-      str << "[" << getPoint(i) << "]";
+      str << "[" << getPoint(i).toString() << "]";
     }
     if (count > 8) str << ", ...}";
     else           str << "}";

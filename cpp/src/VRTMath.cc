@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,23 +11,38 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
-#include "BasicVRTPacket.h"
-#include "InetAddress.h"
-#include "Record.h"
-#include "TimeStamp.h"
-#include "VRTConfig.h"
 #include "VRTMath.h"
 #include <wchar.h>
+#include "BasicVRTPacket.h"
+#if NOT_USING_JNI
+# include "InetAddress.h"
+# include "Record.h"
+# include "TimeStamp.h"
+# include "VRTConfig.h"
+#endif
 
 using namespace vrt;
 using namespace vrt::VRTMath;
+
+#if __INTEL_COMPILER
+  // Some of the Intel C++ documentation says the function is "_rotl" while
+  // other places say "__rotl" (extra underscore). So far, this is the only
+  // version I've seen work.
+# define rotateLeft(val,shift) _rotl(val,shift)
+#else
+/** Rotate left by the specified number of bits. */
+inline unsigned int rotateLeft (unsigned int val, int shift) {
+  return (val << shift) | (val >> (32 - shift));
+}
+#endif
 
 static const int8_t UTF8_1BYTE_M = (int8_t)0x80; // Mask value for UTF8_1BYTE_0 check
 static const int8_t UTF8_1BYTE_0 = (int8_t)0x00; // 0xxxxxxx
@@ -185,52 +200,11 @@ float VRTMath::_fromHalfInternal (int16_t bits) {
   return *((float*)(void*)&floatBits);
 }
 
-/** Determines if value format is signed. */
-static inline bool isSigned (DataItemFormat form) { // TODO: This belongs elsewhere
-  return ((int32_t)form) < 16;
-}
-
-/** Determines number of exponent bits in VRT format. */
-static inline int32_t getExponentBits (DataItemFormat form) { // TODO: This belongs elsewhere
-  switch (form) {
-    case DataItemFormat_SignedVRT1:   return 1;
-    case DataItemFormat_SignedVRT2:   return 2;
-    case DataItemFormat_SignedVRT3:   return 3;
-    case DataItemFormat_SignedVRT4:   return 4;
-    case DataItemFormat_SignedVRT5:   return 5;
-    case DataItemFormat_SignedVRT6:   return 6;
-    case DataItemFormat_UnsignedVRT1: return 1;
-    case DataItemFormat_UnsignedVRT2: return 2;
-    case DataItemFormat_UnsignedVRT3: return 3;
-    case DataItemFormat_UnsignedVRT4: return 4;
-    case DataItemFormat_UnsignedVRT5: return 5;
-    case DataItemFormat_UnsignedVRT6: return 6;
-    default: return -1;
-  }
-}
-
-int64_t VRTMath::toVRTFloat (DataItemFormat form, int32_t dSize, double val) {
-  bool    sign   = isSigned(form);        // Is output signed?
-  int32_t eSize  = getExponentBits(form); // Number of output exponent bits (1 to 6)
-  int64_t maxExp = (0x1 << eSize) - 1;    // Max output exponent value
-  int64_t mSize  = dSize - eSize;         // Output mantissa size
-
-  // ==== SANITY CHECKS ======================================================
-  if (eSize < 1) {
-    throw VRTException("Expected VRT floating-point format");
-  }
-  if ((mSize < 1) || (dSize > 64)) {
-    throw VRTException("Expected VRT data size in range of [%d,64] but given %d",
-                       (eSize+1), dSize);
-  }
-  if (isNull(val)) return 0; // <-- checks for NaN
-  if (!sign && (val < 0)) return 0;
-  if (val ==  0) return 0; // <-- Fast handling for common case
-  if (val >= +1) return (sign)? ~(__INT64_C(-1) << (dSize-1)) : ~(__INT64_C(-1) << dSize);
-  if (val <= -1) return (__INT64_C(0x1) << (dSize-1)) | maxExp;
-
-  // ==== CONVERT TO VRT FLOAT ===============================================
-  int64_t bits      = Utilities::doubleToRawLongBits(val);    // Input IEEE-754 bits
+/** <b>Internal Use Only:</b> Converts to VRTFloat. */
+static int64_t _toVRTFloat64 (bool sign, int32_t eSize, int32_t dSize, double val) {
+  int64_t maxExp    = (__INT64_C(1) << eSize) - 1;            // Max output exponent value
+  int32_t mSize     = dSize - eSize;                          // Output mantissa size
+  int64_t bits      = doubleToRawLongBits(val);               // Input IEEE-754 bits
   int64_t expo      = ((bits >> 52) & 0x7FF) - 1023;          // Input exponent
   int64_t mant      = (bits & __INT64_C(0x000FFFFFFFFFFFFF)); // Input mantissa
   int64_t exponent;                                           // Output exponent
@@ -241,14 +215,9 @@ int64_t VRTMath::toVRTFloat (DataItemFormat form, int32_t dSize, double val) {
     mant = mant | __INT64_C(0x0010000000000000);
   }
 
-  if (sign) {
-    mantissa = (mant >> (54 - mSize));   // 54 not 53 so top bit is effectively "sign bit"
-    exponent = maxExp + expo + 1;  // +2 not +1 to match mantissa 54 not 53
-  }
-  else {
-    mantissa = (mant >> (53 - mSize));
-    exponent = maxExp + expo + 1;
-  }
+  mantissa = (sign)? (mant >> (54 - mSize)) // 54 not 53 so top bit is effectively "sign bit"
+                   : (mant >> (53 - mSize));
+  exponent = maxExp + expo + __INT64_C(1);
 
   if (exponent < 0) {
     // Output is (effectively) a denormal
@@ -256,109 +225,268 @@ int64_t VRTMath::toVRTFloat (DataItemFormat form, int32_t dSize, double val) {
     exponent = 0;
   }
 
-  if (val < 0) { 
+  if (val < 0) {
     mantissa = -mantissa;
   }
 
   return (((mantissa << eSize) | exponent) & ~(__INT64_C(-1) << dSize));
 }
 
-
-double VRTMath::fromVRTFloat (DataItemFormat form, int32_t dSize, int64_t bits) {
-  bool    sign   = isSigned(form);
-  int32_t eSize  = getExponentBits(form);
+/** <b>Internal Use Only:</b> Converts from VRTFloat. */
+static double _fromVRTFloat64 (bool sign, int32_t eSize, int32_t dSize, int64_t bits) {
   int32_t maxExp = (0x1 << eSize) - 1;     // = all exp bits set
   int32_t exp    = ((int32_t)bits) & maxExp;
   int32_t mSize  = dSize - eSize;
-
-  // ==== SANITY CHECKS ======================================================
-  if (eSize < 1) {
-    throw VRTException("Expected VRT floating-point format");
-  }
-  if ((mSize < 1) || (dSize > 64)) {
-    throw VRTException("Expected VRT data size in range of [%d,64] but given %d",
-                       (eSize+1), dSize);
-  }
-
-  // ==== CONVERT TO IEEE-754 FLOAT ==========================================
-  if (bits == 0) return 0.0; // <-- Fast handling for common case
 
   if (sign) {
     // Previously we used 'pow(2, mSize + maxExp - exp - 1)' for the divisor,
     // but since we are using powers of 2 below 2^64 we can do bit-shifts in
     // place of the cal to pow(2,N) if we break them up.
     int64_t man = (bits << (64 - dSize)) >> (64 - mSize); // sign extend and shift
-    double  a   = (__UINT64_C(0x01) << (mSize  - 1  )); // -1 for effective "sign bit"
-    double  b   = (__UINT64_C(0x01) << (maxExp - exp));
+    double  a   = (double)(__UINT64_C(0x01) << (mSize  - 1  )); // -1 for effective "sign bit"
+    double  b   = (double)(__UINT64_C(0x01) << (maxExp - exp));
     // No special case of maxExp=63 and exp=0 in C++ since using UINT64_C
     return man / a / b;
   }
   else {
     int64_t man = (bits >> eSize) & ((__INT64_C(0x1) << mSize) - 1); // mask off upper bits
-    double  a   = (__UINT64_C(0x01) << (mSize       ));
-    double  b   = (__UINT64_C(0x01) << (maxExp - exp));
+    double  a   = (double)(__UINT64_C(0x01) << (mSize       ));
+    double  b   = (double)(__UINT64_C(0x01) << (maxExp - exp));
     // No special case of maxExp=63 and exp=0 in C++ since using UINT64_C
     return man / a / b;
   }
 }
 
-int32_t VRTMath::packAscii (void *ptr, int32_t off, const string &val, int32_t length) {
-  char   *buf = (char*)ptr;
-  size_t  len = val.size();
-  if (((size_t)length) < len) len = length;
+int64_t VRTMath::toVRTFloat (DataItemFormat form, int32_t dSize, double val) {
+  bool    sign   = DataItemFormat_isSigned(form);        // Is output signed?
+  int32_t eSize  = DataItemFormat_getExponentBits(form); // Number of output exponent bits (1 to 6)
 
-  for (size_t i = 0; i < len; i++,off++) {
+  if (eSize < 1) {
+    throw VRTException("Expected VRT floating-point format");
+  }
+  if (((dSize-eSize) < 1) || (dSize > 64)) {
+    // Use snprintf(..) for formatting to be compatible with JNI usage
+    char msg[128];
+    snprintf(msg, 128, "Expected VRT data size in range of [%d,64] but given %d", (eSize+1), dSize);
+    throw VRTException(msg);
+  }
+  return toVRTFloat64(sign, eSize, dSize, val);
+}
+
+int32_t VRTMath::toVRTFloat32 (bool sign, int32_t eSize, int32_t dSize, double val) {
+  // Need to disable Intel compiler warning 1572 (floating-point equality and
+  // inequality comparisons are unreliable) since it will otherwise flag the
+  // following check even though it is a correct checks for 0.0.
+  _Intel_Pragma("warning push")
+  _Intel_Pragma("warning disable 1572")
+  if (val == 0.0) return 0; // <-- Fast handling for common case
+  _Intel_Pragma("warning pop")
+
+  if (val >= +1.0) {
+    if (sign) return ~(-1 << (dSize-1));
+    // special case for dSize=32 since (-1<<32) gives 0 *or* -1
+    return (dSize == 32)? -1 : ~(-1 << dSize);
+  }
+  if (!sign && (val < 0.0)) return 0;
+  if (val <= -1.0) return (0x1 << (dSize-1)) | ((1 << eSize) - 1);
+  if (isNull(val)) return 0; // <-- checks for NaN
+
+  return (int32_t)_toVRTFloat64(sign, eSize, dSize, val);
+}
+
+int64_t VRTMath::toVRTFloat64 (bool sign, int32_t eSize, int32_t dSize, double val) {
+  // Need to disable Intel compiler warning 1572 (floating-point equality and
+  // inequality comparisons are unreliable) since it will otherwise flag the
+  // following check even though it is a correct checks for 0.0.
+  _Intel_Pragma("warning push")
+  _Intel_Pragma("warning disable 1572")
+  if (val == 0.0) return __INT64_C(0); // <-- Fast handling for common case
+  _Intel_Pragma("warning pop")
+
+  if (val >= +1.0) return (sign)? ~(__INT64_C(-1) << (dSize-1)) : ~(__INT64_C(-1) << dSize);
+  if (!sign && (val < 0.0)) return __INT64_C(0);
+  if (val <= -1.0) return (__INT64_C(0x1) << (dSize-1)) | ((__INT64_C(1) << eSize) - 1);
+  if (isNull(val)) return __INT64_C(0); // <-- checks for NaN
+
+  return _toVRTFloat64(sign, eSize, dSize, val);
+}
+
+double VRTMath::fromVRTFloat (DataItemFormat form, int32_t dSize, int64_t bits) {
+  bool    sign   = DataItemFormat_isSigned(form);
+  int32_t eSize  = DataItemFormat_getExponentBits(form);
+  if (eSize < 1) {
+    throw VRTException("Expected VRT floating-point format");
+  }
+  if (((dSize-eSize) < 1) || (dSize > 64)) {
+    // Use snprintf(..) for formatting to be compatible with JNI usage
+    char msg[128];
+    snprintf(msg, 128, "Expected VRT data size in range of [%d,64] but given %d", (eSize+1), dSize);
+    throw VRTException(msg);
+  }
+  return fromVRTFloat64(sign, eSize, dSize, bits);
+}
+
+double VRTMath::fromVRTFloat32 (bool sign, int32_t eSize, int32_t dSize, int32_t bits) {
+  if (bits == 0) return 0.0; // <-- Fast handling for common case
+
+  return _fromVRTFloat64(sign, eSize, dSize, bits);
+}
+
+double VRTMath::fromVRTFloat64 (bool sign, int32_t eSize, int32_t dSize, int64_t bits) {
+  if (bits == __INT64_C(0)) return 0.0; // <-- Fast handling for common case
+
+  return _fromVRTFloat64(sign, eSize, dSize, bits);
+}
+
+int32_t VRTMath::unpackBits32 (const void *ptr, int32_t bitOffset, int32_t bitCount) {
+  const char *buf = (const char*)ptr;
+
+  int32_t mask = (bitCount == 32)? -1 : ((0x1 << bitCount) - 1);
+  int32_t off  = bitOffset >> 3;
+  int32_t skip = bitOffset & 0x7;
+  int32_t bits = 0;   // Bit accumulator
+
+  if ((bitCount < 8) && ((skip + bitCount) <= 8)) {
+    // Special case since we need to consider the "skip bits" at the top of
+    // the byte *AND* any "extra bits" at the bottom of the byte.
+    return (buf[off] >> (8 - bitCount - skip)) & mask;
+  }
+
+  bitCount += skip; // read in "skip bits" as we will discard them at the end
+
+  _Intel_Pragma("loop_count min=0, max=4")
+  while (bitCount >= 8) {
+    bits = (bits << 8) | (0xFF & buf[off++]);
+    bitCount -= 8;
+  }
+
+  if (bitCount > 0) {
+    bits = (bits << bitCount) | ((0xFF & buf[off]) >> (8-bitCount));
+  }
+
+  return bits & mask;
+}
+
+int64_t VRTMath::unpackBits64 (const void *ptr, int32_t bitOffset, int32_t bitCount) {
+  const char *buf = (const char*)ptr;
+  // If < 32 bits, use the 32-bit version which can utilize the 32-bit registers
+  // on the system. However, unlike packBits64(..), simply calling unpackBits32(..)
+  // twice and combining the results is slower than this version since that
+  // form requires converting values from 32-bits to 64-bits twice and two
+  // logical ANDs to prevent accidental sign-extension. Note that this is NOT
+  // used for exactly 32-bit values since it can cause values to be sign-extended
+  // wrong.
+  if (bitCount < 32) return unpackBits32(buf, bitOffset, bitCount);
+
+  int64_t mask = (bitCount == 64)? -1L : ((__INT64_C(0x1) << bitCount) - __INT64_C(1));
+  int32_t off  = bitOffset >> 3;
+  int32_t skip = bitOffset & 0x7;
+  int64_t bits = 0;   // Bit accumulator
+
+  bitCount += skip; // read in "skip bits" as we will discard them at the end
+
+  _Intel_Pragma("loop_count min=0, max=8")
+  while (bitCount >= 8) {
+    bits = (bits << 8) | (0xFF & buf[off++]);
+    bitCount -= 8;
+  }
+
+  if (bitCount > 0) {
+    bits = (bits << bitCount) | ((0xFF & buf[off]) >> (8-bitCount));
+  }
+
+  return bits & mask;
+}
+
+void VRTMath::packBits32 (void *ptr, int32_t bitOffset, int32_t bitCount, int32_t bits) {
+  char *buf = (char*)ptr;
+  // This is a bit messier than the unpackBits32(..) function since we need to
+  // save any existing bits and we are "working backwards" (i.e. pulling bits
+  // off the top rather than the bottom). The rotateLeft(..) function used here
+  // should correspond to an intrinsic function in the Java VM (Java 6+) or
+  // the Intel C++ compiler (GCC 4.8+ should have it as an intrinsic too, once
+  // it is available).
+  int32_t off     = bitOffset >> 3;                  // 8-bit offset into buffer
+  int32_t skipTop = bitOffset & 0x7;                 // Bits to skip at top of first octet
+  int32_t width   = (skipTop + bitCount + 7) / 8;    // Number of octets to modify (+7 to "round up")
+  int32_t skipBtm = (width*8) - skipTop - bitCount;  // Bits to skip at bottom of last octet
+  int32_t maskTop = 0xFF00 >> skipTop;               // Mask for top bits to save (extra bits ignored)
+  int32_t maskBtm = ~(-1 << skipBtm);                // Mask for bottom bits to save
+
+  if (width == 1) {
+    int32_t maskKeep = maskTop | maskBtm;
+    buf[off] = (char)((buf[off] & maskKeep) | ((bits << skipBtm) & ~maskKeep));
+  }
+  else {
+    // The next line is effectively 2 separate shifts:
+    //   bitsToSet = bits << (32 - bitCount);       // shift bits to left of register
+    //   bitsToSet = rotateLeft(bits, 8 - skipTop); // rotate first 8 bits to set
+    int bitsToSet = rotateLeft(bits, 40 - bitCount - skipTop);
+    buf[off] = (char)((buf[off] & maskTop) | (bitsToSet & ~maskTop));
+    off++;
+
+    _Intel_Pragma("loop_count min=1, max=3")
+    for (int32_t i = 2; i < width; i++) { // i=2 since first and last are special
+      buf[off++] = (char)(bitsToSet = rotateLeft(bitsToSet, 8));
+    }
+
+    bitsToSet = rotateLeft(bitsToSet, 8);
+    buf[off] = (char)((buf[off] & maskBtm) | (bitsToSet & ~maskBtm));
+  }
+}
+
+void VRTMath::packBits64 (void *ptr, int32_t bitOffset, int32_t bitCount, int64_t bits) {
+  // If <=32 bits, use the 32-bit version which can utilize the 32-bit registers
+  // on the system. Since we do this, we don't need to worry about the special
+  // width=1 case here.
+  if (bitCount <= 32) {
+    packBits32(ptr, bitOffset, bitCount, (int32_t)bits);
+  }
+  else {
+    // Even though this ends up setting one octet twice (top bits then lower
+    // bits of middle octet), testing revealed no significant performance hit
+    // for doing this, presumably due to the faster math possible when using
+    // 32-bit registers (even on a 64-bit system).
+    int32_t n = bitCount - 32;
+    packBits32(ptr, bitOffset,   n,  (int32_t)(bits >> 32));
+    packBits32(ptr, bitOffset+n, 32, (int32_t)(bits      ));
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+#if NOT_USING_JNI
+////////////////////////////////////////////////////////////////////////////////
+
+int32_t VRTMath::packAscii (void *ptr, int32_t off, const string &val, int32_t length) {
+  char    *buf = (char*)ptr;
+  int32_t  len = 0;
+  int32_t  end = off+length;
+
+  for (size_t i = 0; i < val.length(); i++,off++) {
     char c = val[i];
     if ((c < 0x20) || (c > 0x7E)) c = '?';
     buf[off] = (char)c;
+    len++;
   }
-  for (int i = len; i < length; i++,off++) {
-    buf[off] = '\0';
-  }
-  return len;
-}
-
-int32_t VRTMath::lengthUTF8 (const string &val) {
-  int32_t len = 0;
-  for (size_t i = 0; i < val.length(); i++) {
-    len += (val[i] >= 0x01)? 1                  // ASCII except embeded NUL (0x01 to 0x7F)
-                           : 2;                 // Embedded NUL (0x00) or 0x80 to 0xFF range
+  if (off < end) {
+    memset(&buf[off], 0, length-len);
   }
   return len;
 }
 
-int32_t VRTMath::lengthUTF8 (const wstring &val) {
-  if ((WCHAR_MIN > 0) || (WCHAR_MAX < 0x10FFFF)) {
-    // Found a rare case where wchar_t is defined in such a way that it can not hold all of the
-    // UTF-8 values, likely an issue with it only supporting the older "basic multilingual plane"
-    // (0x0000 to 0xFFFF). Just error out rather than guess at what it does and doesn't support.
-    throw VRTException("This build does not support UTF-8 strings (found WCHAR_MIN=%d and WCHAR_MAX=%d)", WCHAR_MIN, WCHAR_MAX);
-  }
-  int32_t len = 0;
+int32_t VRTMath::packAscii (void *ptr, int32_t off, const wstring &val, int32_t length) {
+  char    *buf = (char*)ptr;
+  int32_t  len = 0;
+  int32_t  end = off+length;
 
-  for (size_t i = 0; i < val.length(); i++) {
+  for (size_t i = 0; i < val.length(); i++,off++) {
     int32_t c = val[i];
-
-    if (c < 0x0000) {
-      // On many platforms wchar_t is typedef'ed the same as int32_t. Since negative values are
-      // invalid in Unicode, just error out if a negative value is seen.
-      throw VRTException("Invalid character 0x%x found in '%ls'", c, val.c_str());
-    }
-    else if ((c >= 0x0001) && (c <= 0x007F)) {           // ASCII (except embedded NUL)
-      len++;
-    }
-    else if (c <= 0x07FF) {                              // 0x0080 to 0x07FF range (or embedded NUL)
-      len+=2;
-    }
-    else if (c < 0xFFFF) {                               // 0x0800 to 0xFFFF range
-      len+=3;
-    }
-    else if (c < 0x10FFFF) {                             // 0x010000 to 0x10FFFF range
-      len+=4;
-    }
-    else {
-      throw VRTException("Invalid character 0x%x found in '%ls'", c, val.c_str());
-    }
+    if ((c < 0x20) || (c > 0x7E)) c = '?';
+    buf[off] = (char)c;
+    len++;
+  }
+  if (off < end) {
+    memset(&buf[off], 0, length-len);
   }
   return len;
 }
@@ -368,11 +496,13 @@ int32_t VRTMath::packUTF8 (void *ptr, int32_t off, const string &val, int32_t le
   int32_t  len = 0;
   int32_t  end = (length < 0)? 0x7FFFFFFF : off+length;
 
-  for (size_t i = 0; (i < val.length()) && (off < end); i++) {
+  for (size_t i = 0; i < val.length(); i++) {
     int32_t c = val[i];
 
     if (c >= 0x01) {                                     // ASCII (except embedded NUL)
-      buf[off++] = (int8_t)c;
+      if (off < end) {
+        buf[off++] = (int8_t)c;
+      }
       len++;
     }
     else {                                               // 0x0080 to 0x07FF range (or embedded NUL)
@@ -381,36 +511,42 @@ int32_t VRTMath::packUTF8 (void *ptr, int32_t off, const string &val, int32_t le
         buf[off++] = (int8_t)(UTF8_2BYTE_1 | (   c     & 0x3F));
       }
       else {
-        while (off < end) buf[off++] = 0;
+        if (off < end) buf[off++] = 0;
       }
       len+=2;
     }
   }
-  while (off < end) buf[off++] = 0;
+  if (off < end) {
+    memset(&buf[off], 0, end-off);
+  }
   return len;
 }
 
 int32_t VRTMath::packUTF8 (void *ptr, int32_t off, const wstring &val, int32_t length) {
-  char *buf = (char*)ptr;
-  if ((WCHAR_MIN > 0) || (WCHAR_MAX < 0x10FFFF)) {
+  char    *buf = (char*)ptr;
+  int32_t  len = 0;
+  int32_t  end = (length < 0)? 0x7FFFFFFF : off+length;
+
+  for (size_t i = 0; i < val.length(); i++) {
+#if (WCHAR_MAX == 0xFFFF)
     // Found a rare case where wchar_t is defined in such a way that it can not hold all of the
     // UTF-8 values, likely an issue with it only supporting the older "basic multilingual plane"
-    // (0x0000 to 0xFFFF). Just error out rather than guess at what it does and doesn't support.
-    throw VRTException("This build does not support UTF-8 strings (found WCHAR_MIN=%d and WCHAR_MAX=%d)", WCHAR_MIN, WCHAR_MAX);
-  }
-  int32_t len = 0;
-  int32_t end = (length < 0)? 0x7FFFFFFF : off+length;
-
-  for (size_t i = 0; (i < val.length()) && (off < end); i++) {
+    // (0x0000 to 0xFFFF).
+    int32_t c = (unsigned int)val[i];
+#else
     int32_t c = val[i];
+#endif
 
     if (c < 0x0000) {
       // On many platforms wchar_t is typedef'ed the same as int32_t. Since negative values are
       // invalid in Unicode, just error out if a negative value is seen.
       throw VRTException("Invalid character 0x%x found in '%ls'", c, val.c_str());
     }
-    else if ((c >= 0x0001) && (c <= 0x007F)) {           // ASCII (except embedded NUL)
-      buf[off++] = (int8_t)c;
+
+    if ((c >= 0x0001) && (c <= 0x007F)) {                // ASCII (except embedded NUL)
+      if (off < end) {
+        buf[off++] = (int8_t)c;
+      }
       len++;
     }
     else if (c <= 0x07FF) {                              // 0x0080 to 0x07FF range (or embedded NUL)
@@ -419,7 +555,7 @@ int32_t VRTMath::packUTF8 (void *ptr, int32_t off, const wstring &val, int32_t l
         buf[off++] = (int8_t)(UTF8_2BYTE_1 | (   c     & 0x3F));
       }
       else {
-        while (off < end) buf[off++] = 0;
+        if (off < end) buf[off++] = 0;
       }
       len+=2;
     }
@@ -430,6 +566,7 @@ int32_t VRTMath::packUTF8 (void *ptr, int32_t off, const wstring &val, int32_t l
         buf[off++] = (int8_t)(UTF8_3BYTE_2 | (    c     & 0x3F));
       }
       else {
+        _Intel_Pragma("loop_count min=0, max=2")
         while (off < end) buf[off++] = 0;
       }
       len+=3;
@@ -442,6 +579,7 @@ int32_t VRTMath::packUTF8 (void *ptr, int32_t off, const wstring &val, int32_t l
         buf[off++] = (int8_t)(UTF8_4BYTE_3 | (    c     & 0x3F));
       }
       else {
+        _Intel_Pragma("loop_count min=0, max=3")
         while (off < end) buf[off++] = 0;
       }
       len+=4;
@@ -450,7 +588,7 @@ int32_t VRTMath::packUTF8 (void *ptr, int32_t off, const wstring &val, int32_t l
       throw VRTException("Invalid character 0x%x found in '%ls'", c, val.c_str());
     }
   }
-  while (off < end) buf[off++] = 0;
+  memset(&buf[off], 0, end-off);
   return len;
 }
 
@@ -460,24 +598,6 @@ int32_t VRTMath::packMetadata (vector<char> &buf, int32_t off, const MetadataBlo
     throw VRTException("Incompatible length (%d) expected %d", length, len);
   }
   return length;
-}
-
-void VRTMath::packTimeStamp (vector<char> &buf, int32_t off, const TimeStamp &val, IntegerMode epoch, ByteOrder rep) {
-  if (epoch == IntegerMode_UTC) {
-    packInt(buf, off, val.getSecondsUTC(), rep);
-    packLong(buf, off+4, val.getPicoSeconds(), rep);
-  }
-  else if (epoch == IntegerMode_GPS) {
-    packInt(buf, off, val.getSecondsGPS(), rep);
-    packLong(buf, off+4, val.getPicoSeconds(), rep);
-  }
-  else {
-    throw VRTException("Unsupported epoch given, expected GPS or UTC");
-  }
-}
-
-void VRTMath::packInetAddr (vector<char> &buf, int32_t off, const InetAddress &val) {
-  memcpy(&buf[off], &val.toIPv6().s6_addr[0], 16);
 }
 
 void VRTMath::packRecord (vector<char> &buf, int32_t off, const Record &val) {
@@ -556,22 +676,20 @@ wstring VRTMath::unpackUTF8 (const void *ptr, int32_t off, int32_t len, wchar_t 
     else if ((b & UTF8_1BYTE_M) == UTF8_1BYTE_0) {                     // ASCII (except embedded NUL)
       c = (b & 0x7F);
     }
-    else if (((b & UTF8_2BYTE_M) == UTF8_2BYTE_0) && (off+1 < len)) {  // 0x0080 to 0x07FF range (or embedded NUL)
-      c = ((b & 0x1F) << 6)
-        | (buf[off++] & 0x3F);
+    else if (((b & UTF8_2BYTE_M) == UTF8_2BYTE_0) && (off < len)) {    // 0x0080 to 0x07FF range (or embedded NUL)
+      c  = (b          & 0x1F) << 6;
+      c |= (buf[off++] & 0x3F);
     }
-    else if (((b & UTF8_3BYTE_M) == UTF8_3BYTE_0) && (off+2 < len)) {  // 0x0800 to 0xFFFF range
-      c = ((b & 0x0F) << 12)
-        | ((buf[off+1] & 0x3F) << 6)
-        |  (buf[off+2] & 0x3F);
-      off+=2;
+    else if (((b & UTF8_3BYTE_M) == UTF8_3BYTE_0) && (off+1 < len)) {  // 0x0800 to 0xFFFF range
+      c  = (b          & 0x0F) << 12;
+      c |= (buf[off++] & 0x3F) << 6;
+      c |= (buf[off++] & 0x3F);
     }
     else if (((b & UTF8_4BYTE_M) == UTF8_4BYTE_0) && (off+2 < len)) {  // 0x010000 to 0x10FFFF range
-      c = ((b & 0x0F) << 18)
-        | ((buf[off+1] & 0x3F) << 6)
-        | ((buf[off+2] & 0x3F) << 6)
-        |  (buf[off+3] & 0x3F);
-      off+=3;
+      c  = (b          & 0x07) << 18;
+      c |= (buf[off++] & 0x3F) << 12;
+      c |= (buf[off++] & 0x3F) <<  6;
+      c |= (buf[off++] & 0x3F);
     }
     else if (replacement != 0) {
       c = replacement;
@@ -591,16 +709,10 @@ MetadataBlock VRTMath::unpackMetadata (const vector<char> &buf, int32_t off, int
   return meta;
 }
 
-TimeStamp VRTMath::unpackTimeStamp (const vector<char> &buf, int32_t off, IntegerMode epoch, ByteOrder rep) {
-  uint32_t sec = unpackUInt(buf, off, rep);
-  uint64_t ps  = unpackULong(buf, off+4, rep);
-  return TimeStamp(epoch, sec, ps);
-}
-
-InetAddress VRTMath::unpackInetAddr (const vector<char> &buf, int32_t off) {
-  return InetAddress(buf, off);
-}
-
 void VRTMath::unpackRecord (const vector<char> &buf, int32_t off, Record &val) {
   val.writeBytes(&buf[off]);
 }
+
+////////////////////////////////////////////////////////////////////////////////
+#endif /* NOT_USING_JNI */
+////////////////////////////////////////////////////////////////////////////////

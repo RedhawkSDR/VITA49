@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #ifndef _AbstractVRAFile_h
@@ -48,8 +49,6 @@ namespace vrt {
    *    {@link #read}
    *    {@link #write}
    *  </pre>
-   *
-   *  @author 
    */
   class AbstractVRAFile : public VRTObject, public PacketContainer {
     /** The minimum file version supported by this version of the library.
@@ -146,7 +145,7 @@ namespace vrt {
     public: static const char VRA_FAW_2 = 0x41;
     /** This is the 4th recorded byte of the 32-bit FWA ({@link #VRA_FAW}). */
     public: static const char VRA_FAW_3 = 0x46;
-    
+
     private:   char     header[HEADER_LENGTH];        // A copy of the header
     private:   int32_t  hdrVersion;    // Local copy of file version (from header)
     private:   int64_t  hdrFileLength; // Local copy of file size    (from header)
@@ -164,20 +163,20 @@ namespace vrt {
 
     /** Basic copy constructor for the class. */
     public: AbstractVRAFile (const AbstractVRAFile &f);
-    
+
     /** <b>Internal Use Only:</b> Creates a new instance, but does not open it yet.
      *  Subclasses must call <tt>open()</tt> as part of the constructor.
-     *  @param uri        The URI for the file (null if n/a).
-     *  @param isRead     Is the file being opened for reading?
-     *  @param isWrite    Is the file being opened for writing?
-     *  @param isSetSize  Should the size be set on write? (ignored if read-only)
-     *  @param isSetCRC   Should the CRC  be set on write? (ignored if read-only)
-     *  @param isStrict   Should strict packet checks be used on write?
+     *  @param _uri        The URI for the file (null if n/a).
+     *  @param _isRead     Is the file being opened for reading?
+     *  @param _isWrite    Is the file being opened for writing?
+     *  @param _isSetSize  Should the size be set on write? (ignored if read-only)
+     *  @param _isSetCRC   Should the CRC  be set on write? (ignored if read-only)
+     *  @param _isStrict   Should strict packet checks be used on write?
      */
-    protected: AbstractVRAFile (string uri, bool isRead,    bool isWrite,
-                                            bool isSetSize, bool isSetCRC,
-                                            bool isStrict);
-    
+    protected: AbstractVRAFile (string _uri, bool _isRead,    bool _isWrite,
+                                             bool _isSetSize, bool _isSetCRC,
+                                             bool _isStrict);
+
     /** Gets a free-form description of the file. Note that the content and structure of this
      *  string is implementation dependant and may change at any time.
      *  @return A free-form string describing the file.
@@ -191,6 +190,7 @@ namespace vrt {
       return uri;
     }
 
+    using VRTObject::equals;
     /** Checks for equality with an unknown object. Two VRA files are considered equal if they
      *  have the same values for {@link #getVersion()} and  {@link #getFileLength()} and the
      *  packets contained in their payloads are identical. The actual implementation classes
@@ -209,13 +209,14 @@ namespace vrt {
         return equals(*checked_dynamic_cast<const AbstractVRAFile*>(&o));
       }
       catch (VRTException e) {
+        UNUSED_VARIABLE(e);
         return false;
       }
     }
-    
+
     /** Checks for equality with another file. */
     public: virtual bool equals (const AbstractVRAFile &f) const;
-    
+
     /** Checks to see if the file is valid. This checks the overall structure of the file and
      *  verifies the checksum (if specified). It also checks to see that the length of the file as
      *  reported in the frame header is equal to the length of the header and trailer plus the length
@@ -291,7 +292,8 @@ namespace vrt {
     public: virtual ConstPacketIterator begin () const;
     public: virtual ConstPacketIterator end () const;
     public: virtual void                gotoNextPacket (ConstPacketIterator &pi) const;
-    public: virtual BasicVRTPacket*     getThisPacket (ConstPacketIterator &pi, bool skip) const;
+    public: virtual BasicVRTPacket*     getThisPacket (ConstPacketIterator &pi, bool skip)
+                                          const __attribute__((warn_unused_result));
 
     /** <i>Optional functionality:</i> Appends a VRTPacket to the end of the file.
      *  @param p The packet to append.
@@ -310,28 +312,28 @@ namespace vrt {
      *  closed then invoking this method has no effect.
      */
     public: virtual void close ();
-    
+
     /** Opens the file. Overriding classes should call <tt>super.open()</tt> once
      *  the file has been opened in order to ensure the header fields have been
      *  read in (if applicable) and initialized.
      */
     protected: virtual void open ();
-    
+
     /** Reads the header in. */
     protected: virtual void readHeader ();
 
     /** The very basic frame validity checks. */
     private: bool isFileValid0 () const;
-    
+
     /** Computes the CRC for the frame, but does not insert it into the frame. */
     private: int32_t computeCRC () const;
-    
+
     /** Sets the version, but does not write header to disk.
      *  @param ver The new version.
      *  @return true if header needs to be written to disk; false if no changes made.
      */
     private: bool _setVersion (int32_t ver);
-    
+
     /** Gets the file length from the O/S or -1 if unknown. */
     protected: virtual int64_t getFileLengthOS () const = 0;
 
@@ -416,5 +418,5 @@ namespace vrt {
      */
     protected: virtual void write (int64_t off, void *ptr, int32_t len, bool flush) = 0;
   };
-};
+} END_NAMESPACE
 #endif /* _AbstractVRAFile_h */

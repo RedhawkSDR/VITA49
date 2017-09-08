@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #ifndef _BasicContextPacket_h
@@ -32,7 +33,6 @@ namespace vrt {
   class AbstractGeolocation;  // declared below
   class Geolocation;          // declared below
   class Ephemeris;            // declared below
-  class EphemerisAdjunct;     // declared below
   class ContextAssocLists;    // declared below
   class GeoSentences;         // declared below
 
@@ -64,28 +64,23 @@ namespace vrt {
     static const int32_t EPHEM_REF      = 0x00000400;
     static const int32_t GPS_ASCII      = 0x00000200;
     static const int32_t CONTEXT_ASOC   = 0x00000100;
-    static const int32_t ECEF_EPHEM_ADJ = 0x00000080;
-    static const int32_t REL_EPHEM_ADJ  = 0x00000040;
-    
-    // Field lengths in the IFContext packet. Note that the entries in CTX_36_OCTETS
-    // all come *after* the variable-length fields, and all others come before.
+
+    // Field lengths in the IFContext packet.
     static const int32_t CTX_4_OCTETS  = REF_POINT     | REF_LEVEL     | GAIN          | OVER_RANGE
                                        | TIME_CALIB    | TEMPERATURE   | STATE_EVENT   | EPHEM_REF;
     static const int32_t CTX_8_OCTETS  = BANDWIDTH     | IF_FREQ       | RF_FREQ       | RF_OFFSET
                                        | IF_OFFSET     | SAMPLE_RATE   | TIME_ADJUST   | DEVICE_ID
                                        | DATA_FORMAT;
     static const int32_t CTX_44_OCTETS = GPS_EPHEM     | INS_EPHEM;
-    static const int32_t CTX_36_OCTETS = REL_EPHEM_ADJ | ECEF_EPHEM_ADJ;
     static const int32_t CTX_52_OCTETS = ECEF_EPHEM    | REL_EPHEM;
-  };
+  } END_NAMESPACE
   using namespace private_BasicContextPacket;
 
 
   /** Represents a GPS or INS geolocation fix. <i>The fact that {@link GeoSentences}
    *  does not extend this class is not accidental.</i>
-   *  @see            Geolocation
-   *  @see            Ephemeris
-   *  @author         
+   *  @see Geolocation
+   *  @see Ephemeris
    */
   class AbstractGeolocation : public Record {
     /** Creates a new instance with the given size.
@@ -147,14 +142,13 @@ namespace vrt {
     public: virtual int32_t   getFieldCount () const;
     public: virtual string    getFieldName  (int32_t id) const;
     public: virtual ValueType getFieldType  (int32_t id) const;
-    public: virtual Value*    getField      (int32_t id) const;
+    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));
     public: virtual void      setField      (int32_t id, const Value* val);
   };
 
   /** Represents a GPS or INS geolocation fix.
-   *  @see            Ephemeris
-   *  @see            GeoSentences
-   *  @author         
+   *  @see Ephemeris
+   *  @see GeoSentences
    */
   class Geolocation : public AbstractGeolocation {
     /** Creates a new instance. */
@@ -189,7 +183,7 @@ namespace vrt {
     }
 
     /** Gets the altitude of the fix.
-     *  @return The altitude in meters (whether this is Mean Sea Level or WGS-84 is defined elsewhere).
+     *  @return The altitude in meters (whether this is MSL or WGS-84 is defined elsewhere).
      */
     public: inline double getAltitude () const {
       int32_t bits = unpackInt(24);
@@ -245,7 +239,7 @@ namespace vrt {
     }
 
     /** Gets the altitude of the fix.
-     *  @param val The altitude in meters (whether this is Mean Sea Level or WGS-84 is defined elsewhere).
+     *  @param val The altitude in meters (whether this is MSL or WGS-84 is defined elsewhere).
      */
     public: inline void setAltitude (double val) {
       int32_t bits = (isNull(val))? 0x7FFFFFFF : fromDouble32(5, val);
@@ -290,186 +284,14 @@ namespace vrt {
     public: virtual int32_t   getFieldCount () const;
     public: virtual string    getFieldName  (int32_t id) const;
     public: virtual ValueType getFieldType  (int32_t id) const;
-    public: virtual Value*    getField      (int32_t id) const;
+    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));
     public: virtual void      setField      (int32_t id, const Value* val);
   };
 
-  /** Represents an Ephemeris Adjunct as used with VITA-49.0b. This class should not be used on
-   *  its own, but rather via the {@link Ephemeris} class.
-   *  @see            Ephemeris
-   *  @author         
-   */
-  class EphemerisAdjunct : public Record {
-    /** <b>Internal use only:</b> Creates a new instance. */
-    public: EphemerisAdjunct ();
-
-    /** Copy constructor. */
-    public: EphemerisAdjunct (const EphemerisAdjunct& r);
-
-    /** Is anything set in this record? */
-    public: virtual bool isAnythingSet () const;
-
-    public: virtual string toString () const;
-
-    /** Gets the rotational velocity about the Z-axis in degrees per second.
-     *  @return The value of null if not specified.
-     */
-    public: inline double getRotationalVelocityAlpha () const {
-      int32_t bits = unpackInt(0);
-      return (bits == 0x7FFFFFFF)? DOUBLE_NAN : toDouble32(16, bits);
-    }
-
-    /** Gets the rotational velocity about the Y-axis in degrees per second.
-     *  @return The value of DOUBLE_NAN if not specified.
-     */
-    public: inline double getRotationalVelocityBeta () const {
-      int32_t bits = unpackInt(4);
-      return (bits == 0x7FFFFFFF)? DOUBLE_NAN : toDouble32(16, bits);
-    }
-
-    /** Gets the rotational velocity about the X-axis in degrees per second.
-     *  @return The value of DOUBLE_NAN if not specified.
-     */
-    public: inline double getRotationalVelocityPhi () const {
-      int32_t bits = unpackInt(8);
-      return (bits == 0x7FFFFFFF)? DOUBLE_NAN : toDouble32(16, bits);
-    }
-
-    /** Sets the rotational velocity about the Z-axis in degrees per second.
-     *  @param val The value or DOUBLE_NAN if not specified.
-     */
-    public: inline void setRotationalVelocityAlpha (double val) {
-      int32_t bits = (isNull(val))? 0x7FFFFFFF : fromDouble32(16, val);
-      packInt(0, bits);
-    }
-
-    /** Sets the rotational velocity about the Y-axis in degrees per second.
-     *  @param val The value or DOUBLE_NAN if not specified.
-     */
-    public: inline void setRotationalVelocityBeta (double val) {
-      int32_t bits = (isNull(val))? 0x7FFFFFFF : fromDouble32(16, val);
-      packInt(4, bits);
-    }
-
-    /** Sets the rotational velocity about the X-axis in degrees per second.
-     *  @param val The value or DOUBLE_NAN if not specified.
-     */
-    public: inline void setRotationalVelocityPhi (double val) {
-      int32_t bits = (isNull(val))? 0x7FFFFFFF : fromDouble32(16, val);
-      packInt(8, bits);
-    }
-
-    /** Gets the acceleration along the X-axis in meters per second<sup>2</sup>.
-     *  @return The value of DOUBLE_NAN if not specified.
-     */
-    public: inline double getAccelerationX () const {
-      int32_t bits = unpackInt(12);
-      return (bits == 0x7FFFFFFF)? DOUBLE_NAN : toDouble32(24, bits);
-    }
-
-    /** Gets the acceleration along the Y-axis in meters per second<sup>2</sup>.
-     *  @return The value of DOUBLE_NAN if not specified.
-     */
-    public: inline double getAccelerationY () const {
-      int32_t bits = unpackInt(16);
-      return (bits == 0x7FFFFFFF)? DOUBLE_NAN : toDouble32(24, bits);
-    }
-
-    /** Gets the acceleration along the Z-axis in meters per second<sup>2</sup>.
-     *  @return The value of DOUBLE_NAN if not specified.
-     */
-    public: inline double getAccelerationZ () const {
-      int32_t bits = unpackInt(20);
-      return (bits == 0x7FFFFFFF)? DOUBLE_NAN : toDouble32(24, bits);
-    }
-
-    /** Sets the acceleration along the X-axis in meters per second<sup>2</sup>.
-     *  @param val The value or DOUBLE_NAN if not specified.
-     */
-    public: inline void setAccelerationX (double val) {
-      int32_t bits = (isNull(val))? 0x7FFFFFFF : fromDouble32(24, val);
-      packInt(12, bits);
-    }
-
-    /** Sets the acceleration along the Y-axis in meters per second<sup>2</sup>.
-     *  @param val The value or DOUBLE_NAN if not specified.
-     */
-    public: inline void setAccelerationY (double val) {
-      int32_t bits = (isNull(val))? 0x7FFFFFFF : fromDouble32(24, val);
-      packInt(16, bits);
-    }
-
-    /** Sets the acceleration along the Z-axis in meters per second<sup>2</sup>.
-     *  @param val The value or DOUBLE_NAN if not specified.
-     */
-    public: inline void setAccelerationZ (double val) {
-      int32_t bits = (isNull(val))? 0x7FFFFFFF : fromDouble32(24, val);
-      packInt(20, bits);
-    }
-
-    /** Gets the rotational acceleration about the Z-axis in degrees per second<sup>2</sup>.
-     *  @return The value of DOUBLE_NAN if not specified.
-     */
-    public: inline double getRotationalAccelerationAlpha () const {
-      int32_t bits = unpackInt(24);
-      return (bits == 0x7FFFFFFF)? DOUBLE_NAN : toDouble32(23, bits);
-    }
-
-    /** Gets the rotational acceleration about the Y-axis in degrees per second<sup>2</sup>.
-     *  @return The value of DOUBLE_NAN if not specified.
-     */
-    public: inline double getRotationalAccelerationBeta () const {
-      int32_t bits = unpackInt(28);
-      return (bits == 0x7FFFFFFF)? DOUBLE_NAN : toDouble32(23, bits);
-    }
-
-    /** Gets the rotational acceleration about the X-axis in degrees per second<sup>2</sup>.
-     *  @return The value of DOUBLE_NAN if not specified.
-     */
-    public: inline double getRotationalAccelerationPhi () const {
-      int32_t bits = unpackInt(32);
-      return (bits == 0x7FFFFFFF)? DOUBLE_NAN : toDouble32(23, bits);
-    }
-
-    /** Sets the rotational acceleration about the Z-axis in degrees per second<sup>2</sup>.
-     *  @param val The value or DOUBLE_NAN if not specified.
-     */
-    public: inline void setRotationalAccelerationAlpha (double val) {
-      int32_t bits = (isNull(val))? 0x7FFFFFFF : fromDouble32(23, val);
-      packInt(24, bits);
-    }
-
-    /** Sets the rotational acceleration about the Y-axis in degrees per second<sup>2</sup>.
-     *  @param val The value or DOUBLE_NAN if not specified.
-     */
-    public: inline void setRotationalAccelerationBeta (double val) {
-      int32_t bits = (isNull(val))? 0x7FFFFFFF : fromDouble32(23, val);
-      packInt(28, bits);
-    }
-
-    /** Sets the rotational acceleration about the X-axis in degrees per second<sup>2</sup>.
-     *  @param val The value or DOUBLE_NAN if not specified.
-     */
-    public: inline void setRotationalAccelerationPhi (double val) {
-      int32_t bits = (isNull(val))? 0x7FFFFFFF : fromDouble32(23, val);
-      packInt(32, bits);
-    }
-  };
-
-  /** Represents an ECEF ephemeris fix. This instance will always be associated with an
-   *  {@link EphemerisAdjunct}, but the adjunct will only be initialized with non-null values
-   *  if VITA-49.0b is used *and* the adjunct is actually present. It will be written out only
-   *  if VITA-49.0b is used and one or more values are non-null. This allows code to be written
-   *  that presumes the presence of the adjunct (i.e. assumes VITA-49.0b) but still functions
-   *  in situations where it can not be inserted into the packet (i.e. strict VITA-49.0).
-   *  @see            Geolocation
-   *  @see            EphemerisAdjunct
-   *  @author         
+  /** Represents an ECEF ephemeris fix.
+   *  @see Geolocation
    */
   class Ephemeris : public AbstractGeolocation {
-    /** The adjunct record, or null if not present. */
-    private: EphemerisAdjunct adjunct;
-
     /** Creates a new instance. */
     public: Ephemeris ();
 
@@ -477,16 +299,6 @@ namespace vrt {
     public: Ephemeris (const Ephemeris &r);
 
     public: virtual string toString () const;
-
-    /** Gets the ephemeris adjunct. */
-    public: inline EphemerisAdjunct getAdjunct () const {
-      return adjunct;
-    }
-
-    /** Gets the reference to the ephemeris adjunct. */
-    public: inline EphemerisAdjunct& getAdjunctRef () {
-      return adjunct;
-    }
 
     /** Sets the time stamp for the geolocation fix.
      *  @param ts The time stamp for the geolocation fix.
@@ -639,144 +451,13 @@ namespace vrt {
       packInt(48, bits);
     }
 
-
-    /** Gets the rotational velocity about the Z-axis in degrees per second.
-     *  @return The value of null if not specified.
-     */
-    public: inline double getRotationalVelocityAlpha () const {
-      return adjunct.getRotationalVelocityAlpha();
-    }
-
-    /** Gets the rotational velocity about the Y-axis in degrees per second.
-     *  @return The value of null if not specified.
-     */
-    public: inline double getRotationalVelocityBeta () const {
-      return adjunct.getRotationalVelocityBeta();
-    }
-
-    /** Gets the rotational velocity about the X-axis in degrees per second.
-     *  @return The value of null if not specified.
-     */
-    public: inline double getRotationalVelocityPhi () const {
-      return adjunct.getRotationalVelocityPhi();
-    }
-
-    /** Sets the rotational velocity about the Z-axis in degrees per second.
-     *  @param val The value or null if not specified.
-     */
-    public: inline void setRotationalVelocityAlpha (double val) {
-      adjunct.setRotationalVelocityAlpha(val);
-    }
-
-    /** Sets the rotational velocity about the Y-axis in degrees per second.
-     *  @param val The value or null if not specified.
-     */
-    public: inline void setRotationalVelocityBeta (double val) {
-      adjunct.setRotationalVelocityBeta(val);
-    }
-
-    /** Sets the rotational velocity about the X-axis in degrees per second.
-     *  @param val The value or null if not specified.
-     */
-    public: inline void setRotationalVelocityPhi (double val) {
-      adjunct.setRotationalVelocityPhi(val);
-    }
-
-
-
-    /** Gets the acceleration along the X-axis in meters per second<sup>2</sup>.
-     *  @return The value of null if not specified.
-     */
-    public: inline double getAccelerationX () const {
-      return adjunct.getAccelerationX();
-    }
-
-    /** Gets the acceleration along the Y-axis in meters per second<sup>2</sup>.
-     *  @return The value of null if not specified.
-     */
-    public: inline double getAccelerationY () const {
-      return adjunct.getAccelerationY();
-    }
-
-    /** Gets the acceleration along the Z-axis in meters per second<sup>2</sup>.
-     *  @return The value of null if not specified.
-     */
-    public: inline double getAccelerationZ () const {
-      return adjunct.getAccelerationZ();
-    }
-
-    /** Sets the acceleration along the X-axis in meters per second<sup>2</sup>.
-     *  @param val The value or null if not specified.
-     */
-    public: inline void setAccelerationX (double val) {
-      adjunct.setAccelerationX(val);
-    }
-
-    /** Sets the acceleration along the Y-axis in meters per second<sup>2</sup>.
-     *  @param val The value or null if not specified.
-     */
-    public: inline void setAccelerationY (double val) {
-      adjunct.setAccelerationY(val);
-    }
-
-    /** Sets the acceleration along the Z-axis in meters per second<sup>2</sup>.
-     *  @param val The value or null if not specified.
-     */
-    public: inline void setAccelerationZ (double val) {
-      adjunct.setAccelerationZ(val);
-    }
-
-
-
-    /** Gets the rotational acceleration about the Z-axis in degrees per second<sup>2</sup>.
-     *  @return The value of null if not specified.
-     */
-    public: inline double getRotationalAccelerationAlpha () const {
-      return adjunct.getRotationalAccelerationAlpha();
-    }
-
-    /** Gets the rotational acceleration about the Y-axis in degrees per second<sup>2</sup>.
-     *  @return The value of null if not specified.
-     */
-    public: inline double getRotationalAccelerationBeta () const {
-      return adjunct.getRotationalAccelerationBeta();
-    }
-
-    /** Gets the rotational acceleration about the X-axis in degrees per second<sup>2</sup>.
-     *  @return The value of null if not specified.
-     */
-    public: inline double getRotationalAccelerationPhi () const {
-      return adjunct.getRotationalAccelerationPhi();
-    }
-
-    /** Sets the rotational acceleration about the Z-axis in degrees per second<sup>2</sup>.
-     *  @param val The value or null if not specified.
-     */
-    public: inline void setRotationalAccelerationAlpha (double val) {
-      adjunct.setRotationalAccelerationAlpha(val);
-    }
-
-    /** Sets the rotational acceleration about the Y-axis in degrees per second<sup>2</sup>.
-     *  @param val The value or null if not specified.
-     */
-    public: inline void setRotationalAccelerationBeta (double val) {
-      adjunct.setRotationalAccelerationBeta(val);
-    }
-
-    /** Sets the rotational acceleration about the X-axis in degrees per second<sup>2</sup>.
-     *  @param val The value or null if not specified.
-     */
-    public: inline void setRotationalAccelerationPhi (double val) {
-      adjunct.setRotationalAccelerationPhi(val);
-    }
-
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // Implement HasFields
     //////////////////////////////////////////////////////////////////////////////////////////////////
     public: virtual int32_t   getFieldCount () const;
     public: virtual string    getFieldName  (int32_t id) const;
     public: virtual ValueType getFieldType  (int32_t id) const;
-    public: virtual Value*    getField      (int32_t id) const;
+    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));
     public: virtual void      setField      (int32_t id, const Value* val);
   };
 
@@ -785,8 +466,7 @@ namespace vrt {
    *  <i>Users are strongly encouraged to consider using the binary form when specifying a
    *  GPS geolocation fix (see {@link Geolocation}). There is no intention of adding any
    *  significant capabilities to this class.</i>
-   *  @see            Geolocation
-   *  @author         
+   *  @see Geolocation
    */
   class GeoSentences : public AbstractGeolocation {
     /** Creates a new instance. */
@@ -840,7 +520,7 @@ namespace vrt {
     public: virtual int32_t   getFieldCount () const;
     public: virtual string    getFieldName  (int32_t id) const;
     public: virtual ValueType getFieldType  (int32_t id) const;
-    public: virtual Value*    getField      (int32_t id) const;
+    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));
     public: virtual void      setField      (int32_t id, const Value* val);
   };
 
@@ -974,14 +654,14 @@ namespace vrt {
      *  @see #getAsynchronousChannelTag()
      */
     public: void setAsynchronousChannel (const vector<int32_t> &val, const vector<int32_t> &tags);
-    
+
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // Implement HasFields
     //////////////////////////////////////////////////////////////////////////////////////////////////
     public: virtual int32_t   getFieldCount () const;
     public: virtual string    getFieldName  (int32_t id) const;
     public: virtual ValueType getFieldType  (int32_t id) const;
-    public: virtual Value*    getField      (int32_t id) const;
+    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));
     public: virtual void      setField      (int32_t id, const Value* val);
   };
 
@@ -1028,8 +708,6 @@ namespace vrt {
    *    ----+--------------------------+------------------
    *    (N = number of fields in BasicVRTPacket)
    *  </pre>
-   *
-   *  @author 
    */
   class BasicContextPacket : public BasicVRTPacket {
     friend class BasicVRTState;
@@ -1041,9 +719,9 @@ namespace vrt {
     public: BasicContextPacket (const BasicVRTPacket &p);
 
     /** Internal constructor, for use by subclasses.
-        @param p       The packet (already initialized).
-        @param classID The expected classID.
-        @throws VRTException If packet type or classID of the packet are invalid.
+     *  @param p       The packet (already initialized).
+     *  @param classID The expected classID.
+     *  @throws VRTException If packet type or classID of the packet are invalid.
      */
     public: BasicContextPacket (const BasicVRTPacket &p, int64_t classID);
 
@@ -1059,13 +737,20 @@ namespace vrt {
      *  of 0).
      */
     public: BasicContextPacket ();
-    public: BasicContextPacket (const int32_t pktsize);
+
+    /** Creates a new instance with a default anticipated length that can be written to.
+     *  Initially this will just be a simple context packet with no fields set (other than
+     *  the required packet length of 8 and a default stream ID  of 0), but will have the
+     *  underlying buffers pre-allocated as required.
+     *  @param bufsize The anticipated buffer size.
+     */
+    public: BasicContextPacket (int32_t bufsize);
 
     public: BasicContextPacket (const vector<char> &buf, ssize_t start, ssize_t end, bool readOnly = false);
 
     /** Creates a new instance accessing the given data buffer. Note that when the buffer lengths
      *  are given, only the most minimal of error checking is done. Users should call
-     *  {@link #isPacketValid()} to verify that the packet is valid. Invalid packets can result
+     *  <tt>isPacketValid()</tt> to verify that the packet is valid. Invalid packets can result
      *  unpredictable behavior, but this is explicitly allowed (to the extent possible) so that
      *  applications creating packets can use this class even if the packet isn't yet "valid".
      *  @param buf      The data buffer to use.
@@ -1079,13 +764,13 @@ namespace vrt {
     public: BasicContextPacket (vector<char> *buf_ptr, bool readOnly = false);
 
     /** Internal constructor, for use by subclasses.
-        @param p                The packet (already initialized).
-        @param type             The expected packet type.
-        @param classID          The expected classID.
-        @param minPayloadLength The minimum payload length.
-        @param maxPayloadLength The maximum payload length (&lt;0 if not pre-defined).
-        @throws VRTException If packet type or classID of the packet are invalid, or if
-                             the payload length is invalid.
+     *  @param p                The packet (already initialized).
+     *  @param type             The expected packet type.
+     *  @param classID          The expected classID.
+     *  @param minPayloadLength The minimum payload length.
+     *  @param maxPayloadLength The maximum payload length (&lt;0 if not pre-defined).
+     *  @throws VRTException If packet type or classID of the packet are invalid, or if
+     *                       the payload length is invalid.
      */
     protected: BasicContextPacket (const BasicVRTPacket &p, PacketType type, int64_t classID,
                                    int32_t minPayloadLength, int32_t maxPayloadLength);
@@ -1166,7 +851,9 @@ namespace vrt {
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isCalibratedTimeStamp () const  { return getStateEventBit(31, 19); }
+    public: inline boolNull isCalibratedTimeStamp () const {
+      return getStateEventBit(31, 19);
+    }
 
     /** Gets the valid data indicator flag.
      *  <pre>
@@ -1179,7 +866,9 @@ namespace vrt {
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isDataValid () const            { return getStateEventBit(30, 18); }
+    public: inline boolNull isDataValid () const {
+      return getStateEventBit(30, 18);
+    }
 
     /** Gets the reference lock indicator flag.
      *  <pre>
@@ -1190,7 +879,9 @@ namespace vrt {
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isReferenceLocked () const      { return getStateEventBit(29, 17); }
+    public: inline boolNull isReferenceLocked () const {
+      return getStateEventBit(29, 17);
+    }
 
     /** Gets the AGC/MGC indicator flag.
      *  <pre>
@@ -1201,7 +892,9 @@ namespace vrt {
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isAutomaticGainControl () const { return getStateEventBit(28, 16); }
+    public: inline boolNull isAutomaticGainControl () const {
+      return getStateEventBit(28, 16);
+    }
 
     /** Gets the signal detected indicator flag.
      *  <pre>
@@ -1214,7 +907,9 @@ namespace vrt {
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isSignalDetected () const       { return getStateEventBit(27, 15); }
+    public: inline boolNull isSignalDetected () const {
+      return getStateEventBit(27, 15);
+    }
 
     /** Gets the spectral inversion indicator flag.
      *  <pre>
@@ -1226,7 +921,9 @@ namespace vrt {
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isInvertedSpectrum () const     { return getStateEventBit(26, 14); }
+    public: inline boolNull isInvertedSpectrum () const {
+      return getStateEventBit(26, 14);
+    }
 
     /** Gets the over-range indicator flag.
      *  <pre>
@@ -1238,7 +935,9 @@ namespace vrt {
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isOverRange () const            { return getStateEventBit(25, 13); }
+    public: inline boolNull isOverRange () const {
+      return getStateEventBit(25, 13);
+    }
 
     /** Gets the sample loss indicator flag.
      *  <pre>
@@ -1250,128 +949,172 @@ namespace vrt {
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isDiscontinuous () const       { return getStateEventBit(24, 12); }
-    
+    public: inline boolNull isDiscontinuous () const {
+      return getStateEventBit(24, 12);
+    }
+
     /** <b>Deprecated:</b> Please change to using <tt>isDiscontinuous</tt>. */
-    public: inline __attribute__((deprecated)) __intelattr__((deprecated)) boolNull isDiscontinuious () const { return isDiscontinuous(); }
+    public: inline __attribute__((deprecated)) __intelattr__((deprecated)) boolNull isDiscontinuious () const {
+      return isDiscontinuous();
+    }
 
     /** <i>Optional functionality:</i> Sets the calibrated time indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setCalibratedTimeStamp (boolNull v)  { setStateEventBit(31, 19, v); }
+    public: inline void setCalibratedTimeStamp (boolNull v) {
+      setStateEventBit(31, 19, v);
+    }
 
     /** <i>Optional functionality:</i> Gets the valid data indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setDataValid (boolNull v)            { setStateEventBit(30, 18, v); }
+    public: inline void setDataValid (boolNull v) {
+      setStateEventBit(30, 18, v);
+    }
 
     /** <i>Optional functionality:</i> Gets the reference lock indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setReferenceLocked (boolNull v)      { setStateEventBit(29, 17, v); }
+    public: inline void setReferenceLocked (boolNull v) {
+      setStateEventBit(29, 17, v);
+    }
 
     /** <i>Optional functionality:</i> Gets the AGC/MGC indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setAutomaticGainControl (boolNull v) { setStateEventBit(28, 16, v); }
+    public: inline void setAutomaticGainControl (boolNull v) {
+      setStateEventBit(28, 16, v);
+    }
 
     /** <i>Optional functionality:</i> Gets the signal detected indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setSignalDetected (boolNull v)       { setStateEventBit(27, 15, v); }
+    public: inline void setSignalDetected (boolNull v) {
+      setStateEventBit(27, 15, v);
+    }
 
     /** <i>Optional functionality:</i> Gets the spectral inversion indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setInvertedSpectrum (boolNull v)     { setStateEventBit(26, 14, v); }
+    public: inline void setInvertedSpectrum (boolNull v) {
+      setStateEventBit(26, 14, v);
+    }
 
     /** <i>Optional functionality:</i> Gets the over-range indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setOverRange (boolNull v)            { setStateEventBit(25, 13, v); }
+    public: inline void setOverRange (boolNull v) {
+      setStateEventBit(25, 13, v);
+    }
 
     /** <i>Optional functionality:</i> Gets the sample loss indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setDiscontinuous (boolNull v)       { setStateEventBit(24, 12, v); }
-    
+    public: inline void setDiscontinuous (boolNull v) {
+      setStateEventBit(24, 12, v);
+    }
+
     /** <b>Deprecated:</b> Please change to using <tt>setDiscontinuous</tt>. */
-    public: inline __attribute__((deprecated)) __intelattr__((deprecated)) void setDiscontinuious (boolNull v) { setDiscontinuous(v); }
+    public: inline __attribute__((deprecated)) __intelattr__((deprecated)) void setDiscontinuious (boolNull v) {
+      setDiscontinuous(v);
+    }
 
     /** Gets the Context Field Change Indicator.
      *  @return true if <b>anything</b> in the packet has changed since the last context packet,
      *          false if <b>nothing</b> has changed since the last context packet.
      */
-    public: inline bool              isChangePacket ()              const { return ((getContextIndicatorField() & CHANGE_IND) != 0); }
+    public: inline bool isChangePacket () const {
+      return ((getContextIndicatorField() & CHANGE_IND) != 0);
+    }
 
     /** Gets the Reference Point Identifier.
      *  @return The point in the system where this context applies (null if not specified).
      */
-    public: inline int32_t           getReferencePointIdentifier () const { return getL(REF_POINT); }
+    public: inline int32_t getReferencePointIdentifier () const {
+      return getL(REF_POINT);
+    }
 
     /** Gets the Timestamp Adjustment in picoseconds. This is the required time adjustment
      *  between the time the signal was digitized (i.e. the timestamp) and the time at the reference
      *  point.
      *  @return The timestamp adjustment (null if not specified).
      */
-    public: inline int64_t           getTimeStampAdjustment ()      const { return getX(TIME_ADJUST); }
+    public: inline int64_t getTimeStampAdjustment () const {
+      return getX(TIME_ADJUST);
+    }
 
     /** Gets the Timestamp Calibration Time in seconds. This is the most recent date and
      *  time when the timestamp in the Data and Context packets was known to be correct.
      *  @return The calibration time (null if not specified).
      */
-    public: inline int32_t           getTimeStampCalibration ()     const { return getL(TIME_CALIB); }
+    public: inline int32_t getTimeStampCalibration () const {
+      return getL(TIME_CALIB);
+    }
 
     /** Gets the Ephemeris Reference Identifier. This is used specifies the process
      *  whose origin applies to the ephemeris returned by {@link #getEphemerisRelative()}.
      *  @return The ephemeris information (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: inline int32_t           getEphemerisReference ()       const { return getL(EPHEM_REF); }
+    public: inline int32_t getEphemerisReference () const { return getL(EPHEM_REF); }
 
-    private: inline Geolocation       getGeolocation (int32_t offset) const {
+    /** Used for unpacking geolocation records. */
+    private: inline Geolocation getGeolocation (int32_t offset) const {
       int32_t     off = getOffset(offset);
       Geolocation val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
     }
-    
+
+    /** Used for unpacking ephemeris records. */
+    private: inline Ephemeris getEphemeris (int32_t offset) const {
+      int32_t   off = getOffset(offset);
+      Ephemeris val;
+      if (off >= 0) unpackPayloadRecord(off,val);
+      return val;
+    }
+
     /** Gets the Formatted GPS (Global Positioning System) Geolocation for the collector.
      *  @return The geolocation information (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: inline Geolocation       getGeolocationGPS ()           const { return getGeolocation(GPS_EPHEM); }
+    public: inline Geolocation getGeolocationGPS () const {
+      return getGeolocation(GPS_EPHEM);
+    }
 
     /** Gets the Formatted INS (Inertial Navigation System) Geolocation for the collector.
      *  @return The geolocation information (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: inline Geolocation       getGeolocationINS ()           const { return getGeolocation(INS_EPHEM); }
+    public: inline Geolocation getGeolocationINS () const {
+      return getGeolocation(INS_EPHEM);
+    }
 
-    /** Gets the ECEF (Earth-Centered, Earth-Fixed) Ephemeris for the collector. This will also
-     *  get any "ECEF (Earth-Centered, Earth-Fixed) Ephemeris Adjunct" information from a
-     *  VITA-49.0b packet (where VITA-49.0b is used).
+    /** Gets the ECEF (Earth-Centered, Earth-Fixed) Ephemeris for the collector.
      *  @return The ephemeris information (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: virtual Ephemeris        getEphemerisECEF ()            const;
+    public: inline Ephemeris getEphemerisECEF () const {
+      return getEphemeris(ECEF_EPHEM);
+    }
 
     /** Gets the Relative Ephemeris for the collector. Unlike {@link #getEphemerisECEF()}
      *  which uses the ECEF coordinate system, this ephemeris is relative to a user-defined system
-     *  specified by {@link #getEphemerisReference()}. This will also get any "Relative Ephemeris
-     *  Adjunct" information from a VITA-49.0b packet (where VITA-49.0b is used).
+     *  specified by {@link #getEphemerisReference()}.
      *  @return The ephemeris information (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: virtual Ephemeris        getEphemerisRelative ()        const;
+    public: inline Ephemeris getEphemerisRelative () const {
+      return getEphemeris(REL_EPHEM);
+    }
 
     /** Gets the GPS ASCII "sentences". These are ASCII "sentences" from a GPS (Global
      *  Positioning System) receiver, such as those conforming to NMEA-0183. <i>Due to the great
@@ -1404,56 +1147,83 @@ namespace vrt {
      *  producing this context packet stream.
      *  @return The device identifier as a string (null if not specified).
      */
-    public: inline string            getDeviceID ()                 const { return Utilities::toStringDeviceID(getDeviceIdentifier()); }
+    public: inline string getDeviceID () const { return Utilities::toStringDeviceID(getDeviceIdentifier()); }
 
     /** Gets the Bandwidth of the signal in Hz.
      *  @return The bandwidth (null if not specified).
      */
-    public: inline double            getBandwidth ()                const { int64_t bits = getX(BANDWIDTH    ); return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits); }
+    public: inline double getBandwidth () const {
+      int64_t bits = getX(BANDWIDTH);
+      return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
+    }
 
     /** Gets the IF Reference Frequency of the signal in Hz.
      *  @return The frequency (null if not specified).
      */
-    public: inline double            getFrequencyIF ()              const { int64_t bits = getX(IF_FREQ      ); return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits); }
+    public: inline double getFrequencyIF () const {
+      int64_t bits = getX(IF_FREQ);
+      return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
+    }
 
     /** Gets the RF Reference Frequency of the signal in Hz.
      *  @return The frequency (null if not specified).
      */
-    public: inline double            getFrequencyRF ()              const { int64_t bits = getX(RF_FREQ      ); return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits); }
+    public: inline double getFrequencyRF () const {
+      int64_t bits = getX(RF_FREQ);
+      return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
+    }
 
     /** Gets the RF Reference Frequency Offset of the signal in Hz.
      *  @return The frequency offset (null if not specified).
      */
-    public: inline double            getFrequencyOffsetRF ()        const { int64_t bits = getX(RF_OFFSET    ); return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits); }
+    public: inline double getFrequencyOffsetRF () const {
+      int64_t bits = getX(RF_OFFSET);
+      return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
+    }
 
     /** Gets the IF Band Offset of the signal in Hz.
      *  @return The band offset (null if not specified).
      */
-    public: inline double            getBandOffsetIF ()             const { int64_t bits = getX(IF_OFFSET    ); return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits); }
+    public: inline double getBandOffsetIF () const {
+      int64_t bits = getX(IF_OFFSET);
+      return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
+    }
 
     /** Gets the Reference Level of the signal in dBm.
      *  @return The reference level (null if not specified).
      */
-    public: inline float             getReferenceLevel ()           const { int16_t bits = getI(REF_LEVEL  ,2); return (isNull(bits))? FLOAT_NAN  : VRTMath::toFloat16 ( 7,bits); }
+    public: inline float getReferenceLevel () const {
+      int16_t bits = getI(REF_LEVEL,2);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
 
     /** Gets the Stage 1 Gain of the device in dB. This is the front-end gain of the
      *  system. In cases where a separate Stage 1 and Stage 2 gain is not necessary, this holds
      *  the total gain of the system and Gain 2 is set to zero.
      *  @return The gain (null if not specified).
      */
-    public: inline float             getGain1 ()                    const { int16_t bits = getI(GAIN       ,0); return (isNull(bits))? FLOAT_NAN  : VRTMath::toFloat16 ( 7,bits); }
+    public: inline float getGain1 () const {
+      int16_t bits = getI(GAIN,2);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
 
     /** Gets the Stage 2 Gain of the device in dB. This is the back-end gain of the
      *  system. In cases where a separate Stage 1 and Stage 2 gain is not necessary, the Stage 1
      *  gain holds the total gain of the system and this is set to zero.
      *  @return The gain (null if not specified).
      */
-    public: inline float             getGain2 ()                    const { int16_t bits = getI(GAIN       ,2); return (isNull(bits))? FLOAT_NAN  : VRTMath::toFloat16 ( 7,bits); }
+    public: inline float getGain2 () const {
+      int16_t bits = getI(GAIN,0);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
 
     /** Gets the Sample Rate in Hz.
      *  @return The sample rate (null if not specified).
      */
-    public: inline double            getSampleRate ()               const { int64_t bits = getX(SAMPLE_RATE  ); return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits); }
+    public: inline double getSampleRate () const {
+      int64_t bits = getX(SAMPLE_RATE);
+      return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
+    }
 
     /** Gets the Sample Period (inverse of Sample Rate) in sec.
      *  @return The sample period (null if not specified).
@@ -1467,7 +1237,10 @@ namespace vrt {
      *  any component that may affect the described signal.
      *  @return The temperature (null if not specified).
      */
-    public: inline float             getTemperature ()              const { int16_t bits = getI(TEMPERATURE,2); return (isNull(bits))? FLOAT_NAN  : VRTMath::toFloat16 ( 6,bits); }
+    public: inline float getTemperature () const {
+      int16_t bits = getI(TEMPERATURE,2);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16( 6,bits);
+    }
 
     /** Gets the User-Defined Bits from the State and Event Indicator Bits. <i>The
      *  definition of these bits should be included in the documentation for the relevent packet
@@ -1478,10 +1251,14 @@ namespace vrt {
      *  @return true if the flag is set, false if it is not set, zero if the State and Event
      *  Indicator Field is absent.
      */
-    public: inline int32_t           getUserDefinedBits ()          const { int8_t  bits = getB(STATE_EVENT,3); return (isNull(bits))? INT32_NULL : ((int32_t)bits)&0x000000FF; }
+    public: inline int32_t getUserDefinedBits () const {
+      int8_t bits = getB(STATE_EVENT,3);
+      return (isNull(bits))? INT32_NULL : ((int32_t)bits)&0x000000FF;
+    }
 
     /** Gets the Data Packet Payload Format. This specifies the format of the data in the
      *  paired data packet stream.
+     *  @param offset The offset.
      *  @return The payload format (null if not specified). <i>Note that changes to the returned
      *          object do not alter the packet.</i>
      */
@@ -1491,18 +1268,30 @@ namespace vrt {
       // not equal to a legal 64-bit integer value.
       return (getOffset(offset) < 0)? PayloadFormat((int64_t)-1) : PayloadFormat(getX(offset));
     }
-    public: inline PayloadFormat     getDataPayloadFormat ()        const { return getDataPayloadFormat(DATA_FORMAT); }
+
+    /** Gets the Data Packet Payload Format. This specifies the format of the data in the
+     *  paired data packet stream.
+     *  @return The payload format (null if not specified). <i>Note that changes to the returned
+     *          object do not alter the packet.</i>
+     */
+    public: inline PayloadFormat getDataPayloadFormat () const {
+      return getDataPayloadFormat(DATA_FORMAT);
+    }
 
     /** Sets the Context Field Change Indicator.
      *  @param change true if <b>anything</b> in the packet has changed since the last context packet,
      *                false if <b>nothing</b> has changed since the last context packet.
      */
-    public: inline void setChangePacket (bool change)                       { setContextIndicatorFieldBit(CHANGE_IND, change); }
+    public: inline void setChangePacket (bool change) {
+      setContextIndicatorFieldBit(CHANGE_IND, change);
+    }
 
     /** Sets the Reference Point Identifier.
      *  @param val The point in the system where this context applies (null if not specified).
      */
-    public: inline void setReferencePointIdentifier (int32_t val)           { setL(REF_POINT, val); }
+    public: inline void setReferencePointIdentifier (int32_t val) {
+      setL(REF_POINT, val);
+    }
 
     /** Sets the User-Defined Bits from the State and Event Indicator Bits. <i>The
      *  definition of these bits should be included in the documentation for the relevent packet
@@ -1511,61 +1300,69 @@ namespace vrt {
      *  support some other bits. As such, no "null value" is supported for the user-defined buts.
      *  @param val true if the flag is set, false if it is not set.
      */
-    public: inline void setUserDefinedBits (int32_t val)                    { if ((getOffset(STATE_EVENT) > 0) || !isNull(val)) setB(STATE_EVENT,3,val); }
+    public: inline void setUserDefinedBits (int32_t val) {
+      if ((getOffset(STATE_EVENT) > 0) || !isNull(val)) {
+        setB(STATE_EVENT,3,(char)val);
+      }
+    }
 
     /** Sets the Timestamp Adjustment in picoseconds. This is the required time adjustment
      *  between the time the signal was digitized (i.e. the timestamp) and the time at the reference
      *  point.
      *  @param val The timestamp adjustment (null if not specified).
      */
-    public: inline void setTimeStampAdjustment (int64_t val)                { setX(TIME_ADJUST,val); }
+    public: inline void setTimeStampAdjustment (int64_t val) {
+      setX(TIME_ADJUST,val);
+    }
 
     /** Sets the Timestamp Calibration Time in seconds. This is the most recent date and
      *  time when the timestamp in the Data and Context packets was known to be correct.
      *  @param val The calibration time (null if not specified).
      */
-    public: inline void setTimeStampCalibration (int32_t val)               { setL(TIME_CALIB,val); }
+    public: inline void setTimeStampCalibration (int32_t val) {
+      setL(TIME_CALIB,val);
+    }
 
     /** Sets the Ephemeris Reference Identifier. This is used specifies the process
      *  whose origin applies to the ephemeris returned by {@link #getEphemerisRelative()}.
      *  @param val The ephemeris information (null if not specified). <i>Note that changes to the
      *             returned object do not alter the packet.</i>
      */
-    public: inline void setEphemerisReference (int32_t val)                { setL(EPHEM_REF,val); }
+    public: inline void setEphemerisReference (int32_t val) {
+      setL(EPHEM_REF,val);
+    }
 
     /** Sets the Formatted GPS (Global Positioning System) Geolocation for the collector.
      *  @param val The geolocation information (null if not specified). <i>Note that changes to the
      *             returned object do not alter the packet.</i>
      */
-    public: inline void setGeolocationGPS (const Geolocation &val)          { setRecord(GPS_EPHEM,val); }
+    public: inline void setGeolocationGPS (const Geolocation &val) {
+      setRecord(GPS_EPHEM,val);
+    }
 
     /** Sets the Formatted INS (Inertial Navigation System) Geolocation for the collector.
      *  @param val The geolocation information (null if not specified). <i>Note that changes to the
      *             returned object do not alter the packet.</i>
      */
-    public: inline void setGeolocationINS (const Geolocation &val)          { setRecord(INS_EPHEM,val); }
+    public: inline void setGeolocationINS (const Geolocation &val) {
+      setRecord(INS_EPHEM,val);
+    }
 
-    /** Sets the ECEF (Earth-Centered, Earth-Fixed) Ephemeris for the collector. This will also
-     *  set any applicable "ECEF (Earth-Centered, Earth-Fixed) Ephemeris Adjunct" information in a
-     *  VITA-49.0b packet (where VITA-49.0b is used). If all of the adjunct information is null it is
-     *  omitted (i.e. nothing to report); if strict VITA-49.0 is used the adjunct information is also
-     *  omitted (even if non-null) since strict VITA-49.0 does not permit it to be reported.
+    /** Sets the ECEF (Earth-Centered, Earth-Fixed) Ephemeris for the collector.
      *  @param val The ephemeris information (null if not specified). <i>Note that changes to the
      *             returned object do not alter the packet.</i>
      */
-    public: virtual void setEphemerisECEF (const Ephemeris &val);
+    public: inline void setEphemerisECEF (const Ephemeris &val) {
+      setRecord(ECEF_EPHEM,val);
+    }
 
-    /** Sets the Relative Ephemeris for the collector. Unlike {@link #getEphemerisECEF()}
-     *  which uses the ECEF coordinate system, this ephemeris is relative to a user-defined system
-     *  specified by {@link #getEphemerisReference()}. This will also set any applicable "Relative
-     *  Ephemeris Adjunct" information in a VITA-49.0b packet (where VITA-49.0b is used). If all of
-     *  the adjunct information is null it is omitted (i.e. nothing to report); if strict VITA-49.0
-     *  is used the adjunct information is also omitted (even if non-null) since strict VITA-49.0
-     *  does not permit it to be reported.
+    /** Sets the Relative Ephemeris for the collector.
      *  @param val The ephemeris information (null if not specified). <i>Note that changes to the
      *             returned object do not alter the packet.</i>
      */
-    public: virtual void setEphemerisRelative (const Ephemeris &val);
+    public: inline void setEphemerisRelative (const Ephemeris &val) {
+      setRecord(REL_EPHEM,val);
+    }
 
     /** Sets the GPS ASCII "sentences". These are ASCII "sentences" from a GPS (Global
      *  Positioning System) receiver, such as those conforming to NMEA-0183. <i>Due to the great
@@ -1575,50 +1372,74 @@ namespace vrt {
      *  @param val The geolocation information (null if not specified). <i>Note that changes to the
      *             returned object do not alter the packet.</i>
      */
-    public: inline void setGeoSentences (const GeoSentences &val)           { setRecord(GPS_ASCII, val, getGeoSentences()); }
+    public: inline void setGeoSentences (const GeoSentences &val) {
+      setRecord(GPS_ASCII, val, getGeoSentences());
+    }
 
     /** Sets the Context Association Lists. These lists indicate the other context/data
      *  streams associated with this one.
      *  @param val The context association lists (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: inline void setContextAssocLists (const ContextAssocLists &val) { setRecord(CONTEXT_ASOC, val, getContextAssocLists()); }
+    public: inline void setContextAssocLists (const ContextAssocLists &val) {
+      setRecord(CONTEXT_ASOC, val, getContextAssocLists());
+    }
 
     /** Sets the Device Identifier specifying the manufacturer and model of the device
      *  producing this context packet stream.
      *  @param val The device identifier as a string (null if not specified).
      */
-    public: inline void setDeviceID (const string &val)                     { setDeviceIdentifier(Utilities::fromStringDeviceID(val)); }
+    public: inline void setDeviceID (const string &val) {
+      setDeviceIdentifier(Utilities::fromStringDeviceID(val));
+    }
 
     /** Sets the Bandwidth of the signal in Hz.
      *  @param val The bandwidth (null if not specified).
      */
-    public: inline void setBandwidth (double val)                           { int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val); setX(BANDWIDTH    ,bits); }
+    public: inline void setBandwidth (double val) {
+      int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
+      setX(BANDWIDTH,bits);
+    }
 
     /** Sets the IF Reference Frequency of the signal in Hz.
      *  @param val The frequency (null if not specified).
      */
-    public: inline void setFrequencyIF (double val)                         { int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val); setX(IF_FREQ      ,bits); }
+    public: inline void setFrequencyIF (double val) {
+      int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
+      setX(IF_FREQ,bits);
+    }
 
     /** Sets the RF Reference Frequency of the signal in Hz.
      *  @param val The frequency (null if not specified).
      */
-    public: inline void setFrequencyRF (double val)                         { int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val); setX(RF_FREQ      ,bits); }
+    public: inline void setFrequencyRF (double val) {
+      int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
+      setX(RF_FREQ,bits);
+    }
 
     /** Sets the RF Reference Frequency Offset of the signal in Hz.
      *  @param val The frequency offset (null if not specified).
      */
-    public: inline void setFrequencyOffsetRF (double val)                   { int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val); setX(RF_OFFSET    ,bits); }
+    public: inline void setFrequencyOffsetRF (double val) {
+      int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
+      setX(RF_OFFSET,bits);
+    }
 
     /** Sets the IF Band Offset of the signal in Hz.
      *  @param val The band offset (null if not specified).
      */
-    public: inline void setBandOffsetIF (double val)                        { int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val); setX(IF_OFFSET    ,bits); }
+    public: inline void setBandOffsetIF (double val) {
+      int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
+      setX(IF_OFFSET,bits);
+    }
 
     /** Sets the Reference Level of the signal in dBm.
      *  @param val The reference level (null if not specified).
      */
-    public: inline void setReferenceLevel (float val)                       { int16_t bits = (isNull(val))? INT16_NULL : VRTMath::fromFloat16 ( 7,val); setI(REF_LEVEL  ,2,bits); }
+    public: inline void setReferenceLevel (float val) {
+      int16_t bits = (isNull(val))? INT16_NULL : VRTMath::fromFloat16(7,val);
+      setI(REF_LEVEL,2,bits);
+    }
 
     /** Sets the Stage 1 Gain of the device in dB. This is the front-end gain of the
      *  system. In cases where a separate Stage 1 and Stage 2 gain is not necessary, this holds
@@ -1626,7 +1447,10 @@ namespace vrt {
      *  specified, it will be set to 0 following the call to this method.</i>
      *  @param val The gain (null if not specified).
      */
-    public: inline void setGain1 (float val)                                { int16_t bits =                             VRTMath::fromFloat16 ( 7,val); setI(GAIN       ,0,bits); }
+    public: inline void setGain1 (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(GAIN,2,bits);
+    }
 
     /** Sets the Stage 2 Gain of the device in dB. This is the back-end gain of the
      *  system. In cases where a separate Stage 1 and Stage 2 gain is not necessary, the Stage 1
@@ -1634,17 +1458,23 @@ namespace vrt {
      *  has been specified, it will be set to 0 following the call to this method.</i>
      *  @param val The gain (null if not specified).
      */
-    public: inline void setGain2 (float val)                                { int16_t bits =                             VRTMath::fromFloat16 ( 7,val); setI(GAIN       ,2,bits); }
+    public: inline void setGain2 (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(GAIN,0,bits);
+    }
 
     /** Sets the Sample Rate in Hz.
      *  @param val The sample rate (null if not specified).
      */
-    public: inline void setSampleRate (double val)                          { int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val); setX(SAMPLE_RATE  ,bits); }
+    public: inline void setSampleRate (double val) {
+      int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
+      setX(SAMPLE_RATE,bits);
+    }
 
     /** Sets the Sample Period (inverse of Sample Rate) in sec.
      *  @param val The sample period (null if not specified).
      */
-    public: inline void setSamplePeriod (double val)  {
+    public: inline void setSamplePeriod (double val) {
       if (isNull(val)) setSampleRate(val);
       else             setSampleRate(1.0 / val);
     }
@@ -1653,14 +1483,20 @@ namespace vrt {
      *  any component that may affect the described signal.
      *  @param val The temperature (null if not specified).
      */
-    public: inline void setTemperature (float val)                          { int16_t bits = (isNull(val))? INT16_NULL : VRTMath::fromFloat16 ( 6,val); setI(TEMPERATURE,2,bits); }
+    public: inline void setTemperature (float val) {
+      int16_t bits = (isNull(val))? INT16_NULL : VRTMath::fromFloat16(6,val);
+      setI(TEMPERATURE,2,bits);
+    }
 
     /** Sets the Data Packet Payload Format. This specifies the format of the data in the
      *  paired data packet stream.
      *  @param val The payload format (null if not specified). <i>Note that changes to the returned
      *             object do not alter the packet.</i>
      */
-    public: inline void setDataPayloadFormat (const PayloadFormat &val)     { int64_t bits = (isNull(val))? INT64_NULL : val.getBits();                 setX(DATA_FORMAT  ,bits); }
+    public: inline void setDataPayloadFormat (const PayloadFormat &val) {
+      int64_t bits = (isNull(val))? INT64_NULL : val.getBits();
+      setX(DATA_FORMAT, bits);
+    }
 
     /** Gets the Total Gain of the device in dB. The total gain is the sum of
      *  {@link #getGain1()} and {@link #getGain2()}.
@@ -1679,7 +1515,7 @@ namespace vrt {
      *  @param val The total gain (null if not specified).
      */
     public: inline void setGain (float val) {
-      if (isNull(val)) setI(GAIN,0,INT32_NULL); // clears gain field(s)
+      if (isNull(val)) setI(GAIN,0,INT16_NULL); // clears gain field(s)
       else             setGain(val,0.0f);       // sets gain field(s)
     }
 
@@ -1757,19 +1593,30 @@ namespace vrt {
     /** Packs a 64-bit integer from the payload at the indicated position. */
     private: void setX (int32_t bit, int64_t val);
 
-    /** Gets a block of data. */
-    private: inline void setRecord (int32_t bit, Record val, Record old) {
+    /** Sets a block of data. */
+    private: inline void setRecord (int32_t bit, const Record &val, const Record &old) {
       if (isNull(old)) setRecord(bit, val, -1);
       else             setRecord(bit, val, old.getByteLength());
     }
 
-    /** Gets a block of data. */
-    private: inline void setRecord (int32_t bit, Record val) {
+    /** Sets a block of data. */
+    private: inline void setRecord (int32_t bit, const Record &val) {
       setRecord(bit, val, getFieldLen(bit));
     }
-  
+
+    /** Sets a block of data. */
+    private: inline void setRecord (int32_t bit, const Record *val) {
+      setRecord(bit, val, getFieldLen(bit));
+    }
+
+    /** Sets a block of data. */
+    private: inline void setRecord (int32_t bit, const Record &val, int32_t oldLen) {
+      if (isNull(val)) setRecord(bit, NULL, oldLen);
+      else             setRecord(bit, &val, oldLen);
+    }
+
     /** Gets a block of data. */
-    private: void setRecord (int32_t bit, Record val, int32_t oldLen);
+    private: void setRecord (int32_t bit, const Record *val, int32_t oldLen);
 
     /** Gets the header type, used with getOffset(..) and OFFSET_TABLE. */
     private: int32_t getContextIndicatorField () const {
@@ -1790,9 +1637,9 @@ namespace vrt {
     public: virtual int32_t   getFieldCount () const;
     public: virtual string    getFieldName  (int32_t id) const;
     public: virtual ValueType getFieldType  (int32_t id) const;
-    public: virtual Value*    getField      (int32_t id) const;
+    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));
     public: virtual void      setField      (int32_t id, const Value* val);
 
   };
-};
+} END_NAMESPACE
 #endif /* _BasicContextPacket_h */

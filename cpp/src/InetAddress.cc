@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,18 +11,27 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "InetAddress.h"
+#include "VRTConfig.h"
 #include <vector>
-#include <string.h>    // required for memcpy(..) on GCC4.4/libc6 2.11.1
-#include <arpa/inet.h> // required for inet_pton(..)
+#include <string.h>      // required for memcpy(..) on GCC4.4/libc6 2.11.1
+#include <arpa/inet.h>   // required for inet_pton(..)
 #include <errno.h>
+#if (_POSIX_C_SOURCE >= 1) || _XOPEN_SOURCE || _POSIX_SOURCE || (defined(__APPLE__) && defined(__MACH__))
+# include <sys/types.h>  // required for getaddrinfo(..)
+# include <sys/socket.h> // required for getaddrinfo(..)
+# include <netdb.h>      // required for getaddrinfo(..)
+# include <unistd.h>     // required for gethostname(..) on OS X
+#else
+#endif
 
 #if (defined(__APPLE__) && defined(__MACH__))
 // Some of the "standard" include-file definitions used on Linux are not present
@@ -36,6 +45,14 @@
 # endif
 #endif
 
+#ifndef HOST_NAME_MAX
+# ifdef _SC_HOST_NAME_MAX
+#  define HOST_NAME_MAX _SC_HOST_NAME_MAX // Used on OS X (other BSD?)
+# else
+#  define HOST_NAME_MAX 255 // Common default
+# endif
+#endif
+
 using namespace vrt;
 
 InetAddress::InetAddress () {
@@ -46,11 +63,19 @@ InetAddress::InetAddress () {
   ipv6.s6_addr32[3] = 0x00000000;
 }
 
-InetAddress::InetAddress (const InetAddress &addr) : ipv4(addr.ipv4), ipv6(addr.ipv6) {
+InetAddress::InetAddress (const InetAddress &addr) :
+  VRTObject(addr), // <-- Used to avoid warnings under GCC with -Wextra turned on
+  ipv4(addr.ipv4),
+  ipv6(addr.ipv6)
+{
   // done
 }
 
 InetAddress::InetAddress (const string &addr) {
+  setHostAddress(addr);
+}
+
+InetAddress::InetAddress (const char *addr) {
   setHostAddress(addr);
 }
 
@@ -62,6 +87,22 @@ InetAddress::InetAddress (const vector<char> &addr, size_t off) {
   }
   else {
     memcpy(&ipv6.s6_addr[0], &addr[off], 16);
+    if (isIPv4()) {
+      ipv4.s_addr = ipv6.s6_addr32[3];
+    }
+  }
+}
+
+InetAddress::InetAddress (const void *addr, size_t off, size_t len) {
+  char *buf = (char*)addr;
+
+  if (len == 4) {
+    ipv6.s6_addr32[2] = 0x0000FFFF;
+    memcpy(&ipv6.s6_addr[12], &buf[off], 4);
+    ipv4.s_addr = ipv6.s6_addr32[3];
+  }
+  else {
+    memcpy(&ipv6.s6_addr[0], &buf[off], 16);
     if (isIPv4()) {
       ipv4.s_addr = ipv6.s6_addr32[3];
     }
@@ -104,11 +145,22 @@ bool InetAddress::isIPv4 () const {
       &&  (ipv6.s6_addr16[5] == 0xFFFF);
 }
 
+bool InetAddress::isMulticastAddress () const {
+  if (isIPv4()) {
+    return (((uint8_t)ipv6.s6_addr[12]) >= 224) &&
+           (((uint8_t)ipv6.s6_addr[12]) <= 239);
+  }
+  else {
+    return (((uint8_t)ipv6.s6_addr[0]) == (uint8_t)0xFF);
+  }
+}
+
 bool InetAddress::equals (const VRTObject &o) const {
   try {
     return equals(*checked_dynamic_cast<const InetAddress*>(&o));
   }
   catch (bad_cast &e) {
+    UNUSED_VARIABLE(e);
     return false;
   }
 }
@@ -127,42 +179,140 @@ string InetAddress::getHostAddress () const {
     snprintf(str, 48, "%d.%d.%d.%d", ipv6.s6_addr[12], ipv6.s6_addr[13], ipv6.s6_addr[14], ipv6.s6_addr[15]);
   }
   else {
-    snprintf(str, 48, "%.4x:%.4x:%.4x:%.4x:%.4x:%.4x:%.4x:%.4x",
-                      ipv6.s6_addr16[0], ipv6.s6_addr16[1], ipv6.s6_addr16[2], ipv6.s6_addr16[3],
-                      ipv6.s6_addr16[4], ipv6.s6_addr16[5], ipv6.s6_addr16[6], ipv6.s6_addr16[7]);
-
+    snprintf(str, 48, "%.2x%.2x:%.2x%.2x:%.2x%.2x:%.2x%.2x:%.2x%.2x:%.2x%.2x:%.2x%.2x:%.2x%.2x",
+                      ipv6.s6_addr[ 0], ipv6.s6_addr[ 1], ipv6.s6_addr[ 2], ipv6.s6_addr[ 3],
+                      ipv6.s6_addr[ 4], ipv6.s6_addr[ 5], ipv6.s6_addr[ 6], ipv6.s6_addr[ 7],
+                      ipv6.s6_addr[ 8], ipv6.s6_addr[ 9], ipv6.s6_addr[10], ipv6.s6_addr[11],
+                      ipv6.s6_addr[12], ipv6.s6_addr[13], ipv6.s6_addr[14], ipv6.s6_addr[15]);
   }
   return str;
 }
 
+void InetAddress::setHostAddressByName (const string &addr) {
+  int family = (VRTConfig::getPreferIPv6Addresses())? AF_INET6 : AF_INET;
+  setHostAddressByName(addr, family);
+}
+
+void InetAddress::setHostAddressByName (const char *addr) {
+  if (addr == NULL) throw VRTException("Can not set address to null");
+  int family = (VRTConfig::getPreferIPv6Addresses())? AF_INET6 : AF_INET;
+  setHostAddressByName(string(addr), family);
+}
+
+void InetAddress::setHostAddressByName (const string &addr, int family) {
+  bool ok = false;
+#if (_POSIX_C_SOURCE >= 1) || _XOPEN_SOURCE || _POSIX_SOURCE || (defined(__APPLE__) && defined(__MACH__))
+  struct addrinfo *res = NULL;
+  struct addrinfo *r   = NULL;
+  struct addrinfo  hints;
+
+  memset(&hints, 0, sizeof(hints));
+  hints.ai_family = family;
+
+  int err = getaddrinfo(addr.c_str(), NULL, &hints, &res);
+  if (err != 0) {
+    throw VRTException(string("Error looking up '")+addr+"': "+gai_strerror(err));
+  }
+
+  for (r = res; r != NULL; r = r->ai_next) {
+    if (res->ai_family == AF_INET) {
+      ipv4 = ((sockaddr_in*)res->ai_addr)->sin_addr;
+      ipv6.s6_addr16[0] = 0x0000;
+      ipv6.s6_addr16[1] = 0x0000;
+      ipv6.s6_addr16[2] = 0x0000;
+      ipv6.s6_addr16[3] = 0x0000;
+      ipv6.s6_addr16[4] = 0x0000;
+      ipv6.s6_addr16[5] = 0xFFFF;
+      ipv6.s6_addr32[3] = ipv4.s_addr;
+      ok = true;
+      break;
+    }
+    else if (res->ai_family == AF_INET6) {
+      ipv6 = ((sockaddr_in6*)res->ai_addr)->sin6_addr;
+      if (isIPv4()) {
+        ipv4.s_addr = ipv6.s6_addr32[3];
+      }
+      ok = true;
+      break;
+    }
+  }
+  freeaddrinfo(res);
+#else
+  // This code is "obsolescent" in POSIX.1-2001 and removed from POSIX.1-2008.
+  // However we keep it here in the off-chance the above code doesn't work
+  // (though we only include the IPv4 form). [This code was manually tested in
+  // Nov 2013 but isn't in the normal unit tests as the test platforms all
+  // support the newer code.]
+  struct hostent *res = gethostbyname(addr.c_str());
+  if (res == NULL) {
+    throw VRTException(string("Error looking up '")+addr+"': "+hstrerror(h_errno));
+  }
+
+  if (res->h_addrtype == AF_INET) {
+    memcpy(&ipv4.s_addr, res->h_addr, res->h_length);
+    ipv6.s6_addr16[0] = 0x0000;
+    ipv6.s6_addr16[1] = 0x0000;
+    ipv6.s6_addr16[2] = 0x0000;
+    ipv6.s6_addr16[3] = 0x0000;
+    ipv6.s6_addr16[4] = 0x0000;
+    ipv6.s6_addr16[5] = 0xFFFF;
+    ipv6.s6_addr32[3] = ipv4.s_addr;
+    ok = true;
+  }
+#endif
+  if (!ok) {
+    if (family != AF_UNSPEC) {
+      // Fall-back to trying both IPv4 *and* IPv6
+      return setHostAddressByName(addr, AF_UNSPEC);
+    }
+    throw VRTException(string("Error looking up '")+addr+"': Unsupported address type returned");
+  }
+}
+
 void InetAddress::setHostAddress (const string &addr) {
-  // Can probably use inet_pton(..) from arpa/inet.h for this, but need to check
-  // to see it is on all platforms we support. Also need to make sure we support
-  // IPv4/IPv6 and IPv4-in-IPv6.
   if ((addr == "") || (addr == "null")) {
     // the setField(..) with an empty string becomes a set with "null", so handle
     // it likewise
     throw VRTException("Invalid HostAddress given empty/null string");
   }
-  
-  size_t colon  = addr.find(':');
-  bool   isIPv6 = (colon != string::npos);
+
+  string _addr   = addr;
+  size_t colon   = _addr.find(":");
+  size_t rcolon  = _addr.rfind(":");
+  size_t bracket = _addr.find("[");
+  bool   _isIPv6 = (bracket == 0) || ((colon != string::npos) && (colon != rcolon));
+  bool   _isIPv4 = !_isIPv6;
   int    status;
-  
-  if (isIPv6) {
+
+  if (bracket == 0) _addr = _addr.substr(1,addr.size()-2);
+
+  for (size_t i = 0; _isIPv4 && (i < _addr.size()); i++) {
+    char c = _addr[i];
+    _isIPv4 = (c == '.') || ((c >= '0') && (c <= '9'));
+  }
+
+  if (_isIPv6) {
 #ifdef AF_INET6
-    status = inet_pton(AF_INET6, addr.c_str(), &ipv6);
+    status = inet_pton(AF_INET6, _addr.c_str(), &ipv6);
 #else
     throw VRTException("Setting InetAddress.HostAddress using IPv6 is not "
                        "supported on this platform.");
 #endif
   }
-  else {
-    status = inet_pton(AF_INET, addr.c_str(), &ipv4);
+  else if (colon != string::npos) {
+    // Error where user passes in host:port (VRT-43)
+    throw VRTException("Expected host name but given %s", addr.c_str());
   }
-  
+  else if (_isIPv4) {
+    status = inet_pton(AF_INET, _addr.c_str(), &ipv4);
+  }
+  else {
+    setHostAddressByName(_addr);
+    return;
+  }
+
   if (status == 1) { // SUCCESS
-    if (isIPv6) {
+    if (_isIPv6) {
       if (isIPv4()) {
         ipv4.s_addr = ipv6.s6_addr32[3];
       }
@@ -181,7 +331,7 @@ void InetAddress::setHostAddress (const string &addr) {
     }
   }
   else if (status == 0) { // INVALID
-    if (isIPv6) {
+    if (_isIPv6) {
       throw VRTException("Invalid IPv6 HostAddress given '%s'", addr.c_str());
     }
     else {
@@ -194,6 +344,32 @@ void InetAddress::setHostAddress (const string &addr) {
   else { // UNKNOWN ERROR
     throw VRTException("Invalid HostAddress given '%s'", addr.c_str());
   }
+}
+
+void InetAddress::setHostAddress (const char *addr) {
+  if (addr == NULL) throw VRTException("Can not set address to null");
+  setHostAddress(string(addr));
+}
+
+InetAddress InetAddress::getLocalHost () {
+#if _BSD_SOURCE || _XOPEN_SOURCE >= 500 || (defined(__APPLE__) && defined(__MACH__))
+  char hostname[HOST_NAME_MAX + 1]; // +1 for terminating NUL character
+  int status = gethostname(hostname, HOST_NAME_MAX+1);
+  if (status < 0) {
+    throw VRTException(errno);
+  }
+  hostname[HOST_NAME_MAX] = '\0'; // since POSIX.1-2001 says \0 can be omitted if name doesn't fit
+
+  return InetAddress(hostname);
+#else
+# warning "gethostname(..) is unsupported, will use loop-back address as local host address"
+  return getLoopbackAddress();
+#endif
+}
+
+InetAddress InetAddress::getLoopbackAddress () {
+  return (VRTConfig::getPreferIPv6Addresses())? InetAddress("::1")
+                                              : InetAddress("127.0.0.1");
 }
 
 int32_t InetAddress::getFieldCount () const {
@@ -223,7 +399,7 @@ Value* InetAddress::getField (int32_t id) const {
 
 void InetAddress::setField (int32_t id, const Value* val) {
   switch (id) {
-    case 0: setHostAddress((string)*val); return;
+    case 0:  setHostAddress(val->toString()); return;
     default: throw VRTException("Invalid field #%d in %s", id, getClassName().c_str());
   }
 }

@@ -64,8 +64,8 @@ StandardContextPacket::StandardContextPacket () :
  // done
 }
 
-StandardContextPacket::StandardContextPacket (const vector<char> &bbuf, bool readOnly) :
-  BasicContextPacket(bbuf, readOnly)
+StandardContextPacket::StandardContextPacket (const vector<char> &_bbuf, bool _readOnly) :
+  BasicContextPacket(_bbuf, _readOnly)
 {
  // done
 }

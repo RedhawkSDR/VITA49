@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -16,6 +16,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "BasicDataPacket.h"
@@ -23,12 +24,12 @@
 
 using namespace vrt;
 
-static const char TRAILER_BIT  = 0x4;  // Trailer present bit in buf[0]
+//static const char TRAILER_BIT = 0x4;  // Trailer present bit in buf[0]
 
 BasicDataPacket::BasicDataPacket (const BasicVRTPacket &p) :
 		  BasicVRTPacket(p)
 {
-	if (!isData()) {
+  if (!isNullValue() && !isData()) {
 		throw VRTException("Can not create DataPacket when input is not data");
 	}
 }
@@ -39,10 +40,10 @@ BasicDataPacket::BasicDataPacket () :
 	// done
 }
 
-BasicDataPacket::BasicDataPacket(const int32_t pktsize) :
-		  BasicVRTPacket(pktsize)
+BasicDataPacket::BasicDataPacket (int32_t bufsize) :
+  BasicVRTPacket(bufsize)
 {
-
+  // done
 }
 
 BasicDataPacket::BasicDataPacket (const void *buf, size_t len, bool readOnly) :
@@ -117,13 +118,28 @@ int8_t BasicDataPacket::getAssocPacketCount () const {
 
 void BasicDataPacket::setAssocPacketCount (int8_t v) {
 	if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-	if ((v != INT8_NULL) && (v < 0)) {
+
+  if (v == INT8_NULL) {
+    if (!hasTrailer()) return; // nothing to do
+    bbuf[getPacketLength()-1] = 0;
+    dropTrailerIfEmpty();
+  }
+  else if (v < 0) {
 		throw VRTException("Invalid associated packet count %d", v);
 	}
+  else {
 	if (!hasTrailer()) shiftTrailer(+4);
-
-	int8_t val = (v == INT8_NULL)? 0 : (0x80 | v);
+    char val = (char)(0x80 | v); // include indicator bit
 	bbuf[getPacketLength()-1] = val;
+}
+}
+
+void BasicDataPacket::dropTrailerIfEmpty () {
+  int32_t off = (getPacketLength() - 4) - 1;
+
+  if ((bbuf[off] == 0) && ((bbuf[off+1] & 0xF0) == 0) && ((bbuf[off+3] & 0x80) == 0)) {
+    shiftTrailer(-4);
+  }
 }
 
 int32_t BasicDataPacket::getTrailer() const {
@@ -138,24 +154,30 @@ boolNull BasicDataPacket::getTrailerBit (int32_t enable, int32_t indicator) cons
 
 void BasicDataPacket::setTrailerBit (int32_t enable, int32_t indicator, boolNull value) {
 	if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-	if (!hasTrailer()) {
-		if (value == _NULL) return; // no trailer, no need to set to null
-		shiftTrailer(+4);
-		bbuf[0] |= TRAILER_BIT;
+
+  if (value == _NULL) {
+    if (!hasTrailer()) return; // no trailer, no need to set to null
+    setStateEventBit(bbuf, getPacketLength()-4, enable, indicator, value);
+    dropTrailerIfEmpty();
 	}
+  else {
+    if (!hasTrailer()) shiftTrailer(+4); // need to insert trailer
 	setStateEventBit(bbuf, getPacketLength()-4, enable, indicator, value);
 }
+}
 
-int32_t BasicDataPacket::getDataLength (const PayloadFormat &pf) const {
+int32_t BasicDataPacket::getDataLength (const PayloadFormat &pf, bool scalar) const {
 	if (isNull(pf)) throw VRTException("Payload format is null");
 
 	int32_t bitsPerSample = pf.getItemPackingFieldSize();
-	int32_t complexMult   = (pf.isComplex())? 2 : 1;
-	bool    naturalSize   = (bitsPerSample ==  8) || (bitsPerSample == 16) ||
-			(bitsPerSample == 32) || (bitsPerSample == 64);
+  int32_t complexMult   = (scalar || !pf.isComplex())? 1 : 2;
+  bool    powerOfTwo    = (bitsPerSample == 64) || (bitsPerSample == 32) ||
+                          (bitsPerSample == 16) || (bitsPerSample ==  8) ||
+                          (bitsPerSample ==  4) || (bitsPerSample ==  2) ||
+                          (bitsPerSample ==  1); // ordered to match common vals first
 
-	if (naturalSize || (!pf.isProcessingEfficient())) {
-		// LinkEfficient (or naturally sized, in which case ProcessingEfficient = LinkEfficient)
+  if (powerOfTwo || (!pf.isProcessingEfficient())) {
+    // LinkEfficient (or 2^N, in which case ProcessingEfficient = LinkEfficient)
 		int32_t totalBits = (getPayloadLength() * 8) - getPadBitCount();
 		return (totalBits / bitsPerSample) / complexMult;
 	}
@@ -181,7 +203,7 @@ TimeStamp BasicDataPacket::getNextTimeStamp (double sampleRate, const PayloadFor
 	TimeStamp ts = getTimeStamp();
 	if (isNull(ts)) return ts;
 	double dt = getDataLength(pf) / sampleRate; // seconds
-	return ts.addPicoSeconds((int64_t)(dt / TimeStamp::ONE_SEC));
+  return ts.addPicoSeconds((int64_t)(dt * TimeStamp::ONE_SEC));
 }
 
 int32_t BasicDataPacket::getLostSamples (const TimeStamp &expected, double sampleRate) const {
@@ -190,20 +212,34 @@ int32_t BasicDataPacket::getLostSamples (const TimeStamp &expected, double sampl
 		throw VRTException("Can not compute number of lost samples, time stamp is null.");
 	}
 	int64_t timeDeltaSec = ts.getSecondsUTC()  - expected.getSecondsUTC();
-	int64_t timeDeltaPS  = ts.getPicoSeconds() - expected.getPicoSeconds() + (timeDeltaSec * TimeStamp::ONE_SEC);
-	return (int32_t)(timeDeltaPS / (sampleRate * TimeStamp::ONE_SEC));
+  int64_t timeDeltaPS  = ts.getPicoSeconds() - expected.getPicoSeconds();
+
+  // Do the math in parts to avoid messy precision issues. The third term (lost3)
+  // provides a 1/2 picosecond delta to address any rounding issues (this addition
+  // should be canceled out by the fact that the return value is floored). If the
+  // third term is dropped the unit tests will fail (particularly the test that
+  // says 1 sample was lost) under some configurations where the compiler is
+  // overly-aggressive in merging the following lines together (e.g. Intel C++
+  // and GCC with -O3 and no debug lines in this function).
+  double lost1 = timeDeltaSec                             * sampleRate;
+  double lost2 = timeDeltaPS  * TimeStamp::ONE_PICOSECOND * sampleRate;
+  double lost3 = TimeStamp::HALF_PICOSECOND               * sampleRate;
+  double sum   = (lost1 + lost2) + lost3;
+  return (int32_t)sum;
 }
 
-void BasicDataPacket::setDataLength (const PayloadFormat &pf, int32_t length) {
+void BasicDataPacket::setDataLength (const PayloadFormat &pf, int32_t length, bool scalar) {
 	if (isNull(pf)) throw VRTException("Payload format is null");
 
 	int32_t bitsPerSample = pf.getItemPackingFieldSize();
-	int32_t samples       = (pf.isComplex())? 2*length : length;
+  int32_t samples       = (scalar || !pf.isComplex())? length : length*2;
+  bool    powerOfTwo    = (bitsPerSample == 64) || (bitsPerSample == 32) ||
+                          (bitsPerSample == 16) || (bitsPerSample ==  8) ||
+                          (bitsPerSample ==  4) || (bitsPerSample ==  2) ||
+                          (bitsPerSample ==  1); // ordered to match common vals first
 
-	bool    naturalSize   = (bitsPerSample ==  8) || (bitsPerSample == 16) ||
-			(bitsPerSample == 32) || (bitsPerSample == 64);
-	if (naturalSize || (!pf.isProcessingEfficient())) {
-		// LinkEfficient (if sample size is multiple of 8-bits, ProcessingEfficient = LinkEfficient)
+  if (powerOfTwo || (!pf.isProcessingEfficient())) {
+    // LinkEfficient (or 2^N, in which case ProcessingEfficient = LinkEfficient)
 		int32_t totalBits  = samples * bitsPerSample;
 		int32_t totalBytes = (totalBits  + 7) / 8;   // +7 to make it round up
 		int32_t totalWords = (totalBytes + 3) / 4;   // +3 to make it round up
@@ -230,28 +266,7 @@ void BasicDataPacket::setDataLength (const PayloadFormat &pf, int32_t length) {
 	}
 }
 
-//added for basic copy back of pointer
-void* BasicDataPacket::getData(){
-	return &bbuf[getHeaderLength()];
-}
-
-
-
-void* BasicDataPacket::getDataShort (const PayloadFormat &pf, bool raw){
-	if (isNull(pf)) throw VRTException("Payload format is null");
-	int32_t len = getScalarDataLength(pf);
-	if (pf.getDataType() == DataType_Int16) {
-		// Fast version where no conversion (other than byte order) is required
-		vector<int16_t> array(len);
-		getData(pf, &array[0]);
-		return &array[0];
-	}
-	else {
-		vector<int16_t> array(len);
-		PackUnpack::unpackAsShort(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
-		return &array[0];
-	}
-}
+// BEGIN TODO FIXME - additions from previous version of shared library
 void BasicDataPacket::swapPayloadBytes(const PayloadFormat &pf, const void* array){
 	int32_t len  = getPayloadLength() - getPadBitCount()/8; // only care if PadBitCount > 8
 	int32_t off  = getHeaderLength();
@@ -285,23 +300,42 @@ void BasicDataPacket::swapPayloadBytes(const PayloadFormat &pf, const void* arra
 		}
 	}
 }
-
 void* BasicDataPacket::getData_normal(const PayloadFormat &pf,int position){
 	DataType type = pf.getDataType();
 
 	if (type == -1) {
 		throw VRTException("Fast unpacking of given data format not supported");
 	}
-	int32_t len  = getPayloadLength() - getPadBitCount()/8; // only care if PadBitCount > 8
+	//int32_t len  = getPayloadLength() - getPadBitCount()/8; // only care if PadBitCount > 8
 	int32_t off  = getHeaderLength()+position;
 
 	return &bbuf[off];
 }
+//added for basic copy back of pointer
+/*void* BasicDataPacket::getData(){
+	return &bbuf[getHeaderLength()];
+}*/
+/*void* BasicDataPacket::getDataShort (const PayloadFormat &pf, bool raw){
+	if (isNull(pf)) throw VRTException("Payload format is null");
+	int32_t len = getScalarDataLength(pf);
+	if (pf.getDataType() == DataType_Int16) {
+		// Fast version where no conversion (other than byte order) is required
+		vector<int16_t> array(len);
+		getData(pf, &array[0]);
+		return &array[0];
+	}
+	else {
+		vector<int16_t> array(len);
+		PackUnpack::unpackAsShort(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+		return &array[0];
+	}
+}*/
+// END TODO FIXME - additions from previous version of shared library
 
 void __attribute__((hot)) *BasicDataPacket::getData (const PayloadFormat &pf, void *array, bool convert) const {
 	DataType type = pf.getDataType();
 
-	if (type == -1) {
+  if (((int)type) == -1) {
 		throw VRTException("Fast unpacking of given data format not supported");
 	}
 
@@ -346,7 +380,7 @@ void __attribute__((hot)) *BasicDataPacket::getData (const PayloadFormat &pf, vo
 void __attribute__((hot)) BasicDataPacket::setData (const PayloadFormat &pf, const void *array, int32_t len, bool convert) {
 	DataType type = pf.getDataType();
 
-	if (type == -1) {
+  if (((int)type) == -1) {
 		throw VRTException("Fast packing of given data format not supported");
 	}
 	int32_t off           = getHeaderLength();

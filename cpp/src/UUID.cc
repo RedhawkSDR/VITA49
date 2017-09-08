@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "UUID.h"
@@ -34,9 +35,9 @@ using namespace vrt;
 #  endif
     void uuid_generate (uuid_t out) {
       unsigned char *u = (unsigned char*)out;
-    
+
       gcry_randomize(u, 16, GCRY_STRONG_RANDOM);
-    
+
       u[6] = (u[6] & 0x0F) | 0x40; // version = 1000 (4 = random)
       u[8] = (u[8] & 0x3F) | 0x80; // variant = 10x  (RFC 4122)
     }
@@ -54,7 +55,9 @@ UUID::UUID () {
   uuid_clear(uu);
 }
 
-UUID::UUID (const UUID &uuid) {
+UUID::UUID (const UUID &uuid) :
+  VRTObject(uuid)  // <-- Used to avoid warnings under GCC with -Wextra turned on
+{
   memcpy(uu, uuid.uu, 16);
 }
 
@@ -79,6 +82,7 @@ bool UUID::equals (const VRTObject &o) const {
     return equals(*checked_dynamic_cast<const UUID*>(&o));
   }
   catch (ClassCastException e) {
+    UNUSED_VARIABLE(e);
     return false;
   }
 }
@@ -92,7 +96,7 @@ bool UUID::equals (const UUID &uuid) const {
   static inline int32_t hexToDec (char a, char b) {
     int32_t _a;
     int32_t _b;
-    
+
          if ((a >= '0') && (a <= '9')) _a = a - '0';
     else if ((a >= 'A') && (a <= 'F')) _a = a - 'A' + 10;
     else if ((a >= 'a') && (a <= 'f')) _a = a - 'a' + 10;
@@ -102,13 +106,13 @@ bool UUID::equals (const UUID &uuid) const {
     else if ((b >= 'A') && (b <= 'F')) _b = b - 'A' + 10;
     else if ((b >= 'a') && (b <= 'f')) _b = b - 'a' + 10;
     else                               return -1;
-    
+
     return (_a << 4) | _b;
   }
-  
+
   void uuid_clear (uuid_t out) {
     char *u = (char*)out;
-    
+
     for (size_t i = 0; i < 16; i++) {
       u[i] = 0;
     }
@@ -117,23 +121,23 @@ bool UUID::equals (const UUID &uuid) const {
   int  uuid_compare (const uuid_t uu1, const uuid_t uu2) {
     char *u1 = (char*)uu1;
     char *u2 = (char*)uu2;
-    
+
     for (size_t i = 0; i < 16; i++) {
       if (u1[i] != u2[i]) return u1[i] - u2[i];
     }
-    
+
     return 0;
   }
-  
+
   int uuid_is_null (const uuid_t uu) {
     char *u = (char*)uu;
-    
+
     for (size_t i = 0; i < 16; i++) {
       if (u[i] != 0) return 0;
     }
     return 1;
   }
-  
+
   void uuid_unparse (const uuid_t uu, char *out) {
     char *u = (char*)uu;
     sprintf(out, "%.2x%.2x%.2x%.2x-"
@@ -145,7 +149,7 @@ bool UUID::equals (const UUID &uuid) const {
                  0xFF&(int32_t)u[ 8], 0xFF&(int32_t)u[ 9], 0xFF&(int32_t)u[10], 0xFF&(int32_t)u[11],
                  0xFF&(int32_t)u[12], 0xFF&(int32_t)u[13], 0xFF&(int32_t)u[14], 0xFF&(int32_t)u[15]);
   }
-  
+
   int uuid_parse (char *in, uuid_t uu) {
     if ((strlen(in) != 36) || (in[ 8] != '-') || (in[13] != '-')
                            || (in[18] != '-') || (in[23] != '-')) {
@@ -153,7 +157,7 @@ bool UUID::equals (const UUID &uuid) const {
     }
     char u[16];
     int  t;
-    
+
     t = hexToDec(in[ 0],in[ 1]);    if (t < 0) return -1;    u[ 0] = (char)t;
     t = hexToDec(in[ 2],in[ 3]);    if (t < 0) return -1;    u[ 1] = (char)t;
     t = hexToDec(in[ 4],in[ 5]);    if (t < 0) return -1;    u[ 2] = (char)t;
@@ -170,12 +174,12 @@ bool UUID::equals (const UUID &uuid) const {
     t = hexToDec(in[30],in[31]);    if (t < 0) return -1;    u[13] = (char)t;
     t = hexToDec(in[32],in[33]);    if (t < 0) return -1;    u[14] = (char)t;
     t = hexToDec(in[34],in[35]);    if (t < 0) return -1;    u[15] = (char)t;
-    
+
     memcpy(uu, u, 16);
     return 0;
   }
 #endif
-  
+
 string UUID::getUUID () const {
   char str[40]; // technically only 37 are required (36 + '\0')
   uuid_unparse(uu,str);
@@ -191,6 +195,11 @@ void UUID::setUUID (const string &uuid) {
   if (ok != 0) {
     throw VRTException("Error while parsing UUID '%s'", uuid.c_str());
   }
+}
+
+void UUID::setUUID (const char *uuid) {
+  if (uuid == NULL) throw VRTException("Can not set UUID to null");
+  setUUID(string(uuid));
 }
 
 int32_t UUID::getFieldCount () const {
@@ -220,7 +229,7 @@ Value* UUID::getField (int32_t id) const {
 
 void UUID::setField (int32_t id, const Value* val) {
   switch (id) {
-    case 0: setUUID((string)*val); return;
+    case 0:  setUUID(val->toString()); return;
     default: throw VRTException("Invalid field #%d in %s", id, getClassName().c_str());
   }
 }

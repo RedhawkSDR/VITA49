@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,31 +11,31 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #ifndef BasicVRTPacket_h
 #define BasicVRTPacket_h
 
 #include "VRTObject.h"
-#include "MetadataBlock.h"
-#include "Utilities.h"
-#include "TimeStamp.h"
-#include "Record.h"
 #include "VRTMath.h"
-#include "InetAddress.h"
-#include "UUID.h"
-#include "HasFields.h"
-#include "Record.h"
-
-//#include <bitset>
+#if NOT_USING_JNI
+# include "MetadataBlock.h"
+# include "Utilities.h"
+# include "TimeStamp.h"
+# include "Record.h"
+# include "InetAddress.h"
+# include "UUID.h"
+# include "HasFields.h"
+# include "Record.h"
+#endif /* NOT_USING_JNI */
 
 using namespace std;
-
 
 namespace vrt {
   ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,8 +59,10 @@ namespace vrt {
     /** <b>Do Not Use:</b> Reserved for future use.           */    PacketType_reserved14          = 14,
     /** <b>Do Not Use:</b> Reserved for future use.           */    PacketType_reserved15          = 15
   };
+#if NOT_USING_JNI
   bool PacketType_isData (PacketType pt);
   bool PacketType_hasStreamIdentifier (PacketType pt);
+#endif
 
   /** Available the real/complex types for data items. */
   enum RealComplexType {
@@ -106,6 +108,30 @@ namespace vrt {
     /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved31   = 31
   };
 
+  /** <b>Internal Use Only:</b> Determines if value format is signed. */
+  inline bool DataItemFormat_isSigned (DataItemFormat form) {
+    return ((int32_t)form) < 16;
+  }
+
+  /** <b>Internal Use Only:</b> Determines number of exponent bits in VRT format. */
+  inline int32_t DataItemFormat_getExponentBits (DataItemFormat form) {
+    switch (form) {
+      case DataItemFormat_SignedVRT1:   return 1;
+      case DataItemFormat_SignedVRT2:   return 2;
+      case DataItemFormat_SignedVRT3:   return 3;
+      case DataItemFormat_SignedVRT4:   return 4;
+      case DataItemFormat_SignedVRT5:   return 5;
+      case DataItemFormat_SignedVRT6:   return 6;
+      case DataItemFormat_UnsignedVRT1: return 1;
+      case DataItemFormat_UnsignedVRT2: return 2;
+      case DataItemFormat_UnsignedVRT3: return 3;
+      case DataItemFormat_UnsignedVRT4: return 4;
+      case DataItemFormat_UnsignedVRT5: return 5;
+      case DataItemFormat_UnsignedVRT6: return 6;
+      default: return -1;
+    }
+  }
+
   /** Data types supported by a <tt>StandardDataPacket</tt>. */
   enum DataType {
     /**  4-bit signed integer.                      */  DataType_Int4       = __INT64_C(0x00FFFFFA00010000),
@@ -126,6 +152,7 @@ namespace vrt {
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   // BasicVRTPacket
   ////////////////////////////////////////////////////////////////////////////////////////////////////
+#if NOT_USING_JNI
   /** A basic but full-featured implementation of {@link BasicVRTPacket}. <br>
    *  <br>
    *  The following implementation is used for the {@link HasFields} methods:
@@ -137,8 +164,6 @@ namespace vrt {
    *     2  | TimeStamp | TimeStamp
    *    ----+-----------+-----------
    *  </pre>
-   *
-   *  @author 
    */
   class BasicVRTPacket : public VRTObject, public HasFields {
     friend class VRTReader;//MSM???
@@ -181,9 +206,16 @@ namespace vrt {
      */
     public: static const int32_t MAX_PAYLOAD_LENGTH = MAX_PACKET_LENGTH - MAX_HEADER_LENGTH - MAX_TRAILER_LENGTH;
 
-    /** Packet buffer (always includes the header) */
+    /** Represents a null VRT packet. */
+    public: static const BasicVRTPacket NULL_PACKET;
 
+    /** Packet buffer (always includes the header) */
+    // TODO FIXME - Revert to public to work with SourceVITA49 and SinkVITA49
+    // TODO FIXME - Can those assets be updated to use new VRT and still be efficient?
+    //protected: vector<char> bbuf;
     public: vector<char> bbuf;
+    // End TODO FIXME
+
     /** Is this instance read-only? */
     protected: bool readOnly;
 
@@ -193,16 +225,18 @@ namespace vrt {
     /** Basic no-argument constructor for the class. */
     public: BasicVRTPacket ();
 
-    /** Creates a new instance accessing the given data buffer.
+    /** Basic copy constructor for the class.
      *  @param p The packet to copy.
      */
     public: BasicVRTPacket (const BasicVRTPacket &p);
-    /** Creates a new instance accessing the given data buffer.
- *      *  @param buf      The pointer to the packet buffer.
- *           *  @param len      The length  of the packet buffer.
- *                *  @param readOnly Should users of this instance be able to modify the underlying data buffer?
- *                     */
-    public: BasicVRTPacket (const int32_t pktsize );
+
+    /** Creates a new instance with a default anticipated length that can be written to.
+     *  Initially this will just be a simple data packet with no fields set (other than
+     *  the required packet length of 4), but will have the underlying buffers pre-allocated
+     *  as required.
+     *  @param bufsize The anticipated buffer size.
+     */
+    public: BasicVRTPacket (int32_t bufsize);
 
     /** Creates a new instance accessing the given data buffer.
      *  @param buf      The pointer to the packet buffer.
@@ -243,28 +277,34 @@ namespace vrt {
     public: inline virtual bool isNullValue () const {
       return (bbuf.size() == 0);
     }
-    
+
 //    /** <b>Internal use only:</b> Swaps packet buffer contents. */
 //    public: inline void swap (vector<char> &buf) {
 //      std::swap(bbuf, buf);
 //    }
-//    
+//
 //    /** <b>Internal use only:</b> Swaps packet buffer contents. */
 //    public: inline void swap (BasicVRTPacket &p) {
 //      std::swap(bbuf, p.bbuf);
 //    }
 
     /** <b>Internal use only:</b> Gets the packet stream code. The stream code is a 64-bit value
-        equal to:
-        <tt>
-          0xt0000000ssssssss   where t = is the numeric value corresponding to the packet type
-                                     s = the stream identifier or 0x00000000 if not specified
-        </tt>
-         This is used as the hashtable key when doing packet sequence accounting since the counters
-        are unique to the stream and type.
-        @return The packet stream code.
+     *  equal to:
+     *  <tt>
+     *    0xt0000000ssssssss   where t = is the numeric value corresponding to the packet type
+     *                               s = the stream identifier or 0x00000000 if not specified
+     *  </tt>
+     *  This is used as the hashtable key when doing packet sequence accounting since the counters
+     *  are unique to the stream and type.
+     *  @return The packet stream code.
      */
     public: int64_t getStreamCode () const;
+
+    /** <b>Internal use only:</b> Gets the packet stream code.
+     *  @param ptr Pointer to the packet content.
+     *  @return The packet stream code.
+     */
+    public: static int64_t getStreamCode (const void *ptr);
 
     /** Checks for header equality with another BasicVRTPacket. The headers of two VRT packets are
      *  considered equal if the content of the payloads is bit-for-bit identical. The contents of the
@@ -312,7 +352,7 @@ namespace vrt {
      *      packet with a trailer that has nothing enabled.
      *    </li>
      *  </ul>
-     *  Regardless of the comparison used, ny two packets for which {@link #equals} returns
+     *  Regardless of the comparison used, any two packets for which {@link #equals} returns
      *  true, must have this method return true as well. This method will always return true if
      *  comparing two context packets since they do not contain trailers.
      *  @param p     The other packet.
@@ -322,6 +362,7 @@ namespace vrt {
      */
     public: bool trailerEquals (const BasicVRTPacket &p, bool exact) const;
 
+    using VRTObject::equals;
     /** Checks for equality with an unknown object. Two VRT packets are considered equal if the
      *  content of the packets is bit-for-bit identical. The actual implementation classes are not
      *  considered relevant for checking equality.
@@ -336,20 +377,14 @@ namespace vrt {
         return equals(*checked_dynamic_cast<const BasicVRTPacket*>(&o));
       }
       catch (bad_cast &e) {
+        UNUSED_VARIABLE(e);
         return false;
       }
     }
 
-    public: inline string toString () const {
-      string err = getPacketValid(false);
-      if (err != "") return getClassName()+": <"+err+">";
-      
-      ostringstream str;
-      toStringStream(str);
-      return str.str();
-    }
+    public: virtual string toString () const;
 
-    /** Writes the packet content to a string styream in a user-friendly format.
+    /** Writes the packet content to a string stream in a user-friendly format.
      *  @param str The string stream to write to.
      */
     protected: virtual void toStringStream (ostringstream &str) const;
@@ -512,7 +547,7 @@ namespace vrt {
      *  @return The time stamp of the packet (never null).
      */
     public: virtual TimeStamp getTimeStamp () const;
-    
+
     /** Gets the time stamp of the packet for the given sampling rate.
      *  @param  sr the sampling rate
      *  @return The time stamp of the packet (never null).
@@ -530,7 +565,14 @@ namespace vrt {
      *  length will always be a multiple of 4-bytes.
      *  @return The total length of the packet in bytes.
      */
-    public: virtual int32_t getPacketLength () const;
+    public: virtual inline int32_t getPacketLength () const {
+      return getPacketLength(bbuf, 0);
+    }
+
+    /** <b>Internal Use Only:</b> Get VRT packet length using a buffer input. */
+    public: inline static int32_t getPacketLength (const vector<char> &buf, int32_t off) {
+      return ((0xFF & ((int32_t)buf[off+2])) << 10) | ((0xFF & ((int32_t)buf[off+3])) << 2);
+    }
 
     /** Gets the payload length in bytes. The payload length is a derived value computed as:
      *  <pre>
@@ -601,7 +643,7 @@ namespace vrt {
      *  @return The packet class identifier or INT8_NULL if not specified.
      */
     public: virtual int64_t getClassIdentifier () const;
-  
+
     /** Gets the Organizational Unique Identifier (OUI) from the packet class identifier. The OUI
      *  is a 24-bit IEEE-assigned identifier for the organization that defined the packet class.
      *  @return The OUI or null if not specified.
@@ -644,13 +686,21 @@ namespace vrt {
      */
     public: virtual void setTimeStamp (const TimeStamp &v);
 
-    /** <i>Optional functionality:</i> Gets the packet count. This is the modulo-16 count of all
+    /** <i>Optional functionality:</i> Sets the packet count. This is the modulo-16 count of all
      *  packets on this stream.
      *  @param v The packet count (0..15).
      *  @throws VRTException If this method is not supported.
      *  @throws VRTException If the value passed in is invalid.
      */
     public: virtual void setPacketCount (int32_t v);
+
+    /** <b>Internal Use Only:</b> Sets the packet count. This is the modulo-16 count of all
+     *  packets on this stream.
+     *  @param ptr Pointer to the packet content.
+     *  @param v   The packet count (0..15).
+     *  @throws VRTException If the value passed in is invalid.
+     */
+    public: static void setPacketCount (void *ptr, int32_t v);
 
     /** <i>Optional functionality:</i> Sets the payload length in bytes. The packet length is
      *  recomputed and trailer is shifted as required. The payload length must be a multiple
@@ -731,14 +781,33 @@ namespace vrt {
     //////////////////////////////////////////////////////////////////////////////////////////////////
 
     /** <b>Experimental, use with care:</b> Gets a pointer to the packet content. */
-    public: void *getPacketPointer ();
-    public: char* getPacketPointer_type();
+    public: char* getPacketPointer ();
 
-    public: vector<char> getPacketVector();
     /** <b>Experimental, use with care:</b> Gets a pointer to the packet payload. */
-    public: void *getPayloadPointer ();
+    public: char* getPayloadPointer ();
 
-    /** Reads the packet payload a vector. */
+    /** Reads the packet content as a vector.
+     *  @deprecated This function is present for backwards-compatibility with a
+     *              user-extension, the proper function to use is <tt>getPacket()</tt>.
+     */
+    public: inline __attribute__((deprecated)) __intelattr__((deprecated))
+            vector<char> getPacketVector () const {
+      return getPacket();
+    }
+
+    /** <b>Experimental, use with care:</b> Gets a pointer to the packet content.
+     *  @deprecated This function is present for backwards-compatibility with a
+     *              user-extension, the proper function to use is <tt>getPacketPointer()</tt>.
+     */
+    public: inline __attribute__((deprecated)) __intelattr__((deprecated))
+            char* getPacketPointer_type () {
+      return getPacketPointer();
+    }
+
+    /** Reads the packet content as a vector. */
+    public: vector<char> getPacket () const;
+
+    /** Reads the packet payload as a vector. */
     public: vector<char> getPayload () const;
 
     /** Reads the packet payload into the provided buffer.
@@ -795,6 +864,19 @@ namespace vrt {
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // Pack/Unpack
     //////////////////////////////////////////////////////////////////////////////////////////////////
+    /** <b>Internal Use Only:</b> Does a buffer swap. */
+    public: inline void swap (vector<char> *buffer) {
+      if (buffer == NULL) throw VRTException("Buffer is null");
+      if (readOnly      ) throw VRTException("Packet is read-only");
+      bbuf.swap(*buffer);
+    }
+    /** <b>Internal Use Only:</b> Does a buffer swap. */
+    public: inline void swap (BasicVRTPacket *pkt) {
+      if (pkt  ==  NULL) throw VRTException("Packet is null");
+      if (readOnly     ) throw VRTException("Packet is read-only");
+      if (pkt->readOnly) throw VRTException("Packet is read-only");
+      bbuf.swap(pkt->bbuf);
+    }
 
     /** Packs an 8-bit integer into the payload of the packet. */
     protected: inline void packPayloadByte      (int32_t off, char     val) { VRTMath::packByte(    bbuf, getHeaderLength()+off, val); }
@@ -907,10 +989,12 @@ namespace vrt {
     public: virtual int32_t   getFieldCount () const;
     public: virtual string    getFieldName  (int32_t id) const;
     public: virtual ValueType getFieldType  (int32_t id) const;
-    public: virtual Value*    getField      (int32_t id) const;
+    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));
     public: virtual void      setField      (int32_t id, const Value* val);
   };
+#endif /* NOT_USING_JNI */
 
+#if NOT_USING_JNI
   /** Specifies the payload format. <br>
    *  <br>
    *  The following implementation is used for the {@link HasFields} methods:
@@ -949,10 +1033,10 @@ namespace vrt {
     private: static const int32_t NULL_VAL_LO = 0x000000000;   // null value for lo
     private: static const int32_t MASK_VAL_HI = ~NULL_VAL_HI;  // clears null value for hi
     private: static const int32_t MASK_VAL_LO = ~NULL_VAL_LO;  // clears null value for lo
-    
+
     private: int32_t hi; // high-order bits
     private: int32_t lo; // low-order bits
-    
+
     /** Creates new instance. */
     public: PayloadFormat ();
 
@@ -1010,8 +1094,9 @@ namespace vrt {
 
     public: virtual string toString () const;
 
+    using VRTObject::equals;
     public: virtual bool equals (const VRTObject &o) const;
-    
+
     /** Checks to see if the payload format is valid.
      *  @return true if it is valid, false otherwise.
      */
@@ -1100,7 +1185,7 @@ namespace vrt {
     public: inline bool isSigned () const {
       return (getDataItemFormat() < 16);
     }
-    
+
     /** Gets the data format used.
      *  @return The format used.
      */
@@ -1216,57 +1301,6 @@ namespace vrt {
       int32_t val  = (hi & mask);
       return val+1;
     }
-    public: inline int64_t getClassIDfromPF (const PayloadFormat &pf){
-    	int64_t ERROR = __INT64_C(-1);
-    	int64_t SIZE_TO_TYPE[] = {
-    	  __INT64_C(0x00FFFFFA00000000),   ERROR,   ERROR,  __INT64_C(0x00FFFFFA00010000),  //  1-bit to  4-bit
-    	                          ERROR,   ERROR,   ERROR,  __INT64_C(0x00FFFFFA00020000),  //  5-bit to  8-bit
-    	                          ERROR,   ERROR,   ERROR,                          ERROR,  //  9-bit to 12-bit
-    	                          ERROR,   ERROR,   ERROR,  __INT64_C(0x00FFFFFA00030000),  // 13-bit to 16-bit
-    	                          ERROR,   ERROR,   ERROR,                          ERROR,  // 17-bit to 20-bit
-    	                          ERROR,   ERROR,   ERROR,                          ERROR,  // 21-bit to 24-bit
-    	                          ERROR,   ERROR,   ERROR,                          ERROR,  // 25-bit to 28-bit
-    	                          ERROR,   ERROR,   ERROR,  __INT64_C(0x00FFFFFA00040000),  // 29-bit to 32-bit
-    	                          ERROR,   ERROR,   ERROR,                          ERROR,  // 33-bit to 36-bit
-    	                          ERROR,   ERROR,   ERROR,                          ERROR,  // 37-bit to 40-bit
-    	                          ERROR,   ERROR,   ERROR,                          ERROR,  // 41-bit to 44-bit
-    	                          ERROR,   ERROR,   ERROR,                          ERROR,  // 45-bit to 48-bit
-    	                          ERROR,   ERROR,   ERROR,                          ERROR,  // 49-bit to 52-bit
-    	                          ERROR,   ERROR,   ERROR,                          ERROR,  // 53-bit to 56-bit
-    	                          ERROR,   ERROR,   ERROR,                          ERROR,  // 57-bit to 60-bit
-    	                          ERROR,   ERROR,   ERROR,  __INT64_C(0x00FFFFFA00050000),  // 61-bit to 64-bit
-    	};
-
-    	  if (isNull(pf)) return ERROR;
-
-    	  int64_t bits  = pf.getBits();
-    	  int64_t check = bits & __INT64_C(0x0FFFF000FFFF0000);
-    	  int64_t itmSz = bits & __INT64_C(0x0000001F00000000);
-    	  int64_t fmtSz = bits & __INT64_C(0x00000FE000000000);
-
-    	  if ((itmSz << 6) != fmtSz) {
-    		  return ERROR;
-    	  }
-    	  else if (check == __INT64_C(0x0000000000000000)) {
-    		  return  SIZE_TO_TYPE[(int)(itmSz>>32)]                  // Type size
-    	         | ((bits >> 41) & __INT64_C(0x00380000))          // Real/Complex + Signed/Unsigned
-    	         | ((bits      ) & __INT64_C(0x0000FFFF));         // Vector Size
-    	  }
-    	  else if (check == __INT64_C(0x0E00000000000000)) {
-    		  return __INT64_C(0x00FFFFFA00060000)                   // 32-bit IEEE-754 Double-Precision
-    	         | ((bits >> 41) & __INT64_C(0x00300000))          // Real/Complex
-    	         | ((bits      ) & __INT64_C(0x0000FFFF));         // Vector Size
-    	  }
-    	  else if (check == __INT64_C(0x0F00000000000000)) {
-    		  return __INT64_C(0x00FFFFFA00070000)                   // 64-bit IEEE-754 Double-Precision
-    	         | ((bits >> 41) & __INT64_C(0x00300000))          // Real/Complex
-    	         | ((bits      ) & __INT64_C(0x0000FFFF));         // Vector Size
-    	  }
-    	  else {
-    		  return ERROR;
-    	  }
-
-    }
 
     /** Sets the data item size.
      *  @param val The data item size (0..63).
@@ -1319,17 +1353,19 @@ namespace vrt {
       hi = (hi                         ) & MASK_VAL_HI;
       lo = ((val-1) | (lo & 0xFFFF0000)) & MASK_VAL_LO;
     }
-    
+
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // Implement HasFields
     //////////////////////////////////////////////////////////////////////////////////////////////////
     public: virtual int32_t   getFieldCount () const;
     public: virtual string    getFieldName  (int32_t id) const;
     public: virtual ValueType getFieldType  (int32_t id) const;
-    public: virtual Value*    getField      (int32_t id) const;
+    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));
     public: virtual void      setField      (int32_t id, const Value* val);
   };
+#endif /* NOT_USING_JNI */
 
+#if NOT_USING_JNI
   /** Standard payload format: Real, signed 4-bit integer. */
   const PayloadFormat PayloadFormat_INT4        (DataType_Int4);
   /** Standard payload format: Real, signed 8-bit integer. */
@@ -1356,6 +1392,7 @@ namespace vrt {
   const PayloadFormat PayloadFormat_UINT32      (DataType_UInt32);
   /** Standard payload format: Real, unsigned 64-bit integer. */
   const PayloadFormat PayloadFormat_UINT64      (DataType_UInt64);
+#endif /* NOT_USING_JNI */
 
   namespace VRTMath {
     /** Converts from an IEEE-754 double-precision floating-point value to the
@@ -1386,6 +1423,26 @@ namespace vrt {
      */
     int64_t toVRTFloat (DataItemFormat form, int32_t dSize, double val); // code in VRTMath.cc
 
+    /** <b>Internal Use Only:</b> Converts from an IEEE-754 double-precision
+     *  floating-point value to the packed bits for a VRT floating-point
+     *  <b>without normal safety checks</b>.
+     *  @param sign  Is output signed?
+     *  @param eSize The number of exponent bits (1 to 6).
+     *  @param dSize The data size in bits (2..63).
+     *  @param val   The value to convert.
+     */
+    int32_t toVRTFloat32 (bool sign, int32_t eSize, int32_t dSize, double val); // code in VRTMath.cc
+
+    /** <b>Internal Use Only:</b> Converts from an IEEE-754 double-precision
+     *  floating-point value to the packed bits for a VRT floating-point
+     *  <b>without normal safety checks</b>.
+     *  @param sign  Is output signed?
+     *  @param eSize The number of exponent bits (1 to 6).
+     *  @param dSize The data size in bits (2..63).
+     *  @param val   The value to convert.
+     */
+    int64_t toVRTFloat64 (bool sign, int32_t eSize, int32_t dSize, double val); // code in VRTMath.cc
+
     /** Converts from the packed bits for a VRT floating-point to an IEEE-754
      *  double-precision floating-point value. <br>
      *  <br>
@@ -1405,9 +1462,30 @@ namespace vrt {
      *  @return The IEEE-754 floating-point number.
      */
     double fromVRTFloat (DataItemFormat form, int32_t dSize, int64_t bits); // code in VRTMath.cc
-  };
-};
 
+    /** <b>Internal Use Only:</b> Converts from the packed bits for a VRT
+     *  floating-point to an IEEE-754 double-precision floating-point value
+     *  <b>without normal safety checks</b>.
+     *  @param sign  Is output signed?
+     *  @param eSize The number of exponent bits (1 to 6).
+     *  @param dSize The data size in bits (2..63).
+     *  @param bits  The packed bits to convert.
+     */
+    double fromVRTFloat32 (bool sign, int32_t eSize, int32_t dSize, int32_t bits); // code in VRTMath.cc
+
+    /** <b>Internal Use Only:</b> Converts from the packed bits for a VRT
+     *  floating-point to an IEEE-754 double-precision floating-point value
+     *  <b>without normal safety checks</b>.
+     *  @param sign  Is output signed?
+     *  @param eSize The number of exponent bits (1 to 6).
+     *  @param dSize The data size in bits (2..63).
+     *  @param bits  The packed bits to convert.
+     */
+    double fromVRTFloat64 (bool sign, int32_t eSize, int32_t dSize, int64_t bits); // code in VRTMath.cc
+  } END_NAMESPACE
+} END_NAMESPACE
+
+#if NOT_USING_JNI
 string   operator+  (string  &s, vrt::PacketType val);
 ostream& operator<< (ostream &s, vrt::PacketType val);
 string   operator+  (string  &s, vrt::RealComplexType val);
@@ -1416,4 +1494,6 @@ string   operator+  (string  &s, vrt::DataItemFormat val);
 ostream& operator<< (ostream &s, vrt::DataItemFormat val);
 string   operator+  (string  &s, vrt::DataType val);
 ostream& operator<< (ostream &s, vrt::DataType val);
+#endif /* NOT_USING_JNI */
+
 #endif /* BasicVRTPacket_h */

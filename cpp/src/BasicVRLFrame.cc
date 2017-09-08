@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include <cstring>
@@ -44,58 +45,76 @@ BasicVRLFrame::BasicVRLFrame () :
   bbuf[11] = NO_CRC_3;
 }
 
-BasicVRLFrame::BasicVRLFrame (const int length) :
-  bbuf(length),
+BasicVRLFrame::BasicVRLFrame (int32_t bufsize) :
+  bbuf(bufsize),
   readOnly(false)
 {
   bbuf[ 0] = VRL_FAW_0;
   bbuf[ 1] = VRL_FAW_1;
   bbuf[ 2] = VRL_FAW_2;
   bbuf[ 3] = VRL_FAW_3;
-  bbuf[ length-5] = 3;
-  bbuf[length-4] = NO_CRC_0;
-  bbuf[length-3] = NO_CRC_1;
-  bbuf[length-2] = NO_CRC_2;
-  bbuf[length-1] = NO_CRC_3;
+  bbuf[ 4] = 0;
+  bbuf[ 5] = 0;
+  bbuf[ 6] = 0;
+  bbuf[ 7] = 3;
+  bbuf[ 8] = NO_CRC_0;
+  bbuf[ 9] = NO_CRC_1;
+  bbuf[10] = NO_CRC_2;
+  bbuf[11] = NO_CRC_3;
 }
 
-
-
-BasicVRLFrame::BasicVRLFrame (const BasicVRLFrame &f)  :
+BasicVRLFrame::BasicVRLFrame (const BasicVRLFrame &f) :
+  VRTObject(f), // <-- Used to avoid warnings under GCC with -Wextra turned on
   bbuf(f.bbuf),
   readOnly(f.readOnly)
 {
   // done
 }
 
-BasicVRLFrame::BasicVRLFrame (vector<char> *buf, bool readOnly)  :
+BasicVRLFrame::BasicVRLFrame (vector<char> *buf, bool readOnly) :
   bbuf(*buf),
   readOnly(readOnly)
 {
   // done
 }
 
-BasicVRLFrame::BasicVRLFrame (const vector<char> &buf, bool readOnly)  :
+BasicVRLFrame::BasicVRLFrame (const vector<char> &buf, bool readOnly) :
   bbuf(buf),
   readOnly(readOnly)
 {
   // done
 }
 
-BasicVRLFrame::BasicVRLFrame (const vector<char> &buf, ssize_t size, bool readOnly)  :
+BasicVRLFrame::BasicVRLFrame (const vector<char> &buf, size_t size, bool readOnly) :
   bbuf(buf.begin(), buf.begin() + size),
   readOnly(readOnly)
 {
   // done
 }
 
+BasicVRLFrame::BasicVRLFrame (const void *ptr, size_t size, bool readOnly) :
+  bbuf(&((const char*)ptr)[0], &((const char*)ptr)[size]),
+  readOnly(readOnly)
+{
+  // done
+}
+
 string BasicVRLFrame::toString () const {
-  if (!isFrameValid()) return getClassName()+": <invalid frame>";
-  ostringstream str;
-  str << getClassName() << ":";
-  str << " FrameCount="  << getFrameCount();
-  str << " FrameLength=" << getFrameLength();
-  return str.str();
+  if (isNullValue()) return getClassName()+": <null>";
+
+  try {
+    string err = getFrameValid(false);
+    if (err != "") return getClassName()+": <"+err+">";
+
+    ostringstream str;
+    str << getClassName() << ":";
+    str << " FrameCount="  << getFrameCount();
+    str << " FrameLength=" << getFrameLength();
+    return str.str();
+  }
+  catch (VRTException e) {
+    return getClassName()+": <Invalid VRLFrame: "+e.toString()+">";
+  }
 }
 
 bool BasicVRLFrame::equals (const BasicVRLFrame &f) const {
@@ -113,6 +132,7 @@ bool BasicVRLFrame::equals (const BasicVRLFrame &f) const {
     return equals(*checked_dynamic_cast<const BasicVRLFrame*>(&o));
   }
   catch (bad_cast &e) {
+    UNUSED_VARIABLE(e);
     return false;
   }
 }
@@ -128,30 +148,40 @@ int32_t BasicVRLFrame::hashCode () const {
   return hash;
 }
 
-bool BasicVRLFrame::isFrameValid0 () const {
-  return (bbuf.size() > HEADER_LENGTH+TRAILER_LENGTH)
-      && (bbuf[0] == VRL_FAW_0)
-      && (bbuf[1] == VRL_FAW_1)
-      && (bbuf[2] == VRL_FAW_2)
-      && (bbuf[3] == VRL_FAW_3)
-      && (getFrameLength() >= 24)
-      && isCRCValid();
-}
-
-bool BasicVRLFrame::isFrameValid () const {
-  if (!isFrameValid0()) return false;
-
-  int32_t start = HEADER_LENGTH;
-  int32_t end   = getPacketEnd(start);
-  while (end > 0) {
-    start = end;
-    end   = getPacketEnd(start);
+string BasicVRLFrame::getFrameValid (bool strict, int32_t length) const {
+  if (!isVRL(bbuf,0)) {
+    return "Invalid VRLFrame: Missing frame alignment word.";
   }
-  return (end == NO_MORE_PACKETS);
-}
+  if (bbuf.size() < (size_t)getFrameLength()) {
+    return "Invalid VRLFrame: Allocated buffer shorter than packet length.";
+  }
+  if (getFrameLength() < HEADER_LENGTH+TRAILER_LENGTH) {
+    return Utilities::format("Invalid VRLFrame: Frame reports length of %d "
+                             "but minimum is %d.", getFrameLength(),
+                             (HEADER_LENGTH+TRAILER_LENGTH));
+  }
+  if (!isCRCValid()) {
+    return "Invalid VRLFrame: Failed CRC check.";
+  }
+  if ((length != -1) && (getFrameLength() != length)) {
+    return Utilities::format("Invalid VRLFrame: Invalid frame length, frame "
+                             "reports %d octets, but working with %d octets.",
+                             getFrameLength(), length);
+  }
 
-bool BasicVRLFrame::isFrameValid (int32_t length) const {
-  return isFrameValid() && (getFrameLength() == length);
+  if (strict) {
+    int32_t start = HEADER_LENGTH;
+    int32_t end   = getPacketEnd(start);
+    while (end > 0) {
+      start = end;
+      end   = getPacketEnd(start);
+    }
+    if (end != NO_MORE_PACKETS) {
+      return "Invalid VRLFrame: Length of packets in frame is not consistent "
+             "with length of frame.";
+    }
+  }
+  return "";
 }
 
 bool BasicVRLFrame::isCRCValid () const {
@@ -161,12 +191,12 @@ bool BasicVRLFrame::isCRCValid () const {
             && (bbuf[off+2] == NO_CRC_2)
             && (bbuf[off+3] == NO_CRC_3);
 
-  return noCRC || (VRTMath::unpackInt(bbuf, off, BIG_ENDIAN) == computeCRC());
+  return noCRC || (VRTMath::unpackInt(bbuf, off) == computeCRC());
 }
 
 void BasicVRLFrame::updateCRC () {
   int32_t off = getFrameLength() - TRAILER_LENGTH;
-  VRTMath::packInt(bbuf, off, computeCRC(), BIG_ENDIAN);
+  VRTMath::packInt(bbuf, off, computeCRC());
 }
 
 void BasicVRLFrame::clearCRC () {
@@ -230,54 +260,135 @@ int32_t BasicVRLFrame::getPacketCount () const {
   return count;
 }
 
+vector<void*> BasicVRLFrame::getVRTPacketsRW () {
+  // This functions needs to be cleaned up... it looks this way since it
+  // pre-dates some of the newer functionality, and we didn't want to spend
+  // too much time revising it until we have the iterators ready for use.
+  vector<void*> list;
+  int32_t start = HEADER_LENGTH;
+  int32_t end   = getPacketEnd(bbuf, start);
+  while (end > 0) {
+    list.push_back(&bbuf[start]);
+    start = end;
+    end   = getPacketEnd(bbuf, start);
+  }
+  if (end != NO_MORE_PACKETS) {
+    return vector<void*>(0); // error condition indicated
+  }
+  return list;
+}
+
 vector<BasicVRTPacket*> BasicVRLFrame::getVRTPackets () const {
-  return getVRTPackets(bbuf, bbuf.size(), readOnly);
-}
-//assumes length is correct ahead of time
-int32_t BasicVRLFrame::setVRTPacket (int32_t maxFrameLength, const BasicVRTPacket *packet){
-	if (readOnly) throw VRTException("Frame is read only");
-
-	int32_t count = 0;
-	int32_t len   = HEADER_LENGTH + TRAILER_LENGTH;
-
-
-	string err = packet->getPacketValid(false);
-	if (err != "") throw VRTException(err);
-
-	int32_t plength = packet->getPacketLength();
-	int32_t length = len + plength;
-
-	if (length < maxFrameLength) {
-		len = length;
-	    count++;
-	}
-
-	else if (maxFrameLength == MAX_FRAME_LENGTH) {
-		throw VRTException("Total packet length exceeds MAX_FRAME_LENGTH");
-	}
-	else {
-		throw VRTException("Total packet length exceeds buffer length");
-	}
-	bbuf.resize(len);
-	// Note that the code below may cause the old CRC to be overwritten, but since we clear it
-	// via the call to setFrameLength, this should not be an issue.
-	int32_t off = HEADER_LENGTH;
-	packet->readPacket(&bbuf[off], 0, plength);
-	setFrameLength(len);
-	return count;
+  // This functions needs to be cleaned up... it looks this way since it
+  // pre-dates some of the newer functionality, and we didn't want to spend
+  // too much time revising it until we have the iterators ready for use.
+  vector<BasicVRTPacket*> list;
+  int32_t start = HEADER_LENGTH;
+  int32_t end   = getPacketEnd(bbuf, start);
+  while (end > 0) {
+    if ((bbuf[start] & 0xC0) == 0) {
+      list.push_back(new BasicDataPacket(bbuf, start, end, readOnly));
+    }
+    else {
+      list.push_back(new BasicContextPacket(bbuf, start, end, readOnly));
+    }
+    start = end;
+    end   = getPacketEnd(bbuf, start);
+  }
+  if (end != NO_MORE_PACKETS) {
+    for (size_t i=0; i<list.size(); i++) {
+      delete list[i];
+    }
+    return vector<BasicVRTPacket*>(0); // error condition indicated
+  }
+  return list;
 }
 
-int32_t BasicVRLFrame::setVRTPackets (bool fit, int32_t maxFrameLength, const vector<BasicVRTPacket> &packets) {
-  if (readOnly) throw VRTException("Frame is read only");
-  
+
+vector<vector<char>*> *BasicVRLFrame::getVRTPackets (const vector<char> &buffer, int32_t len) {
+  vector<vector<char>*> *list = new vector<vector<char>*>();
+  try {
+    int32_t start = HEADER_LENGTH;
+    int32_t end   = getPacketEnd(buffer, start);
+    while (end > 0) {
+      list->push_back(new vector<char>(buffer.begin()+start, buffer.begin()+end));
+      start = end;
+      end   = getPacketEnd(buffer, start);
+      if (end > len) break; // ERROR
+    }
+    if (end == NO_MORE_PACKETS) {
+      return list;
+    }
+  }
+  catch (VRTException e) {
+    // ignore and just return null below
+    UNUSED_VARIABLE(e);
+  }
+
+  // Error condition, delete anything and return null
+  if (list != NULL) {
+    for (size_t i = 0; i < list->size(); i++) {
+      delete list->at(i);
+    }
+    delete list;
+  }
+  return NULL;
+}
+
+int32_t BasicVRLFrame::setVRTPackets (bool fit, int32_t maxFrameLength,
+                                      const BasicVRTPacket *p) {
+  if (readOnly ) throw VRTException("Frame is read only");
+  if (p == NULL) throw VRTException("Null packet given");
+
+  int32_t len = HEADER_LENGTH + TRAILER_LENGTH;
+  string  err = p->getPacketValid(true);
+  if (!isNull(err)) throw VRTException(err);
+
+  int32_t plen   = p->getPacketLength();
+  int32_t length = len + plen;
+  if (length < maxFrameLength) {
+    len = length;
+  }
+  else if (fit) {
+    return 0;
+  }
+  else if (maxFrameLength == MAX_FRAME_LENGTH) {
+    throw VRTException("Total packet length exceeds MAX_FRAME_LENGTH");
+  }
+  else {
+    throw VRTException("Total packet length exceeds buffer length");
+  }
+  bbuf.resize(len);
+
+  // Note that the code below may cause the old CRC to be overwritten, but since we clear it
+  // via the call to setFrameLength, this should not be an issue.
+  p->readPacket(&bbuf[HEADER_LENGTH], 0, plen);
+  clearCRC();
+  setFrameLength(len);
+  return 1;
+}
+
+int32_t BasicVRLFrame::setVRTPackets (bool fit, int32_t maxFrameLength,
+                                      const vector<BasicVRTPacket>  *packets,
+                                      const vector<BasicVRTPacket*> *packetPointers) {
+  size_t packetCount = (packets != NULL)? packets->size() : packetPointers->size();
+
+  if (readOnly        ) throw VRTException("Frame is read only");
+  if (packetCount == 0) return 0;
+  if (packetCount == 1) {
+    const BasicVRTPacket *p = (packets != NULL)? (&(packets->at(0))) : packetPointers->at(0);
+    return setVRTPackets(fit, maxFrameLength, p);
+  }
+
   int32_t count = 0;
   int32_t len   = HEADER_LENGTH + TRAILER_LENGTH;
-  
-  for (size_t i = 0; i < packets.size(); i++) {
-    BasicVRTPacket p = packets[i];
-    string err = p.getPacketValid(false);
+
+  for (size_t i = 0; i < packetCount; i++) {
+    const BasicVRTPacket *p = (packets != NULL)? (&(packets->at(i))) : packetPointers->at(i);
+    if (p == NULL) throw VRTException("Null packet given");
+    string err = p->getPacketValid(false);
     if (err != "") throw VRTException(err);
-    int32_t length = len + p.getPacketLength();
+    int32_t length = len + p->getPacketLength();
 
     if (length < maxFrameLength) {
       len = length;
@@ -299,9 +410,9 @@ int32_t BasicVRLFrame::setVRTPackets (bool fit, int32_t maxFrameLength, const ve
   // via the call to setFrameLength, this should not be an issue.
   int32_t off = HEADER_LENGTH;
   for (int32_t i = 0; i < count; i++) {
-    BasicVRTPacket p = packets[i];
-    int32_t plen = p.getPacketLength();
-    p.readPacket(&bbuf[off], 0, plen);
+    const BasicVRTPacket *p = (packets != NULL)? (&(packets->at(i))) : packetPointers->at(i);
+    int32_t plen = p->getPacketLength();
+    p->readPacket(&bbuf[off], 0, plen);
     off += plen;
   }
   setFrameLength(len);
@@ -309,7 +420,7 @@ int32_t BasicVRLFrame::setVRTPackets (bool fit, int32_t maxFrameLength, const ve
 }
 
 int32_t BasicVRLFrame::getFrameCount () const {
-  return (VRTMath::unpackInt(bbuf, 4, BIG_ENDIAN) >> 20) & 0x00000FFF;
+  return (VRTMath::unpackInt(bbuf, 4) >> 20) & 0x00000FFF;
 }
 
 void BasicVRLFrame::setFrameCount (int32_t count) {
@@ -318,14 +429,10 @@ void BasicVRLFrame::setFrameCount (int32_t count) {
     throw VRTException("Invalid frame count %d", count);
   }
 
-  int32_t val = VRTMath::unpackInt(bbuf, 4, BIG_ENDIAN);
+  int32_t val = VRTMath::unpackInt(bbuf, 4);
   val = (count << 20) | (val & 0x000FFFFF);
-  VRTMath::packInt(bbuf, 4, val, BIG_ENDIAN);
+  VRTMath::packInt(bbuf, 4, val);
   clearCRC();
-}
-
-int32_t BasicVRLFrame::getFrameLength () const {
-  return getFrameLength(bbuf, 0);
 }
 
 void BasicVRLFrame::setFrameLength (int32_t length) {
@@ -334,9 +441,9 @@ void BasicVRLFrame::setFrameLength (int32_t length) {
     throw VRTException("Invalid frame length %d", length);
   }
 
-  int32_t val = VRTMath::unpackInt(bbuf, 4, BIG_ENDIAN);
+  int32_t val = VRTMath::unpackInt(bbuf, 4);
   val = (val & 0xFFF00000) | ((length>>2) & 0x000FFFFF); // >>2 to convert bytes to words
-  VRTMath::packInt(bbuf, 4, val, BIG_ENDIAN);
+  VRTMath::packInt(bbuf, 4, val);
   clearCRC();
 }
 

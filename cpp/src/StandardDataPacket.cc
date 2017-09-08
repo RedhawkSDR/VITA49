@@ -1,21 +1,22 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
- *
+ * 
  * This file is part of REDHAWK.
- *
+ *  
  * REDHAWK is free software: you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.
- *
+ * 
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
- *
+ * 
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "StandardDataPacket.h"
@@ -114,9 +115,9 @@ int64_t StandardDataPacket::toClassID (const PayloadFormat &pf) {
   int64_t fmtSz = bits & __INT64_C(0x00000FE000000000);
 
   if ((itmSz << 6) != fmtSz) {
-   std::cout << "WARNING: DOUBLE SUPPORPT DOES NOT WORK - TODO: Fix this!" << std::endl;
+    return ERROR;
   }
-  if (check == __INT64_C(0x0000000000000000)) {
+  else if (check == __INT64_C(0x0000000000000000)) {
     return SIZE_TO_TYPE[(int)(itmSz>>32)]                  // Type size
          | ((bits >> 41) & __INT64_C(0x00380000))          // Real/Complex + Signed/Unsigned
          | ((bits      ) & __INT64_C(0x0000FFFF));         // Vector Size

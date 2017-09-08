@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #ifndef _Record_h
@@ -32,22 +33,20 @@
 #include <string.h>    // required for memcpy(..) on GCC4.4/libc6 2.11.1
 
 namespace vrt {
-  /** Defines a record that could be in a {@link BasicVRTPacket}.
-   *
-   *  @author         
-   */
+  /** Defines a record that could be in a <tt>BasicVRTPacket</tt>. */
   class Record : public VRTObject, public HasFields {
     /** Chack for strict equality? */
     private:   bool         strictEquality;
     /** <b>Internal Use Only:</b> The data buffer used. */
     protected: vector<char> buf;
+
     /** Creates a new instance sharing the buffers of the one specified. */
     public: Record (const Record &r);
 
     /** Creates a new instance with the given length.
-        @param strictEquality Should the <tt>equals(..)</tt> check ensure strict equality by checking to
-                              see that both the data and class match? If false, only the data is checked.
-        @param len            The initial length of the record.
+     *  @param strictEquality Should the <tt>equals(..)</tt> check ensure strict equality by checking to
+     *                        see that both the data and class match? If false, only the data is checked.
+     *  @param len            The initial length of the record.
      */
     public: Record (int32_t len, bool strictEquality=true);
 
@@ -60,14 +59,14 @@ namespace vrt {
     }
 
     /** Reads bytes from this record to the specified buffer.
-        @param buffer The buffer to write to.
+     *  @param buffer The buffer to write to.
      */
     public: inline virtual void readBytes  (void *buffer) const {
       memmove(buffer, &buf[0], buf.size());
     }
 
     /** Writes bytes to this record from the specified buffer.
-        @param buffer The buffer to read from.
+     *  @param buffer The buffer to read from.
      */
     public: inline virtual void writeBytes (const void *buffer) {
       memmove(&buf[0], buffer, buf.size());
@@ -75,7 +74,7 @@ namespace vrt {
 
     /** Gets the length in bytes. */
     public: inline virtual int32_t getByteLength () const {
-      return buf.size();
+      return (int32_t)buf.size();
     }
 
     /** Sets the length in bytes with any additional bytes added/removed from the given point (-1=end). */
@@ -88,6 +87,7 @@ namespace vrt {
       return "";
     }
 
+    using VRTObject::equals;
     public: virtual bool equals (const VRTObject &o) const;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,25 +172,25 @@ namespace vrt {
     public: virtual int32_t   getFieldCount () const;
     public: virtual string    getFieldName  (int32_t id) const;
     public: virtual ValueType getFieldType  (int32_t id) const;
-    public: virtual Value*    getField      (int32_t id) const;
+    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));
     public: virtual void      setField      (int32_t id, const Value* val);
   };
 
   // See VRTMath.c for function code
   namespace VRTMath {
     /** Pack a record into a buffer.
-        @param buf   byte array of data
-        @param off   Offset into array
-        @param val   The record to pack
+     *  @param buf   byte array of data
+     *  @param off   Offset into array
+     *  @param val   The record to pack
      */
     void packRecord (vector<char> &buf, int32_t off, const Record &val);
 
     /** Pack a record into a buffer.
-        @param buf   byte array of data
-        @param off   Offset into array
-        @param val   The record to pack
+     *  @param buf   byte array of data
+     *  @param off   Offset into array
+     *  @param val   The record to pack
      */
     void unpackRecord (const vector<char> &buf, int32_t off, Record &val);
-  };
-};
+  } END_NAMESPACE
+} END_NAMESPACE
 #endif /* _Record_h */

@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "AbstractPacketFactory.h"
@@ -31,8 +32,6 @@ using namespace vrt;
 const string AbstractVRAFile::FILE_NAME_EXT = ".vra";
 const string AbstractVRAFile::MIME_TYPE     = "application/x-vita-radio-archive";
 
-
-
 static const char DEFAULT_HEADER[20] = { 'V','R','A','F',
                                          AbstractVRAFile::DEFAULT_VERSION, 0, 0, 0,
                                          0, 0, 0, 0,
@@ -40,6 +39,7 @@ static const char DEFAULT_HEADER[20] = { 'V','R','A','F',
                                          'V','E','N','D' };
 
 AbstractVRAFile::AbstractVRAFile (const AbstractVRAFile &f) :
+  VRTObject(f), // <-- Used to avoid warnings under GCC with -Wextra turned on
   hdrVersion(f.hdrVersion),
   hdrFileLength(f.hdrFileLength),
   hdrCRC(f.hdrCRC),
@@ -97,30 +97,30 @@ bool AbstractVRAFile::equals (const AbstractVRAFile &that) const {
   ConstPacketIterator that_begin = that.begin();
   ConstPacketIterator this_end   = this->end();
   ConstPacketIterator that_end   = that.end();
-  
+
   while (this_begin != this_end) {
     if (that_begin == that_end) return false;
-    
+
     BasicVRTPacket *this_pkt = *this_begin;
     BasicVRTPacket *that_pkt = *that_begin;
-    
+
     if (!this_pkt->equals(*that_pkt)) {
       return false;
     }
-    
+
     delete this_pkt;
     delete that_pkt;
-    
+
     ++this_begin;
     ++that_begin;
   }
-  
+
   return (that_begin == that_end);
 }
 
 bool AbstractVRAFile::isFileValid () const {
   if (!isFileValid0()) return false;
-    
+
   int64_t lenFromHeader = getFileLengthHeader();
   int64_t lenFromOS     = getFileLengthOS();
 
@@ -136,12 +136,13 @@ bool AbstractVRAFile::isFileValid () const {
   try {
     ConstPacketIterator this_begin = this->begin();
     ConstPacketIterator this_end   = this->end();
-    
+
     while (this_begin != this_end) {
       ++this_begin; // <-- throws exception if invalid
     }
   }
   catch (VRTException e) {
+    UNUSED_VARIABLE(e);
     return false;
   }
   return true;
@@ -323,7 +324,10 @@ ConstPacketIterator AbstractVRAFile::end () const {
 }
 
 void AbstractVRAFile::gotoNextPacket (ConstPacketIterator &pi) const {
-  if (pi.length < 0) getThisPacket(pi, true); // <-- updates pi.length
+  if (pi.length < 0) {
+    BasicVRTPacket *pkt = getThisPacket(pi, true); // <-- updates pi.length
+    safe_delete(pkt); // pkt should already be null since skip=true
+  }
   pi.offset += pi.length;
   pi.length = -1;
 }
@@ -332,7 +336,7 @@ BasicVRTPacket* AbstractVRAFile::getThisPacket (ConstPacketIterator &pi, bool sk
   if (pi.offset >= getFileLength()) {
     throw VRTException("No such element in %s", pi.toString().c_str());
   }
-  
+
   // ==== DUPLICATE READ? ====================================================
   if (pi.length > 0) {
     if (skip) {
@@ -346,7 +350,7 @@ BasicVRTPacket* AbstractVRAFile::getThisPacket (ConstPacketIterator &pi, bool sk
       return new BasicVRTPacket(&pi.buf[0], pi.buf.size(), false);
     }
   }
-  
+
   // ==== READ PACKET HEADER =================================================
   int32_t numRead = read(pi.offset, &pi.buf[0], 4);
 
@@ -363,8 +367,8 @@ BasicVRTPacket* AbstractVRAFile::getThisPacket (ConstPacketIterator &pi, bool sk
 
   // ==== UPDATE LENGTH ======================================================
   pi.length = len;
-  
-  
+
+
   // ==== READ PACKET ========================================================
   if (!skip) {
     pi.buf.resize(len);

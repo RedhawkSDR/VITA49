@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -16,6 +16,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #ifndef _BasicDataPacket_h
@@ -48,8 +49,6 @@ namespace vrt {
    *    ----+----------------------+---------------
    *    (N = number of fields in BasicVRTPacket)
    *  </pre>
-   *
-   *  @author 
    */
   class BasicDataPacket : public BasicVRTPacket {
     friend class BasicVRTState;
@@ -75,13 +74,19 @@ namespace vrt {
      */
     public: BasicDataPacket ();
 
-    public: BasicDataPacket (const int32_t pktsize);
+    /** Creates a new instance with a default anticipated length that can be written to.
+     *  Initially this will just be a simple data packet with no fields set (other than
+     *  the required packet length of 4), but will have the underlying buffers pre-allocated
+     *  as required.
+     *  @param bufsize The anticipated buffer size.
+     */
+    public: BasicDataPacket (int32_t bufsize);
 
     public: BasicDataPacket (const vector<char> &buf, ssize_t start, ssize_t end, bool readOnly = false);
 
     /** Creates a new instance accessing the given data buffer. Note that when the buffer lengths
      *  are given, only the most minimal of error checking is done. Users should call
-     *  {@link #isPacketValid()} to verify that the packet is valid. Invalid packets can result
+     *  <tt>isPacketValid()</tt> to verify that the packet is valid. Invalid packets can result
      *  unpredictable behavior, but this is explicitly allowed (to the extent possible) so that
      *  applications creating packets can use this class even if the packet isn't yet "valid".
      *  @param buf      The data buffer to use.
@@ -91,7 +96,7 @@ namespace vrt {
 
     /** Creates a new instance accessing the given data buffer pointer. Note that when the buffer lengths
      *  are given, only the most minimal of error checking is done. Users should call
-     *  {@link #isPacketValid()} to verify that the packet is valid. Invalid packets can result
+     *  <tt>isPacketValid()</tt> to verify that the packet is valid. Invalid packets can result
      *  unpredictable behavior, but this is explicitly allowed (to the extent possible) so that
      *  applications creating packets can use this class even if the packet isn't yet "valid".
      *  @param buf      The data buffer pointer to use.
@@ -275,7 +280,7 @@ namespace vrt {
 
     /** Gets the associated packet count. This indicates the number of context
      *  packets with context change or event information relevant to this data packet.
-     *  @return The assocaited packet count (0..127), or null if not specified (null is returned
+     *  @return The associated packet count (0..127), or null if not specified (null is returned
      *          for all context packets).
      */
     public: int8_t getAssocPacketCount () const;
@@ -363,10 +368,13 @@ namespace vrt {
     /** <i>Optional functionality:</i> Gets the associated packet count.
      *  This indicates the number of context packets with context change or event information
      *  relevant to this data packet.
-     *  @param v The assocaited packet count (0..127), or null if not specified.
+     *  @param v The associated packet count (0..127), or null if not specified.
      *  @throws VRTException If this method is not supported.
      */
     public: void setAssocPacketCount (int8_t v);
+
+    /** If the trailer is empty, delete it. */
+    protected: void dropTrailerIfEmpty ();
 
     /** Gets the assumed payload format used when interacting with the data in this packet. This
      *  setting can either be fixed based on the packet class or set via {@link #setPayloadFormat}.
@@ -391,8 +399,8 @@ namespace vrt {
       payloadFormat = pf;
     }
 
-    /** <i>Utility method:</i> gets the length of the data in number of scalar elements. Unlike
-     *  {@link #getPayloadLength()} this returns the number of data elements, not bytes. For complex
+    /** <i>Utility method:</i> Gets the length of the data in number of scalar elements. Unlike
+     *  <tt>getPayloadLength()</tt> this returns the number of data elements, not bytes. For complex
      *  data the real and imaginary components of a single value count as a two elements (see
      *  {@link #getDataLength()}). <br>
      *  <br>
@@ -402,11 +410,11 @@ namespace vrt {
      *  @return The number of elements in the payload.
      */
     public: inline int32_t getScalarDataLength () const {
-      return getScalarDataLength(getPayloadFormat());
+      return getDataLength(getPayloadFormat(), true);
     }
 
-    /** <i>Utility method:</i> gets the length of the data in number of scalar elements. Unlike
-     *  {@link #getPayloadLength()} this returns the number of data elements, not bytes. For complex
+    /** <i>Utility method:</i> Gets the length of the data in number of scalar elements. Unlike
+     *  <tt>getPayloadLength()</tt> this returns the number of data elements, not bytes. For complex
      *  data the real and imaginary components of a single value count as a two elements (see
      *  {@link #getDataLength()}). <br>
      *  @param pf The payload format to assume.
@@ -414,12 +422,10 @@ namespace vrt {
      *  @throws VRTException If the payload format is null.
      */
     public: inline int32_t getScalarDataLength (const PayloadFormat &pf) const {
-      if (isNull(pf)) throw VRTException("Payload format is null");
-      int32_t complexMult = (pf.isComplex())? 2 : 1;
-      return getDataLength(pf) * complexMult;
+      return getDataLength(pf, true);
     }
 
-    /** Gets the length of the data in number of elements. Unlike {@link #getPayloadLength()}
+    /** Gets the length of the data in number of elements. Unlike <tt>getPayloadLength()</tt>
      *  this returns the number of data elements, not bytes. For complex data the real and imaginary
      *  components of a single value count as a single element (see {@link #getScalarDataLength()}). <br>
      *  <br>
@@ -429,17 +435,22 @@ namespace vrt {
      *  @return The number of elements in the payload.
      */
     public: inline int32_t getDataLength () const {
-      return getDataLength(getPayloadFormat());
+      return getDataLength(getPayloadFormat(), false);
     }
 
-    /** Gets the length of the data in number of elements. Unlike {@link #getPayloadLength()}
+    /** Gets the length of the data in number of elements. Unlike <tt>getPayloadLength()</tt>
      *  this returns the number of data elements, not bytes. For complex data the real and imaginary
      *  components of a single value count as a single element (see {@link #getScalarDataLength()}).
      *  @param pf The payload format to assume.
      *  @return The number of elements in the payload.
      *  @throws VRTException If the payload format is null.
      */
-    public: int32_t getDataLength (const PayloadFormat &pf) const;
+    public: inline int32_t getDataLength (const PayloadFormat &pf) const {
+      return getDataLength(pf, false);
+    }
+
+    /** Gets the data length with option for scalar-only computation. */
+    protected: int32_t getDataLength (const PayloadFormat &pf, bool scalar) const;
 
     /** Gets the next expected time stamp for a data packet on this stream. This is computed
      *  as the following:
@@ -507,7 +518,33 @@ namespace vrt {
       return getLostBytes(expected, sampleRate, getPayloadFormat());
     }
 
-    /** Sets the length of the data in number of elements. Unlike {@link #setPayloadLength(int32_t)}
+    /** <i>Utility method:</i> Sets the length of the data in number of scalar elements. Unlike
+     *  <tt>setPayloadLength(..)</tt> this sets the number of data elements, not bytes. For complex
+     *  data the real and imaginary components of a single value count as a two elements (see
+     *  <tt>setDataLength(..)</tt>. <br>
+     *  <br>
+     *  This method can only be used AFTER a payload format for the packet has been specified
+     *  (see {@link #getPayloadFormat()}. This method is identical to calling
+     *  <tt>p.getScalarDataLength(p.getPayloadFormat())</tt>
+     *  @param length The number of elements in the payload.
+     */
+    public: inline void setScalarDataLength (int32_t length) {
+      setDataLength(getPayloadFormat(), length, true);
+    }
+
+    /** <i>Utility method:</i> Sets the length of the data in number of scalar elements. Unlike
+     *  <tt>setPayloadLength(..)</tt> this sets the number of data elements, not bytes. For complex
+     *  data the real and imaginary components of a single value count as a two elements (see
+     *  <tt>setDataLength(..)</tt>.
+     *  @param pf The payload format to assume.
+     *  @param length The number of elements in the payload.
+     *  @throws NullPointerException If the payload format is null.
+     */
+    public: inline void setScalarDataLength (PayloadFormat pf, int32_t length) {
+      setDataLength(pf, length, true);
+    }
+
+    /** Sets the length of the data in number of elements. Unlike <tt>setPayloadLength(..)</tt>
      *  this sets the number of data elements, not bytes. For complex data the real and imaginary
      *  components of a single value count as a single element (see {@link #getScalarDataLength()}). <br>
      *  <br>
@@ -517,21 +554,35 @@ namespace vrt {
      *  @param length The number of elements in the payload.
      */
     public: inline void setDataLength (int32_t length) {
-      setDataLength(getPayloadFormat(), length);
+      setDataLength(getPayloadFormat(), length, false);
     }
 
-    /** Sets the length of the data in number of elements. Unlike {@link #setPayloadLength(int32_t)}
+    /** Sets the length of the data in number of elements. Unlike <tt>setPayloadLength(..)</tt>
      *  this sets the number of data elements, not bytes. For complex data the real and imaginary
      *  components of a single value count as a single element (see {@link #getScalarDataLength()}).
      *  @param pf     The payload format to assume.
      *  @param length The number of elements in the payload.
      *  @throws VRTException If the payload format is null.
      */
-    public: void setDataLength (const PayloadFormat &pf, int32_t length);
+    public: void setDataLength (const PayloadFormat &pf, int32_t length) {
+      setDataLength(pf, length, false);
+    }
+
+    /** Sets the data length with option for scalar-only computation. */
+    protected: void setDataLength (const PayloadFormat &pf, int32_t length, bool scalar);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // GET WITH GIVEN PAYLOAD FORMAT
     //////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // BEGIN TODO FIXME - additions from previous version of shared library
+    public: void swapPayloadBytes(const PayloadFormat &pf, const void* array);
+    public: void* getData_normal(const PayloadFormat &pf, int position);
+    //public: void* getData();
+    //public: void* getDataShort (const PayloadFormat &pf, bool raw);
+    // END TODO FIXME - additions from previous version of shared library
+
+
     /** Unpacks the data and returns it in a native byte buffer. This is basically a byte-for-byte
      *  copy of the payload, except that a conversion is done from <tt>BIG_ENDIAN</tt> to the native
      *  byte ordering. This method is intended for use within existing programming frameworks that
@@ -554,19 +605,14 @@ namespace vrt {
      *          <tt>PayloadFormat_FLOAT32</tt>, <tt>PayloadFormat_DOUBLE64</tt>
      *          <tt>PayloadFormat_UINT1</tt>,   <tt>PayloadFormat_UINT4</tt>,   <tt>PayloadFormat_UINT8</tt>,
      *          <tt>PayloadFormat_UINT16</tt>,  <tt>PayloadFormat_UINT32</tt>,  <tt>PayloadFormat_UINT64</tt>.
-     *  @throws VRTException If the array length is shorter than
-     *          <tt>offset+{@link #getPayloadLength()}</tt>.
+     *  @throws VRTException If the array length is shorter than <tt>offset+getPayloadLength()</tt>.
      */
-    public: void swapPayloadBytes(const PayloadFormat &pf, const void* array);
-
     public: inline void getData (const PayloadFormat &pf, vector<char> &array, size_t offset, bool convert=true) const {
       if (array.size() < (offset+getPayloadLength())) {
         throw VRTException("Illegal offset (%d) for array of length %d", offset, array.size());
       }
       getData(pf, (void*)&array[offset], convert);
     }
-    public: void* getData_normal(const PayloadFormat &pf, int position);
-    public: void* getData();
 
     /** Unpacks the data and returns it in a native byte buffer. This is basically a byte-for-byte
      *  copy of the payload, except that a conversion is done from <tt>BIG_ENDIAN</tt> to the native
@@ -590,11 +636,27 @@ namespace vrt {
      *          <tt>PayloadFormat_FLOAT32</tt>, <tt>PayloadFormat_DOUBLE64</tt>
      *          <tt>PayloadFormat_UINT1</tt>,   <tt>PayloadFormat_UINT4</tt>,   <tt>PayloadFormat_UINT8</tt>,
      *          <tt>PayloadFormat_UINT16</tt>,  <tt>PayloadFormat_UINT32</tt>,  <tt>PayloadFormat_UINT64</tt>.
-     *  @throws VRTException If the array length is shorter than
-     *          <tt>offset+{@link #getPayloadLength()}</tt>.
+     *  @throws VRTException If the array length is shorter than <tt>offset+getPayloadLength()</tt>.
      */
     public: void* getData (const PayloadFormat &pf, void *array, bool convert=true) const;
 
+    /** Unpacks the data and returns it as a double array. If the underlying data is not double,
+     *  it will be converted to double and any values that fall outside of the range of a double will
+     *  will have unpredictable output. If the payload format is incorrectly specified, the output of
+     *  this method will be useless.
+     *  @param pf The payload format to assume.
+     *  @param pf    The payload format to assume.
+     *  @param array The array to insert the data into (not null). The array must
+     *               be sufficiently long for the number of elements in the packet
+     *               (see <tt>getScalarDataLength(pf)</tt>).
+     *  @return Pointer to 'buf'.
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline double* getDataDouble (const PayloadFormat &pf, double *array) const {
+      int32_t len = getScalarDataLength(pf);
+      PackUnpack::unpackAsDouble(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      return array;
+    }
 
     /** Unpacks the data and returns it as a double array. If the underlying data is not double,
      *  it will be converted to double and any values that fall outside of the range of a double will
@@ -605,19 +667,27 @@ namespace vrt {
      *  @throws VRTException If the payload format is null.
      */
     public: inline vector<double> getDataDouble (const PayloadFormat &pf) const {
-      if (isNull(pf)) throw VRTException("Payload format is null");
       int32_t len = getScalarDataLength(pf);
-      if (pf.getDataType() == DataType_Double) {
-        // Fast version where no conversion (other than byte order) is required
-        vector<double> array(len);
-        getData(pf, &array[0]);
-        return array;
-      }
-      else {
         vector<double> array(len);
         PackUnpack::unpackAsDouble(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
         return array;
       }
+
+    /** Unpacks the data and returns it as a float array. If the underlying data is not float,
+     *  it will be converted to float and any values that fall outside of the range of a float will
+     *  will have unpredictable output. If the payload format is incorrectly specified, the output of
+     *  this method will be useless.
+     *  @param pf    The payload format to assume.
+     *  @param array The array to insert the data into (not null). The array must
+     *               be sufficiently long for the number of elements in the packet
+     *               (see <tt>getScalarDataLength(pf)</tt>).
+     *  @return Pointer to 'buf'.
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline float* getDataFloat (const PayloadFormat &pf, float *array) const {
+      int32_t len = getScalarDataLength(pf);
+      PackUnpack::unpackAsFloat(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      return array;
     }
 
     /** Unpacks the data and returns it as a float array. If the underlying data is not float,
@@ -629,19 +699,27 @@ namespace vrt {
      *  @throws VRTException If the payload format is null.
      */
     public: inline vector<float> getDataFloat (const PayloadFormat &pf) const {
-      if (isNull(pf)) throw VRTException("Payload format is null");
       int32_t len = getScalarDataLength(pf);
-      if (pf.getDataType() == DataType_Float) {
-        // Fast version where no conversion (other than byte order) is required
-        vector<float> array(len);
-        getData(pf, &array[0]);
-        return array;
-      }
-      else {
         vector<float> array(len);
         PackUnpack::unpackAsFloat(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
         return array;
       }
+
+    /** Unpacks the data and returns it as a long array. If the underlying data is not long,
+     *  it will be converted to long and any values that fall outside of the range of a long will
+     *  will have unpredictable output. If the payload format is incorrectly specified, the output of
+     *  this method will be useless.
+     *  @param pf    The payload format to assume.
+     *  @param array The array to insert the data into (not null). The array must
+     *               be sufficiently long for the number of elements in the packet
+     *               (see <tt>getScalarDataLength(pf)</tt>).
+     *  @return Pointer to 'buf'.
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline int64_t* getDataLong (const PayloadFormat &pf, int64_t *array) const {
+      int32_t len = getScalarDataLength(pf);
+      PackUnpack::unpackAsLong(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      return array;
     }
 
     /** Unpacks the data and returns it as a long array. If the underlying data is not long,
@@ -653,19 +731,27 @@ namespace vrt {
      *  @throws VRTException If the payload format is null.
      */
     public: inline vector<int64_t> getDataLong (const PayloadFormat &pf) const {
-      if (isNull(pf)) throw VRTException("Payload format is null");
       int32_t len = getScalarDataLength(pf);
-      if (pf.getDataType() == DataType_Int64) {
-        // Fast version where no conversion (other than byte order) is required
-        vector<int64_t> array(len);
-        getData(pf, &array[0]);
-        return array;
-      }
-      else {
         vector<int64_t> array(len);
         PackUnpack::unpackAsLong(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
         return array;
       }
+
+    /** Unpacks the data and returns it as a int array. If the underlying data is not int,
+     *  it will be converted to int and any values that fall outside of the range of a int will
+     *  will have unpredictable output. If the payload format is incorrectly specified, the output of
+     *  this method will be useless.
+     *  @param pf    The payload format to assume.
+     *  @param array The array to insert the data into (not null). The array must
+     *               be sufficiently long for the number of elements in the packet
+     *               (see <tt>getScalarDataLength(pf)</tt>).
+     *  @return Pointer to 'buf'.
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline int32_t* getDataInt (const PayloadFormat &pf, int32_t *array) const {
+      int32_t len = getScalarDataLength(pf);
+      PackUnpack::unpackAsInt(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      return array;
     }
 
     /** Unpacks the data and returns it as a int array. If the underlying data is not int,
@@ -677,19 +763,27 @@ namespace vrt {
      *  @throws VRTException If the payload format is null.
      */
     public: inline vector<int32_t> getDataInt (const PayloadFormat &pf) const {
-      if (isNull(pf)) throw VRTException("Payload format is null");
       int32_t len = getScalarDataLength(pf);
-      if (pf.getDataType() == DataType_Int32) {
-        // Fast version where no conversion (other than byte order) is required
-        vector<int32_t> array(len);
-        getData(pf, &array[0]);
-        return array;
-      }
-      else {
         vector<int32_t> array(len);
         PackUnpack::unpackAsInt(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
         return array;
       }
+
+    /** Unpacks the data and returns it as a short array. If the underlying data is not short,
+     *  it will be converted to short and any values that fall outside of the range of a short will
+     *  will have unpredictable output. If the payload format is incorrectly specified, the output of
+     *  this method will be useless.
+     *  @param pf    The payload format to assume.
+     *  @param array The array to insert the data into (not null). The array must
+     *               be sufficiently long for the number of elements in the packet
+     *               (see <tt>getScalarDataLength(pf)</tt>).
+     *  @return Pointer to 'buf'.
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline int16_t* getDataShort (const PayloadFormat &pf, int16_t *array) const {
+      int32_t len = getScalarDataLength(pf);
+      PackUnpack::unpackAsShort(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      return array;
     }
 
     /** Unpacks the data and returns it as a short array. If the underlying data is not short,
@@ -701,24 +795,28 @@ namespace vrt {
      *  @throws VRTException If the payload format is null.
      */
     public: inline vector<int16_t> getDataShort (const PayloadFormat &pf) const {
-      if (isNull(pf)) throw VRTException("Payload format is null");
       int32_t len = getScalarDataLength(pf);
-      if (pf.getDataType() == DataType_Int16) {
-        // Fast version where no conversion (other than byte order) is required
-        vector<int16_t> array(len);
-        getData(pf, &array[0]);
-        return array;
-      }
-      else {
-        vector<int16_t> array(len);
-        PackUnpack::unpackAsShort(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
-        return array;
-      }
+      vector<int16_t> array(len);
+      PackUnpack::unpackAsShort(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      return array;
     }
 
-
-    void* getDataShort (const PayloadFormat &pf, bool raw);
-
+    /** Unpacks the data and returns it as a byte array. If the underlying data is not byte,
+     *  it will be converted to byte and any values that fall outside of the range of a byte will
+     *  will have unpredictable output. If the payload format is incorrectly specified, the output of
+     *  this method will be useless.
+     *  @param pf    The payload format to assume.
+     *  @param array The array to insert the data into (not null). The array must
+     *               be sufficiently long for the number of elements in the packet
+     *               (see <tt>getScalarDataLength(pf)</tt>).
+     *  @return Pointer to 'buf'.
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline int8_t* getDataByte (const PayloadFormat &pf, int8_t *array) const {
+      int32_t len = getScalarDataLength(pf);
+      PackUnpack::unpackAsByte(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      return array;
+    }
 
     /** Unpacks the data and returns it as a byte array. If the underlying data is not byte,
      *  it will be converted to byte and any values that fall outside of the range of a byte will
@@ -729,20 +827,11 @@ namespace vrt {
      *  @throws VRTException If the payload format is null.
      */
     public: inline vector<int8_t> getDataByte (const PayloadFormat &pf) const {
-      if (isNull(pf)) throw VRTException("Payload format is null");
       int32_t len = getScalarDataLength(pf);
-      if (pf.getDataType() == DataType_Int8) {
-        // Fast version where no conversion (other than byte order) is required
-        vector<int8_t> vector(len);
-        getData(pf, &vector[0]);
-        return vector;
-      }
-      else {
         vector<int8_t> array(len);
         PackUnpack::unpackAsByte(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
         return array;
       }
-    }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // GET WITH PRE-DEFINED PAYLOAD FORMAT
@@ -763,6 +852,8 @@ namespace vrt {
      *  <tt>p.getData(p.getPayloadFormat(),array,offset)</tt>
      *  @param array  The array to insert the data into.
      *  @param offset The array offset.
+     *  @param convert Convert byte order to match native representation? Set this to false if it
+     *                 is necessary to keep the data in big-endian format.
      *  @return <tt>array</tt>
      *  @throws VRTException If the payload format is null or if the array is null.
      *  @throws VRTException If the payload format is anything other than
@@ -771,11 +862,10 @@ namespace vrt {
      *          <tt>PayloadFormat_FLOAT32</tt>, <tt>PayloadFormat_DOUBLE64</tt>
      *          <tt>PayloadFormat_UINT1</tt>, <tt>PayloadFormat_UINT4</tt>,    <tt>PayloadFormat_UINT8</tt>,
      *          <tt>PayloadFormat_UINT16</tt>, <tt>PayloadFormat_UINT32</tt>,   <tt>PayloadFormat_UINT64</tt>.
-     *  @throws VRTException If the array length is shorter than
-     *          <tt>offset+{@link #getPayloadLength()}</tt>.
+     *  @throws VRTException If the array length is shorter than <tt>offset+getPayloadLength()</tt>.
      */
-    public: inline void getData (vector<char> array, size_t offset) const {
-      getData(getPayloadFormat(), array, offset);
+    public: inline void getData (vector<char> &array, size_t offset, bool convert=true) const {
+      getData(getPayloadFormat(), array, offset, convert);
     }
 
     /** Unpacks the data and returns it in a native byte buffer. This is basically a byte-for-byte
@@ -793,6 +883,8 @@ namespace vrt {
      *  (see {@link #getPayloadFormat()}. This method is identical to calling
      *  <tt>p.getData(p.getPayloadFormat(),array)</tt>
      *  @param array  The array to insert the data into.
+     *  @param convert Convert byte order to match native representation? Set this to false if it
+     *                 is necessary to keep the data in big-endian format.
      *  @return <tt>array</tt>
      *  @throws VRTException If the payload format is null or if the array is null.
      *  @throws VRTException If the payload format is anything other than
@@ -802,8 +894,26 @@ namespace vrt {
      *          <tt>PayloadFormat_UINT1</tt>, <tt>PayloadFormat_UINT4</tt>,    <tt>PayloadFormat_UINT8</tt>,
      *          <tt>PayloadFormat_UINT16</tt>, <tt>PayloadFormat_UINT32</tt>,   <tt>PayloadFormat_UINT64</tt>.
      */
-    public: inline void *getData (void *array) const {
-      return getData(getPayloadFormat(), array);
+    public: inline void *getData (void *array, bool convert=true) const {
+      return getData(getPayloadFormat(), array, convert);
+    }
+
+    /** Unpacks the data and returns it as a double array. If the underlying data is not double,
+     *  it will be converted to double and any values that fall outside of the range of a double will
+     *  will have unpredictable output. If the payload format is incorrectly specified, the output of
+     *  this method will be useless. <br>
+     *  <br>
+     *  This method can only be used AFTER a payload format for the packet has been specified
+     *  (see {@link #getPayloadFormat()}. This method is identical to calling
+     *  <tt>p.getDataDouble(p.getPayloadFormat())</tt>
+     *  @param array The array to insert the data into (not null). The array must
+     *               be sufficiently long for the number of elements in the packet
+     *               (see <tt>getScalarDataLength(pf)</tt>).
+     *  @return Pointer to 'buf'.
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline double* getDataDouble (double *array) const {
+      return getDataDouble(getPayloadFormat(), array);
     }
 
     /** Unpacks the data and returns it as a double array. If the underlying data is not double,
@@ -821,6 +931,24 @@ namespace vrt {
       return getDataDouble(getPayloadFormat());
     }
 
+    /** Unpacks the data and returns it as a float array. If the underlying data is not float,
+     *  it will be converted to float and any values that fall outside of the range of a float will
+     *  will have unpredictable output. If the payload format is incorrectly specified, the output of
+     *  this method will be useless. <br>
+     *  <br>
+     *  This method can only be used AFTER a payload format for the packet has been specified
+     *  (see {@link #getPayloadFormat()}. This method is identical to calling
+     *  <tt>p.getDataDouble(p.getPayloadFormat())</tt>
+     *  @param array The array to insert the data into (not null). The array must
+     *               be sufficiently long for the number of elements in the packet
+     *               (see <tt>getScalarDataLength(pf)</tt>).
+     *  @return Pointer to 'buf'.
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline float* getDataFloat (float *array) const {
+      return getDataFloat(getPayloadFormat(), array);
+    }
+
     /** Unpacks the data and returns it as a float array. If the underlying data is not double,
      *  it will be converted to float and any values that fall outside of the range of a float will
      *  will have unpredictable output. If the payload format is incorrectly specified, the output of
@@ -834,6 +962,24 @@ namespace vrt {
      */
     public: inline vector<float> getDataFloat () const {
       return getDataFloat( getPayloadFormat());
+    }
+
+    /** Unpacks the data and returns it as a long array. If the underlying data is not long,
+     *  it will be converted to long and any values that fall outside of the range of a long will
+     *  will have unpredictable output. If the payload format is incorrectly specified, the output of
+     *  this method will be useless. <br>
+     *  <br>
+     *  This method can only be used AFTER a payload format for the packet has been specified
+     *  (see {@link #getPayloadFormat()}. This method is identical to calling
+     *  <tt>p.getDataDouble(p.getPayloadFormat())</tt>
+     *  @param array The array to insert the data into (not null). The array must
+     *               be sufficiently long for the number of elements in the packet
+     *               (see <tt>getScalarDataLength(pf)</tt>).
+     *  @return Pointer to 'buf'.
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline int64_t* getDataLong (int64_t *array) const {
+      return getDataLong(getPayloadFormat(), array);
     }
 
     /** Unpacks the data and returns it as a long array. If the underlying data is not double,
@@ -851,6 +997,24 @@ namespace vrt {
       return getDataLong(  getPayloadFormat());
     }
 
+    /** Unpacks the data and returns it as a int array. If the underlying data is not int,
+     *  it will be converted to int and any values that fall outside of the range of a int will
+     *  will have unpredictable output. If the payload format is incorrectly specified, the output of
+     *  this method will be useless. <br>
+     *  <br>
+     *  This method can only be used AFTER a payload format for the packet has been specified
+     *  (see {@link #getPayloadFormat()}. This method is identical to calling
+     *  <tt>p.getDataDouble(p.getPayloadFormat())</tt>
+     *  @param array The array to insert the data into (not null). The array must
+     *               be sufficiently long for the number of elements in the packet
+     *               (see <tt>getScalarDataLength(pf)</tt>).
+     *  @return Pointer to 'buf'.
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline int32_t* getDataInt (int32_t *array) const {
+      return getDataInt(getPayloadFormat(), array);
+    }
+
     /** Unpacks the data and returns it as a int array. If the underlying data is not double,
      *  it will be converted to int and any values that fall outside of the range of a int will
      *  will have unpredictable output. If the payload format is incorrectly specified, the output of
@@ -866,6 +1030,24 @@ namespace vrt {
       return getDataInt(   getPayloadFormat());
     }
 
+    /** Unpacks the data and returns it as a short array. If the underlying data is not short,
+     *  it will be converted to short and any values that fall outside of the range of a short will
+     *  will have unpredictable output. If the payload format is incorrectly specified, the output of
+     *  this method will be useless. <br>
+     *  <br>
+     *  This method can only be used AFTER a payload format for the packet has been specified
+     *  (see {@link #getPayloadFormat()}. This method is identical to calling
+     *  <tt>p.getDataDouble(p.getPayloadFormat())</tt>
+     *  @param array The array to insert the data into (not null). The array must
+     *               be sufficiently long for the number of elements in the packet
+     *               (see <tt>getScalarDataLength(pf)</tt>).
+     *  @return Pointer to 'buf'.
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline int16_t* getDataShort (int16_t *array) const {
+      return getDataShort(getPayloadFormat(), array);
+    }
+
     /** Unpacks the data and returns it as a byte array. If the underlying data is not double,
      *  it will be converted to byte and any values that fall outside of the range of a byte will
      *  will have unpredictable output. If the payload format is incorrectly specified, the output of
@@ -879,6 +1061,24 @@ namespace vrt {
      */
     public: inline vector<int16_t> getDataShort () const {
       return getDataShort( getPayloadFormat());
+    }
+
+    /** Unpacks the data and returns it as a byte array. If the underlying data is not byte,
+     *  it will be converted to byte and any values that fall outside of the range of a byte will
+     *  will have unpredictable output. If the payload format is incorrectly specified, the output of
+     *  this method will be useless. <br>
+     *  <br>
+     *  This method can only be used AFTER a payload format for the packet has been specified
+     *  (see {@link #getPayloadFormat()}. This method is identical to calling
+     *  <tt>p.getDataDouble(p.getPayloadFormat())</tt>
+     *  @param array The array to insert the data into (not null). The array must
+     *               be sufficiently long for the number of elements in the packet
+     *               (see <tt>getScalarDataLength(pf)</tt>).
+     *  @return Pointer to 'buf'.
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline int8_t* getDataByte (int8_t *array) const {
+      return getDataByte(getPayloadFormat(), array);
     }
 
     /** Unpacks the data and returns it as a byte array. If the underlying data is not double,
@@ -918,8 +1118,7 @@ namespace vrt {
      *          <tt>PayloadFormat_FLOAT32</tt>, <tt>PayloadFormat_DOUBLE64</tt>
      *          <tt>PayloadFormat_UINT1</tt>, <tt>PayloadFormat_UINT4</tt>,    <tt>PayloadFormat_UINT8</tt>,
      *          <tt>PayloadFormat_UINT16</tt>, <tt>PayloadFormat_UINT32</tt>,   <tt>PayloadFormat_UINT64</tt>.
-     *  @throws VRTException If the array length is shorter than
-     *          <tt>offset+{@link #getPayloadLength()}</tt>.
+     *  @throws VRTException If the array length is shorter than <tt>offset+getPayloadLength()</tt>.
      *  @throws VRTException If the length is invalid.
      */
     public: inline void setData (const PayloadFormat &pf, const vector<char> &array, size_t offset, int32_t length, bool convert=true) {
@@ -957,19 +1156,39 @@ namespace vrt {
      *  the size of the data (see {@link #setDataLength}) and indirectly the payload and packet.
      *  @param pf The payload format to assume.
      *  @param array The values to insert.
+     *  @param len   The length of the array (in number of scalar values).
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline void setDataDouble (const PayloadFormat &pf, const double *array, size_t len) {
+      setScalarDataLength(pf, (int32_t)len);
+      PackUnpack::packAsDouble(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      }
+
+    /** Packs the data using the values from a double array. If the underlying data is not double,
+     *  it will be converted from double and any values that fall outside of the range of a of the
+     *  payload format will have unpredictable output. This method also has the effect of setting
+     *  the size of the data (see {@link #setDataLength}) and indirectly the payload and packet.
+     *  @param pf The payload format to assume.
+     *  @param array The values to insert.
      *  @throws VRTException If the payload format is null.
      */
     public: inline void setDataDouble (const PayloadFormat &pf, const vector<double> &array) {
-      if (isNull(pf)) throw VRTException("Payload format is null");
-      if (pf.getDataType() == DataType_Double) {
-        // Fast version where no conversion (other than byte order) is required
-        int32_t len = array.size() * 8;
-        setPayloadLength(len);
-        setData(pf, &array[0], len);
-      }
-      else {
+      setScalarDataLength(pf, array.size());
         PackUnpack::packAsDouble(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, array.size());
       }
+
+    /** Packs the data using the values from a float array. If the underlying data is not float,
+     *  it will be converted from float and any values that fall outside of the range of a of the
+     *  payload format will have unpredictable output. This method also has the effect of setting
+     *  the size of the data (see {@link #setDataLength}) and indirectly the payload and packet.
+     *  @param pf    The payload format to assume.
+     *  @param array The values to insert.
+     *  @param len   The length of the array (in number of scalar values).
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline void setDataFloat (const PayloadFormat &pf, const float *array, size_t len) {
+      setScalarDataLength(pf, (int32_t)len);
+      PackUnpack::packAsFloat(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
     }
 
     /** Packs the data using the values from a float array. If the underlying data is not float,
@@ -981,16 +1200,22 @@ namespace vrt {
      *  @throws VRTException If the payload format is null.
      */
     public: inline void setDataFloat (const PayloadFormat &pf, const vector<float> &array) {
-      if (isNull(pf)) throw VRTException("Payload format is null");
-      if (pf.getDataType() == DataType_Float) {
-        // Fast version where no conversion (other than byte order) is required
-        int32_t len = array.size() * 4;
-        setPayloadLength(len);
-        setData(pf, &array[0], len);
-      }
-      else {
+      setScalarDataLength(pf, array.size());
         PackUnpack::packAsFloat(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, array.size());
       }
+
+    /** Packs the data using the values from a long array. If the underlying data is not long,
+     *  it will be converted from long and any values that fall outside of the range of a of the
+     *  payload format will have unpredictable output. This method also has the effect of setting
+     *  the size of the data (see {@link #setDataLength}) and indirectly the payload and packet.
+     *  @param pf    The payload format to assume.
+     *  @param array The values to insert.
+     *  @param len   The length of the array (in number of scalar values).
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline void setDataLong (const PayloadFormat &pf, const int64_t *array, size_t len) {
+      setScalarDataLength(pf, (int32_t)len);
+      PackUnpack::packAsLong(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
     }
 
     /** Packs the data using the values from a long array. If the underlying data is not long,
@@ -1002,16 +1227,22 @@ namespace vrt {
      *  @throws VRTException If the payload format is null.
      */
     public: inline void setDataLong (const PayloadFormat &pf, const vector<int64_t> &array) {
-      if (isNull(pf)) throw VRTException("Payload format is null");
-      if (pf.getDataType() == DataType_Int64) {
-        // Fast version where no conversion (other than byte order) is required
-        int32_t len = array.size() * 8;
-        setPayloadLength(len);
-        setData(pf, &array[0], len);
-      }
-      else {
+      setScalarDataLength(pf, array.size());
         PackUnpack::packAsLong(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, array.size());
       }
+
+    /** Packs the data using the values from a int array. If the underlying data is not int,
+     *  it will be converted from int and any values that fall outside of the range of a of the
+     *  payload format will have unpredictable output. This method also has the effect of setting
+     *  the size of the data (see {@link #setDataLength}) and indirectly the payload and packet.
+     *  @param pf    The payload format to assume.
+     *  @param array The values to insert.
+     *  @param len   The length of the array (in number of scalar values).
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline void setDataInt (const PayloadFormat &pf, const int32_t *array, size_t len) {
+      setScalarDataLength(pf, (int32_t)len);
+      PackUnpack::packAsInt(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
     }
 
     /** Packs the data using the values from a int array. If the underlying data is not int,
@@ -1023,16 +1254,22 @@ namespace vrt {
      *  @throws VRTException If the payload format is null.
      */
     public: inline void setDataInt (const PayloadFormat &pf, const vector<int32_t> &array) {
-      if (isNull(pf)) throw VRTException("Payload format is null");
-      if (pf.getDataType() == DataType_Int32) {
-        // Fast version where no conversion (other than byte order) is required
-        int32_t len = array.size() * 4;
-        setPayloadLength(len);
-        setData(pf, &array[0], len);
-      }
-      else {
+      setScalarDataLength(pf, array.size());
         PackUnpack::packAsInt(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, array.size());
       }
+
+    /** Packs the data using the values from a short array. If the underlying data is not short,
+     *  it will be converted from short and any values that fall outside of the range of a of the
+     *  payload format will have unpredictable output. This method also has the effect of setting
+     *  the size of the data (see {@link #setDataLength}) and indirectly the payload and packet.
+     *  @param pf    The payload format to assume.
+     *  @param array The values to insert.
+     *  @param len   The length of the array (in number of scalar values).
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline void setDataShort (const PayloadFormat &pf, const int16_t *array, size_t len) {
+      setScalarDataLength(pf, (int32_t)len);
+      PackUnpack::packAsShort(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
     }
 
     /** Packs the data using the values from a short array. If the underlying data is not short,
@@ -1044,30 +1281,24 @@ namespace vrt {
      *  @throws VRTException If the payload format is null.
      */
     public: inline void setDataShort (const PayloadFormat &pf, const vector<int16_t> &array) {
-      if (isNull(pf)) throw VRTException("Payload format is null");
-      if (pf.getDataType() == DataType_Int16) {
-        // Fast version where no conversion (other than byte order) is required
-        int32_t len = array.size() * 2;
-        setPayloadLength(len);
-        setData(pf, &array[0], len);
-      }
-      else {
+      setScalarDataLength(pf, array.size());
         PackUnpack::packAsShort(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, array.size());
       }
-    }
 
-    public: inline void setDataShort (const PayloadFormat &pf, int16_t *array, int length) {
-          if (isNull(pf)) throw VRTException("Payload format is null");
-          if (pf.getDataType() == DataType_Int16) {
-            // Fast version where no conversion (other than byte order) is required
-            int32_t len = length * 2;
-            setPayloadLength(len);
-            setData(pf, &array[0], len);
-          }
-          else {
-            PackUnpack::packAsShort(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, length);
-          }
+    /** Packs the data using the values from a byte array. If the underlying data is not byte,
+     *  it will be converted from byte and any values that fall outside of the range of a of the
+     *  payload format will have unpredictable output. This method also has the effect of setting
+     *  the size of the data (see {@link #setDataLength}) and indirectly the payload and packet.
+     *  @param pf    The payload format to assume.
+     *  @param array The values to insert.
+     *  @param len   The length of the array (in number of scalar values).
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline void setDataByte (const PayloadFormat &pf, const int8_t *array, size_t len) {
+      setScalarDataLength(pf, (int32_t)len);
+      PackUnpack::packAsByte(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
         }
+
     /** Packs the data using the values from a byte array. If the underlying data is not byte,
      *  it will be converted from byte and any values that fall outside of the range of a of the
      *  payload format will have unpredictable output. This method also has the effect of setting
@@ -1077,18 +1308,9 @@ namespace vrt {
      *  @throws VRTException If the payload format is null.
      */
     public: inline void setDataByte (const PayloadFormat &pf, const vector<int8_t> &array) {
-      if (isNull(pf)) throw VRTException("Payload format is null");
-      if (pf.getDataType() == DataType_Int8) {
-        // Fast version where no conversion is required
-        int32_t len = array.size();
-        setPayloadLength(len);
-        setData(pf, &array[0], len);
-      }
-      else {
-        setDataLength(pf, array.size());
+      setScalarDataLength(pf, array.size());
         PackUnpack::packAsByte(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, array.size());
       }
-    }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // SET WITH PRE-DEFINED PAYLOAD FORMAT
@@ -1106,6 +1328,8 @@ namespace vrt {
      *  @param offset The array offset.
      *  @param length The number of bytes to pack (must be a multiple of 8 for <tt>PayloadFormat_INT64</tt>
      *                or <tt>PayloadFormat_DOUBLE64</tt> or a multiple of 4 for all others).
+     *  @param convert Convert byte order to match native representation? Set this to false if it
+     *                 is necessary to keep the data in big-endian format.
      *  @throws VRTException If the payload format is null or if the array is null.
      *  @throws VRTException If the payload format is anything other than
      *          <tt>PayloadFormat_INT4</tt>,    <tt>PayloadFormat_INT8</tt>,
@@ -1113,11 +1337,11 @@ namespace vrt {
      *          <tt>PayloadFormat_FLOAT32</tt>, <tt>PayloadFormat_DOUBLE64</tt>
      *          <tt>PayloadFormat_UINT1</tt>, <tt>PayloadFormat_UINT4</tt>,    <tt>PayloadFormat_UINT8</tt>,
      *          <tt>PayloadFormat_UINT16</tt>, <tt>PayloadFormat_UINT32</tt>,   <tt>PayloadFormat_UINT64</tt>.
-     *  @throws VRTException If the array length is shorter than <tt>offset+{@link #getPayloadLength()}</tt>.
+     *  @throws VRTException If the array length is shorter than <tt>offset+getPayloadLength()</tt>.
      *  @throws VRTException If the length is invalid.
      */
-    public: inline void setData (const vector<char> &array, size_t offset, int32_t length) {
-        setData(getPayloadFormat(), array, offset, length);
+    public: inline void setData (const vector<char> &array, size_t offset, int32_t length, bool convert=true) {
+      setData(getPayloadFormat(), array, offset, length, convert);
       }
 
     /** Packs the data from a native byte buffer. This is basically a byte-for-byte
@@ -1132,18 +1356,37 @@ namespace vrt {
      *  @param array  The array to insert the data into.
      *  @param length The number of bytes to pack (must be a multiple of 8 for <tt>PayloadFormat_INT64</tt>
      *                or <tt>PayloadFormat_DOUBLE64</tt> or a multiple of 4 for all others).
+     *  @param convert Convert byte order to match native representation? Set this to false if it
+     *                 is necessary to keep the data in big-endian format.
      *  @throws VRTException If the payload format is null or if the array is null.
+     *  @throws VRTException If the payload format is anything other than
      *  @throws VRTException If the payload format is anything other than
      *          <tt>PayloadFormat_INT4</tt>,    <tt>PayloadFormat_INT8</tt>,
      *          <tt>PayloadFormat_INT16</tt>, <tt>PayloadFormat_INT32</tt>,   <tt>PayloadFormat_INT64</tt>,
      *          <tt>PayloadFormat_FLOAT32</tt>, <tt>PayloadFormat_DOUBLE64</tt>
      *          <tt>PayloadFormat_UINT1</tt>, <tt>PayloadFormat_UINT4</tt>,    <tt>PayloadFormat_UINT8</tt>,
      *          <tt>PayloadFormat_UINT16</tt>, <tt>PayloadFormat_UINT32</tt>,   <tt>PayloadFormat_UINT64</tt>.
-     *  @throws VRTException If the array length is shorter than <tt>offset+{@link #getPayloadLength()}</tt>.
+     *  @throws VRTException If the array length is shorter than <tt>offset+getPayloadLength()</tt>.
      *  @throws VRTException If the length is invalid.
      */
-    public: inline void setData (const void *array, int32_t length) {
-      setData(getPayloadFormat(), array, length);
+    public: inline void setData (const void *array, int32_t length, bool convert=true) {
+      setData(getPayloadFormat(), array, length, convert);
+    }
+
+    /** Packs the data using the values from a double array. If the underlying data is not double,
+     *  it will be converted from double and any values that fall outside of the range of a of the
+     *  payload format will have unpredictable output. This method also has the effect of setting
+     *  the size of the data (see {@link #setDataLength}) and indirectly the payload and packet. <br>
+     *  <br>
+     *  This method can only be used AFTER a payload format for the packet has been specified
+     *  (see {@link #getPayloadFormat()}. This method is identical to calling
+     *  <tt>p.setDataByte(p.getPayloadFormat(),array)</tt>
+     *  @param array The values to insert.
+     *  @param len   The length of the array (in number of scalar values).
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline void setDataDouble (const double *array, size_t len) {
+      setDataDouble(getPayloadFormat(), array, len);
     }
 
     /** Packs the data using the values from a double array. If the underlying data is not double,
@@ -1168,6 +1411,22 @@ namespace vrt {
      *  <br>
      *   This method can only be used AFTER a payload format for the packet has been specified
      *  (see {@link #getPayloadFormat()}. This method is identical to calling
+     *  <tt>p.setDataByte(p.getPayloadFormat(),array)</tt>
+     *  @param array The values to insert.
+     *  @param len   The length of the array (in number of scalar values).
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline void setDataFloat (const float *array, size_t len) {
+      setDataFloat(getPayloadFormat(), array, len);
+    }
+
+    /** Packs the data using the values from a float array. If the underlying data is not float,
+     *  it will be converted from float and any values that fall outside of the range of a of the
+     *  payload format will have unpredictable output. This method also has the effect of setting
+     *  the size of the data (see {@link #setDataLength}) and indirectly the payload and packet. <br>
+     *  <br>
+     *  This method can only be used AFTER a payload format for the packet has been specified
+     *  (see {@link #getPayloadFormat()}. This method is identical to calling
      *  <tt>p.setDataFloat(p.getPayloadFormat(),array)</tt>
      *  @param array The values to insert.
      *  @throws VRTException If the payload format is null.
@@ -1182,6 +1441,22 @@ namespace vrt {
      *  the size of the data (see {@link #setDataLength}) and indirectly the payload and packet. <br>
      *  <br>
      *   This method can only be used AFTER a payload format for the packet has been specified
+     *  (see {@link #getPayloadFormat()}. This method is identical to calling
+     *  <tt>p.setDataByte(p.getPayloadFormat(),array)</tt>
+     *  @param array The values to insert.
+     *  @param len   The length of the array (in number of scalar values).
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline void setDataLong (const int64_t *array, size_t len) {
+      setDataLong(getPayloadFormat(), array, len);
+    }
+
+    /** Packs the data using the values from a long array. If the underlying data is not long,
+     *  it will be converted from long and any values that fall outside of the range of a of the
+     *  payload format will have unpredictable output. This method also has the effect of setting
+     *  the size of the data (see {@link #setDataLength}) and indirectly the payload and packet. <br>
+     *  <br>
+     *  This method can only be used AFTER a payload format for the packet has been specified
      *  (see {@link #getPayloadFormat()}. This method is identical to calling
      *  <tt>p.setDataLong(p.getPayloadFormat(),array)</tt>
      *  @param array The values to insert.
@@ -1198,6 +1473,22 @@ namespace vrt {
      *  <br>
      *   This method can only be used AFTER a payload format for the packet has been specified
      *  (see {@link #getPayloadFormat()}. This method is identical to calling
+     *  <tt>p.setDataByte(p.getPayloadFormat(),array)</tt>
+     *  @param array The values to insert.
+     *  @param len   The length of the array (in number of scalar values).
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline void setDataInt (const int32_t *array, size_t len) {
+      setDataInt(getPayloadFormat(), array, len);
+    }
+
+    /** Packs the data using the values from a int array. If the underlying data is not int,
+     *  it will be converted from int and any values that fall outside of the range of a of the
+     *  payload format will have unpredictable output. This method also has the effect of setting
+     *  the size of the data (see {@link #setDataLength}) and indirectly the payload and packet. <br>
+     *  <br>
+     *  This method can only be used AFTER a payload format for the packet has been specified
+     *  (see {@link #getPayloadFormat()}. This method is identical to calling
      *  <tt>p.setDataInt(p.getPayloadFormat(),array)</tt>
      *  @param array The values to insert.
      *  @throws VRTException If the payload format is null.
@@ -1212,6 +1503,22 @@ namespace vrt {
      *  the size of the data (see {@link #setDataLength}) and indirectly the payload and packet. <br>
      *  <br>
      *   This method can only be used AFTER a payload format for the packet has been specified
+     *  (see {@link #getPayloadFormat()}. This method is identical to calling
+     *  <tt>p.setDataByte(p.getPayloadFormat(),array)</tt>
+     *  @param array The values to insert.
+     *  @param len   The length of the array (in number of scalar values).
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline void setDataShort (const int16_t *array, size_t len) {
+      setDataShort(getPayloadFormat(), array, len);
+    }
+
+    /** Packs the data using the values from a short array. If the underlying data is not short,
+     *  it will be converted from short and any values that fall outside of the range of a of the
+     *  payload format will have unpredictable output. This method also has the effect of setting
+     *  the size of the data (see {@link #setDataLength}) and indirectly the payload and packet. <br>
+     *  <br>
+     *  This method can only be used AFTER a payload format for the packet has been specified
      *  (see {@link #getPayloadFormat()}. This method is identical to calling
      *  <tt>p.setDataShort(p.getPayloadFormat(),array)</tt>
      *  @param array The values to insert.
@@ -1230,6 +1537,22 @@ namespace vrt {
      *  (see {@link #getPayloadFormat()}. This method is identical to calling
      *  <tt>p.setDataByte(p.getPayloadFormat(),array)</tt>
      *  @param array The values to insert.
+     *  @param len   The length of the array (in number of scalar values).
+     *  @throws VRTException If the payload format is null.
+     */
+    public: inline void setDataByte (const int8_t *array, size_t len) {
+      setDataByte(getPayloadFormat(), array, len);
+    }
+
+    /** Packs the data using the values from a byte array. If the underlying data is not byte,
+     *  it will be converted from byte and any values that fall outside of the range of a of the
+     *  payload format will have unpredictable output. This method also has the effect of setting
+     *  the size of the data (see {@link #setDataLength}) and indirectly the payload and packet. <br>
+     *  <br>
+     *  This method can only be used AFTER a payload format for the packet has been specified
+     *  (see {@link #getPayloadFormat()}. This method is identical to calling
+     *  <tt>p.setDataByte(p.getPayloadFormat(),array)</tt>
+     *  @param array The values to insert.
      *  @throws VRTException If the payload format is null.
      */
     public: inline void setDataByte (const vector<int8_t> &array) {
@@ -1245,5 +1568,5 @@ namespace vrt {
     public: virtual Value*    getField      (int32_t id) const;
     public: virtual void      setField      (int32_t id, const Value* val);
   };
-};
+} END_NAMESPACE
 #endif /* _BasicDataPacket_h */

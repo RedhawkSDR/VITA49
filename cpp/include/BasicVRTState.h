@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #ifndef _BasicVRTState_h
@@ -32,9 +33,7 @@ using namespace std;
 
 namespace vrt {
   /** <b>Internal use only:</b> Used internal to <tt>sourcevrt</tt> and <tt>sinkvrt</tt>.
-       Maintains state of VRT Stream.
-
-      @author 
+   *   Maintains state of VRT Stream.
    */
   class CachedContextWrapper : public BasicContextPacket {
     friend class BasicVRTState;
@@ -95,9 +94,7 @@ namespace vrt {
   };
 
   /** <b>Internal use only:</b> Used internal to <tt>sourcevrt</tt> and <tt>sinkvrt</tt>.
-       Maintains state of VRT Stream.
-
-      @author 
+   *   Maintains state of VRT Stream.
    */
   class BasicVRTState : public VRTObject, public HasFields {
     private: int32_t contextTrigger;
@@ -173,6 +170,10 @@ namespace vrt {
      *  trigger fields set up in the constructor.</i>
      */
     public: bool updateState (const BasicContextPacket& ctx);
+
+    /** Updates the state of this VRT Stream from a TimeStamp.
+     */
+    public: bool updateState(const TimeStamp& ts);
 
     public: virtual string toString () const;
 
@@ -467,19 +468,21 @@ namespace vrt {
     /** Gets the total number of packets containing discontinuous packets since state was maintained. */
     public: virtual int64_t getTotalDiscontinuousPackets () const { return totalDiscontinuousPackets; }
 
-    public: virtual Value* getField (int32_t id) const { return currentContextState.getField(id); }
+    public: virtual Value*    getField (int32_t id) const { return currentContextState.getField(id); }
     public: virtual ValueType getFieldType (int32_t id) const { return currentContextState.getFieldType(id); }
     public: virtual string    getFieldName  (int32_t id) const { return currentContextState.getFieldName(id); };
-    public: virtual int32_t    getFieldCount  () const { return currentContextState.getFieldCount(); };
-    public: virtual void       setField  (int32_t id, const Value* val) { throw VRTException("Cannot set field in state."); };
+    public: virtual int32_t   getFieldCount  () const { return currentContextState.getFieldCount(); };
+
+    public: virtual void setField (int32_t id, const Value* val) {
+      UNUSED_VARIABLE(id);
+      UNUSED_VARIABLE(val);
+      throw VRTException("Cannot set field in state.");
+    };
 
     /** Is this object equal to null. */
     public: inline virtual bool isNullValue () const {
       return (!initialized);
     }
-
   };
-
-}
-
+} END_NAMESPACE
 #endif /* _BasicVRTState_h */

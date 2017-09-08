@@ -1,22 +1,3 @@
-/*
- * This file is protected by Copyright. Please refer to the COPYRIGHT file
- * distributed with this source distribution.
- *
- * This file is part of REDHAWK VITA49Libraries.
- *
- * REDHAWK VITA49Libraries is free software: you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.
- *
- * REDHAWK VITA49Libraries is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
- * for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
- */
 //
 //  This class was auto-generated, do not modify.
 //
@@ -41,9 +22,10 @@ namespace vrt {
    *  
    *          The "no data packet" is used to indicate that no data exists in the
    *          Information Stream. Its sole purpose is to permit receivers to identify
-   *          the paired IF Context Stream as is required by Section 8. The trailer 
-   *  	is usually included for consistency and to provide the Calibrated Time 
-   *  	Indicator. This packet <b>shall not</b> have any payload associated with it.
+   *          the paired IF Context Stream as is required by Section 8 of the "VITA 49
+   *          Spectrum Survey Profile". The trailer is usually included for
+   *          consistency and to provide the Calibrated Time Indicator. This
+   *          packet <b>shall not</b> have any payload associated with it.
    *        
    */
   class NoDataPacket : public BasicDataPacket {
@@ -102,7 +84,7 @@ namespace vrt {
     public:    virtual int32_t   getFieldCount () const;
     public:    virtual string    getFieldName (int32_t id) const;
     public:    virtual ValueType getFieldType (int32_t id) const;
-    public:    virtual Value*    getField (int32_t id) const;
+    public:    virtual Value*    getField (int32_t id) const __attribute__((warn_unused_result));
     public:    virtual void      setField (int32_t id, const Value* val);
     //======================================================================
     // GET/SET METHODS
@@ -111,6 +93,6 @@ namespace vrt {
     // TRAILER
     //======================================================================
   };
-};
+} END_NAMESPACE
 #endif /* _NoDataPacket_h */
 

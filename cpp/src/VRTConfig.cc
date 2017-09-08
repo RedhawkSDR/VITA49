@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "AbstractPacketFactory.h"
@@ -27,19 +28,24 @@
 #include "VRTConfig.h"
 #include "stdlib.h"     // required for getenv(..) on GCC4.4/libc6 2.11.1
 
-
-#define _libraryVersion "0.9.0";
-
 using namespace std;
 using namespace vrt;
 
-
-bool                     _initDone             = false;
-bool                     _quickTest            = true;
-bool                     _strict               = false;
-bool                     _noradLeapSecCounted  = true;
-VRTConfig::VITAVersion   _vrtVersion           = VRTConfig::VITAVersion_V49;
-void                    *_packetFactory        = NULL;
+static bool                     _initDone             = false;
+static string                   _libraryVersion       = "0.9.0";
+static int32_t                  _testDelay            = 0;
+static string                   _testDevice           = "";
+static string                   _testFirstMCast       = "";
+static int32_t                  _testFirstPort        = 0;
+static bool                     _testQuick            = true;
+static string                   _testServer           = "";
+static int32_t                  _testServerTimeout    = 0;
+static bool                     _strict               = false;
+static bool                     _preferIPv6Addresses  = false;
+static string                   _leapSecondsFile      = "";
+static bool                     _noradLeapSecCounted  = true;
+static VRTConfig::VITAVersion   _vrtVersion           = VRTConfig::VITAVersion_V49;
+static void                    *_packetFactory        = NULL;
 
 #ifdef DYNAMIC_LIBS
 #include <dlfcn.h>
@@ -75,12 +81,35 @@ static inline string getProperty (const string &name, const string &def) {
   return (val != NULL)? val : def;
 }
 
-/** <b>Internal use only:</b> Initializes the values for VRTConfig. */
-static void _init () {
-  string vrthome = getProperty("VRTHOME", "");
+/** <b>Internal use only:</b> Gets an environment variable. */
+static inline string getProperty (const char *name, const char *def) {
+  const char *val = getenv(name);
+  return (val != NULL)? val : def;
+}
+
+void VRTConfig::libraryInit () {
+  //////////////////////////////////////////////////////////////////////////////
+  // Constants for VRTConfig
+  //////////////////////////////////////////////////////////////////////////////
+  string vrthome       = getProperty("VRTHOME",                 "");
+  string testDelay     = getProperty("VRT_TEST_DELAY",          "0");
+  string firstPort     = getProperty("VRT_TEST_FIRST_PORT",     "");
+  string serverTimeout = getProperty("VRT_TEST_SERVER_TIMEOUT", "0");
+  if (firstPort     == "") firstPort = "0";
+  if (serverTimeout == "") firstPort = "3600";
+
   _initDone            = true;
-  _quickTest           = Utilities::toBooleanValue(getProperty("VRT_QUICK_TEST","true"));
+  _testDelay           = atoi(testDelay.c_str());;
+  _testDevice          = getProperty("VRT_TEST_DEVICE",      "");
+  _testFirstMCast      = getProperty("VRT_TEST_FIRST_MCAST", "");
+  _testFirstPort       = atoi(firstPort.c_str());
+  _testQuick           = Utilities::toBooleanValue(getProperty("VRT_TEST_QUICK","true"));
+  _testServer          = getProperty("VRT_TEST_SERVER", "");
+  _testServerTimeout   = atoi(serverTimeout.c_str());;
   _strict              = Utilities::toBooleanValue(getProperty("VRT_STRICT","false"));
+  _preferIPv6Addresses = Utilities::toBooleanValue(getProperty("VRT_PREFER_IPV6_ADDRESSES","false"));
+  _leapSecondsFile     = (vrthome == "")? getProperty("VRT_LEAP_SECONDS", "")
+                                        : getProperty("VRT_LEAP_SECONDS", vrthome+"/cpp_lib/tai-utc.dat");
   _noradLeapSecCounted = Utilities::toBooleanValue(getProperty("VRT_NORAD_LS_COUNTED","true"));
   _packetFactory       = NULL;
 
@@ -109,56 +138,95 @@ static void _init () {
     }
     _packetFactory = initPacketFactory(packetFactories.substr(start), packetFactory);
 #else
-    cerr << "This version of the VRT library is built without DYNAMIC_LIBS sypport, ignoring "
+    cerr << "This version of the VRT library is built without DYNAMIC_LIBS support, ignoring "
             "VRT_PACKET_FACTORY=" << packetFactories << endl;
     _packetFactory = new vrt::PacketFactory;
 #endif
   }
+
+  //////////////////////////////////////////////////////////////////////////////
+  // Timer initialization for Utilities
+  //////////////////////////////////////////////////////////////////////////////
+  Utilities::sleep(0); // <-- forces init
 }
 
 string VRTConfig::getLibraryVersion () {
+  if (!_initDone) libraryInit();
   return _libraryVersion;
 }
 
 VRTConfig::VITAVersion VRTConfig::getVRTVersion () {
-  if (!_initDone) _init();
+  if (!_initDone) libraryInit();
   return _vrtVersion;
 }
 
-bool VRTConfig::getQuickTest () {
-  if (!_initDone) _init();
-  return _quickTest;
+int32_t VRTConfig::getTestDelay () {
+  if (!_initDone) libraryInit();
+  return _testDelay;
+}
+
+string VRTConfig::getTestDevice () {
+  if (!_initDone) libraryInit();
+  return _testDevice;
+}
+
+string VRTConfig::getTestFirstMCast () {
+  if (!_initDone) libraryInit();
+  return _testFirstMCast;
+}
+
+int32_t VRTConfig::getTestFirstPort () {
+  if (!_initDone) libraryInit();
+  return _testFirstPort;
+}
+
+bool VRTConfig::getTestQuick () {
+  if (!_initDone) libraryInit();
+  return _testQuick;
+}
+
+string VRTConfig::getTestServer () {
+  if (!_initDone) libraryInit();
+  return _testServer;
+}
+
+int32_t VRTConfig::getTestServerTimeout () {
+  if (!_initDone) libraryInit();
+  return _testServerTimeout;
 }
 
 bool VRTConfig::getStrict () {
-  if (!_initDone) _init();
+  if (!_initDone) libraryInit();
   return _strict;
 }
 
+bool VRTConfig::getPreferIPv6Addresses () {
+  if (!_initDone) libraryInit();
+  return _preferIPv6Addresses;
+}
+
 string VRTConfig::getLeapSecondsFile () {
-  static string _leapSecondsFile      = "";
-  if (_leapSecondsFile=="") {
-	  string vrthome = getProperty("VRTHOME", "");
-	  _leapSecondsFile     = (vrthome == "")? getProperty("VRT_LEAP_SECONDS", "")
-	                                        : getProperty("VRT_LEAP_SECONDS", vrthome+"/cpp_lib/tai-utc.dat");
-  }
-  if (!_initDone) _init();
+  if (!_initDone) libraryInit();
   return _leapSecondsFile;
 }
 
 bool VRTConfig::getNoradLeapSecCounted () {
-  if (!_initDone) _init();
+  if (!_initDone) libraryInit();
   return _noradLeapSecCounted;
 }
 
 AbstractPacketFactory *VRTConfig::getPacketFactory () {
-  if (!_initDone) _init();
+  if (!_initDone) libraryInit();
   return (AbstractPacketFactory*)_packetFactory;
 }
 
 void VRTConfig::setPacketFactory (AbstractPacketFactory *pf) {
-  if (!_initDone) _init();
+  if (!_initDone) libraryInit();
   _packetFactory = (void*)pf;
+}
+
+BasicVRTPacket *VRTConfig::getPacket (const BasicVRTPacket &p) {
+  return getPacket(&p);
 }
 
 BasicVRTPacket *VRTConfig::getPacket (const BasicVRTPacket *p) {
@@ -174,7 +242,7 @@ BasicVRTPacket *VRTConfig::getPacket (const BasicVRTPacket *p) {
   if (StandardDataPacket::isStandardDataPacket(id)) {
     return new StandardDataPacket(*p);
   }
-  
+
   switch (type) {
     case PacketType_UnidentifiedData:    return new BasicDataPacket(*p);
     case PacketType_Data:                return new BasicDataPacket(*p);
@@ -184,10 +252,6 @@ BasicVRTPacket *VRTConfig::getPacket (const BasicVRTPacket *p) {
     case PacketType_ExtContext:          return new BasicVRTPacket(*p);
     default:                             return new BasicVRTPacket(*p);
   }
-}
-
-BasicVRTPacket *VRTConfig::getPacket (const BasicVRTPacket &p) {
-  return VRTConfig::getPacket(&p);
 }
 
 BasicVRTPacket *VRTConfig::getPacket (PacketType type, int64_t id) {
@@ -209,6 +273,35 @@ BasicVRTPacket *VRTConfig::getPacket (PacketType type, int64_t id) {
     case PacketType_ExtContext:          return new BasicVRTPacket;
     default:                             return new BasicVRTPacket;
   }
+}
+
+BasicVRTPacket *VRTConfig::getPacket (vector<char> &bbuf, int32_t boff, int32_t blen) {
+  if (blen < 0) blen = (int32_t)bbuf.size();
+  BasicVRTPacket p(&bbuf[boff], blen);
+  return getPacketSwap(&p); // <-- we can use swap here since we own the new buffer
+}
+
+BasicVRTPacket *VRTConfig::getPacketSwap (vector<char> &bbuf, int32_t boff, int32_t blen) {
+  if (boff == 0) {
+    BasicVRTPacket p; p.swap(&bbuf);
+    return getPacketSwap(&p);
+  }
+  else {
+    if (blen < 0) blen = (int32_t)bbuf.size();
+    BasicVRTPacket p(&bbuf[boff], blen);
+    return getPacketSwap(&p);
+  }
+}
+
+BasicVRTPacket *VRTConfig::getPacketSwap (BasicVRTPacket *p) {
+  if (p == NULL) throw VRTException("Can not get specific packet type when generic packet is null.");
+
+  PacketType type = p->getPacketType();
+  int64_t    id   = p->getClassIdentifier();
+
+  BasicVRTPacket *pkt = getPacket(type, id);
+  pkt->swap(p);
+  return pkt;
 }
 
 ostream& operator<< (ostream &s, VRTConfig::VITAVersion val) {

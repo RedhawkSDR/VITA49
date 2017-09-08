@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #ifndef _TimeStamp_h
@@ -261,7 +262,7 @@ namespace vrt {
    *         Clock Synchronization Protocol for Networked Measurement and Control Systems."
    *         IEEE Std 1588-2008. The Institute of Electrical and Electronics Engineers,
    *         Inc. 24 July 2008.
-   *  
+   *
    *     [3] USNO. "Leap Seconds." Time Service Dept., U.S. Naval Observatory.
    *         http://tycho.usno.navy.mil/leapsec.html Last Accessed 15 September 2011.
    *         <i>(Note: The companion to this is [4].)</i>
@@ -276,24 +277,47 @@ namespace vrt {
    *     [5] Klyne, G., C. Newman. "Date and Time on the Internet: Timestamps." Network
    *         Working Group. RFC3339. July 2002.
    *  </pre>
-   *  @author         
    */
   class TimeStamp : public VRTObject, public HasFields {
-    /** The value of 1 second in picoseconds. */
-    public: static const int64_t   ONE_SEC    = __INT64_C(1000000000000);
+    /** The value of 1 picosecond in seconds.
+     *  <pre>
+     *    ONE_PICOSECOND = (1.0 / ONE_SEC) = 1e-12 seconds
+     *  </pre>
+     *  Note that this is explicitly defined as 1e-12 rather than the division
+     *  shown above to avoid rounding errors that may otherwise be introduced.
+     */
+    public: static const double ONE_PICOSECOND;
 
-    /** The value of 1 second in picoseconds. */
-    public: static const uint64_t  ONE_SECOND = __INT64_C(1000000000000);
+    /** The value of 1/2 picosecond in seconds.
+     *  <pre>
+     *    HALF_PICOSECOND = 0.500e-12 seconds
+     *  </pre>
+     */
+    public: static const double HALF_PICOSECOND;
+
+    /** The value of 1 second in picoseconds.
+     *  <pre>
+     *    ONE_SEC = 1000000000000 picoseconds
+     *  </pre>
+     */
+    public: static const int64_t ONE_SEC;
+
+    /** The value of 1 second in picoseconds (unsigned variant).
+     *  <pre>
+     *    ONE_SECOND = 1000000000000 picoseconds
+     *  </pre>
+     */
+    public: static const uint64_t ONE_SECOND;
 
     /** The UTC epoch. */
-    public: static const IntegerMode UTC_EPOCH = IntegerMode_UTC;
+    public: static const IntegerMode UTC_EPOCH;
 
     /** The GPS epoch. */
-    public: static const IntegerMode GPS_EPOCH = IntegerMode_GPS;
+    public: static const IntegerMode GPS_EPOCH;
 
     /** The "null" epoch. */
-    public: static const IntegerMode NULL_EPOCH = IntegerMode_None;
-    
+    public: static const IntegerMode NULL_EPOCH;
+
     /** An empty time stamp. This is equal to:
      *  <pre>
      *    NO_TIME_STAMP = TimeStamp(IntegerMode.None, FractionalMode.None, null, null)
@@ -315,7 +339,7 @@ namespace vrt {
      *  See top of class for a detailed discussion regarding number of leap seconds added
      *  between 1 Jan 1970 and 6 Jan 1980.
      */
-    public: static const int32_t GPS2UTC = 315964811;
+    public: static const int32_t GPS2UTC;
 
     /** Delta between Midas and POSIX epochs.
      *  <pre>
@@ -323,14 +347,14 @@ namespace vrt {
      *    MIDAS2POSIX = 631,152,000 seconds
      *  </pre>
      */
-    public: static const int32_t MIDAS2POSIX = 631152000;
+    public: static const int32_t MIDAS2POSIX;
 
     /** Delta between GPS and PTP epochs.
      *  <pre>
      *    GPS2PTP = 315,964,819 seconds
      *  </pre>
      */
-    public: static const int32_t GPS2PTP = 315964819;
+    public: static const int32_t GPS2PTP;
 
     private: IntegerMode    tsiMode;
     private: FractionalMode tsfMode;
@@ -379,7 +403,7 @@ namespace vrt {
      *                    (in picoseconds) is greater than or equal to one second.
      */
     public: TimeStamp (IntegerMode tsiMode, FractionalMode tsfMode, uint32_t tsi, uint64_t tsf, double sr = DOUBLE_NAN);
-    
+
     /** Creates a new instance.
      *  @param tsiMode The IntegerMode mode used.
      *  @param tsfMode The FractionalMode mode used.
@@ -401,136 +425,145 @@ namespace vrt {
     }
 
     /** Gets a time stamp using system time. This time should be considered unreliable as it is
-        using <tt>gettimeofday(..)</tt> as its data source rather than a precision time
-        reference. The resolution of this time stamp is only as good as that provided by the O/S,
-        and will never be better than 1 micorsecond.
+     *  using <tt>gettimeofday(..)</tt> as its data source rather than a precision time
+     *  reference. The resolution of this time stamp is only as good as that provided by the O/S,
+     *  and will never be better than 1 micorsecond.
      */
     public: static inline TimeStamp getSystemTime () {
       return getSystemTime(LeapSeconds::getDefaultInstance());
     }
 
     /** Gets a time stamp using system time. This time should be considered unreliable as it is
-        using <tt>gettimeofday(..)</tt> as its data source rather than a precision time
-        reference. The resolution of this time stamp is only as good as that provided by the O/S,
-        and will never be better than 1 micorsecond.
-        @param ls The leap-seconds reference to use.
+     *  using <tt>gettimeofday(..)</tt> as its data source rather than a precision time
+     *  reference. The resolution of this time stamp is only as good as that provided by the O/S,
+     *  and will never be better than 1 micorsecond.
+     *  @param ls The leap-seconds reference to use.
      */
     public: static TimeStamp getSystemTime (LeapSeconds *ls);
 
     /** Converts from UTC or GPS time to UTC. This operation does nothing to the fractional time
-        seconds, and is only valid for dates after 1-Jan-1980.
-        @return <tt>this</tt> if already in UTC, otherwise a new TimeStamp in GPS time representing
-                the same time.
-        @throws VRTException If the current time stamp is not GPS or UTC.
+     *  seconds, and is only valid for dates after 1-Jan-1980.
+     *  @return <tt>this</tt> if already in UTC, otherwise a new TimeStamp in GPS time representing
+     *          the same time.
+     *  @throws VRTException If the current time stamp is not GPS or UTC.
      */
     public: TimeStamp toUTC () const;
 
     /** Converts from UTC or GPS time to GPS. This operation does nothing to the fractional time
-        seconds, and is only valid for dates after 1-Jan-1980.
-        @return <tt>this</tt> if already in GPS, otherwise a new TimeStamp in UTC time representing
-                the same time.
-        @throws VRTException If the current time stamp is not GPS or UTC.
+     *  seconds, and is only valid for dates after 1-Jan-1980.
+     *  @return <tt>this</tt> if already in GPS, otherwise a new TimeStamp in UTC time representing
+     *          the same time.
+     *  @throws VRTException If the current time stamp is not GPS or UTC.
      */
     public: TimeStamp toGPS () const;
 
     /** Adds the specified number of seconds to the current time and returns the resulting time.
-        This is identical to <tt>addTime(sec,0L)</tt> except that it will not throw an exception if
-        {@link #getFractionalMode()} is not <tt>FractionalMode_RealTime</tt>.
-        @param sec The number of seconds.
-        @return A new time object representing the resulting time.
-        @throws VRTException If the {@link #getIntegerMode() } is not
-                <tt>IntegerMode_UTC</tt> or <tt>IntegerMode_GPS</tt> .
+     *  This is identical to <tt>addTime(sec,0L)</tt> except that it will not throw an exception if
+     *  {@link #getFractionalMode()} is not <tt>FractionalMode_RealTime</tt>.
+     *  @param sec The number of seconds.
+     *  @return A new time object representing the resulting time.
+     *  @throws VRTException If the {@link #getIntegerMode() } is not
+     *          <tt>IntegerMode_UTC</tt> or <tt>IntegerMode_GPS</tt> .
      */
     public: inline TimeStamp addSeconds (int64_t sec) const {
       return addTime(sec, __INT64_C(0), false);
     }
 
     /** Adds the specified number of picoseconds to the current time and returns the resulting time.
-        This is identical to <tt>addTime(0L,ps)</tt>.
-        @param ps The number of picoseconds.
-        @return A new time object representing the resulting time.
-        @throws VRTException If the {@link #getIntegerMode() } is not
-                <tt>IntegerMode_UTC</tt> or <tt>IntegerMode_GPS</tt> or if {@link #getFractionalMode()}
-                is not <tt>FractionalMode_RealTime</tt>.
+     *  This is identical to <tt>addTime(0L,ps)</tt>.
+     *  @param ps The number of picoseconds.
+     *  @return A new time object representing the resulting time.
+     *  @throws VRTException If the {@link #getIntegerMode() } is not
+     *          <tt>IntegerMode_UTC</tt> or <tt>IntegerMode_GPS</tt> or if {@link #getFractionalMode()}
+     *          is not <tt>FractionalMode_RealTime</tt>.
      */
     public: inline TimeStamp addPicoSeconds (int64_t ps) const {
-      return addTime(__INT64_C(0), ps, ONE_SEC, true);
+      if (tsfMode == FractionalMode_RealTime) {
+        return addTime(__INT64_C(0), ps, ONE_SEC, true);
+      }
+      throw VRTException("Can not add picoseconds to non-RealTime");
     }
 
     /** Adds the specified number of picoseconds to the current time and returns the resulting time.
-        This is identical to <tt>addTime(0L,ps)</tt>.
-        @param samples The number of samples.
-        @param sr      The sample rate.
-        @return A new time object representing the resulting time.
-        @throws VRTException If the {@link #getIntegerMode() } is not
-                <tt>IntegerMode_UTC</tt> or <tt>IntegerMode_GPS</tt> or if {@link #getFractionalMode()}
-                is not <tt>FractionalMode_RealTime</tt>.
+     *  This is identical to <tt>addTime(0L,ps)</tt>.
+     *  @param samples The number of samples.
+     *  @param _sr     The sample rate.
+     *  @return A new time object representing the resulting time.
+     *  @throws VRTException If the {@link #getIntegerMode() } is not
+     *          <tt>IntegerMode_UTC</tt> or <tt>IntegerMode_GPS</tt> or if {@link #getFractionalMode()}
+     *          is not <tt>FractionalMode_RealTime</tt> or <tt>FractionalMode_SampleCount</tt>.
      */
-    public: inline TimeStamp addSamples (int64_t samples, double sr) const {
-      return addTime(__INT64_C(0), samples, sr, true);
+    public: inline TimeStamp addSamples (int64_t samples, double _sr) const {
+      if (tsfMode == FractionalMode_SampleCount) {
+        return addTime(__INT64_C(0), samples, _sr, true);
+      }
+      else if (tsfMode == FractionalMode_RealTime) {
+        double dt = samples / _sr; // 1/seconds
+        return addPicoSeconds((int64_t)floor(dt * TimeStamp::ONE_SEC + 0.5));
+      }
+      throw VRTException("Can not add samples to non-(RealTime or SampleCount) to non GPS/UTC time");
     }
 
-
     /** Adds the specified number of picoseconds to the current time and returns the resulting time.
-        <pre>
-          r = t.addTime(sec, ps)
-          implies: r.getTimeStampInteger()    = t.getTimeStampInteger()    + sec
-                   r.getTimeStampFractional() = t.getTimeStampFractional() + ps
-        </pre>
-         Note that if the value of <tt>ps</tt> exceeds {@link #ONE_SEC}, the input parameters will
-        be normalized with:
-        <pre>
-          sec = (ps / ONE_SEC) + sec;
-          ps  = (ps % ONE_SEC);
-        </pre>
-        Note that subtracting time can be accomplished simply by calling <tt>addTime(-sec,-ps)</tt>.
-        Both <tt>sec</tt> and <tt>ps</tt> must be signed negative to accomplish the subtraction of
-        seconds+picoseconds. <br>
-        <br>
-        This method maintains the functionality that the following will all of the following are
-        equal (assuming time never exceeds 0xFFFFFFFF, not drops below the start of the epoch):
-        <pre>
-          r = t.addTime(a,b)
-          r = t.addTime(a,0L).addTime(0L,b)
-          r = t.addTime(0L,b).addTime(a,0L)
-        </pre>
-        @param sec The number of seconds.
-        @param ps  The number of picoseconds.
-        @return A new time object representing the resulting time.
-        @throws VRTException If the {@link #getIntegerMode()} is not <tt>IntegerMode_UTC</tt> or
-                             <tt>IntegerMode_GPS</tt> or if {@link #getFractionalMode()}
-                             is not <tt>FractionalMode_RealTime</tt>.
+     *  <pre>
+     *    r = t.addTime(sec, ps)
+     *    implies: r.getTimeStampInteger()    = t.getTimeStampInteger()    + sec
+     *             r.getTimeStampFractional() = t.getTimeStampFractional() + ps
+     *  </pre>
+     *  Note that if the value of <tt>ps</tt> exceeds {@link #ONE_SEC}, the input parameters will
+     *  be normalized with:
+     *  <pre>
+     *    sec = (ps / ONE_SEC) + sec;
+     *    ps  = (ps % ONE_SEC);
+     *  </pre>
+     *  Note that subtracting time can be accomplished simply by calling <tt>addTime(-sec,-ps)</tt>.
+     *  Both <tt>sec</tt> and <tt>ps</tt> must be signed negative to accomplish the subtraction of
+     *  seconds+picoseconds. <br>
+     *  <br>
+     *  This method maintains the functionality that the following will all of the following are
+     *  equal (assuming time never exceeds 0xFFFFFFFF, not drops below the start of the epoch):
+     *  <pre>
+     *    r = t.addTime(a,b)
+     *    r = t.addTime(a,0L).addTime(0L,b)
+     *    r = t.addTime(0L,b).addTime(a,0L)
+     *  </pre>
+     *  @param sec The number of seconds.
+     *  @param ps  The number of picoseconds.
+     *  @return A new time object representing the resulting time.
+     *  @throws VRTException If the {@link #getIntegerMode()} is not <tt>IntegerMode_UTC</tt> or
+     *                       <tt>IntegerMode_GPS</tt> or if {@link #getFractionalMode()}
+     *                       is not <tt>FractionalMode_RealTime</tt>.
      */
-
     public: inline TimeStamp addTime (int64_t sec, int64_t ps) const {
       return addTime(sec, ps, ONE_SEC, true);
     }
 
-    public: inline TimeStamp addTime (int64_t sec, int64_t fsec, double sr) const {
-      return addTime(sec, fsec, sr, true);
+    public: inline TimeStamp addTime (int64_t sec, int64_t fsec, double _sr) const {
+      return addTime(sec, fsec, _sr, true);
     }
 
     /** Internal method, flags if fractional is supported, if fract=false, ps must be 0L. */
     private: TimeStamp addTime (int64_t sec, int64_t fsec, double sr, bool fract) const;
 
     /** Compares time stamp values. If the time stamps have different epochs, this method will
-        attempt to convert both to GPS and will throw a {@link VRTException} if
-        unable to do so. If the fractioal time stamp values have a different reference, an
-        {@link VRTException} will be thrown. This method assumes that any
-        "wrap-arround" within the fractional time stamp is accounted for in the integral time stamp.
-        If two GPS/UTC times are compared, this will return 0 iff they represent exactly the same
-        instant in time.
-        @return <tt>&lt;0</tt> if <tt>this</tt> is comes before than <tt>other</tt>,
-                <tt>=0</tt> if <tt>this</tt> is comes at the same point as <tt>other</tt>,
-                <tt>&gt;0</tt> if <tt>this</tt> is comes after than <tt>other</tt>.
-        @throws VRTException If the current time stamp is not GPS or UTC.
+     *  attempt to convert both to GPS and will throw a {@link VRTException} if
+     *  unable to do so. If the fractional time stamp values have a different reference, an
+     *  {@link VRTException} will be thrown. This method assumes that any
+     *  "wrap-arround" within the fractional time stamp is accounted for in the integral time stamp.
+     *  If two GPS/UTC times are compared, this will return 0 iff they represent exactly the same
+     *  instant in time.
+     *  @return <tt>&lt;0</tt> if <tt>this</tt> is comes before than <tt>other</tt>,
+     *          <tt>=0</tt> if <tt>this</tt> is comes at the same point as <tt>other</tt>,
+     *          <tt>&gt;0</tt> if <tt>this</tt> is comes after than <tt>other</tt>.
+     *  @throws VRTException If the current time stamp is not GPS or UTC.
      */
     public: char compareTo (const TimeStamp &other) const;
 
+    using VRTObject::equals;
     /** Equals method that checks for strict equality. Two time stamps representing the same point
-        but using different epoch (UTC vs GPS) will not be considered equal.
-        @param ts The object to compare to this one.
-        @return <tt>true</tt> if exactly equal, <tt>false</tt> otherwise.
+     *  but using different epoch (UTC vs GPS) will not be considered equal.
+     *  @param ts The object to compare to this one.
+     *  @return <tt>true</tt> if exactly equal, <tt>false</tt> otherwise.
      */
     public: bool equals (const VRTObject &ts) const;
 
@@ -551,6 +584,7 @@ namespace vrt {
      */
     public: string toString () const;
 
+    /** <b>Internal Use Only (Experimental)</b> */
     public: string toStringUTC (string format) const;
 
     /** A textural representation of the time stamp in UTC. This is identical to the time stamp
@@ -568,15 +602,15 @@ namespace vrt {
     public: string toStringGPS () const;
 
     /** Gets the epoch used.
-     *  @return {@link #GPS_EPOCH} or {@link #UTC_EPOCH} or {@link #NULL_EPOCH} if neither apply. This will return
-     *          {@link #NULL_EPOCH} any time <tt>FractionalMode_SampleCount</tt> or <tt>FractionalMode_FreeRunningCount</tt>
-     *          is in use.
+     *  @return {@link #GPS_EPOCH} or {@link #UTC_EPOCH} or {@link #NULL_EPOCH} if neither apply.
+     *          This will return {@link #NULL_EPOCH} any time <tt>FractionalMode_SampleCount</tt>
+     *          or <tt>FractionalMode_FreeRunningCount</tt> is in use.
      *  @see #getIntegerMode()
      *  @see #getFractionalMode()
      */
     public: IntegerMode getEpoch () const;
 
-    /** Gets the time stamp mode used for integeral seconds.
+    /** Gets the time stamp mode used for integral seconds.
      *  @see #getTimeStampInteger()
      */
     public: inline IntegerMode getIntegerMode () const {
@@ -604,7 +638,7 @@ namespace vrt {
      *  @see #getUTCSeconds()
      */
     public: double getDoubleSeconds () const;
-    
+
     /** Gets the floating point time stamp in UTC seconds (if GPS it converts to UTC first) given a sampling rate.
      *  including fractional seconds.
      *  @param sr the sampling rate
@@ -725,7 +759,7 @@ namespace vrt {
     public: inline double getMidasSeconds () const {
       return (double)(getPOSIXSeconds() + MIDAS2POSIX);
     }
-    
+
     /** Gets the sample rate.
      *  @return the sample rate.
      */
@@ -743,7 +777,7 @@ namespace vrt {
      *  @throws VRTException If the fractional time stamp is not RealTime.
      */
     public: uint64_t getPicoSeconds () const;
-    
+
     /** Gets the fractional time stamp as a fraction of a second. This is
      *  identical to the following (done in double-precision):
      *  <pre>
@@ -789,96 +823,96 @@ namespace vrt {
     }
 
     /** Parses a time stamp in one of the ISO 8601 formats documented in <tt>parseTime(time, tsiMode, ls)</tt>.
-        @param time    The time string.
-        @param tsiMode The time epoch (must be <tt>IntegerMode_GPS</tt> or <tt>IntegerMode_UTC</tt>).
-        @return The parsed time stamp.
+     *  @param time     The time string.
+     *  @param _tsiMode The time epoch (must be <tt>IntegerMode_GPS</tt> or <tt>IntegerMode_UTC</tt>).
+     *  @return The parsed time stamp.
      */
-    public: static inline TimeStamp parseTime (string time, IntegerMode tsiMode) {
-      return parseTime(time, tsiMode, LeapSeconds::getDefaultInstance());
+    public: static inline TimeStamp parseTime (string time, IntegerMode _tsiMode) {
+      return parseTime(time, _tsiMode, LeapSeconds::getDefaultInstance());
     }
 
     /** Parses a time stamp in one of the following ISO 8601 formats.
-        <pre>
-          yyyy-mm-ddThh:mm:ss.sss        (TimeZone = +0 hours)
-          yyyy-mm-ddThh:mm:ss.sssZ       (TimeZone = +0 hours)
-          yyyy-mm-ddThh:mm:ss.sss+zz     (TimeZone = +zz hours)
-          yyyy-mm-ddThh:mm:ss.sss-zz     (TimeZone = -zz hours)
-          yyyy-mm-ddThh:mm:ss.sss+zz:zz  (TimeZone = +zz:zz hours)
-          yyyy-mm-ddThh:mm:ss.sss-zz:zz  (TimeZone = -zz:zz hours)
-        </pre>
-        @param time    The time string.
-        @param tsiMode The time epoch (must be <tt>IntegerMode_GPS</tt> or <tt>IntegerMode_UTC</tt>).
-        @param ls      The leap seconds instance to use.
-        @return The parsed time stamp.
+     *  <pre>
+     *    yyyy-mm-ddThh:mm:ss.sss        (TimeZone = +0 hours)
+     *    yyyy-mm-ddThh:mm:ss.sssZ       (TimeZone = +0 hours)
+     *    yyyy-mm-ddThh:mm:ss.sss+zz     (TimeZone = +zz hours)
+     *    yyyy-mm-ddThh:mm:ss.sss-zz     (TimeZone = -zz hours)
+     *    yyyy-mm-ddThh:mm:ss.sss+zz:zz  (TimeZone = +zz:zz hours)
+     *    yyyy-mm-ddThh:mm:ss.sss-zz:zz  (TimeZone = -zz:zz hours)
+     *  </pre>
+     *  @param time    The time string.
+     *  @param tsiMode The time epoch (must be <tt>IntegerMode_GPS</tt> or <tt>IntegerMode_UTC</tt>).
+     *  @param ls      The leap seconds instance to use.
+     *  @return The parsed time stamp.
      */
     public: static TimeStamp parseTime (string time, IntegerMode tsiMode, LeapSeconds *ls);
 
     /** Converts a time specifier to a time stamp.
-        @param year    The year (1981 to 2099).
-        @param mon     The month (1 to 12).
-        @param day     The day of month (1 to 31).
-        @param hour    The hour of day (0 to 23).
-        @param min     The minute of hour (0 to 59).
-        @param wsec    The whole seconds (0 to 60).
-        @param psec    Any picoseconds.
-        @param zone    The time-zone delta in seconds.
-        @param tsiMode The time epoch (must be <tt>IntegerMode_GPS</tt> or <tt>IntegerMode_UTC</tt>).
-        @return The time stamp.
+     *  @param year     The year (1981 to 2099).
+     *  @param mon      The month (1 to 12).
+     *  @param day      The day of month (1 to 31).
+     *  @param hour     The hour of day (0 to 23).
+     *  @param min      The minute of hour (0 to 59).
+     *  @param wsec     The whole seconds (0 to 60).
+     *  @param psec     Any picoseconds.
+     *  @param zone     The time-zone delta in seconds.
+     *  @param _tsiMode The time epoch (must be <tt>IntegerMode_GPS</tt> or <tt>IntegerMode_UTC</tt>).
+     *  @return The time stamp.
      */
     public: static inline TimeStamp forTime (int32_t year, int32_t mon, int32_t day, int32_t hour, int32_t min, int32_t wsec,
-                                             int64_t psec, int32_t zone, IntegerMode tsiMode) {
-      return forTime(year, mon, day, hour, min, wsec, psec, zone, tsiMode, LeapSeconds::getDefaultInstance());
+                                             int64_t psec, int32_t zone, IntegerMode _tsiMode) {
+      return forTime(year, mon, day, hour, min, wsec, psec, zone, _tsiMode, LeapSeconds::getDefaultInstance());
     }
 
     /** Converts a time specifier to a time stamp.
-        @param year    The year (1981 to 2099).
-        @param mon     The month (1 to 12).
-        @param day     The day of month (1 to 31).
-        @param hour    The hour of day (0 to 23).
-        @param min     The minute of hour (0 to 59).
-        @param wsec    The whole seconds (0 to 60).
-        @param psec    Any picoseconds.
-        @param zone    The time-zone delta in seconds.
-        @param tsiMode The time epoch (must be <tt>IntegerMode_GPS</tt> or <tt>IntegerMode_UTC</tt>).
-        @param ls      The leap seconds instance to use.
-        @return The time stamp.
+     *  @param year    The year (1981 to 2099).
+     *  @param mon     The month (1 to 12).
+     *  @param day     The day of month (1 to 31).
+     *  @param hour    The hour of day (0 to 23).
+     *  @param min     The minute of hour (0 to 59).
+     *  @param wsec    The whole seconds (0 to 60).
+     *  @param psec    Any picoseconds.
+     *  @param zone    The time-zone delta in seconds.
+     *  @param tsiMode The time epoch (must be <tt>IntegerMode_GPS</tt> or <tt>IntegerMode_UTC</tt>).
+     *  @param ls      The leap seconds instance to use.
+     *  @return The time stamp.
      */
     public: static TimeStamp forTime (int32_t year, int32_t mon, int32_t day, int32_t hour, int32_t min, int32_t wsec,
                                       int64_t psec, int32_t zone, IntegerMode tsiMode, LeapSeconds *ls);
 
 
     /** Creates a time stamp from a POSIX time. See lengthy discussion at top of
-        this class for details regarding POSIX to UTC conversions.
-        @param seconds     The number of whole seconds since the POSIX epoch.
-        @param picoseconds The number of picoseconds since the start of the current second.
-        @return The corresponding TimeStamp.
-        @throws VRTException if the time corresponds to a value prior to 1972/01/01.
+     *  this class for details regarding POSIX to UTC conversions.
+     *  @param seconds     The number of whole seconds since the POSIX epoch.
+     *  @param picoseconds The number of picoseconds since the start of the current second.
+     *  @return The corresponding TimeStamp.
+     *  @throws VRTException if the time corresponds to a value prior to 1972/01/01.
      */
     public: static inline TimeStamp forTimePOSIX (int64_t seconds, int64_t picoseconds) {
       return forTimePOSIX(seconds, picoseconds, LeapSeconds::getDefaultInstance());
     }
 
     /** Creates a time stamp from a POSIX time. See lengthy discussion at top of
-        this class for details regarding POSIX to UTC conversions.
-        @param seconds     The number of whole seconds since the POSIX epoch.
-        @param picoseconds The number of picoseconds since the start of the current second.
-        @param ls          The leap seconds instance to use (null to use default).
-        @return The corresponding TimeStamp.
-        @throws VRTException if the time corresponds to a value prior to 1972/01/01.
+     *  this class for details regarding POSIX to UTC conversions.
+     *  @param seconds     The number of whole seconds since the POSIX epoch.
+     *  @param picoseconds The number of picoseconds since the start of the current second.
+     *  @param ls          The leap seconds instance to use (null to use default).
+     *  @return The corresponding TimeStamp.
+     *  @throws VRTException if the time corresponds to a value prior to 1972/01/01.
      */
     public: static TimeStamp forTimePOSIX (int64_t seconds, int64_t picoseconds, LeapSeconds *ls);
 
     /** Creates a time stamp from a Midas time. This is identical to:
-        <pre>
-          forTimePOSIX(seconds - MIDAS2POSIX, ONE_SEC * fractionalSeconds)
-        </pre>
-        <b>WARNING: <tt>seconds</tt> must be an integral value and <tt>fractionalSeconds</tt>
-        must be a value on the range [0,1). Failure to follow this will result in undefined
-        behavior.</b>
-        @param seconds           The number of whole seconds since the Midas epoch.
-        @param fractionalSeconds The fractional seconds since the start of the current second.
-        @return The corresponding TimeStamp.
-        @throws VRTException if the time corresponds to a value prior to 1972/01/01.
+     *  <pre>
+     *    forTimePOSIX(seconds - MIDAS2POSIX, ONE_SEC * fractionalSeconds)
+     *  </pre>
+     *  <b>WARNING: <tt>seconds</tt> must be an integral value and <tt>fractionalSeconds</tt>
+     *  must be a value on the range [0,1). Failure to follow this will result in undefined
+     *  behavior.</b>
+     *  @param seconds           The number of whole seconds since the Midas epoch.
+     *  @param fractionalSeconds The fractional seconds since the start of the current second.
+     *  @return The corresponding TimeStamp.
+     *  @throws VRTException if the time corresponds to a value prior to 1972/01/01.
      */
     public: static inline TimeStamp forTimeMidas (double seconds, double fractionalSeconds) {
       return forTimePOSIX((int64_t)(seconds - MIDAS2POSIX),
@@ -886,103 +920,104 @@ namespace vrt {
     }
 
     /** Creates a time stamp from a Midas time. This is identical to:
-        <pre>
-          forTimePOSIX(seconds - MIDAS2POSIX, ONE_SEC * fractionalSeconds, ls)
-        </pre>
-        <b>WARNING: <tt>seconds</tt> must be an integral value and <tt>fractionalSeconds</tt>
-        must be a value on the range [0,1). Failure to follow this will result in undefined
-        behavior.</b>
-        @param seconds           The number of whole seconds since the Midas epoch.
-        @param fractionalSeconds The fractional seconds since the start of the current second.
-        @param ls                The leap seconds instance to use (null to use default).
-        @return The corresponding TimeStamp.
-        @throws VRTException if the time corresponds to a value prior to 1972/01/01.
+     *  <pre>
+     *    forTimePOSIX(seconds - MIDAS2POSIX, ONE_SEC * fractionalSeconds, ls)
+     *  </pre>
+     *  <b>WARNING: <tt>seconds</tt> must be an integral value and <tt>fractionalSeconds</tt>
+     *  must be a value on the range [0,1). Failure to follow this will result in undefined
+     *  behavior.</b>
+     *  @param seconds           The number of whole seconds since the Midas epoch.
+     *  @param fractionalSeconds The fractional seconds since the start of the current second.
+     *  @param _ls               The leap seconds instance to use (null to use default).
+     *  @return The corresponding TimeStamp.
+     *  @throws VRTException if the time corresponds to a value prior to 1972/01/01.
      */
-    public: static inline TimeStamp forTimeMidas (double seconds, double fractionalSeconds, LeapSeconds *ls) {
+    public: static inline TimeStamp forTimeMidas (double seconds, double fractionalSeconds, LeapSeconds *_ls) {
       return forTimePOSIX((int64_t)(seconds - MIDAS2POSIX),
                           (int64_t)(ONE_SEC * fractionalSeconds),
-                          ls);
+                          _ls);
     }
 
     /** Creates a GPS time stamp from a PTP time. This only supports times after 6 Jan 1980 since
-        there is a simple conversion from PTP to GPS time. It is possible to convert from PTP to UTC
-        for dates between 1 Jan 1972 (not 1 Jan 1970) and 6 Jan 1980, but it would add significant
-        complication to what is otherwise a trivial function that the compiler can easily in-line.
-        @param seconds     The number of whole seconds since the PTP epoch.
-        @param nanoseconds The number of nanoseconds since the start of the current second.
-        @return The corresponding TimeStamp.
-        @throws VRTException if the time corresponds to a value prior to 1980/01/06.
+     *  there is a simple conversion from PTP to GPS time. It is possible to convert from PTP to UTC
+     *  for dates between 1 Jan 1972 (not 1 Jan 1970) and 6 Jan 1980, but it would add significant
+     *  complication to what is otherwise a trivial function that the compiler can easily in-line.
+     *  @param seconds     The number of whole seconds since the PTP epoch.
+     *  @param nanoseconds The number of nanoseconds since the start of the current second.
+     *  @return The corresponding TimeStamp.
+     *  @throws VRTException if the time corresponds to a value prior to 1980/01/06.
      */
     public: static inline TimeStamp forTimePTP (int64_t seconds, int64_t nanoseconds) {
       return forTimePTP(seconds, nanoseconds, LeapSeconds::getDefaultInstance());
     }
 
     /** Creates a GPS time stamp from a PTP time. This only supports times after 6 Jan 1980 since
-        there is a simple conversion from PTP to GPS time. It is possible to convert from PTP to UTC
-        for dates between 1 Jan 1972 (not 1 Jan 1970) and 6 Jan 1980, but it would add significant
-        complication to what is otherwise a trivial function that the compiler can easily in-line.
-        @param seconds     The number of whole seconds since the PTP epoch.
-        @param nanoseconds The number of nanoseconds since the start of the current second.
-        @param ls          The leap seconds instance to use.
-        @return The corresponding TimeStamp.
-        @throws VRTException if the time corresponds to a value prior to 1980/01/06.
+     *  there is a simple conversion from PTP to GPS time. It is possible to convert from PTP to UTC
+     *  for dates between 1 Jan 1972 (not 1 Jan 1970) and 6 Jan 1980, but it would add significant
+     *  complication to what is otherwise a trivial function that the compiler can easily in-line.
+     *  @param seconds     The number of whole seconds since the PTP epoch.
+     *  @param nanoseconds The number of nanoseconds since the start of the current second.
+     *  @param _ls         The leap seconds instance to use.
+     *  @return The corresponding TimeStamp.
+     *  @throws VRTException if the time corresponds to a value prior to 1980/01/06.
      */
-    public: static inline TimeStamp forTimePTP (int64_t seconds, int64_t nanoseconds, LeapSeconds *ls) {
-      return TimeStamp(ls, IntegerMode_GPS, FractionalMode_RealTime, seconds-GPS2PTP, nanoseconds*1000);
+    public: static inline TimeStamp forTimePTP (int64_t seconds, int64_t nanoseconds, LeapSeconds *_ls) {
+      return TimeStamp(_ls, IntegerMode_GPS, FractionalMode_RealTime, (uint32_t)(seconds-GPS2PTP),
+                                                                     nanoseconds*1000);
     }
 
     /** Creates a time stamp from a NORAD time. The NORAD time epoch is measured in number of
-        1-second intervals elapsed since the start of the current UTC year; however, there is some
-        ambiguity as to whether a mid-year leap second is counted or not counted. This is the same
-        as <tt>forTimeNORAD(seconds, picoseconds, -1, null)</tt>
-        @param seconds     The number of whole seconds since the start of the year.
-        @param picoseconds The number of picoseconds since the start of the current second.
-        @param leapCounted Were any mid-year leap seconds counted (true) or skipped (false)? If this
-                           is _NULL, the value of <tt>VRTConfig::getNoradLeapSecCounted()</tt> is used.
-        @return The corresponding TimeStamp.
+     *  1-second intervals elapsed since the start of the current UTC year; however, there is some
+     *  ambiguity as to whether a mid-year leap second is counted or not counted. This is the same
+     *  as <tt>forTimeNORAD(seconds, picoseconds, -1, null)</tt>
+     *  @param seconds     The number of whole seconds since the start of the year.
+     *  @param picoseconds The number of picoseconds since the start of the current second.
+     *  @param leapCounted Were any mid-year leap seconds counted (true) or skipped (false)? If this
+     *                     is _NULL, the value of <tt>VRTConfig::getNoradLeapSecCounted()</tt> is used.
+     *  @return The corresponding TimeStamp.
      */
     public: static inline TimeStamp forTimeNORAD (int32_t seconds, int64_t picoseconds, boolNull leapCounted=_NULL) {
       return forTimeNORAD(seconds, picoseconds, leapCounted, -1, LeapSeconds::getDefaultInstance());
     }
 
     /** Creates a time stamp from a NORAD time. The NORAD time epoch is measured in number of
-        1-second intervals elapsed since the start of the current UTC year; however, there is some
-        ambiguity as to whether a mid-year leap second is counted or not counted. This is the same
-        as <tt>forTimeNORAD(seconds, picoseconds, _NULL, year, ls)</tt>
-        @param seconds     The number of whole seconds since the start of the year.
-        @param picoseconds The number of picoseconds since the start of the current second.
-        @param year        The year to use (-1 for automatic, otherwise after 1972).
-        @param ls          The leap seconds instance to use.
-        @return The corresponding TimeStamp.
+     *  1-second intervals elapsed since the start of the current UTC year; however, there is some
+     *  ambiguity as to whether a mid-year leap second is counted or not counted. This is the same
+     *  as <tt>forTimeNORAD(seconds, picoseconds, _NULL, year, ls)</tt>
+     *  @param seconds     The number of whole seconds since the start of the year.
+     *  @param picoseconds The number of picoseconds since the start of the current second.
+     *  @param year        The year to use (-1 for automatic, otherwise after 1972).
+     *  @param _ls         The leap seconds instance to use.
+     *  @return The corresponding TimeStamp.
      */
     public: static inline TimeStamp forTimeNORAD (int32_t seconds, int64_t picoseconds,
-                                                  int32_t year, LeapSeconds *ls) {
-      return forTimeNORAD(seconds, picoseconds, _NULL, year, ls);
+                                                  int32_t year, LeapSeconds *_ls) {
+      return forTimeNORAD(seconds, picoseconds, _NULL, year, _ls);
     }
-    
+
     /** Creates a time stamp from a NORAD time. The NORAD time epoch is measured in number of
-        1-second intervals elapsed since the start of the current UTC year; however, there is some
-        ambiguity as to whether a mid-year leap second is counted or not counted. At the time this
-        function was written (2011), it had been 14+ years since the last mid-year leap second, so
-        there is little reason to believe that past experience in this regard is a good indicator
-        of future behavior. <br>
-        <br>
-         <b>Automatic Year Setting:</b> When converting NORAD time to UTC, the number of UTC
-        seconds at the start of the current year is added in. If the year is not given (i.e. -1), the
-        current year is used. However, if a late-December time is seen in early-January, the previous
-        year is used. Similarly if an early-January time is seen in late-December, the subsequent year
-        is used. This is done to account for cases where data that is time-stamped at the end of one
-        year does not get processed until the beginning of the next year.
-        @param seconds     The number of whole seconds since the start of the year.
-        @param picoseconds The number of picoseconds since the start of the current second.
-        @param leapCounted Were any mid-year leap seconds counted (true) or skipped (false)? If this
-                           is _NULL, the value of <tt>VRTConfig::getNoradLeapSecCounted()</tt> is used.
-        @param year        The year to use (-1 for automatic, otherwise after 1972).
-        @param ls          The leap seconds instance to use.
-        @return The corresponding TimeStamp.
+     *  1-second intervals elapsed since the start of the current UTC year; however, there is some
+     *  ambiguity as to whether a mid-year leap second is counted or not counted. At the time this
+     *  function was written (2011), it had been 14+ years since the last mid-year leap second, so
+     *  there is little reason to believe that past experience in this regard is a good indicator
+     *  of future behavior. <br>
+     *  <br>
+     *  <b>Automatic Year Setting:</b> When converting NORAD time to UTC, the number of UTC
+     *  seconds at the start of the current year is added in. If the year is not given (i.e. -1), the
+     *  current year is used. However, if a late-December time is seen in early-January, the previous
+     *  year is used. Similarly if an early-January time is seen in late-December, the subsequent year
+     *  is used. This is done to account for cases where data that is time-stamped at the end of one
+     *  year does not get processed until the beginning of the next year.
+     *  @param seconds     The number of whole seconds since the start of the year.
+     *  @param picoseconds The number of picoseconds since the start of the current second.
+     *  @param leapCounted Were any mid-year leap seconds counted (true) or skipped (false)? If this
+     *                     is _NULL, the value of <tt>VRTConfig::getNoradLeapSecCounted()</tt> is used.
+     *  @param year        The year to use (-1 for automatic, otherwise after 1972).
+     *  @param _ls         The leap seconds instance to use.
+     *  @return The corresponding TimeStamp.
      */
     public: static inline TimeStamp forTimeNORAD (int32_t seconds, int64_t picoseconds, boolNull leapCounted,
-                                                  int32_t year, LeapSeconds *ls) {
+                                                  int32_t year, LeapSeconds *_ls) {
       bool _leapCounted;
       if (leapCounted == _NULL) {
         _leapCounted = VRTConfig::getNoradLeapSecCounted();
@@ -990,22 +1025,22 @@ namespace vrt {
       else {
         _leapCounted = (leapCounted == _TRUE);
       }
-      return _forTimeNORAD(seconds, picoseconds, _leapCounted, year, ls);
+      return _forTimeNORAD(seconds, picoseconds, _leapCounted, year, _ls);
     }
-    
+
     /** Same as above, but bool rather than boolNull. */
     private: static TimeStamp _forTimeNORAD (int32_t seconds, int64_t picoseconds, bool leapCounted,
                                              int32_t year, LeapSeconds *ls);
 
     /** Creates a time stamp from an IRIG time. This is the same as
-        <tt>forTimeIRIG(seconds,minutes,hours,days,0,LeapSeconds::getDefaultInstance())</tt>
-        @param seconds     The number of whole seconds since the start of the minute (0 to 59[+1]).
-        @param minutes     The number of whole minutes since the start of the hour   (0 to 59).
-        @param hours       The number of whole hours   since the start of the day    (0 to 23).
-        @param days        The number of whole days    since the start of the year   (0 to 365[+1])
-                           where 1=Jan1, 2=Jan2, ..., 32=Feb1, ...).
-        @return The corresponding TimeStamp.
-        @throws IllegalArgumentException If an invalid parameter is specified.
+     *  <tt>forTimeIRIG(seconds,minutes,hours,days,0,LeapSeconds::getDefaultInstance())</tt>
+     *  @param seconds     The number of whole seconds since the start of the minute (0 to 59[+1]).
+     *  @param minutes     The number of whole minutes since the start of the hour   (0 to 59).
+     *  @param hours       The number of whole hours   since the start of the day    (0 to 23).
+     *  @param days        The number of whole days    since the start of the year   (0 to 365[+1])
+     *                     where 1=Jan1, 2=Jan2, ..., 32=Feb1, ...).
+     *  @return The corresponding TimeStamp.
+     *  @throws IllegalArgumentException If an invalid parameter is specified.
      */
     public: static inline TimeStamp forTimeIRIG (int32_t seconds, int32_t minutes, int32_t hours,
                                                  int32_t days) {
@@ -1013,32 +1048,32 @@ namespace vrt {
     }
 
     /** Creates a time stamp from an IRIG time. This is the same as
-        <tt>forTimeIRIG(seconds,minutes,hours,days,0,ls)</tt>
-        @param seconds     The number of whole seconds since the start of the minute (0 to 59[+1]).
-        @param minutes     The number of whole minutes since the start of the hour   (0 to 59).
-        @param hours       The number of whole hours   since the start of the day    (0 to 23).
-        @param days        The number of whole days    since the start of the year   (0 to 365[+1])
-                           where 1=Jan1, 2=Jan2, ..., 32=Feb1, ...).
-        @param ls          The leap seconds instance to use (null to use default).
-        @return The corresponding TimeStamp.
-        @throws IllegalArgumentException If an invalid parameter is specified.
+     *  <tt>forTimeIRIG(seconds,minutes,hours,days,0,ls)</tt>
+     *  @param seconds     The number of whole seconds since the start of the minute (0 to 59[+1]).
+     *  @param minutes     The number of whole minutes since the start of the hour   (0 to 59).
+     *  @param hours       The number of whole hours   since the start of the day    (0 to 23).
+     *  @param days        The number of whole days    since the start of the year   (0 to 365[+1])
+     *                     where 1=Jan1, 2=Jan2, ..., 32=Feb1, ...).
+     *  @param _ls         The leap seconds instance to use (null to use default).
+     *  @return The corresponding TimeStamp.
+     *  @throws IllegalArgumentException If an invalid parameter is specified.
      */
     public: static inline TimeStamp forTimeIRIG (int32_t seconds, int32_t minutes, int32_t hours,
-                                                 int32_t days, LeapSeconds *ls) {
-      return forTimeIRIG(seconds,minutes,hours,days,0,ls);
+                                                 int32_t days, LeapSeconds *_ls) {
+      return forTimeIRIG(seconds,minutes,hours,days,0,_ls);
     }
 
     /** Creates a time stamp from an IRIG time. This is the same as
-        <tt>forTimeIRIG(seconds,minutes,hours,days,hundreths,LeapSeconds::getDefaultInstance())</tt>
-        @param seconds     The number of whole seconds since the start of the minute (0 to 59[+1]).
-        @param minutes     The number of whole minutes since the start of the hour   (0 to 59).
-        @param hours       The number of whole hours   since the start of the day    (0 to 23).
-        @param days        The number of whole days    since the start of the year   (0 to 365[+1])
-                           where 1=Jan1, 2=Jan2, ..., 32=Feb1, ...).
-        @param hundreths   The number of whole 1/100 seconds since the start of the current second
-                           (0 to 99).
-        @return The corresponding TimeStamp.
-        @throws IllegalArgumentException If an invalid parameter is specified.
+     *  <tt>forTimeIRIG(seconds,minutes,hours,days,hundreths,LeapSeconds::getDefaultInstance())</tt>
+     *  @param seconds     The number of whole seconds since the start of the minute (0 to 59[+1]).
+     *  @param minutes     The number of whole minutes since the start of the hour   (0 to 59).
+     *  @param hours       The number of whole hours   since the start of the day    (0 to 23).
+     *  @param days        The number of whole days    since the start of the year   (0 to 365[+1])
+     *                     where 1=Jan1, 2=Jan2, ..., 32=Feb1, ...).
+     *  @param hundreths   The number of whole 1/100 seconds since the start of the current second
+     *                     (0 to 99).
+     *  @return The corresponding TimeStamp.
+     *  @throws IllegalArgumentException If an invalid parameter is specified.
      */
     public: static inline TimeStamp forTimeIRIG (int32_t seconds, int32_t minutes, int32_t hours,
                                                  int32_t days, int32_t hundreths) {
@@ -1046,37 +1081,24 @@ namespace vrt {
     }
 
     /** Creates a time stamp from an IRIG time. This function implicitly knows that IRIG time
-        does not indicate if any mid-year leap-seconds that have occurred nor does it count them
-        (except in rare situations that the IRIG time stamp is seen as a leap-second is being
-        added [i.e. 23:59:60], in which case this function returns
-        <tt>forTimeIRIG(59,59,23,days,hundreths,ls).addSeconds(1)</tt>); as such, it always consults
-        the applicable leap-seconds table to check for scheduled mid-year leap-seconds.
-        @param seconds     The number of whole seconds since the start of the minute (0 to 59[+1]).
-        @param minutes     The number of whole minutes since the start of the hour   (0 to 59).
-        @param hours       The number of whole hours   since the start of the day    (0 to 23).
-        @param days        The number of whole days    since the start of the year   (0 to 365[+1])
-                           where 1=Jan1, 2=Jan2, ..., 32=Feb1, ...).
-        @param hundreths   The number of whole 1/100 seconds since the start of the current second
-                           (0 to 99).
-        @param ls          The leap seconds instance to use.
-        @return The corresponding TimeStamp.
-        @throws IllegalArgumentException If an invalid parameter is specified.
+     *  does not indicate if any mid-year leap-seconds that have occurred nor does it count them
+     *  (except in rare situations that the IRIG time stamp is seen as a leap-second is being
+     *  added [i.e. 23:59:60], in which case this function returns
+     *  <tt>forTimeIRIG(59,59,23,days,hundreths,ls).addSeconds(1)</tt>); as such, it always consults
+     *  the applicable leap-seconds table to check for scheduled mid-year leap-seconds.
+     *  @param seconds     The number of whole seconds since the start of the minute (0 to 59[+1]).
+     *  @param minutes     The number of whole minutes since the start of the hour   (0 to 59).
+     *  @param hours       The number of whole hours   since the start of the day    (0 to 23).
+     *  @param days        The number of whole days    since the start of the year   (0 to 365[+1])
+     *                     where 1=Jan1, 2=Jan2, ..., 32=Feb1, ...).
+     *  @param hundreths   The number of whole 1/100 seconds since the start of the current second
+     *                     (0 to 99).
+     *  @param ls          The leap seconds instance to use.
+     *  @return The corresponding TimeStamp.
+     *  @throws IllegalArgumentException If an invalid parameter is specified.
      */
     public: static TimeStamp forTimeIRIG (int32_t seconds, int32_t minutes, int32_t hours,
                                           int32_t days, int32_t hundreths, LeapSeconds *ls);
-
-    //////////////////////////////////////////////////////////////////////////////////////////////////
-    // DEPRECATED FUNCTIONS
-    //////////////////////////////////////////////////////////////////////////////////////////////////
-    /** @deprecated use forTimeNORAD(..) */
-    public: static inline TimeStamp forNoradTime (int32_t seconds, int64_t picoseconds) {
-      return forTimeNORAD(seconds, picoseconds, -1, LeapSeconds::getDefaultInstance());
-    }
-
-    /** @deprecated use forTimeNORAD(..) */
-    public: static inline TimeStamp forNoradTime (int32_t seconds, int64_t picoseconds, int32_t year, LeapSeconds *ls) {
-      return forTimeNORAD(seconds, picoseconds, year, ls);
-    }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // Implement HasFields
@@ -1084,30 +1106,94 @@ namespace vrt {
     public: virtual int32_t   getFieldCount () const;
     public: virtual string    getFieldName  (int32_t id) const;
     public: virtual ValueType getFieldType  (int32_t id) const;
-    public: virtual Value*    getField      (int32_t id) const;
+    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));
     public: virtual void      setField      (int32_t id, const Value* val);
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // DEPRECATED FUNCTIONS
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    /** @deprecated use forTimeNORAD(..) */
+    public: static inline __attribute__((deprecated)) __intelattr__((deprecated))
+            TimeStamp forNoradTime (int32_t seconds, int64_t picoseconds) {
+      return forTimeNORAD(seconds, picoseconds, -1, LeapSeconds::getDefaultInstance());
+    }
+
+    /** @deprecated use forTimeNORAD(..) */
+    public: static inline __attribute__((deprecated)) __intelattr__((deprecated))
+            TimeStamp forNoradTime (int32_t seconds, int64_t picoseconds, int32_t year, LeapSeconds *_ls) {
+      return forTimeNORAD(seconds, picoseconds, year, _ls);
+    }
   };
+
+  // See Utilities.c for function code
+  namespace Utilities {
+    /** Sleeps until the given system time and ignores any interrupted exceptions
+     *  (EINTR).
+     *  @param ts The time stamp to wait until.
+     */
+    void sleepUntil (TimeStamp ts);
+  }
 
   // See VRTMath.c for function code
   namespace VRTMath {
     /** Pack a VITA 49.0 time stamp into a buffer.
-        @param buf   byte array of data [OUTPUT]
-        @param off   Offset into array
-        @param val   value to pack [INPUT]
-        @param epoch The epoch to use (must be either <tt>IntegerMode_UTC</tt> or <tt>IntegerMode_GPS</tt>).
-        @param rep   The byte representation to use
+     *  @param ptr   Pointer to packed byte array [OUTPUT]
+     *  @param off   Offset into array
+     *  @param val   value to pack [INPUT]
+     *  @param epoch The epoch to use (must be either <tt>IntegerMode_UTC</tt> or <tt>IntegerMode_GPS</tt>).
+     *  @param rep   The byte representation to use
      */
-    void packTimeStamp (vector<char> &buf, int32_t off, const TimeStamp &val, IntegerMode epoch, ByteOrder rep=BIG_ENDIAN);
+    inline void packTimeStamp (void *ptr, int32_t off, const TimeStamp &val, IntegerMode epoch, ByteOrder rep=BIG_ENDIAN) {
+      // Since 'epoch' is usually passed as a constant, the code below should
+      // transform into a branchless two-liner when inlined at compile time.
+      if (epoch == IntegerMode_UTC) {
+        packInt(ptr, off, val.getSecondsUTC(), rep);
+        packLong(ptr, off+4, val.getPicoSeconds(), rep);
+      }
+      else if (epoch == IntegerMode_GPS) {
+        packInt(ptr, off, val.getSecondsGPS(), rep);
+        packLong(ptr, off+4, val.getPicoSeconds(), rep);
+      }
+      else {
+        throw VRTException("Unsupported epoch given, expected GPS or UTC");
+      }
+    }
+
+    /** Pack a VITA 49.0 time stamp into a buffer.
+     *  @param buf   byte array of data [OUTPUT]
+     *  @param off   Offset into array
+     *  @param val   value to pack [INPUT]
+     *  @param epoch The epoch to use (must be either <tt>IntegerMode_UTC</tt> or <tt>IntegerMode_GPS</tt>).
+     *  @param rep   The byte representation to use
+     */
+    inline void packTimeStamp (vector<char> &buf, int32_t off, const TimeStamp &val, IntegerMode epoch, ByteOrder rep=BIG_ENDIAN) {
+      packTimeStamp(&buf[0], off, val, epoch, rep);
+    }
 
     /** Unpack an VITA 49.0 time stamp from a buffer.
-        @param buf   byte array of data
-        @param off   Offset into array
-        @param epoch The epoch to use (must be either <tt>IntegerMode_UTC</tt> or <tt>IntegerMode_GPS</tt>).
-        @param rep   The byte representation to use
-        @return The unpacked value
+     *  @param ptr   pointer to byte array of data
+     *  @param off   Offset into array
+     *  @param epoch The epoch to use (must be either <tt>IntegerMode_UTC</tt> or <tt>IntegerMode_GPS</tt>).
+     *  @param rep   The byte representation to use
+     *  @return The unpacked value
      */
-    TimeStamp unpackTimeStamp (const vector<char> &buf, int32_t off, IntegerMode epoch, ByteOrder rep=BIG_ENDIAN);
-  };
+    inline TimeStamp unpackTimeStamp (const void *ptr, int32_t off, IntegerMode epoch, ByteOrder rep=BIG_ENDIAN) {
+      uint32_t sec = unpackUInt(ptr, off, rep);
+      uint64_t ps  = unpackULong(ptr, off+4, rep);
+      return TimeStamp(epoch, sec, ps);
+    }
+
+    /** Unpack an VITA 49.0 time stamp from a buffer.
+     *  @param buf   byte array of data
+     *  @param off   Offset into array
+     *  @param epoch The epoch to use (must be either <tt>IntegerMode_UTC</tt> or <tt>IntegerMode_GPS</tt>).
+     *  @param rep   The byte representation to use
+     *  @return The unpacked value
+     */
+    inline TimeStamp unpackTimeStamp (const vector<char> &buf, int32_t off, IntegerMode epoch, ByteOrder rep=BIG_ENDIAN) {
+      return unpackTimeStamp(&buf[0], off, epoch, rep);
+    }
+  } END_NAMESPACE
 
   /** Supports comparing two a {@link TimeStamp} values. This is identical to using
    *  <tt>a.compareTo(b) &lt; 0</tt>.
@@ -1133,5 +1219,5 @@ namespace vrt {
    *  <tt>a.compareTo(b) &gt; 0</tt>.
    */
   inline bool operator>  (const TimeStamp &a, const TimeStamp &b) { return a.compareTo(b) >  0; }
-};
+} END_NAMESPACE
 #endif /* _TimeStamp_h */

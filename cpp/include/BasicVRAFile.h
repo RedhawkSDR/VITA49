@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #ifndef _BasicVRAFile_h
@@ -96,7 +97,7 @@ namespace vrt {
      */
     FileMode_WriteSynchData            = 0x12
   };
-  
+
   /** Defines a VRA file type. The most frequently used implementations of interface
    *  this is {@link BasicVRAFile}. Most implementations that extend this class will
    *  only need to override the following methods:
@@ -109,22 +110,18 @@ namespace vrt {
    *    {@link #read}
    *    {@link #write}
    *  </pre>
-   *
-   *  @author 
    */
   class BasicVRAFile : public AbstractVRAFile {
     private: string    fname; // The file name (not in URI form)
     private: FILE     *file;  // The underlying file
     private: FileMode  mode;  // The underlying mode
-    
-    
-    
+
     /** Basic destructor for the class. */
     public: ~BasicVRAFile () { }
 
     /** Basic copy constructor for the class. */
     public: BasicVRAFile (const BasicVRAFile &f);
-    
+
     /** Creates a new instance for a local file on disk.
      *  @param fname      The file name.
      *  @param fmode      The mode to use when opening the file.
@@ -134,7 +131,7 @@ namespace vrt {
      */
     public: BasicVRAFile (string fname, FileMode fmode, bool isSetSize=false,
                           bool isSetCRC=false, bool isStrict=false);
-    
+
 
     protected: virtual void    open ();
     public:    virtual void    close ();
@@ -144,7 +141,7 @@ namespace vrt {
     protected: virtual int32_t read (int64_t off, void *ptr, int32_t len) const;
     protected: virtual void    write (int64_t off, void *ptr, int32_t len, bool flush);
   };
-};
+} END_NAMESPACE
 
 /** Supports appending a {@link FileMode} value to a string. */
 ostream& operator<< (ostream &s, vrt::FileMode mode);

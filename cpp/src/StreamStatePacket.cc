@@ -110,8 +110,8 @@ StreamStatePacket::StreamStatePacket () :
  // done
 }
 
-StreamStatePacket::StreamStatePacket (const vector<char> &bbuf, bool readOnly) :
-  BasicVRTPacket(bbuf, readOnly)
+StreamStatePacket::StreamStatePacket (const vector<char> &_bbuf, bool _readOnly) :
+  BasicVRTPacket(_bbuf, _readOnly)
 {
  // done
 }
@@ -159,7 +159,7 @@ void StreamStatePacket::toStringStream (ostringstream &str) const {
   str << " InputStatus=" << getInputStatus();
   str << " InternalStatus=" << getInternalStatus();
   str << " OutputStatus=" << getOutputStatus();
-  str << " Message='" << getMessage() << "'";
+  str << " Message='" << Utilities::fromUTF8(getMessage()) << "'";
 }
 
 int32_t StreamStatePacket::getFieldCount () const {

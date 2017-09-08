@@ -64,8 +64,8 @@ NoDataPacket::NoDataPacket () :
  // done
 }
 
-NoDataPacket::NoDataPacket (const vector<char> &bbuf, bool readOnly) :
-  BasicDataPacket(bbuf, readOnly)
+NoDataPacket::NoDataPacket (const vector<char> &_bbuf, bool _readOnly) :
+  BasicDataPacket(_bbuf, _readOnly)
 {
  // done
 }

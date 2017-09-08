@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,14 +11,16 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #include "LeapSeconds.h"
+#include "TimeStamp.h"
 #include "Utilities.h"
 #include <fstream>
 #include <iostream>
@@ -29,35 +31,23 @@
 using namespace std;
 using namespace vrt;
 
-LeapSeconds* LeapSeconds::defaultInstance;
+LeapSeconds* LeapSeconds::defaultInstance = NULL;
 
 static const size_t  PRE_1972_LENGTH    = 13;
-static const size_t  FIRST_LINES_LENGTH = 39;
+static const size_t  FIRST_LINES_LENGTH = 40;
 
 /** Day In Month map. Maps the day-of-year to the month that day falls in.
-    <pre>
-      NON-LEAP-YEARS:
-        (<i>day</i> &gt;= dim[0]) && (<i>day</i> &lt; dim[1])  --&gt; JAN
-        (<i>day</i> &gt;= dim[8]) && (<i>day</i> &lt; dim[9])  --&gt; SEP
-      LEAP-YEARS:
-        (<i>day</i> &gt;= dim[0+12]) && (<i>day</i> &lt; dim[1+12])  --&gt; JAN
-        (<i>day</i> &gt;= dim[8+12]) && (<i>day</i> &lt; dim[9+12])  --&gt; SEP
-    </pre>
+ *  <pre>
+ *    NON-LEAP-YEARS:
+ *      (<i>day</i> &gt;= dim[0]) && (<i>day</i> &lt; dim[1])  --&gt; JAN
+ *      (<i>day</i> &gt;= dim[8]) && (<i>day</i> &lt; dim[9])  --&gt; SEP
+ *    LEAP-YEARS:
+ *      (<i>day</i> &gt;= dim[0+12]) && (<i>day</i> &lt; dim[1+12])  --&gt; JAN
+ *      (<i>day</i> &gt;= dim[8+12]) && (<i>day</i> &lt; dim[9+12])  --&gt; SEP
+ *  </pre>
  */
 static const int32_t dim[24] = { 0,31,59,90,120,151,181,212,243,273,304,334,
                                  0,31,60,91,121,152,182,213,244,274,305,335 };
-
-/** Indicates if the given year is a leap year. The code for this method was copied from RFC 3339.
-    <pre>
-      Source: Klyne, et.al. "RFC 3339 / Date and Time on the Internet: Timestamps."
-              ITEF, July 2002. http://tools.ietf.org/html/rfc3339 (Retrieved 2007-06-15)
-    </pre>
-    @param year The year number.
-    @return true if it is a leap year, false otherwise.
- */
-static inline int32_t isLeapYear (int32_t year) {
-  return (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0));
-}
 
 static const double PRE_1972[] = {
   // START DATE    CONSTANT  OFFSET      SCALE
@@ -121,6 +111,7 @@ static const char FIRST_LINES[FIRST_LINES_LENGTH][128] = {
     " 2006 JAN  1 =JD 2453736.5  TAI-UTC=  33.0       S + (MJD - 41317.) X 0.0      S", // 36
     " 2009 JAN  1 =JD 2454832.5  TAI-UTC=  34.0       S + (MJD - 41317.) X 0.0      S", // 37
     " 2012 JUL  1 =JD 2456109.5  TAI-UTC=  35.0       S + (MJD - 41317.) X 0.0      S", // 38
+    " 2015 JUL  1 =JD 2457204.5  TAI-UTC=  36.0       S + (MJD - 41317.) X 0.0      S", // 39
 };
 
 int32_t LeapSeconds::ymdToGpsDay (int32_t year, int32_t month, int32_t day) {
@@ -135,15 +126,6 @@ int32_t LeapSeconds::ymdToPosixDay (int32_t year, int32_t month, int32_t day) {
                          : ((year-1950)*365 + (year+3)/4 - 7793 + (day + dim[month-1+ 0] - 1));
 }
 
-string YMDHMS::toString () const {
-  char str[40];
-  if ((int64_t)psec != -1)
-    snprintf(str, 40, "%.4d-%.2d-%.2dT%.2d:%.2d:%.2d.%.12" PRIu64 "Z", year, month, day, hour, min, sec, psec);
-  else
-    snprintf(str, 40, "%.4d-%.2d-%.2dT%.2d:%.2d:%.2d", year, month, day, hour, min, sec);
-  return string(str);
-}
-
 LeapSeconds::LeapSeconds () :
   startDatePOSIX(0),
   startDateUTC(0),
@@ -154,8 +136,8 @@ LeapSeconds::LeapSeconds () :
   // do nothing
 }
 
-
 LeapSeconds::LeapSeconds(const LeapSeconds &ls) :
+  VRTObject(ls), // <-- Used to avoid warnings under GCC with -Wextra turned on
   startDatePOSIX(ls.startDatePOSIX),
   startDateUTC(ls.startDateUTC),
   leapSeconds(ls.leapSeconds),
@@ -164,7 +146,6 @@ LeapSeconds::LeapSeconds(const LeapSeconds &ls) :
 {
   // do nothing
 }
-
 
 LeapSeconds::LeapSeconds (vector<int64_t> wsec, vector<int32_t> ls) :
   startDatePOSIX(ls.size()),
@@ -177,13 +158,13 @@ LeapSeconds::LeapSeconds (vector<int64_t> wsec, vector<int32_t> ls) :
     startDatePOSIX[i] = (int32_t)(wsec[i]);
     startDateUTC[i]   = (int32_t)(startDatePOSIX[i] + leapSeconds[i]);
   }
-  
+
   int32_t year  = 1972;
   int64_t posix = 365 * 2 * __INT64_C(86400); // start in 1972
   for (size_t i = 0; i < yearStartUTC.size(); i++) {
     yearStartPOSIX[i] = posix;
     yearStartUTC[i]   = posix + getLeapSecondsPOSIX(posix);
-    
+
     posix += (isLeapYear(year))? (366 * __INT64_C(86400))
                                : (365 * __INT64_C(86400));
     year  += 1;
@@ -193,7 +174,7 @@ LeapSeconds::LeapSeconds (vector<int64_t> wsec, vector<int32_t> ls) :
 LeapSeconds* LeapSeconds::getDefaultInstance () {
   if (defaultInstance == NULL) {
     string fname = VRTConfig::getLeapSecondsFile();
-    
+
     if (fname == "") {
       cout << "WARNING: No leap seconds file found at $VRT_LEAP_SECONDS or "
               "$VRTHOME/cpp_lib/tai-utc.dat, using built-in table." << endl;
@@ -218,12 +199,12 @@ LeapSeconds* LeapSeconds::getInstance (string fname) {
     }
   }
   else {
-  ifstream in(fname.c_str(), ifstream::in);
-  while (in.good()) {
-    in.getline(lines[len], 128);
-    if (strlen(lines[len]) > 0) len++;
-  }
-  in.close();
+    ifstream in(fname.c_str(), ifstream::in);
+    while (in.good()) {
+      in.getline(lines[len], 128);
+      if (strlen(lines[len]) > 0) len++;
+    }
+    in.close();
   }
 
   if (len < FIRST_LINES_LENGTH) {
@@ -264,21 +245,21 @@ LeapSeconds* LeapSeconds::getInstance (string fname) {
 }
 
 double LeapSeconds::getLeapSeconds (double wsec, double fsec) const {
-  int32_t posix = (int32_t)(wsec - J1970TOJ1950);
-    
+  int32_t posix = (int32_t)(wsec - TimeStamp::MIDAS2POSIX);
+
   if (posix >= startDatePOSIX[0]) {
     return getLeapSecondsPOSIX(posix);
   }
   if (posix == 0) {
     return 0.0; // common special-case where time is zero
   }
-    
+
   for (int32_t i = (PRE_1972_LENGTH*4)-4; i >= 0; i-=4) {
     if (PRE_1972[i] > wsec) continue;
     //     CONSTANT      + (wsec + fsec - OFFSET       ) * (SCALE         / SecondsPerDay)
     return PRE_1972[i+1] + (wsec + fsec - PRE_1972[i+2]) * (PRE_1972[i+3] / 86400.0      ) - 8.000082;
   }
-  
+
   // This should only hit for dates before 1961
   throw VRTException("Can not convert from TAI to UTC, dates before 1960/01/01 are not supported.");
 }
@@ -298,7 +279,7 @@ int32_t LeapSeconds::getLeapSecondsUTC (int64_t utc) const {
   }
   throw VRTException("Input time is before 1972/01/01.");
 }
-  
+
 int32_t LeapSeconds::getLeapSecondsPOSIX (int64_t posix) const {
   if (posix > __INT64_C(0xFFFFFFFF)) throw VRTException("Input time exceeds max value.");
 
@@ -317,7 +298,7 @@ int32_t LeapSeconds::getLeapSecondsPOSIX (int64_t posix) const {
 
 bool LeapSeconds::isLeapSecond (int64_t utc) const {
   if (utc > __INT64_C(0xFFFFFFFF)) throw VRTException("Input time exceeds max value.");
-  
+
   if ((utc == 0) || (utc >= startDateUTC[startDateUTC.size()-1])) {
     // the two most common cases, and they are both false
     return false;
@@ -338,85 +319,163 @@ int32_t LeapSeconds::getYear (int64_t utc) const {
   return (i >= 0)? 1972+i : 1972+(-i)-2;
 }
 
-int32_t LeapSeconds::getMonth (int64_t utc) const {
+int32_t LeapSeconds::getMonth (int32_t year, int64_t utc) const {
   if (utc == 0) return 1; // special case (date not yet initialized, use 1970-01-01T00:00:00)
-
-  int32_t year = getYear(utc);
 
   for (int32_t mon = 2; mon <= 12; mon++) {
     if (utc < getStartOfMonth(year,mon)) return mon-1;
   }
   return 12;
 }
-  
+
 int64_t LeapSeconds::getStartOfMonth (int32_t year, int32_t mon) const {
   int64_t monthStartPOSIX = ymdToPosixDay(year, mon, 1)*86400L;
   int64_t monthStartUTC   = monthStartPOSIX + getLeapSecondsPOSIX(monthStartPOSIX);
   return monthStartUTC;
 }
-  
+
 int64_t LeapSeconds::getStartOfYearUTC (int32_t year) const {
   if (year < 1972) throw VRTException("Year look-up with leap seconds not valid before 1972");
   if (year > 2106) throw VRTException("Year look-up with leap seconds not valid after 2106");
   return yearStartUTC[year - 1972];
 }
-  
+
 int64_t LeapSeconds::getStartOfYearPOSIX (int32_t year) const {
   if (year < 1972) throw VRTException("Year look-up with leap seconds not valid before 1972");
   if (year > 2106) throw VRTException("Year look-up with leap seconds not valid after 2106");
   return yearStartPOSIX[year - 1972];
 }
 
-YMDHMS LeapSeconds::utcToYMDHMS (int64_t seconds, int64_t picoseconds) const {
-  YMDHMS ymdhms;
-  int32_t sec;
-
+string LeapSeconds::toStringUTC (int64_t seconds, int64_t picoseconds) const {
   if (isLeapSecond(seconds)) {
-    ymdhms.year  = getYear(seconds);
-    ymdhms.month = getMonth(seconds);      sec = (int32_t)(seconds - getStartOfMonth(ymdhms.year, ymdhms.month));
-    ymdhms.day   = ((sec-1) / 86400) + 1;
-    ymdhms.hour  = 23;
-    ymdhms.min   = 59;
-    ymdhms.sec   = 60;
-    ymdhms.psec  = picoseconds;
+    int32_t year  = getYear(seconds);
+    int32_t month = getMonth(year,seconds);
+    int32_t sec   = (int32_t)(seconds - getStartOfMonth(year,month));
+    int32_t day   = ((sec-1) / 86400) + 1;
+    return toString(year, month, day, 23, 59, 60, picoseconds);
   }
   else {
-    ymdhms.year  = getYear(seconds);
-    ymdhms.month = getMonth(seconds);      sec = (int32_t)(seconds - getStartOfMonth(ymdhms.year, ymdhms.month));
-    ymdhms.day   = (sec / 86400) + 1;      sec = sec - (ymdhms.day-1) * 86400;
-    ymdhms.hour  = sec / 3600;             sec = sec - ymdhms.hour    * 3600;
-    ymdhms.min   = sec / 60;               sec = sec - ymdhms.min     * 60;
-    ymdhms.sec   = sec;
-    ymdhms.psec  = picoseconds;
+    int32_t year  = getYear(seconds);
+    int32_t month = getMonth(year,seconds);
+    int32_t sec   = (int32_t)(seconds - getStartOfMonth(year,month));
+    int32_t day   = (sec / 86400) + 1;      sec = sec - (day-1) * 86400;
+    int32_t hour  = sec / 3600;             sec = sec - hour    * 3600;
+    int32_t min   = sec / 60;               sec = sec - min     * 60;
+    return toString(year, month, day, hour, min, sec, picoseconds);
   }
-  return ymdhms;
 }
 
-YMDHMS LeapSeconds::gpsToYMDHMS (int64_t seconds, int64_t picoseconds) {
-  // JC4: This method doesn't really belong here, I just didn't know where to put it.
-  YMDHMS ymdhms;
+string LeapSeconds::toStringGPS (int64_t seconds, int64_t picoseconds) {
+  // This function was re-written in Dec 2013 due to it having shown up as a
+  // performance hot-spot. The new version is branch-free (except for the one
+  // branch in toString(..), uses only integer math, and minimizes the number
+  // of function calls used.
+  int32_t sec   = (int32_t)(seconds % 86400);
+  int32_t hour  = sec / 3600; sec = sec - hour * 3600;
+  int32_t min   = sec / 60;   sec = sec - min  * 60;
 
-  int32_t days = (int32_t)(seconds / 86400);
-  int32_t sec  = (int32_t)(seconds % 86400);
-  int32_t year = (int32_t)((days+723199.5)/365.25 + .002);
-  int32_t doy  = days - ymdToGpsDay(year, 1, 1);
-  int32_t mon  = (isLeapYear(year))? 23: 11;
-  while (dim[mon] > doy) mon--;
+  // This takes advantage of there being 1461 days in every 4-year period. Unlike
+  // the more intuitive version of this equation, this needs to use a value for
+  // d that is offset differently to account for 0=6 Jan 1980 (not 1 Jan 1980)
+  // and to account for the first year being a leap-year.
+  int32_t days  = (int32_t)(seconds / 86400);
+  int32_t d     = days + 4;
+  int32_t year  = 1980 + (d / 1461) * 4 + ((d % 1461) / 365);  // year number
+  int32_t soy   = ((year - 1977) / 4) + ((year - 1980) * 365); // start-of-year where 0=1 Jan 1980
+  int32_t doy   = d - soy + 2;
 
-  ymdhms.year  = year;
-  ymdhms.month = (mon < 12)? mon+1: mon-11;
-  ymdhms.day   = doy - dim[mon] + 1;
-  ymdhms.hour  = sec / 3600;                       sec = sec - ymdhms.hour * 3600;
-  ymdhms.min   = sec / 60;                         sec = sec - ymdhms.min  * 60;
-  ymdhms.sec   = sec;
-  ymdhms.psec  = picoseconds;
+  // Offset the day-of-year such that 0=1 Mar and Jan & Feb are the last months
+  // (or 13 & 14). This way 29 Feb will be at the end (if present) and we can
+  // make use of the fact that between March and January every 5-month interval
+  // has 153 days. Note that these computations only work with strict integer
+  // math where any fractional artifacts of the division operations are discarded.
+  //
+  // Note that the "(bool)? 1 : 0" construct is a special one in many compilers
+  // (including Java HotSpot) since it can strip the branch out if the boolean
+  // value is already stored in the register as a 1 or 0.
+  //
+  // The mask + ddd construct used below is the branch-free form of:
+  //   int ddd = (doy < cutOff)? doy + 305 : doy - cutOff;
+  int32_t cutOff     = 60 + ((isLeapYear(year))? 1 : 0);
+  int32_t mask       = (doy - cutOff) >> 31;
+  int32_t ddd        = doy + (305 & mask) + (-cutOff & ~mask);
+  int32_t m          = (5*ddd + 2) / 153;      // Month number if counting from March
+  int32_t monthStart = (153*m + 2) / 5;        // DoY for month start where 0=1 March
+  int32_t dayOfMon   = ddd - monthStart + 1;   // Normal day-of-month
+  int32_t monOfYear  = ((m+2) % 12) + 1;       // Normal month-of-year (1=Jan)
 
-  return ymdhms;
+  return toString(year, monOfYear, dayOfMon, hour, min, sec, picoseconds);
 }
+
+
+/** Writes a set of picoseconds to a string in the form ".00000000000". */
+char* LeapSeconds::writePicoseconds (char *str, int32_t off, int64_t psec) {
+  str[off   ] = '.';
+  str[off+ 1] = (char)('0' + ((psec / __INT64_C(100000000000)) % 10));
+  str[off+ 2] = (char)('0' + ((psec / __INT64_C( 10000000000)) % 10));
+  str[off+ 3] = (char)('0' + ((psec / __INT64_C(  1000000000)) % 10));
+  str[off+ 4] = (char)('0' + ((psec / __INT64_C(   100000000)) % 10));
+  str[off+ 5] = (char)('0' + ((psec / __INT64_C(    10000000)) % 10));
+  str[off+ 6] = (char)('0' + ((psec / __INT64_C(     1000000)) % 10));
+  str[off+ 7] = (char)('0' + ((psec / __INT64_C(      100000)) % 10));
+  str[off+ 8] = (char)('0' + ((psec / __INT64_C(       10000)) % 10));
+  str[off+ 9] = (char)('0' + ((psec / __INT64_C(        1000)) % 10));
+  str[off+10] = (char)('0' + ((psec / __INT64_C(         100)) % 10));
+  str[off+11] = (char)('0' + ((psec / __INT64_C(          10)) % 10));
+  str[off+12] = (char)('0' + ((psec                          ) % 10));
+  return str;
+}
+
+/** Converts a set of picoseconds to a string in the form "0.00000000000". */
+string LeapSeconds::toPicosecondString (int64_t psec) {
+  char str[15];
+  str[ 0] = '0';
+  str[14] = '\0';
+  return writePicoseconds(str, 1, psec);
+}
+
+/** Converts date/time to string. (psec=-1L to ignore) */
+string LeapSeconds::toString (int32_t year, int32_t month, int32_t day,
+                              int32_t hour, int32_t min, int32_t sec, int64_t psec) {
+  char str[(psec >= 0)? 34 : 21];
+
+  if (psec >= 0) {
+    writePicoseconds(str, 19, psec);
+    str[32] = 'Z';
+    str[33] = '\0';
+  }
+  else {
+    str[19] = 'Z';
+    str[20] = '\0';
+  }
+
+  str[ 0] = (char)('0' + ((year  / 1000)     ));
+  str[ 1] = (char)('0' + ((year  /  100) % 10));
+  str[ 2] = (char)('0' + ((year  /   10) % 10));
+  str[ 3] = (char)('0' + ((year        ) % 10));
+  str[ 4] = '-';
+  str[ 5] = (char)('0' + ((month /   10)     ));
+  str[ 6] = (char)('0' + ((month       ) % 10));
+  str[ 7] = '-';
+  str[ 8] = (char)('0' + ((day   /   10)     ));
+  str[ 9] = (char)('0' + ((day         ) % 10));
+  str[10] = 'T';
+  str[11] = (char)('0' + ((hour  /   10)     ));
+  str[12] = (char)('0' + ((hour        ) % 10));
+  str[13] = ':';
+  str[14] = (char)('0' + ((min   /   10)     ));
+  str[15] = (char)('0' + ((min         ) % 10));
+  str[16] = ':';
+  str[17] = (char)('0' + ((sec   /   10)     ));
+  str[18] = (char)('0' + ((sec         ) % 10));
+
+  return str;
+}
+
 
 bool LeapSeconds::equals (const VRTObject &o) const {
   if (getClass() != o.getClass()) return false;
-  
+
   LeapSeconds ls = *checked_dynamic_cast<const LeapSeconds*>(&o);
   return (startDatePOSIX == ls.startDatePOSIX)
       && (startDateUTC   == ls.startDateUTC  )

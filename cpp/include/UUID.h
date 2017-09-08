@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -11,11 +11,12 @@
  *
  * REDHAWK is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
  * for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * along with this program. If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #ifndef _UUID_h
@@ -58,7 +59,6 @@ namespace vrt {
    *      Internal UUID library (no gen):   setenv INTERNAL_UUID_LIB 1
    *      Internal UUID library (random):   setenv INTERNAL_UUID_LIB 2
    *  </pre>
-   *  @author 
    */
   class UUID : public VRTObject, public HasFields {
     /** The 128-bit UUID. */
@@ -84,8 +84,9 @@ namespace vrt {
     /** A UUID is considered null if all bits are set to 0 (this is not a valid UUID). */
     public: virtual bool isNullValue () const;
 
+    using VRTObject::equals;
     public: virtual bool equals (const VRTObject &o) const;
-    
+
     /** Checks to see if two UUIDs are equal. */
     public: virtual bool equals (const UUID &uuid) const;
 
@@ -114,37 +115,62 @@ namespace vrt {
 
     /** Sets the 16-byte UUID value from the given buffer. */
     public: void setUUID (const string &uuid);
-    
+
+    /** Sets the 16-byte UUID value from the given buffer. */
+    public: void setUUID (const char *uuid);
+
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // Implement HasFields
     //////////////////////////////////////////////////////////////////////////////////////////////////
     public: virtual int32_t   getFieldCount () const;
     public: virtual string    getFieldName  (int32_t id) const;
     public: virtual ValueType getFieldType  (int32_t id) const;
-    public: virtual Value*    getField      (int32_t id) const;
+    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));
     public: virtual void      setField      (int32_t id, const Value* val);
   };
 
   namespace VRTMath {
     /** Pack a 16-byte UUID into a buffer.
-        @param buf   byte array of data [OUTPUT]
-        @param off   Offset into array
-        @param val   value to pack [INPUT]
+     *  @param ptr   Pointer to packed byte array [OUTPUT]
+     *  @param off   Offset into array
+     *  @param val   value to pack [INPUT]
+     */
+    inline void packUUID (void *ptr, int32_t off, const UUID &val) {
+      char *buf = (char*)ptr;
+      val.getValue(&buf[off]);
+    }
+
+    /** Pack a 16-byte UUID into a buffer.
+     *  @param buf   byte array of data [OUTPUT]
+     *  @param off   Offset into array
+     *  @param val   value to pack [INPUT]
      */
     inline void packUUID (vector<char> &buf, int32_t off, const UUID &val) {
       val.getValue(&buf[off]);
     }
 
     /** Unpack a 16-byte UUID from a buffer.
-        @param buf   byte array of data
-        @param off   Offset into array
-        @return The unpacked value
+     *  @param ptr   pointer to byte array of data
+     *  @param off   Offset into array
+     *  @return The unpacked value
+     */
+    inline UUID unpackUUID (const void *ptr, int32_t off) {
+      const char *buf = (const char*)ptr;
+      UUID val;
+      val.setValue(&buf[off]);
+      return val;
+    }
+
+    /** Unpack a 16-byte UUID from a buffer.
+     *  @param buf   byte array of data
+     *  @param off   Offset into array
+     *  @return The unpacked value
      */
     inline UUID unpackUUID (const vector<char> &buf, int32_t off) {
       UUID val;
       val.setValue(&buf[off]);
       return val;
     }
-  };
-};
+  } END_NAMESPACE
+} END_NAMESPACE
 #endif /* _UUID_h */
