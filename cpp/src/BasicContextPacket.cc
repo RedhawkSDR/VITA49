@@ -23,7 +23,7 @@
 #include <bitset> // includes the popcount functions
 
 using namespace vrt;
-using namespace private_BasicContextPacket;
+using namespace IndicatorFields;
 
 /** Basic population count. This algorithm comes from [1] and is believed to be
  *  nearly-identical to what is being done in Java. The use of GCC's
@@ -60,10 +60,10 @@ static inline int32_t bitCount (int32_t val) {
  */
 static inline vector<char> BasicContextPacket_createDefaultPacket () {
   vector<char> buf(BasicVRTPacket::MAX_HEADER_LENGTH + 4);
-  buf[0] = 0x48;
-  buf[1] = 0x60;
-  buf[2] = 0x00;
-  buf[3] = 0x08;
+  buf[0] = 0x48; // Context w/ CID, TSM=0
+  buf[1] = 0x60; // TSI: UTC, TSF: Real-Time (ps) fractional timestamp, packet count =0
+  buf[2] = 0x00; // 
+  buf[3] = 0x08; // Packet size = 8
   return buf;
 }
 
@@ -129,8 +129,10 @@ BasicContextPacket::BasicContextPacket () :
   // done
 }
 
+// TODO - update with more CIFs
 void BasicContextPacket::toStringStream (ostringstream &str) const {
   BasicVRTPacket::toStringStream(str);
+  //Utilities::append(str, " ChangePacket="            ,IndicatorFieldProvider::isChangePacket()             );
   Utilities::append(str, " ChangePacket="            ,isChangePacket()             );
   Utilities::append(str, " ReferencePointIdentifier=",getReferencePointIdentifier());
   Utilities::append(str, " Bandwidth="               ,getBandwidth()         ,"Hz" );
@@ -164,8 +166,11 @@ void BasicContextPacket::toStringStream (ostringstream &str) const {
   Utilities::append(str, " EphemerisReference={"     ,getEphemerisReference()  ,"}");
   Utilities::append(str, " GeoSentences={"           ,getGeoSentences()        ,"}");
   Utilities::append(str, " ContextAssocLists={"      ,getContextAssocLists()   ,"}");
+  // ...
+  Utilities::append(str, " ModeID={"                 ,getModeID()              ,"}");
 }
 
+// TODO - update for additional CIFs
 bool BasicContextPacket::resetForResend (const TimeStamp &t) {
   BasicVRTPacket::resetForResend(t);
   setChangePacket(false);
@@ -175,9 +180,34 @@ bool BasicContextPacket::resetForResend (const TimeStamp &t) {
   return true;
 }
 
-void BasicContextPacket::setRecord (int32_t bit, const Record *val, int32_t oldLen) {
+// This is the State and Event Indicator, which has the same format as the Trailer for Data/ExtData packets
+// The trailer function is leveraged to eliminate duplicate code.
+boolNull BasicContextPacket::getStateEventBit (int32_t enable, int32_t indicator) const {
+  //int32_t off = IndicatorFieldProvider::getOffset(STATE_EVENT);
+  int32_t off = getOffset(0, protected_CIF0::STATE_EVENT_mask);
+  if (off < 0) return _NULL;
+  // Note: offset passed to BasicVRTPacket is from start of bbuf
+  return BasicVRTPacket::getStateEventBit(bbuf, off+getPrologueLength(), enable, indicator);
+}
+
+// This is the State and Event Indicator, which has the same format as the Trailer for Data/ExtData packets
+// The trailer function is leveraged to eliminate duplicate code.
+void BasicContextPacket::setStateEventBit (int32_t enable, int32_t indicator, boolNull value) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  int32_t off = getOffset(bit);
+  //int32_t off = IndicatorFieldProvider::getOffset(STATE_EVENT);
+  int32_t off = getOffset(0, protected_CIF0::STATE_EVENT_mask);
+  if (off < 0) {
+    if (value == _NULL) return; // no State and Event Indicator, no need to set to null
+    setContextIndicatorFieldBit(STATE_EVENT, true);
+    off = shiftPayload(off, 4, true);
+  }
+  // Note: offset passed to BasicVRTPacket is from start of bbuf
+  BasicVRTPacket::setStateEventBit(bbuf, off+getPrologueLength(), enable, indicator, value);
+}
+
+void BasicContextPacket::setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen) {
+  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
+  int32_t off = getOffset(cifNum, bit);
 
   if ((val == NULL) && (off < 0)) return; // not present, no change
 
@@ -189,144 +219,287 @@ void BasicContextPacket::setRecord (int32_t bit, const Record *val, int32_t oldL
   else {
     if (off >= 0) {
       // remove the old one
-      setContextIndicatorFieldBit(bit, false);
+      setContextIndicatorFieldBit(cifNum, bit, false);
       shiftPayload(off, oldLen, false);
       off = -off;
     }
 
     if (val != NULL) {
-      setContextIndicatorFieldBit(bit, true);
+      setContextIndicatorFieldBit(cifNum, bit, true);
       off = shiftPayload(off, newLen, true);
       packPayloadRecord(off, *val);
     }
   }
 }
 
-void BasicContextPacket::setContextIndicatorFieldBit (int32_t bit, bool set) {
-  int32_t cif = getContextIndicatorField();
+void BasicContextPacket::setContextIndicatorField0Bit (int32_t bit, bool set, bool occurrence) {
+  UNUSED_VARIABLE(occurrence);
+  int32_t cif0 = getContextIndicatorField0();
   int32_t val;
 
-  if (set) val = cif | bit;
-  else     val = cif & ~bit;
+  if (set) val = cif0 | bit;
+  else     val = cif0 & ~bit;
 
-  if (val != cif) {
-    VRTMath::packInt(bbuf, getHeaderLength(), val);
+  if (val != cif0) {
+    VRTMath::packInt(bbuf, getPrologueLength(), val);
+  }
+}
+void BasicContextPacket::setContextIndicatorField1Bit (int32_t bit, bool set, bool occurrence) {
+  UNUSED_VARIABLE(occurrence);
+  if (!isCIF1Enable()) throw VRTException("Context Indicator Field 1 not enabled.");
+  int32_t cif1 = getContextIndicatorField1();
+  int32_t val;
+
+  if (set) val = cif1 | bit;
+  else     val = cif1 & ~bit;
+
+  if (val != cif1) {
+    VRTMath::packInt(bbuf, getPrologueLength()+4, val);
+  }
+}
+void BasicContextPacket::setContextIndicatorField2Bit (int32_t bit, bool set, bool occurrence) {
+  UNUSED_VARIABLE(occurrence);
+  if (!isCIF2Enable()) throw VRTException("Context Indicator Field 2 not enabled.");
+  int32_t cif2 = getContextIndicatorField2();
+  int32_t val;
+
+  if (set) val = cif2 | bit;
+  else     val = cif2 & ~bit;
+
+  if (val != cif2) {
+    int32_t off = 0;
+    if (isCIF1Enable()) off+=4;
+    VRTMath::packInt(bbuf, getPrologueLength()+4+off, val);
+  }
+}
+void BasicContextPacket::setContextIndicatorField3Bit (int32_t bit, bool set, bool occurrence) {
+  UNUSED_VARIABLE(occurrence);
+  if (!isCIF3Enable()) throw VRTException("Context Indicator Field 3 not enabled.");
+  int32_t cif3 = getContextIndicatorField3();
+  int32_t val;
+
+  if (set) val = cif3 | bit;
+  else     val = cif3 & ~bit;
+
+  if (val != cif3) {
+    int32_t off = 0;
+    if (isCIF1Enable()) off+=4;
+    if (isCIF2Enable()) off+=4;
+    VRTMath::packInt(bbuf, getPrologueLength()+4+off, val);
+  }
+}
+void BasicContextPacket::setContextIndicatorField7Bit (int32_t bit, bool set, bool occurrence) {
+  UNUSED_VARIABLE(occurrence);
+  if (!isCIF7Enable()) throw VRTException("Context Indicator Field 7 not enabled.");
+  int32_t cif7 = getContextIndicatorField7();
+  int32_t val;
+
+  if (set) val = cif7 | bit;
+  else     val = cif7 & ~bit;
+
+  if (val != cif7) {
+    int32_t off = 0;
+    if (isCIF1Enable()) off+=4;
+    if (isCIF2Enable()) off+=4;
+    if (isCIF3Enable()) off+=4;
+    VRTMath::packInt(bbuf, getPrologueLength()+4+off, val);
   }
 }
 
-int8_t BasicContextPacket::getB (int32_t bit, int32_t xoff) const {
-  int32_t off = getOffset(bit);
+void BasicContextPacket::addCIF1 (bool add, bool occurrence) {
+  UNUSED_VARIABLE(occurrence);
+  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
+  if (isCIF1Enable() == add) return; // Nothing to do
+
+  setContextIndicatorField0Bit(protected_CIF0::CIF1_ENABLE_mask, add);
+
+  int32_t off = 4; // CIF0
+  if (add) off = -off; // negative if doesn't exist
+  off = shiftPayload(off, 4, add);
+}
+
+void BasicContextPacket::addCIF2 (bool add, bool occurrence) {
+  UNUSED_VARIABLE(occurrence);
+  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
+  if (isCIF2Enable() == add) return; // Nothing to do
+
+  setContextIndicatorField0Bit(protected_CIF0::CIF2_ENABLE_mask, add);
+
+  int32_t off = 4; // CIF0
+  if (isCIF1Enable()) off+=4;
+  if (add) off = -off; // negative if doesn't exist
+  off = shiftPayload(off, 4, add);
+}
+
+void BasicContextPacket::addCIF3 (bool add, bool occurrence) {
+  UNUSED_VARIABLE(occurrence);
+  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
+  if (isCIF3Enable() == add) return; // Nothing to do
+
+  setContextIndicatorField0Bit(protected_CIF0::CIF3_ENABLE_mask, add);
+
+  int32_t off = 4; // CIF0
+  if (isCIF1Enable()) off+=4;
+  if (isCIF2Enable()) off+=4;
+  if (add) off = -off; // negative if doesn't exist
+  off = shiftPayload(off, 4, add);
+}
+
+void BasicContextPacket::addCIF7 (bool add, bool occurrence) {
+  UNUSED_VARIABLE(occurrence);
+  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
+  if (isCIF7Enable() == add) return; // Nothing to do
+
+  setContextIndicatorField0Bit(protected_CIF0::CIF7_ENABLE_mask, add);
+
+  int32_t off = 4; // CIF0
+  if (isCIF1Enable()) off+=4;
+  if (isCIF2Enable()) off+=4;
+  if (isCIF3Enable()) off+=4;
+  if (add) off = -off; // negative if doesn't exist
+  off = shiftPayload(off, 4, add);
+}
+
+
+int8_t BasicContextPacket::getB (int8_t cifNum, int32_t bit, int32_t xoff) const {
+  int32_t off = getOffset(cifNum, bit);
   if (off < 0) return INT8_NULL;
-  return bbuf[off+xoff+getHeaderLength()];
+  return bbuf[off+xoff+getPrologueLength()];
 }
-void BasicContextPacket::setB (int32_t bit, int32_t xoff, int8_t val) {
+void BasicContextPacket::setB (int8_t cifNum, int32_t bit, int32_t xoff, int8_t val) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  int32_t off = getOffset(bit);
+  int32_t off = getOffset(cifNum, bit);
   bool present = !isNull(val);
 
-  setContextIndicatorFieldBit(bit, present);
+  setContextIndicatorFieldBit(cifNum, bit, present);
   off = shiftPayload(off, 4, present);
 
   if (!isNull(val)) {
-    bbuf[off+xoff+getHeaderLength()] = val;
+    bbuf[off+xoff+getPrologueLength()] = val;
   }
 }
-int16_t BasicContextPacket::getI (int32_t bit, int32_t xoff) const {
-  int32_t off = getOffset(bit);
+int16_t BasicContextPacket::getI (int8_t cifNum, int32_t bit, int32_t xoff) const {
+  int32_t off = getOffset(cifNum, bit);
   if (off < 0) return INT16_NULL;
-  return VRTMath::unpackShort(bbuf, off+xoff+getHeaderLength());
+  return VRTMath::unpackShort(bbuf, off+xoff+getPrologueLength());
 }
-void BasicContextPacket::setI (int32_t bit, int32_t xoff, int16_t val) {
+void BasicContextPacket::setI (int8_t cifNum, int32_t bit, int32_t xoff, int16_t val) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  int32_t off = getOffset(bit);
+  int32_t off = getOffset(cifNum, bit);
   bool present = !isNull(val);
 
-  setContextIndicatorFieldBit(bit, present);
+  setContextIndicatorFieldBit(cifNum, bit, present);
   off = shiftPayload(off, 4, present);
 
   if (!isNull(val)) {
-    VRTMath::packShort(bbuf, off+xoff+getHeaderLength(), val);
+    VRTMath::packShort(bbuf, off+xoff+getPrologueLength(), val);
   }
 }
-int32_t BasicContextPacket::getL24 (int32_t bit, int32_t offset) const {
-  int32_t off = getOffset(bit);
+int32_t BasicContextPacket::getL24 (int8_t cifNum, int32_t bit, int32_t offset) const {
+  int32_t off = getOffset(cifNum, bit);
   if (off < 0) return INT32_NULL;
-  int32_t bits = VRTMath::unpackInt(bbuf, off+getHeaderLength());
+  int32_t bits = VRTMath::unpackInt(bbuf, off+getPrologueLength());
   bits = (bits & (0xFFFFFF00 >> 8*offset)) >> 8*offset;
   return bits;
 }
-int32_t BasicContextPacket::getL (int32_t bit) const {
-  int32_t off = getOffset(bit);
+int32_t BasicContextPacket::getL (int8_t cifNum, int32_t bit) const {
+  int32_t off = getOffset(cifNum, bit);
   if (off < 0) return INT32_NULL;
-  return VRTMath::unpackInt(bbuf, off+getHeaderLength());
+  return VRTMath::unpackInt(bbuf, off+getPrologueLength());
 }
-void BasicContextPacket::setL (int32_t bit, int32_t val) {
+void BasicContextPacket::setL (int8_t cifNum, int32_t bit, int32_t val) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  int32_t off = getOffset(bit);
+  int32_t off = getOffset(cifNum, bit);
   bool present = !isNull(val);
 
-  setContextIndicatorFieldBit(bit, present);
+  setContextIndicatorFieldBit(cifNum, bit, present);
   off = shiftPayload(off, 4, present);
 
   if (!isNull(val)) {
-    VRTMath::packInt(bbuf, off+getHeaderLength(), val);
+    VRTMath::packInt(bbuf, off+getPrologueLength(), val);
   }
 }
-int64_t BasicContextPacket::getX (int32_t bit) const {
-  int32_t off = getOffset(bit);
+int64_t BasicContextPacket::getX (int8_t cifNum, int32_t bit) const {
+  int32_t off = getOffset(cifNum, bit);
   if (off < 0) return INT64_NULL;
-  return VRTMath::unpackLong(bbuf, off+getHeaderLength());
+  return VRTMath::unpackLong(bbuf, off+getPrologueLength());
 }
-void BasicContextPacket::setX (int32_t bit, int64_t val) {
+void BasicContextPacket::setX (int8_t cifNum, int32_t bit, int64_t val) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  int32_t off = getOffset(bit);
+  int32_t off = getOffset(cifNum, bit);
   bool present = !isNull(val);
 
-  setContextIndicatorFieldBit(bit, present);
+  setContextIndicatorFieldBit(cifNum, bit, present);
   off = shiftPayload(off, 8, present);
 
   if (!isNull(val)) {
-    VRTMath::packLong(bbuf, off+getHeaderLength(), val);
+    VRTMath::packLong(bbuf, off+getPrologueLength(), val);
   }
 }
 
-boolNull BasicContextPacket::getStateEventBit (int32_t enable, int32_t indicator) const {
-  int32_t off = getOffset(STATE_EVENT);
-  if (off < 0) return _NULL;
-  return BasicVRTPacket::getStateEventBit(bbuf, off+getHeaderLength(), enable, indicator);
-}
+int32_t BasicContextPacket::getFieldLen (int8_t cifNum, int32_t field) const {
+  // TODO - do CIF7 settings affect calculation of field length?
+  //      - i.e. does field length include all attributes for the field?
+  switch(cifNum) {
+  case 0:
+    if ((field & protected_CIF0::CTX_4_OCTETS ) != 0) return  4;
+    if ((field & protected_CIF0::CTX_8_OCTETS ) != 0) return  8;
+    if ((field & protected_CIF0::CTX_44_OCTETS) != 0) return 44;
+    if ((field & protected_CIF0::CTX_52_OCTETS) != 0) return 52;
+    if (field == protected_CIF0::GPS_ASCII_mask) {
+      int32_t prologlen = getPrologueLength();
+      int off = getOffset(cifNum, field);
+      return VRTMath::unpackInt(bbuf, prologlen+4+off)*4+8;
+    }
+    if (field == protected_CIF0::CONTEXT_ASOC_mask) {
+      int32_t prologlen = getPrologueLength();
+      int off = getOffset(cifNum, field);
+      int32_t source = VRTMath::unpackShort(bbuf, prologlen+0+off) & 0x01FF;
+      int32_t system = VRTMath::unpackShort(bbuf, prologlen+2+off) & 0x01FF;
+      int32_t vector = VRTMath::unpackShort(bbuf, prologlen+4+off) & 0xFFFF;
+      int32_t asynch = VRTMath::unpackShort(bbuf, prologlen+6+off) & 0x7FFF;
+      if ((VRTMath::unpackShort(bbuf, prologlen+6+off) & 0x8000) != 0) asynch *= 2;
+      return (source + system + vector + asynch)*4+8;
+    }
+    break;
+  case 1:
+    if ((field & protected_CIF1::CTX_4_OCTETS ) != 0) return 4;
+    if ((field & protected_CIF1::CTX_8_OCTETS ) != 0) return 8;
+    if ((field & protected_CIF1::CTX_56_OCTETS ) != 0) return 56;
+    // others (variable) :
+    //                     PNT_ANGL_2D_ST_mask TODO variable (Section 9.4.1)
+    //                     CIFS_ARRAY_mask TODO variable (Section 9.13.1)
+    //                     SECTOR_SCN_STP_mask TODO variable (Section 9.6.2)
+    //                     INDEX_LIST_mask TODO variable (Section 9.3.2)
 
-void BasicContextPacket::setStateEventBit (int32_t enable, int32_t indicator, boolNull value) {
-  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  int32_t off = getOffset(STATE_EVENT);
-  if (off < 0) {
-    if (value == _NULL) return; // no trailer, no need to set to null
-    setContextIndicatorFieldBit(STATE_EVENT, true);
-    off = shiftPayload(off, 4, true);
-  }
-  BasicVRTPacket::setStateEventBit(bbuf, off+getHeaderLength(), enable, indicator, value);
-}
+    break;
+  case 2:
+    if ((field & protected_CIF2::CTX_4_OCTETS ) != 0) return 4;
+    if ((field & protected_CIF2::CTX_16_OCTETS ) != 0) return 16;
+    break;
+  case 3:
+    if ((field & protected_CIF3::CTX_4_OCTETS ) != 0) return 4;
+    if ((field & protected_CIF3::CTX_8_OCTETS ) != 0) return 4;
+    if ((field & protected_CIF3::CTX_TSTAMP_OCTETS ) != 0) {
+      // BasicVRTPacket doesn't provide us any help, so do it manually
+      //      - for TSI and TSF, 0x00 = no timestamp (+0 octets)
+      //      - for TSI!=0, integer tstamp present (+4 octets)
+      //      - for TSF!=0, fractional tstamp present (+8 octets)
+      // TSI: ((bbuf[1] >> 6) & 0x3);
+      // TSF: ((bbuf[1] >> 4) & 0x3);
+      int32_t len = 0;
+      if (((bbuf[1] >> 6) & 0x3) != 0) len+=4;
+      if (((bbuf[1] >> 4) & 0x3) != 0) len+=8;
+      return len;
+    }
+    break;
+  case 7:
+    // TODO - return 0? or -1? (will return -1 for change bit in CIF0, these are similar, but maybe that's wrong... -1 means variable, -2 means not found, so maybe 0 is more appropriate)
+    break;
+  default:
+    throw VRTException("Invalid Context Indicator Field number.");
+  } // switch
 
-int32_t BasicContextPacket::getFieldLen (int32_t field) const {
-  if ((field & CTX_4_OCTETS ) != 0) return  4;
-  if ((field & CTX_8_OCTETS ) != 0) return  8;
-  if ((field & CTX_44_OCTETS) != 0) return 44;
-  if ((field & CTX_52_OCTETS) != 0) return 52;
-  if (field == GPS_ASCII) {
-    int32_t h = getHeaderLength();
-    int off = getOffset(GPS_ASCII);
-    return VRTMath::unpackInt(bbuf, h+4+off)*4+8;
-  }
-  if (field == CONTEXT_ASOC) {
-    int32_t h = getHeaderLength();
-    int off = getOffset(CONTEXT_ASOC);
-    int32_t source = VRTMath::unpackShort(bbuf, h+0+off) & 0x01FF;
-    int32_t system = VRTMath::unpackShort(bbuf, h+2+off) & 0x01FF;
-    int32_t vector = VRTMath::unpackShort(bbuf, h+4+off) & 0xFFFF;
-    int32_t asynch = VRTMath::unpackShort(bbuf, h+6+off) & 0x7FFF;
-    if ((VRTMath::unpackShort(bbuf, h+6+off) & 0x8000) != 0) asynch *= 2;
-    return (source + system + vector + asynch)*4+8;
-  }
   return -1;
 }
 
@@ -342,7 +515,20 @@ string BasicContextPacket::getPacketValid (bool strict, int32_t length) const {
   return "";
 }
 
-int32_t __attribute__((hot)) BasicContextPacket::getOffset (int32_t field) const {
+int32_t BasicContextPacket::getCif7Offset (int32_t attr, int32_t len) const {
+  int32_t cif7 = getContextIndicatorField7();
+  if (isNull(cif7)) {
+    throw VRTException("CIF7 is not enabled.");
+  }
+  int32_t mask = ~(attr ^ (attr - 1));
+  int32_t m    = cif7 & mask;
+  int32_t off  = (bitCount(m & protected_CIF7::CTX_4_OCTETS    ) * 4  )
+               + (bitCount(m & protected_CIF7::CTX_SAME_OCTETS ) * len);
+  return ((cif7 & attr) != 0)? off: -off;  // -off if not present
+}
+
+// TODO - use of CIF7 is a special case that massively changes this calculation
+int32_t __attribute__((hot)) BasicContextPacket::getOffset (int8_t cifNum, int32_t field) const {
   // Since this is the most-used method in the class and often sees millions and
   // millions of calls within a typical application, it has been heavily
   // optimized to remove any loops and minimize the number of branches and other
@@ -352,12 +538,64 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int32_t field) const
   // References:
   //   [1] Warren, Henry S. Jr. "Hacker's Delight." Addison-Wesley. 2002.
   //       ISBN 0-201-91465-4
-  if (field == CONTEXT_IND) return 0; // special case, must be first
+
 
   // Set the mask for all fields before 'field'. This uses the "x^(x-1)" algorithm
   // from [1] (section 2-1) to set the field bit and all bits to the right, and
   // then inverts it to get all bits left of 'field' to be set.
-  int32_t mask = ~(field ^ (field - 1));
+  int32_t mask0, mask1, mask2, mask3;
+  int32_t field0, field1, field2, field3;
+  mask0 = mask1 = mask2 = mask3 = 0xFFFFFFFF; // mask to use for CIFs before cifNum of interest
+  field0 = field1 = field2 = field3 = 0x0;   // field to use for CIFs before cifNum of interest
+  switch(cifNum) {
+    case 0:
+      mask0 = ~(field ^ (field - 1));
+      field0 = field;
+      break;
+    case 1:
+      mask1 = ~(field ^ (field - 1));
+      field1 = field;
+      break;
+    case 2:
+      mask2 = ~(field ^ (field - 1));
+      field2 = field;
+      break;
+    case 3:
+      mask3 = ~(field ^ (field - 1));
+      field3 = field;
+      break;
+    case 7:
+      throw VRTException("Invalid Context Indicator Field number (CIF7).");
+      break;
+    default:
+      throw VRTException("Invalid Context Indicator Field number (undefined).");
+      break;
+  } // switch(cifNum)
+
+  // If CIF7 is in use, calculate offset multiple
+  // could just do isCIF7Enable(), but we need cif0 and we likely need header length later
+  // so we break out that function here to store off the parts we'll re-use
+  int32_t prologlen = getPrologueLength();
+  int32_t cif0 = VRTMath::unpackInt(bbuf, prologlen);
+  int32_t cifOffset = 4; // offset of next CIF; currently 'next' is after CIF0
+  int32_t cif7Mult = 1;  // Multiplier to apply to all fields for CIF7 attributes
+  int32_t cif7Add = 0;   // octets to add to all fields for CIF7 attributes
+  if((cif0 & protected_CIF0::CIF7_ENABLE_mask) != 0) {
+    // Count number of CIFs enabled, add 4 bytes to offset for each
+    // Note: CIF7 is enabled but shouldn't count towards offset (+4 bytes of offset)
+    //       CIF0 has no enable but should count towards offset (-4 bytes of offset)
+    //       +4 and -4 ==> 0 adjustement, so it works out as planned.
+    int32_t cif7 = VRTMath::unpackInt(bbuf, prologlen+(bitCount(cif0 & 0xFF) * 4));
+    // Calcluate multiplier (i.e. if max/min/actual, mult=3)
+    cif7Add  = bitCount((cif7 & protected_CIF7::CTX_4_OCTETS   )) * 4;
+    cif7Mult = bitCount((cif7 & protected_CIF7::CTX_SAME_OCTETS));
+  }
+
+  // Start offset calculation with the CIFs present
+  int32_t off = 4 + (bitCount(cif0 & 0xFF) *  4); // 4 for CIF0 + 4 for each other CIF present
+
+  /** CIF0 calculation
+   */
 
   // For efficiency we compute the offset based on an applied bit mask and a few
   // multiplies. For *52 we do an *8 plus *44 to avoid the overhead of an extra
@@ -365,43 +603,176 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int32_t field) const
   // CTX_44_OCTETS|CTX_52_OCTETS should be in-lined during the compile; also the
   // *4 and *8 should be optimized (by the compiler) to bit-shifts where
   // appropriate.
-  int32_t cif  = getContextIndicatorField();
-  int32_t m    = cif & mask;
-  int32_t off  = 4
-               + (bitCount(m & (CTX_4_OCTETS               )) *  4)
-               + (bitCount(m & (CTX_8_OCTETS |CTX_52_OCTETS)) *  8)
-               + (bitCount(m & (CTX_44_OCTETS|CTX_52_OCTETS)) * 44);
+  int32_t m    = cif0 & (mask0 & 0xFFFFFF00); // clear CIF enable bits of CIF0 mask - they're already counted
+  int32_t off0 = (bitCount(m & protected_CIF0::CTX_4_OCTETS ) * (cif7Add + ( 4*cif7Mult) ))
+               + (bitCount(m & protected_CIF0::CTX_8_OCTETS ) * (cif7Add + ( 8*cif7Mult) ))
+               + (bitCount(m & protected_CIF0::CTX_44_OCTETS) * (cif7Add + (44*cif7Mult) ))
+               + (bitCount(m & protected_CIF0::CTX_52_OCTETS) * (cif7Add + (52*cif7Mult) ));
 
   // GPS_ASCII length is variable so we handle it separately if applicable. Note
-  // that following our initial off= computation the offset is now queued up to
+  // that following our initial off+off0 computation the offset is now queued up to
   // point to the start of the GPS_ASCII field.
-  if (field < GPS_ASCII) {
-    int32_t h = getHeaderLength();
-    if ((cif & GPS_ASCII) != 0) {
-      off += VRTMath::unpackInt(bbuf, h+off+4)*4+8;
+  if (field0 < protected_CIF0::GPS_ASCII_mask) {
+    if ((cif0 & protected_CIF0::GPS_ASCII_mask) != 0) {
+      // TODO - when and where does cif7Mult apply? perhaps not all field sizes are affected.    
+      off0 += (VRTMath::unpackInt(bbuf, prologlen+off+off0+4)*4+8)*cif7Mult + cif7Add;
     }
+    
 
     // CONTEXT_ASOC length is also variable, since it comes after GPS_ASCII
     // we nest it here so the check can be skipped in the 80% use case. Note
-    // that off= should not point to the start of the CONTEXT_ASOC field.
-    if (field < CONTEXT_ASOC) {
-      if ((cif & CONTEXT_ASOC) != 0) {
-        int32_t source = VRTMath::unpackShort(bbuf, h+off+0) & 0x01FF;
-        int32_t system = VRTMath::unpackShort(bbuf, h+off+2) & 0x01FF;
-        int32_t vector = VRTMath::unpackShort(bbuf, h+off+4) & 0xFFFF;
-        int32_t asynch = VRTMath::unpackShort(bbuf, h+off+6) & 0x7FFF;
-        if ((VRTMath::unpackShort(bbuf, h+6+off) & 0x8000) != 0) asynch *= 2;
-        off += (source + system + vector + asynch)*4+8;
+    // that off+off0 should now point to the start of the CONTEXT_ASOC field.
+    if (field0 < protected_CIF0::CONTEXT_ASOC_mask) {
+      if ((cif0 & protected_CIF0::CONTEXT_ASOC_mask) != 0) {
+        int32_t source = VRTMath::unpackShort(bbuf, prologlen+off+off0+0) & 0x01FF;
+        int32_t system = VRTMath::unpackShort(bbuf, prologlen+off+off0+2) & 0x01FF;
+        int32_t vector = VRTMath::unpackShort(bbuf, prologlen+off+off0+4) & 0xFFFF;
+        int32_t asynch = VRTMath::unpackShort(bbuf, prologlen+off+off0+6) & 0x7FFF;
+        if ((VRTMath::unpackShort(bbuf, prologlen+6+off+off0) & 0x8000) != 0) asynch *= 2;
+        off0 += ((source + system + vector + asynch)*4+8)*cif7Mult + cif7Add;
       }
     }
   }
-  return ((cif & field) != 0)? off : -off;  // -off if not present
+  off += off0;
+  if (cifNum == 0) return ((cif0 & field) != 0)? off: -off;  // -off if not present
+  
+  // CIF1
+  if((cif0 & protected_CIF0::CIF1_ENABLE_mask) != 0) {
+    int32_t cif1 = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
+    cifOffset += 4; // increment for next CIF
+    // Only count fields before the first variable length field (PNT_ANGL_2D_ST)
+    // Note: all of which are 4-octets, so only check that one
+    m = cif1 & mask1 & 0xE0000000;
+    int32_t off1 = (bitCount(m & protected_CIF1::CTX_4_OCTETS) * (cif7Add + (4*cif7Mult) ));
+
+    // PNT_ANGL_2D_ST length is variable so we handle it separately if applicable.
+    if (field1 < protected_CIF1::PNT_ANGL_2D_ST_mask) {
+      if ((cif1 & protected_CIF1::PNT_ANGL_2D_ST_mask) != 0) {
+        // TODO - determine size of field and add to off1= w/ cif7Add and cif7Mult applied
+      }
+
+      // Only count fields not yet counted (i.e. after PNT_ANGL_2D_ST) and before
+      // the next variable length field (CIFS_ARRAY).
+      // Note: all of which are either 4- or 8-octets, so only check those
+      m = cif1 & mask1 & 0x0FFFF000;
+      off1 += (bitCount(m & (protected_CIF1::CTX_4_OCTETS)) * (cif7Add + (4*cif7Mult) ))
+            + (bitCount(m & (protected_CIF1::CTX_8_OCTETS)) * (cif7Add + (8*cif7Mult) ));
+
+      // CIFS_ARRAY is also variable length, since it comes after PNT_ANGL_2D_ST
+      // we nest it here so the check can be skipped.
+      if (field1 < protected_CIF1::CIFS_ARRAY_mask) {
+        if ((cif0 & protected_CIF1::CIFS_ARRAY_mask) != 0) {
+          // TODO - determine size of field and add to off1= w/ cif7Add and cif7Mult applied
+        }
+
+      // Only count SPECTRUM since it is the only field between the previous
+      // and next variable length fields. SPECTRUM is 56-octets.
+      if ((cif1 & mask1 & protected_CIF1::SPECTRUM_mask) != 0) off1 += (cif7Add + (56*cif7Mult));
+
+        // SECTOR_SCN_STP is also variable length, since it comes after CIFS_ARRAY
+        // we nest it here so the check can be skipped.
+        if (field < protected_CIF1::SECTOR_SCN_STP_mask) {
+          if ((cif1 & protected_CIF1::SECTOR_SCN_STP_mask) != 0) {
+            // TODO - determine size of field and add to off1= w/ cif7Add and cif7Mult applied
+          }
+
+          // Only field between the previous and next variable length fields is reserved (i.e. 0).
+          // Nothing to add here for CIF1_RESERVED_8.
+
+          // INDEX_LIST is also variable length, since it comes after SECTOR_SCN_STP
+          // we nest it here so the check can be skipped.
+          if (field < protected_CIF1::INDEX_LIST_mask) {
+            if ((cif1 & protected_CIF1::INDEX_LIST_mask) != 0) {
+              // TODO - determine size of field and add to off1= w/ cif7Add and cif7Mult applied
+            }
+          }
+          
+          // Finally, count the remaining fields, which are all either 4- or 8-octets.
+          m = cif1 & mask1 & 0x0000007F;
+          off1 += (bitCount(m & (protected_CIF1::CTX_4_OCTETS)) * (cif7Add + (4*cif7Mult) ))
+                + (bitCount(m & (protected_CIF1::CTX_8_OCTETS)) * (cif7Add + (8*cif7Mult) ));
+        }
+      }
+    }
+
+    off += off1;
+    if (cifNum == 1) return ((cif1 & field) != 0)? off : -off;  // -off if not present
+  } else {
+    // TODO - might be better to return NULL to indicate invalid CIF
+    //      - offset value is wrong anyway because the CIF would have to be added first,
+    //        adding at least 4 bytes to the needed offset
+    if (cifNum == 1) return -off;  // -off since not present
+  }
+
+  // CIF2
+  if((cif0 & protected_CIF0::CIF2_ENABLE_mask) != 0) {
+    int32_t cif2 = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
+    cifOffset += 4; // increment for next CIF
+    m    = cif2 & mask2;
+    int32_t off2 = (bitCount(m & protected_CIF2::CTX_4_OCTETS)  * (cif7Add + ( 4*cif7Mult) ))
+                 + (bitCount(m & protected_CIF2::CTX_16_OCTETS) * (cif7Add + (16*cif7Mult) ));
+    off += off2;
+    if (cifNum == 2) return ((cif2 & field) != 0)? off : -off;  // -off if not present
+  } else {
+    // TODO - might be better to return NULL to indicate invalid CIF
+    //      - offset value is wrong anyway because the CIF would have to be added first,
+    //        adding at least 4 bytes to the needed offset
+    if (cifNum == 2) return -off;  // -off since not present
+  }
+
+  // CIF3
+  if((cif0 & protected_CIF0::CIF3_ENABLE_mask) != 0) {
+    int32_t cif3 = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
+    cifOffset += 4; // increment for next CIF
+    m    = cif3 & mask3;
+    int32_t off3 = (bitCount(m & protected_CIF3::CTX_4_OCTETS) * (cif7Add + (4*cif7Mult) ))
+                 + (bitCount(m & protected_CIF3::CTX_8_OCTETS) * (cif7Add + (8*cif7Mult) ));
+
+    // AGE length is variable so we handle it separately if applicable.
+    if (field3 < protected_CIF3::AGE_mask) {
+      // AGE and SHELF_LIFE variable length fields are both dependant on TSI/TSF
+      // calculate once for both.
+      // BasicVRTPacket doesn't provide us any help, so do it manually
+      //      - for TSI and TSF, 0x00 = no timestamp (+0 octets)
+      //      - for TSI!=0, integer tstamp present (+4 octets)
+      //      - for TSF!=0, fractional tstamp present (+8 octets)
+      // TSI: ((bbuf[1] >> 6) & 0x3);
+      // TSF: ((bbuf[1] >> 4) & 0x3);
+      int32_t tstampLen = 0;
+      if (((bbuf[1] >> 6) & 0x3) != 0) tstampLen+=4;
+      if (((bbuf[1] >> 4) & 0x3) != 0) tstampLen+=8;
+
+      if ((cif3 & protected_CIF3::AGE_mask) != 0) {
+        off3 += (cif7Add + (tstampLen*cif7Mult));
+      }
+
+      // SHELF_LIFE is also variable...
+      if (field3 < protected_CIF3::SHELF_LIFE_mask) {
+        if ((cif3 & protected_CIF3::SHELF_LIFE_mask) != 0) {
+          off3 += (cif7Add + (tstampLen*cif7Mult));
+        }
+      }
+    }
+
+    off += off3;
+    if (cifNum == 3) return ((cif3 & field) != 0)? off : -off;  // -off if not present
+  } else {
+    // TODO - might be better to return NULL to indicate invalid CIF
+    //      - offset value is wrong anyway because the CIF would have to be added first,
+    //        adding at least 4 bytes to the needed offset
+    if (cifNum == 3) return -off;  // -off since not present
+  }
+  // XXX - should never get here since CIF3 defines the last potential part of payload
+  // TODO - might be better to return NULL to indicate invalid CIF
+  return -off;
 }
 
+// TODO - update with new CIFs
 int32_t BasicContextPacket::getFieldCount () const {
   return BasicVRTPacket::getFieldCount() + 35;
 }
 
+// TODO - update with new CIFs
 string BasicContextPacket::getFieldName (int32_t id) const {
   switch (id - BasicVRTPacket::getFieldCount()) {
     case  0: return "ChangePacket";
@@ -443,6 +814,7 @@ string BasicContextPacket::getFieldName (int32_t id) const {
   }
 }
 
+// TODO - update with new CIFs
 ValueType BasicContextPacket::getFieldType (int32_t id) const {
   switch (id - BasicVRTPacket::getFieldCount()) {
     case  0: return ValueType_Bool;
@@ -484,8 +856,10 @@ ValueType BasicContextPacket::getFieldType (int32_t id) const {
   }
 }
 
+// TODO - update with new CIFs
 Value* BasicContextPacket::getField (int32_t id) const {
   switch (id - BasicVRTPacket::getFieldCount()) {
+    //case  0: return new Value(IndicatorFieldProvider::isChangePacket());
     case  0: return new Value(isChangePacket());
     case  1: return new Value(getReferencePointIdentifier());
     case  2: return new Value(getBandwidth());
@@ -525,6 +899,7 @@ Value* BasicContextPacket::getField (int32_t id) const {
   }
 }
 
+// TODO - update with new CIFs
 void BasicContextPacket::setField (int32_t id, const Value* val) {
   switch (id - BasicVRTPacket::getFieldCount()) {
     case  0: setChangePacket(            val->as<bool    >()); return;
@@ -563,498 +938,5 @@ void BasicContextPacket::setField (int32_t id, const Value* val) {
     case 33: setGeoSentences(           *val->cast<GeoSentences*     >()); return;
     case 34: setContextAssocLists(      *val->cast<ContextAssocLists*>()); return;
     default: BasicVRTPacket::setField(id,val); return;
-  }
-}
-
-ContextAssocLists::ContextAssocLists     ()                             : Record(8) { }
-ContextAssocLists::ContextAssocLists     (const ContextAssocLists   &r) : Record(r) { }
-AbstractGeolocation::AbstractGeolocation (size_t n)                     : Record(n) { }
-AbstractGeolocation::AbstractGeolocation (const AbstractGeolocation &r) : Record(r) { }
-Geolocation::Geolocation                 ()                             : AbstractGeolocation(44) { }
-Geolocation::Geolocation                 (const Geolocation         &r) : AbstractGeolocation(r ) { }
-GeoSentences::GeoSentences               ()                             : AbstractGeolocation(8 ) { }
-GeoSentences::GeoSentences               (const GeoSentences        &r) : AbstractGeolocation(r ) { }
-
-string AbstractGeolocation::toString () const {
-  ostringstream str;
-  str << Record::toString();
-  Utilities::append(str,  "Manufacturer=", getManufacturerID());
-  Utilities::append(str, " TimeStamp=",    getTimeStamp());
-  return str.str();
-}
-
-TimeStamp AbstractGeolocation::getTimeStamp () const {
-  int8_t         b       = unpackByte(0);
-  IntegerMode    tsiMode = (IntegerMode)((b >> 2) & 0x3);
-  FractionalMode tsfMode = (FractionalMode)(b & 0x3);
-  uint32_t       tsi     = (uint32_t)unpackInt(4);
-  uint64_t       tsf     = (uint64_t)unpackLong(8);
-
-  return TimeStamp(tsiMode, tsfMode, tsi, tsf);
-}
-
-void AbstractGeolocation::setTimeStamp (const TimeStamp &ts) {
-  int8_t b = (int8_t)((ts.getIntegerMode() << 2) | ts.getFractionalMode());
-  packByte(0, b);
-
-  if (ts.getIntegerMode() == IntegerMode_None) {
-    packInt(4, 0xFFFFFFFF);
-  }
-  else {
-    packInt(4, (int32_t)ts.getTimeStampInteger());
-  }
-
-  if (ts.getFractionalMode() == FractionalMode_None) {
-    packInt( 8, 0xFFFFFFFF);
-    packInt(12, 0xFFFFFFFF);
-  }
-  else {
-    packLong(8, (int64_t)ts.getTimeStampFractional());
-  }
-}
-
-int32_t AbstractGeolocation::getFieldCount () const {
-  return Record::getFieldCount() + 2;
-}
-
-string AbstractGeolocation::getFieldName (int32_t id) const {
-  switch (id - Record::getFieldCount()) {
-    case  0: return "Manufacturer";
-    case  1: return "TimeStamp";
-    default: return Record::getFieldName(id);
-  }
-}
-
-ValueType AbstractGeolocation::getFieldType (int32_t id) const {
-  switch (id - Record::getFieldCount()) {
-    case  0: return ValueType_Bool;
-    case  1: return ValueType_VRTObject;
-    default: return Record::getFieldType(id);
-  }
-}
-
-Value* AbstractGeolocation::getField (int32_t id) const {
-  switch (id - Record::getFieldCount()) {
-    case  0: return new Value(getManufacturerID());
-    case  1: return new Value(new TimeStamp(getTimeStamp()));
-    default: return Record::getField(id);
-  }
-}
-
-void AbstractGeolocation::setField (int32_t id, const Value* val) {
-  switch (id - Record::getFieldCount()) {
-    case  0: setManufacturerID(val->as<string>()); return;
-    case  1: setTimeStamp(*val->cast<TimeStamp*>()); return;
-    default: Record::setField(id,val); return;
-  }
-}
-
-string Geolocation::toString () const {
-  ostringstream str;
-  str << AbstractGeolocation::toString();
-  Utilities::append(str, " Latitude=",          getLatitude());
-  Utilities::append(str, " Longitude=",         getLongitude());
-  Utilities::append(str, " Altitude=",          getAltitude());
-  Utilities::append(str, " SpeedOverGround=",   getSpeedOverGround());
-  Utilities::append(str, " HeadingAngle=",      getHeadingAngle());
-  Utilities::append(str, " TrackAngle=",        getTrackAngle());
-  Utilities::append(str, " MagneticVariation=", getMagneticVariation());
-  return str.str();
-}
-
-int32_t Geolocation::getFieldCount () const {
-  return AbstractGeolocation::getFieldCount() + 7;
-}
-
-string Geolocation::getFieldName (int32_t id) const {
-  switch (id - AbstractGeolocation::getFieldCount()) {
-    case  0: return "Latitude";
-    case  1: return "Longitude";
-    case  2: return "Altitude";
-    case  3: return "SpeedOverGround";
-    case  4: return "HeadingAngle";
-    case  5: return "TrackAngle";
-    case  6: return "MagneticVariation";
-    default: return AbstractGeolocation::getFieldName(id);
-  }
-}
-
-ValueType Geolocation::getFieldType (int32_t id) const {
-  switch (id - AbstractGeolocation::getFieldCount()) {
-    case  0: return ValueType_Double;
-    case  1: return ValueType_Double;
-    case  2: return ValueType_Double;
-    case  3: return ValueType_Double;
-    case  4: return ValueType_Double;
-    case  5: return ValueType_Double;
-    case  6: return ValueType_Double;
-    default: return AbstractGeolocation::getFieldType(id);
-  }
-}
-
-Value* Geolocation::getField (int32_t id) const {
-  switch (id - AbstractGeolocation::getFieldCount()) {
-    case  0: return new Value(getLatitude());
-    case  1: return new Value(getLongitude());
-    case  2: return new Value(getAltitude());
-    case  3: return new Value(getSpeedOverGround());
-    case  4: return new Value(getHeadingAngle());
-    case  5: return new Value(getTrackAngle());
-    case  6: return new Value(getMagneticVariation());
-    default: return AbstractGeolocation::getField(id);
-  }
-}
-
-void Geolocation::setField (int32_t id, const Value* val) {
-  switch (id - AbstractGeolocation::getFieldCount()) {
-    case  0: setLatitude(         val->as<double>()); return;
-    case  1: setLongitude(        val->as<double>()); return;
-    case  2: setAltitude(         val->as<double>()); return;
-    case  3: setSpeedOverGround(  val->as<double>()); return;
-    case  4: setHeadingAngle(     val->as<double>()); return;
-    case  5: setTrackAngle(       val->as<double>()); return;
-    case  6: setMagneticVariation(val->as<double>()); return;
-    default: AbstractGeolocation::setField(id,val); return;
-  }
-}
-
-Ephemeris::Ephemeris () :
-  AbstractGeolocation(52)
-{
-  // done
-}
-
-Ephemeris::Ephemeris (const Ephemeris &r) :
-  AbstractGeolocation(r)
-{
-  // done
-}
-
-string Ephemeris::toString () const {
-  ostringstream str;
-  str << AbstractGeolocation::toString();
-  Utilities::append(str, " PositionX=",     getPositionX());
-  Utilities::append(str, " PositionY=",     getPositionY());
-  Utilities::append(str, " PositionZ=",     getPositionZ());
-  Utilities::append(str, " AttitudeAlpha=", getAttitudeAlpha());
-  Utilities::append(str, " AttitudeBeta=",  getAttitudeBeta());
-  Utilities::append(str, " AttitudePhi=",   getAttitudePhi());
-  Utilities::append(str, " VelocityX=",     getVelocityX());
-  Utilities::append(str, " VelocityY=",     getVelocityY());
-  Utilities::append(str, " VelocityZ=",     getVelocityZ());
-  return str.str();
-}
-
-int32_t Ephemeris::getFieldCount () const {
-  return AbstractGeolocation::getFieldCount() + 18;
-}
-
-string Ephemeris::getFieldName (int32_t id) const {
-  switch (id - AbstractGeolocation::getFieldCount()) {
-    case  0: return "PositionX";
-    case  1: return "PositionY";
-    case  2: return "PositionZ";
-    case  3: return "AttitudeAlpha";
-    case  4: return "AttitudeBeta";
-    case  5: return "AttitudePhi";
-    case  6: return "VelocityX";
-    case  7: return "VelocityY";
-    case  8: return "VelocityZ";
-    default: return AbstractGeolocation::getFieldName(id);
-  }
-}
-
-ValueType Ephemeris::getFieldType (int32_t id) const {
-  switch (id - AbstractGeolocation::getFieldCount()) {
-    case  0: return ValueType_Double;
-    case  1: return ValueType_Double;
-    case  2: return ValueType_Double;
-    case  3: return ValueType_Double;
-    case  4: return ValueType_Double;
-    case  5: return ValueType_Double;
-    case  6: return ValueType_Double;
-    case  7: return ValueType_Double;
-    case  8: return ValueType_Double;
-    default: return AbstractGeolocation::getFieldType(id);
-  }
-}
-
-Value* Ephemeris::getField (int32_t id) const {
-  switch (id - AbstractGeolocation::getFieldCount()) {
-    case  0: return new Value(getPositionX());
-    case  1: return new Value(getPositionY());
-    case  2: return new Value(getPositionZ());
-    case  3: return new Value(getAttitudeAlpha());
-    case  4: return new Value(getAttitudeBeta());
-    case  5: return new Value(getAttitudePhi());
-    case  6: return new Value(getVelocityX());
-    case  7: return new Value(getVelocityY());
-    case  8: return new Value(getVelocityZ());
-    default: return AbstractGeolocation::getField(id);
-  }
-}
-
-void Ephemeris::setField (int32_t id, const Value* val) {
-  switch (id - AbstractGeolocation::getFieldCount()) {
-    case  0: setPositionX(                  val->as<double>()); return;
-    case  1: setPositionY(                  val->as<double>()); return;
-    case  2: setPositionZ(                  val->as<double>()); return;
-    case  3: setAttitudeAlpha(              val->as<double>()); return;
-    case  4: setAttitudeBeta(               val->as<double>()); return;
-    case  5: setAttitudePhi(                val->as<double>()); return;
-    case  6: setVelocityX(                  val->as<double>()); return;
-    case  7: setVelocityY(                  val->as<double>()); return;
-    case  8: setVelocityZ(                  val->as<double>()); return;
-    default: AbstractGeolocation::setField(id,val); return;
-  }
-}
-
-string GeoSentences::toString () const {
-  ostringstream str;
-  str << AbstractGeolocation::toString();
-  str << " Sentences=" << getSentences();
-  return str.str();
-}
-
-int32_t GeoSentences::getFieldCount () const {
-  return AbstractGeolocation::getFieldCount() + 1;
-}
-
-string GeoSentences::getFieldName (int32_t id) const {
-  switch (id - AbstractGeolocation::getFieldCount()) {
-    case  0: return "Sentences";
-    default: return AbstractGeolocation::getFieldName(id);
-  }
-}
-
-ValueType GeoSentences::getFieldType (int32_t id) const {
-  switch (id - AbstractGeolocation::getFieldCount()) {
-    case  0: return ValueType_String;
-    default: return AbstractGeolocation::getFieldType(id);
-  }
-}
-
-Value* GeoSentences::getField (int32_t id) const {
-  switch (id - AbstractGeolocation::getFieldCount()) {
-    case  0: return new Value(getSentences());
-    default: return AbstractGeolocation::getField(id);
-  }
-}
-
-void GeoSentences::setField (int32_t id, const Value* val) {
-  switch (id - AbstractGeolocation::getFieldCount()) {
-    case  0: setSentences(val->as<string>()); return;
-    default: AbstractGeolocation::setField(id,val); return;
-  }
-}
-
-void ContextAssocLists::setAsynchronousChannelTagsPresent (bool val) {
-  if (val) packShort(6, (short)(unpackShort(6) | 0x8000)); // insert
-  else     packShort(6, (short)(unpackShort(6) & 0x7FFF)); // remove
-  updateByteLength(-1);
-}
-
-vector<int32_t> ContextAssocLists::getSourceContext () const {
-  vector<int32_t> val(getSourceContextCount());
-  for (size_t i=0, j=getSourceContextOffset(); i < val.size(); i++,j+=4) {
-    val[i] = unpackInt(j);
-  }
-  return val;
-}
-
-vector<int32_t> ContextAssocLists::getSystemContext () const {
-  vector<int32_t> val(getSystemContextCount());
-  for (size_t i=0, j=getSystemContextOffset(); i < val.size(); i++,j+=4) {
-    val[i] = unpackInt(j);
-  }
-  return val;
-}
-
-vector<int32_t> ContextAssocLists::getVectorComponent () const {
-  vector<int32_t> val(getVectorComponentCount());
-  for (size_t i=0, j=getVectorComponentOffset(); i < val.size(); i++,j+=4) {
-    val[i] = unpackInt(j);
-  }
-  return val;
-}
-
-vector<int32_t> ContextAssocLists::getAsynchronousChannel () const {
-  vector<int32_t> val(getAsynchronousChannelCount());
-  for (size_t i=0, j=getAsynchronousChannelOffset(); i < val.size(); i++,j+=4) {
-    val[i] = unpackInt(j);
-  }
-  return val;
-}
-
-vector<int32_t> ContextAssocLists::getAsynchronousChannelTag () const {
-  if (!getAsynchronousChannelTagsPresent()) return vector<int32_t>(0);
-  vector<int32_t> val(getAsynchronousChannelCount());
-  for (size_t i=0, j=getAsynchronousChannelTagsOffset(); i < val.size(); i++,j+=4) {
-    val[i] = unpackInt(j);
-  }
-  return val;
-}
-
-void ContextAssocLists::setSourceContext (const vector<int32_t> &val) {
-  setSourceContextCount(val.size());
-  for (size_t i=0, j=getSourceContextOffset(); i < val.size(); i++,j+=4) {
-    packInt(j, val[i]);
-  }
-}
-
-void ContextAssocLists::setSystemContext (const vector<int32_t> &val) {
-  setSystemContextCount(val.size());
-  for (size_t i=0, j=getSystemContextOffset(); i < val.size(); i++,j+=4) {
-    packInt(j, val[i]);
-  }
-}
-
-void ContextAssocLists::setVectorComponent (const vector<int32_t> &val) {
-  setVectorComponentCount(val.size());
-  for (size_t i=0, j=getVectorComponentOffset(); i < val.size(); i++,j+=4) {
-    packInt(j, val[i]);
-  }
-}
-
-void ContextAssocLists::setAsynchronousChannel (const vector<int32_t> &val) {
-  setAsynchronousChannelCount(val.size());
-  setAsynchronousChannelTagsPresent(false);
-  for (size_t i=0, j=getAsynchronousChannelOffset(); i < val.size(); i++,j+=4) {
-    packInt(j, val[i]);
-  }
-}
-
-void ContextAssocLists::setAsynchronousChannel (const vector<int32_t> &val, const vector<int32_t> &tags) {
-  setAsynchronousChannel(val);
-  if (val.size() == tags.size()) {
-    setAsynchronousChannelTagsPresent(true);
-    for (size_t i=0, j=getAsynchronousChannelTagsOffset(); i < val.size(); i++,j+=4) {
-      packInt(j, tags[i]);
-    }
-  }
-}
-
-string ContextAssocLists::toString () const {
-  vector<int32_t> _source = getSourceContext();
-  vector<int32_t> _system = getSystemContext();
-  vector<int32_t> _vector = getVectorComponent();
-  vector<int32_t> _asynch = getAsynchronousChannel();
-  vector<int32_t> _asytag = getAsynchronousChannelTag();
-
-  ostringstream str;
-  str << Record::toString();
-  str << "SourceContext=[";
-  for (size_t i = 0; i < _source.size(); i++) {
-    if (i > 0) str << ", ";
-    str << _source[i];
-  }
-  str << "] SystemContext=[";
-  for (size_t i = 0; i < _system.size(); i++) {
-    if (i > 0) str << ", ";
-    str << _system[i];
-  }
-  str << "] VectorComponent=[";
-  for (size_t i = 0; i < _vector.size(); i++) {
-    if (i > 0) str << ", ";
-    str << _vector[i];
-  }
-  str << "] AsynchronousChannel=[";
-  for (size_t i = 0; i < _asynch.size(); i++) {
-    if (i > 0) str << ", ";
-    str << _asynch[i];
-  }
-  if (getAsynchronousChannelTagsPresent()) {
-    str << "] AsynchronousChannelTag=[";
-    for (size_t i = 0; i < _asytag.size(); i++) {
-      if (i > 0) str << ", ";
-      str << _asytag[i];
-    }
-  }
-  str << "]";
-  return str.str();
-}
-
-void ContextAssocLists::updateByteLength (int32_t off) {
-  int32_t len = getAsynchronousChannelTagsOffset();
-  if (getAsynchronousChannelTagsPresent()) {
-    len += 4*getAsynchronousChannelCount();
-  }
-  setByteLength(len, off);
-}
-
-void ContextAssocLists::resize (int32_t pos, int32_t max, int32_t off, int32_t old, int32_t val) {
-  if (old == val) {
-    return; // no change
-  }
-  if ((val < 0) || (val > max)) {
-    throw VRTException("Invalid size %d must be between 0 and %d", val, max);
-  }
-
-  int32_t oldLen = getByteLength();
-  int32_t newLen = oldLen + ((val - old) * 4);
-  int32_t offset = off + (min(old, val) * 4);
-
-  setByteLength(newLen, offset);
-  packShort(pos, (int16_t)(val & max));
-}
-
-int32_t ContextAssocLists::getFieldCount () const {
-  return Record::getFieldCount() + 5;
-}
-
-string ContextAssocLists::getFieldName (int32_t id) const {
-  switch (id - Record::getFieldCount()) {
-    case  0: return "SourceContext";
-    case  1: return "SystemContext";
-    case  2: return "VectorComponent";
-    case  3: return "AsynchronousChannel";
-    case  4: return "AsynchronousChannelTag";
-    default: return Record::getFieldName(id);
-  }
-}
-
-ValueType ContextAssocLists::getFieldType (int32_t id) const {
-  switch (id - Record::getFieldCount()) {
-    case  0: return (ValueType)-ValueType_Int32;
-    case  1: return (ValueType)-ValueType_Int32;
-    case  2: return (ValueType)-ValueType_Int32;
-    case  3: return (ValueType)-ValueType_Int32;
-    case  4: return (ValueType)-ValueType_Int32;
-    default: return Record::getFieldType(id);
-  }
-}
-
-Value* ContextAssocLists::getField (int32_t id) const {
-  switch (id - Record::getFieldCount()) {
-    case  0: return new Value(new vector<int32_t>(getSourceContext()),          true);
-    case  1: return new Value(new vector<int32_t>(getSystemContext()),          true);
-    case  2: return new Value(new vector<int32_t>(getVectorComponent()),        true);
-    case  3: return new Value(new vector<int32_t>(getAsynchronousChannel()),    true);
-    case  4: return new Value(new vector<int32_t>(getAsynchronousChannelTag()), true);
-    default: return Record::getField(id);
-  }
-}
-
-void ContextAssocLists::setField (int32_t id, const Value* val) {
-  int n = (id - Record::getFieldCount());
-
-  if ((n >= 0) && (n <= 4)) {
-    vector<int32_t> vec(val->size());
-    for (size_t i = 0; i < val->size(); i++) {
-      Value *v = val->at(i);
-      vec[i] = *v;
-      delete v;
-    }
-
-    switch (n) {
-      case  0: setSourceContext(vec); return;
-      case  1: setSystemContext(vec); return;
-      case  2: setVectorComponent(vec); return;
-      case  3: setAsynchronousChannel(vec); return;
-      case  4: setAsynchronousChannel(getAsynchronousChannel(), vec); return;
-    }
-  }
-  else {
-    Record::setField(id,val); return;
   }
 }

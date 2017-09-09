@@ -29,23 +29,36 @@ const BasicVRTPacket BasicVRTPacket::NULL_PACKET = BasicVRTPacket(vector<char>(0
 
 static const vector<char> NULL_TRAILER(BasicVRTPacket::MAX_TRAILER_LENGTH); // only used by trailerEquals(..)
 
+// Bit masks for all pkt types
 static const char CLASS_ID_BIT = 0x8;  // Class ID present bit in buf[0]
+
+// Data Indicator bits
 static const char TRAILER_BIT  = 0x4;  // Trailer present bit in buf[0]
+static const char SPECTRAL_BIT = 0x2;  // Spectral data bit in buf[0]
+
+// Context Indicator bits
 static const char TSM_BIT      = 0x1;  // TimeStamp Mode bit in buf[0]
+
+// Command Indicator bits
+static const char CTRL_ACK_BIT = 0x4;  // Control (0) or Ack (1) packet bit in buf[0]
+static const char STALE_TS_BIT = 0x2;  // Stale or no timestamp mode bit in buf[0]
+static const char CANCEL_BIT   = 0x1;  // Cancel previous command bit in buf[0]
 
 // Flags for getOffset(..). These values are in the form:
 //   AABBaabb         AA - Bit mask to apply to bbuf[0] indicating flag is present
 //                    BB - Bit mask to apply to bbuf[1] indicating flag is present
 //                    aa - Bit mask to apply to bbuf[0] highlighting all preceding
 //                    bb - Bit mask to apply to bbuf[1] highlighting all preceding
-// In doing this, we use AA=0x20 to indicate the presence of the payload (and always
-// apply it to our read of bbuf[0] since the payload is mandatory). 0x20 was chosen
+// In doing this, we use AA=0x80 to indicate the presence of the payload (and always
+// apply it to our read of bbuf[0] since the payload is mandatory). 0x80 was chosen
 // since that bit is always 0 in the header.
-static const int32_t STREAM_ID = 0x50000000; // getOffset(..) flag for field: STREAM_ID
+static const int32_t STREAM_ID = 0x50000000; // getOffset(..) flag for field: STREAM_ID // XXX - this is not future-proof
 static const int32_t CLASS_ID  = 0x08005000; // getOffset(..) flag for field: CLASS_ID
 static const int32_t TSI       = 0x00C05800; // getOffset(..) flag for field: TSI
 static const int32_t TSF       = 0x003058C0; // getOffset(..) flag for field: TSF
-static const int32_t PAYLOAD   = 0x020058F0; // getOffset(..) flag for field: PAYLOAD
+//static const int32_t PAYLOAD = 0x020058F0; // getOffset(..) flag for field: PAYLOAD // doesn't work, 0x02 bit is used for spectral now
+// below will work, but is still a hack (using most significant bit of packet type field, which is reserved and always 0)
+static const int32_t HDR_END   = 0x800058F0; // getOffset(..) flag for field: End of header (either PSP or Payload)
 
 
 ostream& operator<< (ostream &s, PacketType val) {
@@ -53,7 +66,7 @@ ostream& operator<< (ostream &s, PacketType val) {
     case PacketType_UnidentifiedData:    return s << "UnidentifiedData";     case PacketType_Data:        return s << "Data";
     case PacketType_UnidentifiedExtData: return s << "UnidentifiedExtData";  case PacketType_ExtData:     return s << "ExtData";
     case PacketType_Context:             return s << "Context";              case PacketType_ExtContext:  return s << "ExtContext";
-    case PacketType_reserved6:           return s << "reserved6";            case PacketType_reserved7:   return s << "reserved7";
+    case PacketType_Command:             return s << "Command";              case PacketType_ExtCommand:  return s << "ExtCommand";
     case PacketType_reserved8:           return s << "reserved8";            case PacketType_reserved9:   return s << "reserved9";
     case PacketType_reserved10:          return s << "reserved10";           case PacketType_reserved11:  return s << "reserved11";
     case PacketType_reserved12:          return s << "reserved12";           case PacketType_reserved13:  return s << "reserved13";
@@ -73,7 +86,35 @@ bool vrt::PacketType_isData (PacketType pt) {
     case PacketType_UnidentifiedData:    return true;     case PacketType_Data:                return true;
     case PacketType_UnidentifiedExtData: return true;     case PacketType_ExtData:             return true;
     case PacketType_Context:             return false;    case PacketType_ExtContext:          return false;
-    case PacketType_reserved6:           return false;    case PacketType_reserved7:           return false;
+    case PacketType_Command:             return false;    case PacketType_ExtCommand:          return false;
+    case PacketType_reserved8:           return false;    case PacketType_reserved9:           return false;
+    case PacketType_reserved10:          return false;    case PacketType_reserved11:          return false;
+    case PacketType_reserved12:          return false;    case PacketType_reserved13:          return false;
+    case PacketType_reserved14:          return false;    case PacketType_reserved15:          return false;
+  }
+  throw VRTException("Invalid packet type");
+}
+
+bool vrt::PacketType_isContext (PacketType pt) {
+  switch (pt) {
+    case PacketType_UnidentifiedData:    return false;    case PacketType_Data:                return false;
+    case PacketType_UnidentifiedExtData: return false;    case PacketType_ExtData:             return false;
+    case PacketType_Context:             return true;     case PacketType_ExtContext:          return true;
+    case PacketType_Command:             return false;    case PacketType_ExtCommand:          return false;
+    case PacketType_reserved8:           return false;    case PacketType_reserved9:           return false;
+    case PacketType_reserved10:          return false;    case PacketType_reserved11:          return false;
+    case PacketType_reserved12:          return false;    case PacketType_reserved13:          return false;
+    case PacketType_reserved14:          return false;    case PacketType_reserved15:          return false;
+  }
+  throw VRTException("Invalid packet type");
+}
+
+bool vrt::PacketType_isCommand (PacketType pt) {
+  switch (pt) {
+    case PacketType_UnidentifiedData:    return false;    case PacketType_Data:                return false;
+    case PacketType_UnidentifiedExtData: return false;    case PacketType_ExtData:             return false;
+    case PacketType_Context:             return false;    case PacketType_ExtContext:          return false;
+    case PacketType_Command:             return true;     case PacketType_ExtCommand:          return true;
     case PacketType_reserved8:           return false;    case PacketType_reserved9:           return false;
     case PacketType_reserved10:          return false;    case PacketType_reserved11:          return false;
     case PacketType_reserved12:          return false;    case PacketType_reserved13:          return false;
@@ -87,7 +128,7 @@ bool vrt::PacketType_hasStreamIdentifier (PacketType pt) {
     case PacketType_UnidentifiedData:    return false;    case PacketType_Data:                return true;
     case PacketType_UnidentifiedExtData: return false;    case PacketType_ExtData:             return true;
     case PacketType_Context:             return true;     case PacketType_ExtContext:          return true;
-    case PacketType_reserved6:           return false;    case PacketType_reserved7:           return false;
+    case PacketType_Command:             return true;     case PacketType_ExtCommand:          return true;
     case PacketType_reserved8:           return false;    case PacketType_reserved9:           return false;
     case PacketType_reserved10:          return false;    case PacketType_reserved11:          return false;
     case PacketType_reserved12:          return false;    case PacketType_reserved13:          return false;
@@ -96,6 +137,7 @@ bool vrt::PacketType_hasStreamIdentifier (PacketType pt) {
   throw VRTException("Invalid packet type");
 }
 
+// Data Sample formats (see V49.2 section 6.1.1.4 rule #1)
 ostream& operator<<(ostream &s, RealComplexType val) {
   switch (val) {
     case RealComplexType_Real:             return s << "Real";
@@ -112,24 +154,25 @@ string operator+(string &s, RealComplexType val) {
   return str.str();
 }
 
+// Data Item formats (see V49.2 section 6.1.1.4 rule #2)
 ostream& operator<<(ostream &s, DataItemFormat val) {
   switch (val) {
-    case DataItemFormat_SignedInt    : return s << "SignedInt";      case DataItemFormat_SignedVRT1   : return s << "SignedVRT1";
-    case DataItemFormat_SignedVRT2   : return s << "SignedVRT2";     case DataItemFormat_SignedVRT3   : return s << "SignedVRT3";
-    case DataItemFormat_SignedVRT4   : return s << "SignedVRT4";     case DataItemFormat_SignedVRT5   : return s << "SignedVRT5";
-    case DataItemFormat_SignedVRT6   : return s << "SignedVRT6";     case DataItemFormat_reserved7    : return s << "reserved7";
-    case DataItemFormat_reserved8    : return s << "reserved8";      case DataItemFormat_reserved9    : return s << "reserved9";
-    case DataItemFormat_reserved10   : return s << "reserved10";     case DataItemFormat_reserved11   : return s << "reserved11";
-    case DataItemFormat_reserved12   : return s << "reserved12";     case DataItemFormat_reserved13   : return s << "reserved13";
-    case DataItemFormat_Float        : return s << "Float";          case DataItemFormat_Double       : return s << "Double";
-    case DataItemFormat_UnsignedInt  : return s << "UnsignedInt";    case DataItemFormat_UnsignedVRT1 : return s << "UnsignedVRT1";
-    case DataItemFormat_UnsignedVRT2 : return s << "UnsignedVRT2";   case DataItemFormat_UnsignedVRT3 : return s << "UnsignedVRT3";
-    case DataItemFormat_UnsignedVRT4 : return s << "UnsignedVRT4";   case DataItemFormat_UnsignedVRT5 : return s << "UnsignedVRT5";
-    case DataItemFormat_UnsignedVRT6 : return s << "UnsignedVRT6";   case DataItemFormat_reserved23   : return s << "reserved23";
-    case DataItemFormat_reserved24   : return s << "reserved24";     case DataItemFormat_reserved25   : return s << "reserved25";
-    case DataItemFormat_reserved26   : return s << "reserved26";     case DataItemFormat_reserved27   : return s << "reserved27";
-    case DataItemFormat_reserved28   : return s << "reserved28";     case DataItemFormat_reserved29   : return s << "reserved29";
-    case DataItemFormat_reserved30   : return s << "reserved30";     case DataItemFormat_reserved31   : return s << "reserved31";
+    case DataItemFormat_SignedInt    : return s << "SignedInt";      case DataItemFormat_SignedVRT1    : return s << "SignedVRT1";
+    case DataItemFormat_SignedVRT2   : return s << "SignedVRT2";     case DataItemFormat_SignedVRT3    : return s << "SignedVRT3";
+    case DataItemFormat_SignedVRT4   : return s << "SignedVRT4";     case DataItemFormat_SignedVRT5    : return s << "SignedVRT5";
+    case DataItemFormat_SignedVRT6   : return s << "SignedVRT6";     case DataItemFormat_SignedIntNN   : return s << "SignedIntNN";
+    case DataItemFormat_reserved8    : return s << "reserved8";      case DataItemFormat_reserved9     : return s << "reserved9";
+    case DataItemFormat_reserved10   : return s << "reserved10";     case DataItemFormat_reserved11    : return s << "reserved11";
+    case DataItemFormat_reserved12   : return s << "reserved12";     case DataItemFormat_Float16       : return s << "Float16";
+    case DataItemFormat_Float        : return s << "Float";          case DataItemFormat_Double        : return s << "Double";
+    case DataItemFormat_UnsignedInt  : return s << "UnsignedInt";    case DataItemFormat_UnsignedVRT1  : return s << "UnsignedVRT1";
+    case DataItemFormat_UnsignedVRT2 : return s << "UnsignedVRT2";   case DataItemFormat_UnsignedVRT3  : return s << "UnsignedVRT3";
+    case DataItemFormat_UnsignedVRT4 : return s << "UnsignedVRT4";   case DataItemFormat_UnsignedVRT5  : return s << "UnsignedVRT5";
+    case DataItemFormat_UnsignedVRT6 : return s << "UnsignedVRT6";   case DataItemFormat_UnsignedIntNN : return s << "UnsignedIntNN";
+    case DataItemFormat_reserved24   : return s << "reserved24";     case DataItemFormat_reserved25    : return s << "reserved25";
+    case DataItemFormat_reserved26   : return s << "reserved26";     case DataItemFormat_reserved27    : return s << "reserved27";
+    case DataItemFormat_reserved28   : return s << "reserved28";     case DataItemFormat_reserved29    : return s << "reserved29";
+    case DataItemFormat_reserved30   : return s << "reserved30";     case DataItemFormat_reserved31    : return s << "reserved31";
     default                          : return s << "Unknown DataItemFormat " << (int32_t)val;
   }
 }
@@ -148,6 +191,7 @@ ostream& operator<<(ostream &s, DataType val) {
     case DataType_Int16      : return s << "Int16";
     case DataType_Int32      : return s << "Int32";
     case DataType_Int64      : return s << "Int64";
+    //case DataType_Float16    : return s << "Float16";
     case DataType_Float      : return s << "Float";
     case DataType_Double     : return s << "Double";
     case DataType_UInt1      : return s << "UInt1";
@@ -167,26 +211,15 @@ string operator+(string &s, DataType val) {
 }
 
 BasicVRTPacket::BasicVRTPacket () :
-  bbuf(7*4/*=MAX_HEADER_LENGTH*/),
+  bbuf(MAX_HEADER_LENGTH),
   readOnly(false)
 {
   // Initializes a default header for the packet.
-  bbuf[0] = 0x18;
-  bbuf[1] = 0x60;
-  bbuf[2] = 0x00;
-  bbuf[3] = 0x07;
+  bbuf[0] = 0x18; // Data packet with SID and CID
+  bbuf[1] = 0x60; // TSI=UTC; TSF=Real-Time (ps); PktCnt=0
+  bbuf[2] = 0x00; // 
+  bbuf[3] = 0x07; // PktSize = seven 32-bit words (max header size w/ no PSP, no payload, and no trailer)
   // done
-}
-
-BasicVRTPacket::BasicVRTPacket (int32_t bufsize) :
-  bbuf(max(7*4/*=MAX_HEADER_LENGTH*/, bufsize)),
-  readOnly(false)
-{
-  // Initializes a default header for the packet.
-  bbuf[0] = 0x18;
-  bbuf[1] = 0x60;
-  bbuf[2] = 0x00;
-  bbuf[3] = 0x07;
 }
 
 BasicVRTPacket::BasicVRTPacket (const BasicVRTPacket &p) :
@@ -197,10 +230,21 @@ BasicVRTPacket::BasicVRTPacket (const BasicVRTPacket &p) :
   // done
 }
 
+BasicVRTPacket::BasicVRTPacket (int32_t bufsize) :
+  bbuf(max(MAX_HEADER_LENGTH, bufsize)),
+  readOnly(false)
+{
+  // Initializes a default header for the packet.
+  bbuf[0] = 0x18;
+  bbuf[1] = 0x60;
+  bbuf[2] = 0x00;
+  bbuf[3] = 0x07;
+}
+
 BasicVRTPacket::BasicVRTPacket (const void *buf, size_t len, bool readOnly) :
   readOnly(readOnly)
 {
-  if (len < 4) {
+  if (len < 4) { 
     // If user accidentally calls with 'BasicVRTPacket(buf, false)' there will
     // be no compile-time warning (C++ changes false/true to 0/1), but there
     // will be a segfault later when they try to do stuff. As such we should
@@ -258,6 +302,7 @@ int64_t BasicVRTPacket::getStreamCode () const {
   switch (bbuf[0] & 0xF0) {
     case 0x00: return __INT64_C(0x0000000000000000); // no stream identifier
     case 0x20: return __INT64_C(0x2000000000000000); // no stream identifier
+    // XXX - If any reserved packet types 0b1XXX are later defined to not have stream identifier, add cases here.
     default:   return VRTMath::unpackLong(bbuf, 0) & __INT64_C(0xF0000000FFFFFFFF);
   }
 }
@@ -267,6 +312,7 @@ int64_t BasicVRTPacket::getStreamCode (const void *ptr) {
   switch (bbuf[0] & 0xF0) {
     case 0x00: return __INT64_C(0x0000000000000000); // no stream identifier
     case 0x20: return __INT64_C(0x2000000000000000); // no stream identifier
+    // XXX - If any reserved packet types 0b1XXX are later defined to not have stream identifier, add cases here.
     default:   return VRTMath::unpackLong(bbuf, 0) & __INT64_C(0xF0000000FFFFFFFF);
   }
 }
@@ -276,14 +322,18 @@ void BasicVRTPacket::toStringStream (ostringstream &str) const {
   str << " PacketType="   << getPacketType();
   str << " PacketCount="  << getPacketCount();
   str << " PacketLength=" << getPacketLength();
-  str <<   " (Header="    << getHeaderLength();
+  str <<   " (Prologue="  << getPrologueLength();
   str <<   ",Payload="    << getPayloadLength();
   str <<   ",Trailer="    << getTrailerLength() << ")";
   str << " PadBitCount="  << getPadBitCount();
-  Utilities::append(str, " TimeStamp=",     getTimeStamp());
-  Utilities::append(str, " StreamID=",      getStreamID());
-  Utilities::append(str, " ClassID=",       getClassID());
-  Utilities::append(str, " TimeStampMode=", isTimeStampMode());
+  Utilities::append(str, " TimeStamp=",          getTimeStamp());
+  Utilities::append(str, " StreamID=",           getStreamID());
+  Utilities::append(str, " ClassID=",            getClassID());
+  Utilities::append(str, " TimeStampMode=",      isTimeStampMode());
+  Utilities::append(str, " SpectrumMode=",       isSpectrumMode());
+  Utilities::append(str, " ControlAckMode=",     isControlAckMode());
+  Utilities::append(str, " StaleTimeStampMode=", isStaleTimeStampMode());
+  Utilities::append(str, " CancelMode=",         isCancelMode());
 }
 
 bool BasicVRTPacket::headerEquals (const BasicVRTPacket &p2) const {
@@ -292,10 +342,22 @@ bool BasicVRTPacket::headerEquals (const BasicVRTPacket &p2) const {
   return (memcmp(&bbuf[0], &p2.bbuf[0], hLen) == 0);
 }
 
+bool BasicVRTPacket::prologueEquals (const BasicVRTPacket &p2) const {
+  int32_t prologLen = getPrologueLength();
+  if (prologLen != p2.getPrologueLength()) return false;
+  return (memcmp(&bbuf[0], &p2.bbuf[0], prologLen) == 0);
+}
+
+bool BasicVRTPacket::pktSpecificPrologueEquals (const BasicVRTPacket &p2) const {
+  int32_t pspLen = getPktSpecificPrologueLength();
+  if (pspLen != p2.getPktSpecificPrologueLength()) return false;
+  return (memcmp(&bbuf[getHeaderLength()], &p2.bbuf[p2.getHeaderLength()], pspLen) == 0);
+}
+
 bool BasicVRTPacket::payloadEquals (const BasicVRTPacket &p2) const {
   int32_t pLen = getPayloadLength();
   if (pLen != p2.getPayloadLength()) return false;
-  return (memcmp(&bbuf[getHeaderLength()], &p2.bbuf[p2.getHeaderLength()], pLen) == 0);
+  return (memcmp(&bbuf[getPrologueLength()], &p2.bbuf[p2.getPrologueLength()], pLen) == 0);
 }
 
 bool BasicVRTPacket::trailerEquals (const BasicVRTPacket &p2, bool exact) const {
@@ -351,16 +413,25 @@ string BasicVRTPacket::toString () const {
   }
 }
 
+// XXX - use of 0x80 as "HDR_END" bit is not future-proof for when additional packet types are defined
+//     - also, this implementation assumes all reserved packet types 0b1XXX will have mandatory stream id
 int32_t __attribute__((hot)) BasicVRTPacket::getOffset (int32_t field) const {
-  int32_t a0  = (bbuf[0] | 0x02) & 0xFF;
+  //int32_t a0  = (bbuf[0] | 0x02) & 0xFF; // this sets the sprectral bit, which was previously reserved
+  int32_t a0  = (bbuf[0] | 0x80) & 0xFF;   // this NOW sets the MSBit of packet type, which is still reserved
   int32_t b0  = (bbuf[1]       ) & 0xFF;
   int32_t a   = a0 & (field >> 8);
   int32_t b   = b0 & (field     );
+
+  // Determine if field exists already (mul=1) or not (mul=-1)
   int32_t sgn = ~(-((a0 & (field >> 24))    // If any bits in mask -> "N>0", otherwise "N=0",
                    |(b0 & (field >> 16)))); // then doing ~(-N) changes this to "N>0" and "N<0"
   int32_t mul = (sgn >> 31) | 0x00000001;   // This changes it to "N=+1" or "N=-1"
+
+  // Calculate offset, including 4 bytes for mandatory 4-byte header
   int32_t off = 4
               + (((a >> 2) | (a >> 4)) & 0x04)   // xxx1 xxxx OR x1xx xxxx -> has stream identifier (4)
+              // XXX - above is currently true (per V49.2), but may not hold true in the future... 
+              //     - could add a ` & ~(a >> 5) ` to eliminate all reserved packet types not yet defined
               + (( a                 ) & 0x08)   // xxxx 1xxx              -> has class identifier  (8)
               + (((b >> 5) | (b >> 4)) & 0x04)   // 1xxx xxxx OR x1xx xxxx -> has TSI               (4)
               + (((b >> 2) | (b >> 1)) & 0x08);  // xx1x xxxx OR xxx1 xxxx -> has TSF               (8)
@@ -384,7 +455,7 @@ void BasicVRTPacket::shiftHeader (int32_t field, int32_t bytes, bool present) {
   }
 }
 
-int32_t BasicVRTPacket::shiftPayload (int32_t off, int32_t bytes, bool add) {
+int32_t BasicVRTPacket::shiftPacketSpecificPrologue (int32_t off, int32_t bytes, bool add) {
   int32_t offset = (off < 0)? -off : off;
   if ((off >= 0) == add) return offset; // no change
 
@@ -401,12 +472,34 @@ int32_t BasicVRTPacket::shiftPayload (int32_t off, int32_t bytes, bool add) {
   return offset;
 }
 
-void BasicVRTPacket::shiftTrailer (int32_t bytes) {
+int32_t BasicVRTPacket::shiftPayload (int32_t off, int32_t bytes, bool add) {
+  int32_t offset = (off < 0)? -off : off;
+  // TODO - the following will not allow bytes to be added/removed at offset 0, but should it?
+  //      - as a workaround, it's possible to use shiftPacketSpecificPrologue(...) with the
+  //        offset value equal to (+/-) getPrologueLength()-getHeaderLength().
+  if ((off >= 0) == add) return offset; // no change
+
+  int32_t prologlen = getPrologueLength();
+  if (add) {
+    bbuf.reserve(getPacketLength()+bytes);
+    bbuf.insert(bbuf.begin()+prologlen+offset, bytes, 0);
+    setPacketLength(getPacketLength()+bytes);
+  }
+  else {
+    bbuf.erase(bbuf.begin()+prologlen+offset, bbuf.begin()+prologlen+offset+bytes);
+    setPacketLength(getPacketLength()-bytes);
+  }
+  return offset;
+}
+
+void BasicVRTPacket::shiftTrailer (bool add) {
+  if (hasTrailer() == add) return; // no change
+
   int32_t oldLen = getPacketLength();
-  int32_t newLen = oldLen + bytes;
+  int32_t newLen = oldLen + (add ? MAX_TRAILER_LENGTH : -MAX_TRAILER_LENGTH);
 
   bbuf.resize(newLen, 0);
-  if (bytes < 0) {
+  if (!add) {
     bbuf[0] &= ~TRAILER_BIT;
   }
   else {
@@ -447,28 +540,48 @@ void BasicVRTPacket::setStateEventBit (vector<char> &buf, int32_t off, int32_t e
 }
 
 string BasicVRTPacket::getPacketValid (bool strict, int32_t length) const {
-  static const int32_t CONTEXT_CLASSID_RESERVED = 0xFF;
-  static const int32_t DATA_CLASSID_RESERVED    = (VRTConfig::getVRTVersion() == VRTConfig::VITAVersion_V49b)? 0x07 : 0xFF;
+  static const int32_t DATA_CLASSID_RESERVED    = (VRTConfig::getVRTVersion() == VRTConfig::VITAVersion_V49)? 0xFF : 0x07;
+  // XXX - V49.2 spec does not specify that CONTEXT/COMMAND packets shall have no 0-padding and that pad bit count must be =0
+  //     - CLASSID_RESERVED = 0xFF requires pad bit count be set to 0
+  //     - CLASSID_RESERVED = 0x07 does not require pad bit count be set to 0
+  //     - it is unclear whether CONTEXT/COMMAND packets are able to have 0-padding, so do not require pad bit count be =0
+  //static const int32_t CONTEXT_CLASSID_RESERVED = 0xFF;
+  //static const int32_t COMMAND_CLASSID_RESERVED = 0xFF;
+  static const int32_t CLASSID_RESERVED = 0x07;
+  static const int32_t COMMAND_PSP_RESERVED = 0xFF;
 
   // This method is called a LOT so it has been re-written to eliminate any branches outside of
   // the error case.
 
-  bool    data = isData();
-  int32_t cid  = getOffset(CLASS_ID);
-  bool    resOK = !strict || (( data && ((bbuf[0] & 0x3) == 0))               // Fixed Reserved Bits (data)
-                          ||  (!data && ((bbuf[0] & 0x6) == 0)));             // Fixed Reserved Bits (context)
-  bool    cidOK = !strict || (cid < 0)
-                          || ( data && ((bbuf[cid] & DATA_CLASSID_RESERVED   ) == 0))  // ClassID Reserved Bits (data)
-                          || (!data && ((bbuf[cid] & CONTEXT_CLASSID_RESERVED) == 0)); // ClassID Reserved Bits (context)
   // Check lengths
-  int32_t pLen     = getPacketLength();
-  int32_t hLen     = getHeaderLength();
-  int32_t tLen     = getTrailerLength();
-  bool    sizeMin  = (pLen >= hLen+tLen);
+  int32_t pLen      = getPacketLength();
+  int32_t hLen      = getHeaderLength();
+  int32_t prologLen = getPrologueLength();
+  int32_t tLen      = getTrailerLength();
+  bool    sizeMin  = (pLen >= prologLen+tLen);
   bool    sizeOk1  = (bbuf.size() >= (size_t)pLen);
   bool    lenOK    = (length == -1) || (length == pLen);
-  bool    allOK    = resOK && cidOK && sizeMin && lenOK && sizeOk1;
 
+  // XXX - Could add simple `if (strict) {...}` to entire block below to skip when !strict
+  bool    data = isData();
+  bool    ctxt = isContext();
+  bool    cmd  = isCommand();
+  int32_t cid  = getOffset(CLASS_ID);
+  bool    resOK = !strict || cmd
+                          || (data && ((bbuf[0] & 0x1) == 0))              // Fixed Reserved Bits (data)
+                          || (ctxt && ((bbuf[0] & 0x6) == 0));             // Fixed Reserved Bits (context)
+  bool    cidOK = !strict || (cid < 0)
+                          || (data  && ((bbuf[cid] & DATA_CLASSID_RESERVED) == 0))  // ClassID Reserved Bits (data)
+                          || (!data && ((bbuf[cid] & CLASSID_RESERVED     ) == 0)); // ClassID Reserved Bits (context and command)
+                          //|| (ctxt && ((bbuf[cid] & CONTEXT_CLASSID_RESERVED) == 0))  // ClassID Reserved Bits (context)
+                          //|| ( cmd && ((bbuf[cid] & COMMAND_CLASSID_RESERVED) == 0)); // ClassID Reserved Bits (command)
+  //int32_t psp = getHeaderLength(); // Packet Specific Prologue offset, immediately after header for all command packets
+  // just use hLen, gotten previously
+  bool    pspOk = !strict || !cmd
+                          || (    ((bbuf[hLen+2] & COMMAND_PSP_RESERVED) == 0)
+                               && ((bbuf[hLen+3] & COMMAND_PSP_RESERVED) == 0));
+
+  bool    allOK    = resOK && cidOK && sizeMin && lenOK && sizeOk1 && pspOk;
   if (allOK) {
     return "";
   }
@@ -480,10 +593,11 @@ string BasicVRTPacket::getPacketValid (bool strict, int32_t length) const {
     else if (!cidOK  ) str << "Reserved ClassID bit(s) set to 1 but expected 0 (using "
                               "VRT_VERSION=" << VRTConfig::getVRTVersion() << ").";
     else if (!sizeMin) str << "Invalid packet length, packet reports " << pLen << " octets total, "
-                              "but has " << hLen << "+" << tLen << " octets in header+trailer.";
+                              "but has " << prologLen << "+" << tLen << " octets in prologue+trailer.";
     else if (!lenOK  ) str << "Invalid packet length, packet reports " << pLen << " octets, "
                               "but working with " << length << " octets.";
     else if (!sizeOk1) str << "Allocated buffer shorter than packet length.";
+    else if (!pspOk)   str << "Reserved bit(s) of Ctrl/Ack settings in Packet Specific Prologue set to 1 but expected 0.";
     else               str << "Unknown issue with packet.";
 
     return str.str();
@@ -514,10 +628,19 @@ void BasicVRTPacket::setPadBitCount (int32_t bits, int32_t bitsPerSample) {
       bbuf[cid] = 0;
     }
   }
-  else if (!isData()) {
-    // Context packets expect PadBitCount=0
-    throw VRTException("Can not set PadBitCount to %d for a context packet.", bits);
-  }
+// Commented out because V49.2 spec says nothing about PadBitCount=0 for ANY packet type
+//   - is mentioned generally at VRTPacket level
+//   - specifics are added at DataPacket level
+//   - no other packet type mentions it, but they all inherit from VRTPacket, so should allow pad bits
+//  else if (!isData()) { 
+    // Context packets expect PadBitCount=0 // XXX perhaps V49.0 and V49.0b rule no longer true for V49.2?
+    // TODO - is this true? Nothing in V49.2 spec indicates this explicitly
+    //      - perhaps it is implicit b/c CIF+fields always fill 32-bit words?
+    // Command packets likely can have a PadBitCount, at least the Acknowledge sub-type w/ free-form warn/error msg
+    //      - Control and Acknowledge-Query-Status (AckS) - likely same as Context: perpahs no padding, unclear
+    //      - Acknowledge (AckV and AckX)                 - likely allow padding
+//    throw VRTException("Can not set PadBitCount to %d for a context packet.", bits);
+//  }
   else if ((bits < 0) || (bits > 31)) {
     throw VRTException("Given PadBitCount of %d is outside of allowable limits.", bits);
   }
@@ -531,12 +654,12 @@ void BasicVRTPacket::setPadBitCount (int32_t bits, int32_t bitsPerSample) {
     // Value is not implicit, but can not set
     throw VRTException("Can not set PadBitCount to %d without a ClassID set.", bits);
   }
-  else if (VRTConfig::getVRTVersion() != VRTConfig::VITAVersion_V49b) {
+  else if (VRTConfig::getVRTVersion() == VRTConfig::VITAVersion_V49) {
     // Value is not implicit, but can not set
-    throw VRTException("Can only set PadBitCount to %d when using VRT_VERSION=V49b.", bits);
+    throw VRTException("Cannot set PadBitCount to %d when using VRT_VERSION=V49.", bits);
   }
   else {
-    // Have a ClassID and using VITA-49.0b so set the bits
+    // Have a ClassID and using VITA-49.0b (or later) so set the bits
     bbuf[cid] = (int8_t)(bits << 3);
   }
 }
@@ -546,6 +669,24 @@ bool BasicVRTPacket::isData () const {
   //    return PacketType_isData(getPacketType());
   // but changed to make it faster
   return ((bbuf[0] & 0xC0) == 0); // i.e. accept types 0x0o, 0x1o, 0x2o, 0x3o
+}
+
+bool BasicVRTPacket::isContext () const {
+  // This used to be implemented as
+  //    return PacketType_isContext(getPacketType());
+  // but changed to make it faster
+  return ((bbuf[0] & 0xE0) == 0x40); // i.e. accept types 0x4o, 0x5o
+}
+
+bool BasicVRTPacket::isCommand () const {
+  // This used to be implemented as
+  //    return PacketType_isCommand(getPacketType());
+  // but changed to make it faster
+  return ((bbuf[0] & 0xE0) == 0x60); // i.e. accept types 0x6o, 0x7o
+}
+
+bool BasicVRTPacket::hasPacketSpecificPrologue () const {
+  return isCommand(); // Has PSP if and only if is Command
 }
 
 bool BasicVRTPacket::hasTrailer () const {
@@ -573,9 +714,33 @@ bool BasicVRTPacket::isChangePacket () const {
   return true;
 }
 
+boolNull BasicVRTPacket::isSpectrumMode () const {
+  if (!isData()) return _NULL;
+  if ((bbuf[0]&SPECTRAL_BIT)!=0) return _TRUE;
+  return _FALSE;
+}
+
 boolNull BasicVRTPacket::isTimeStampMode () const {
-  if (isData()) return _NULL;
+  if (!isContext()) return _NULL;
   if ((bbuf[0]&TSM_BIT)!=0) return _TRUE;
+  return _FALSE;
+}
+
+boolNull BasicVRTPacket::isControlAckMode () const {
+  if (!isCommand()) return _NULL;
+  if ((bbuf[0]&CTRL_ACK_BIT)!=0) return _TRUE;
+  return _FALSE;
+}
+
+boolNull BasicVRTPacket::isStaleTimeStampMode () const {
+  if (!isCommand()) return _NULL;
+  if ((bbuf[0]&STALE_TS_BIT)!=0) return _TRUE;
+  return _FALSE;
+}
+
+boolNull BasicVRTPacket::isCancelMode () const {
+  if (!isCommand()) return _NULL;
+  if ((bbuf[0]&CANCEL_BIT)!=0) return _TRUE;
   return _FALSE;
 }
 
@@ -588,8 +753,20 @@ int32_t BasicVRTPacket::getPacketCount () const {
   return bbuf[1] & 0xF;
 }
 
+int32_t BasicVRTPacket::getPrologueLength () const {
+  // Assume no PacketSpecificPrologue in this class and return HeaderLength
+  // Since this is virtual, it'll get overridden where necessary
+  return getOffset(HDR_END);
+}
+
 int32_t BasicVRTPacket::getHeaderLength () const {
-  return getOffset(PAYLOAD);
+  return getOffset(HDR_END);
+}
+
+int32_t BasicVRTPacket::getPktSpecificPrologueLength () const {
+  // Assume no PacketSpecificPrologue in this class and return 0
+  // Since this is virtual, it'll get overridden where necessary
+  return 0;
 }
 
 void BasicVRTPacket::setPacketLength (int32_t v) {
@@ -599,19 +776,62 @@ void BasicVRTPacket::setPacketLength (int32_t v) {
 void BasicVRTPacket::setPacketType (PacketType t) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
 
+  bool hasT = hasTrailer();
+
   shiftHeader(STREAM_ID, 4, PacketType_hasStreamIdentifier(t));
   bbuf[0] = (char)((0x0F & bbuf[0]) | (t << 4));
 
-  if (isData()) bbuf[0] &= ~TSM_BIT;     // clear TSM bit
-  else          bbuf[0] &= ~TRAILER_BIT; // clear trailer bit
+  // TODO - this will preserve trailer in some cases; should it?
+  if (!hasT) {
+    bbuf[0] &= 0xF8;            // clear all indicator bits
+  } else {                      // was a data packet with trailer
+    if (isData()) {
+      bbuf[0] &= 0xFC;          // clear all indicator bits except Trailer bit; preserve trailer
+    } else {
+      shiftTrailer(false);      // remove trailer
+      bbuf[0] &= 0xF8;          // clear all indicator bits
+    }
+  }
+}
+
+void BasicVRTPacket::setSpectrumMode (bool v) {
+  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
+  if (!isData()) throw VRTException("Can not set spectrum mode on a context or command packet.");
+
+  if (v) bbuf[0] |=  SPECTRAL_BIT;
+  else   bbuf[0] &= ~SPECTRAL_BIT;
 }
 
 void BasicVRTPacket::setTimeStampMode (bool v) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  if (isData()) throw VRTException("Can not set time-stamp mode on a data packet.");
+  if (!isContext()) throw VRTException("Can not set time-stamp mode on a data or command packet.");
 
   if (v) bbuf[0] |=  TSM_BIT;
   else   bbuf[0] &= ~TSM_BIT;
+}
+
+void BasicVRTPacket::setControlAckMode (bool v) {
+  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
+  if (!isCommand()) throw VRTException("Can not set control/ack mode on a data or context packet.");
+
+  if (v) bbuf[0] |=  CTRL_ACK_BIT;
+  else   bbuf[0] &= ~CTRL_ACK_BIT;
+}
+
+void BasicVRTPacket::setStaleTimeStampMode (bool v) {
+  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
+  if (!isCommand()) throw VRTException("Can not set stale timestamp mode on a data or context packet.");
+
+  if (v) bbuf[0] |=  STALE_TS_BIT;
+  else   bbuf[0] &= ~STALE_TS_BIT;
+}
+
+void BasicVRTPacket::setCancelMode (bool v) {
+  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
+  if (!isCommand()) throw VRTException("Can not set cancel mode on a data or context packet.");
+
+  if (v) bbuf[0] |=  CANCEL_BIT;
+  else   bbuf[0] &= ~CANCEL_BIT;
 }
 
 TimeStamp BasicVRTPacket::getTimeStamp (double sr) const {
@@ -663,7 +883,7 @@ void BasicVRTPacket::setPacketCount (void *ptr, int32_t v) {
 void BasicVRTPacket::setPayloadLength (int32_t v) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   int32_t plen = getPayloadLength();
-  int32_t hlen = getHeaderLength();
+  int32_t prologlen = getPrologueLength();
   if (v == plen) return; // no change
 
   if ((v < 0) || (v > MAX_PAYLOAD_LENGTH)) {
@@ -674,13 +894,13 @@ void BasicVRTPacket::setPayloadLength (int32_t v) {
   }
 
   if (v > plen) {
-    bbuf.reserve(hlen+v+getTrailerLength());
-    bbuf.insert(bbuf.begin()+hlen+plen, v-plen, 0);
+    bbuf.reserve(prologlen+v+getTrailerLength());
+    bbuf.insert(bbuf.begin()+prologlen+plen, v-plen, 0);
   }
   else {
-    bbuf.erase(bbuf.begin()+hlen+v, bbuf.begin()+hlen+plen);
+    bbuf.erase(bbuf.begin()+prologlen+v, bbuf.begin()+prologlen+plen);
   }
-  setPacketLength(hlen+v+getTrailerLength());
+  setPacketLength(prologlen+v+getTrailerLength());
 }
 
 int32_t BasicVRTPacket::getStreamIdentifier () const {
@@ -774,12 +994,14 @@ void BasicVRTPacket::setClassIdentifier (int32_t oui, int16_t icc, int16_t pcc) 
   setClassIdentifier(_oui|_icc|_pcc);
 }
 
+// XXX - TODO update SourceVITA49/SinkVITA49 to use this instead of requiring bbuf be public
 char* BasicVRTPacket::getPacketPointer () {
   return &bbuf[0];
 }
 
+// XXX - TODO update SourceVITA49/SinkVITA49 to use this instead of requiring bbuf be public
 char* BasicVRTPacket::getPayloadPointer () {
-  return &bbuf[getHeaderLength()];
+  return &bbuf[getPrologueLength()];
 }
 
 vector<char> BasicVRTPacket::getPacket () const {
@@ -788,7 +1010,7 @@ vector<char> BasicVRTPacket::getPacket () const {
 }
 
 vector<char> BasicVRTPacket::getPayload () const {
-  const char *p = &bbuf[getHeaderLength()];
+  const char *p = &bbuf[getPrologueLength()];
   return vector<char>(p, p+getPayloadLength());
 }
 
@@ -802,7 +1024,7 @@ int32_t BasicVRTPacket::readPacket (void *buffer, int32_t poff, int32_t len) con
 int32_t BasicVRTPacket::readPayload (void *buffer, int32_t poff, int32_t len) const {
   int32_t plen = getPayloadLength();
   if (len > plen-poff) len = plen-poff;
-  memmove(buffer, &bbuf[getHeaderLength()+poff], len);
+  memmove(buffer, &bbuf[getPrologueLength()+poff], len);
   return len;
 }
 
@@ -813,7 +1035,7 @@ void BasicVRTPacket::writePayload (void *buffer, int32_t payloadOffset, int32_t 
     throw VRTException("Bytes to be written to payload (%d) with given start offset (%d) exceeds payload length (%d).",
                         len, payloadOffset, getPayloadLength());
   }
-  memmove(&bbuf[getHeaderLength()+payloadOffset], buffer, len);
+  memmove(&bbuf[getPrologueLength()+payloadOffset], buffer, len);
 }
 
 int32_t BasicVRTPacket::getFieldCount () const {
@@ -882,6 +1104,7 @@ PayloadFormat::PayloadFormat (DataItemFormat format, int32_t size) : hi(0), lo(0
   setRepeating(false);
   setEventTagSize(0);
   setChannelTagSize(0);
+  setDataItemFracSize(0);
   setItemPackingFieldSize(size);
   setDataItemSize(size);
   setRepeatCount(1);
@@ -895,6 +1118,7 @@ PayloadFormat::PayloadFormat (RealComplexType type, DataItemFormat format, int32
   setRepeating(false);
   setEventTagSize(0);
   setChannelTagSize(0);
+  setDataItemFracSize(0);
   setItemPackingFieldSize(size);
   setDataItemSize(size);
   setRepeatCount(1);
@@ -906,15 +1130,44 @@ PayloadFormat::PayloadFormat (DataType dataType, RealComplexType realComplex) : 
   setDataType(dataType);
 }
 
+PayloadFormat::PayloadFormat (DataItemFormat format, int32_t size, int32_t fracSize) : hi(0), lo(0) {
+  setProcessingEfficient(true);
+  setRealComplexType(RealComplexType_Real);
+  setDataItemFormat(format);
+  setRepeating(false);
+  setEventTagSize(0);
+  setChannelTagSize(0);
+  setDataItemFracSize(fracSize);
+  setItemPackingFieldSize(size);
+  setDataItemSize(size);
+  setRepeatCount(1);
+  setVectorSize(1);
+}
+
+PayloadFormat::PayloadFormat (RealComplexType type, DataItemFormat format, int32_t size, int32_t fracSize) : hi(0), lo(0) {
+  setProcessingEfficient(true);
+  setRealComplexType(type);
+  setDataItemFormat(format);
+  setRepeating(false);
+  setEventTagSize(0);
+  setChannelTagSize(0);
+  setDataItemFracSize(fracSize);
+  setItemPackingFieldSize(size);
+  setDataItemSize(size);
+  setRepeatCount(1);
+  setVectorSize(1);
+}
+
 PayloadFormat::PayloadFormat (bool procEfficient, RealComplexType type, DataItemFormat format,
                               bool repeating, int32_t eventTagSize, int32_t chanTagSize, int32_t fieldSize,
-                              int32_t itemSize, int32_t repeatCount, int32_t vectorSize) : hi(0), lo(0) {
+                              int32_t itemSize, int32_t repeatCount, int32_t vectorSize, int32_t fracSize) : hi(0), lo(0) {
   setProcessingEfficient(procEfficient);
   setRealComplexType(type);
   setDataItemFormat(format);
   setRepeating(repeating);
   setEventTagSize(eventTagSize);
   setChannelTagSize(chanTagSize);
+  setDataItemFracSize(fracSize);
   setItemPackingFieldSize(fieldSize);
   setDataItemSize(itemSize);
   setRepeatCount(repeatCount);
@@ -926,6 +1179,7 @@ string PayloadFormat::getValid () const {
   int            dSize  = getDataItemSize();
   int            eSize  = getEventTagSize();
   int            cSize  = getChannelTagSize();
+  int         fracSize  = getDataItemFracSize();
   DataItemFormat format = getDataItemFormat();
 
   if (fSize < (dSize+eSize+cSize)) {
@@ -946,9 +1200,19 @@ string PayloadFormat::getValid () const {
     case DataItemFormat_UnsignedVRT4: if (dSize <   5) return "Invalid use of DataItemFormat=UnsignedVRT4 with DataItemSize<5"; break;
     case DataItemFormat_UnsignedVRT5: if (dSize <   6) return "Invalid use of DataItemFormat=UnsignedVRT5 with DataItemSize<6"; break;
     case DataItemFormat_UnsignedVRT6: if (dSize <   7) return "Invalid use of DataItemFormat=UnsignedVRT6 with DataItemSize<7"; break;
+    case DataItemFormat_Float16:      if (dSize != 16) return "Invalid use of DataItemFormat=Float16 with DataItemSize!=16"; break;
     case DataItemFormat_Float:        if (dSize != 32) return "Invalid use of DataItemFormat=Float with DataItemSize!=32"; break;
     case DataItemFormat_Double:       if (dSize != 64) return "Invalid use of DataItemFormat=Double with DataItemSize!=64"; break;
     default: break;
+  }
+  
+  // Special check of DataItemFracSize
+  //if (format & 0x07 == 0x07) // DataItemFormat_SignedIntNN (0x07) or DataItemFormat_UnsignedIntNN (0x17)
+  if (format == DataItemFormat_SignedIntNN || format == DataItemFormat_UnsignedIntNN) {
+    if (fracSize > dSize-1) return "Given DataItemFracSize is incompatible with DataItemSize";
+  }
+  else if (fracSize != 0) {
+    return "DataItemFracSize must be zero for all normalized data types";
   }
 
   return "";
@@ -963,6 +1227,7 @@ string PayloadFormat::toString () const {
   str << " Repeating="            << isRepeating();
   str << " EventTagSize="         << getEventTagSize();
   str << " ChannelTagSize="       << getChannelTagSize();
+  str << " DataItemFracSize="     << getDataItemFracSize();
   str << " ItemPackingFieldSize=" << getItemPackingFieldSize();
   str << " DataItemSize="         << getDataItemSize();
   str << " RepeatCount="          << getRepeatCount();
@@ -1002,6 +1267,11 @@ DataType PayloadFormat::getDataType () const {
         case 64:                 return DataType_UInt64;
         default:                 return (DataType)-1; // ERROR
       }
+    // For same reason the VRT types aren't included, the non-normalized should not be included:
+    //   there is no pre-defined fraction size
+    //case DataItemFormat_SignedIntNN:
+    //case DataItemFormat_UnsignedIntNN:
+    //case DataItemFormat_Float16: return DataType_Float16;
     case DataItemFormat_Float:   return DataType_Float;
     case DataItemFormat_Double:  return DataType_Double;
     default:                     return (DataType)-1; // ERROR
@@ -1009,7 +1279,8 @@ DataType PayloadFormat::getDataType () const {
 }
 
 void PayloadFormat::setDataType (DataType type) {
-  int size;
+  // clearNull(); // unnecessary since this will be called by all three function calls below.
+  int size, fracSize = 0;
   switch (type) {
     case DataType_Int4:       size =  4; setDataItemFormat(DataItemFormat_SignedInt  ); break; // nibble
     case DataType_Int8:       size =  8; setDataItemFormat(DataItemFormat_SignedInt  ); break; // byte
@@ -1022,16 +1293,22 @@ void PayloadFormat::setDataType (DataType type) {
     case DataType_UInt16:     size = 16; setDataItemFormat(DataItemFormat_UnsignedInt); break; // short
     case DataType_UInt32:     size = 32; setDataItemFormat(DataItemFormat_UnsignedInt); break; // int
     case DataType_UInt64:     size = 64; setDataItemFormat(DataItemFormat_UnsignedInt); break; // long
+    //case DataType_Float16:    size = 16; setDataItemFormat(DataItemFormat_Float16    ); break; // short
     case DataType_Float:      size = 32; setDataItemFormat(DataItemFormat_Float      ); break; // int
     case DataType_Double:     size = 64; setDataItemFormat(DataItemFormat_Double     ); break; // long
+    // For same reason the VRT types aren't included, the non-normalized should not be included:
+    //   there is no pre-defined fraction size
+    //case DataItemFormat_SignedIntNN:
+    //case DataItemFormat_UnsignedIntNN:
     default:                  throw VRTException("Unsupported data type %d", type);
   }
   setItemPackingFieldSize(size);
   setDataItemSize(size);
+  setDataItemFracSize(fracSize);
 }
 
 int32_t PayloadFormat::getFieldCount () const {
-  return 11;
+  return 12;
 }
 
 string PayloadFormat::getFieldName (int32_t id) const {
@@ -1042,11 +1319,12 @@ string PayloadFormat::getFieldName (int32_t id) const {
     case  3: return "Repeating";
     case  4: return "EventTagSize";
     case  5: return "ChannelTagSize";
-    case  6: return "ItemPackingFieldSize";
-    case  7: return "DataItemSize";
-    case  8: return "RepeatCount";
-    case  9: return "VectorSize";
-    case 10: return "DataType";
+    case  6: return "DataItemFracSize";
+    case  7: return "ItemPackingFieldSize";
+    case  8: return "DataItemSize";
+    case  9: return "RepeatCount";
+    case 10: return "VectorSize";
+    case 11: return "DataType";
     default: throw VRTException("Invalid field #%d in %s", id, getClassName().c_str());
   }
 }
@@ -1063,7 +1341,8 @@ ValueType PayloadFormat::getFieldType (int32_t id) const {
     case  7: return ValueType_Int32;
     case  8: return ValueType_Int32;
     case  9: return ValueType_Int32;
-    case 10: return ValueType_Int64;
+    case 10: return ValueType_Int32;
+    case 11: return ValueType_Int64;
     default: throw VRTException("Invalid field #%d in %s", id, getClassName().c_str());
   }
 }
@@ -1076,11 +1355,12 @@ Value* PayloadFormat::getField (int32_t id) const {
     case  3: return new Value(isRepeating());
     case  4: return new Value(getEventTagSize());
     case  5: return new Value(getChannelTagSize());
-    case  6: return new Value(getItemPackingFieldSize());
-    case  7: return new Value(getDataItemSize());
-    case  8: return new Value(getRepeatCount());
-    case  9: return new Value(getVectorSize());
-    case 10: return new Value((int64_t)getDataType());
+    case  6: return new Value(getDataItemFracSize());
+    case  7: return new Value(getItemPackingFieldSize());
+    case  8: return new Value(getDataItemSize());
+    case  9: return new Value(getRepeatCount());
+    case 10: return new Value(getVectorSize());
+    case 11: return new Value((int64_t)getDataType());
     default: return new Value(); // null value
   }
 }
@@ -1093,11 +1373,12 @@ void PayloadFormat::setField (int32_t id, const Value* val) {
     case  3: setRepeating(                            val->as<bool   >()); break;
     case  4: setEventTagSize(                         val->as<int32_t>()); break;
     case  5: setChannelTagSize(                       val->as<int32_t>()); break;
-    case  6: setItemPackingFieldSize(                 val->as<int32_t>()); break;
-    case  7: setDataItemSize(                         val->as<int32_t>()); break;
-    case  8: setRepeatCount(                          val->as<int32_t>()); break;
-    case  9: setVectorSize(                           val->as<int32_t>()); break;
-    case 10: setDataType(            (DataType       )val->as<int64_t>()); break;
+    case  6: setDataItemFracSize(                     val->as<int32_t>()); break;
+    case  7: setItemPackingFieldSize(                 val->as<int32_t>()); break;
+    case  8: setDataItemSize(                         val->as<int32_t>()); break;
+    case  9: setRepeatCount(                          val->as<int32_t>()); break;
+    case 10: setVectorSize(                           val->as<int32_t>()); break;
+    case 11: setDataType(            (DataType       )val->as<int64_t>()); break;
     default: throw VRTException("Invalid field #%d in %s", id, getClassName().c_str());
   }
 }

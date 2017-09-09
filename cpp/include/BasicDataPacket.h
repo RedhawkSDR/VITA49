@@ -25,6 +25,20 @@
 #include "PackUnpack.h"
 
 namespace vrt {
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Enumerated Types
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  /** Available values for Sample Frame Start/Stop Indication (SSI) Bits of Data Packet Trailer. */
+  enum StartStopIndication {
+    /** Not Applicable                              */   StartStopIndication_NA     = 0x0,
+    /** First data packet of current Sample Frame   */   StartStopIndication_First  = 0x1,
+    /** Middle data packet of current Sample Frame  */   StartStopIndication_Middle = 0x2,
+    /** Final data packet of current Sample Fram    */   StartStopIndication_Final  = 0x3
+  };
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
+  // BasicDataPacket
+  ////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /** An basic but full-featured implementation of a VRT IF Data packet. <br>
    *  <br>
@@ -51,7 +65,7 @@ namespace vrt {
    *  </pre>
    */
   class BasicDataPacket : public BasicVRTPacket {
-    friend class BasicVRTState;
+    //friend class BasicVRTState; // Unnecessary class not updated for V49.2 yet
 
     /** The payload format to assume. */
     private: PayloadFormat payloadFormat;
@@ -286,6 +300,31 @@ namespace vrt {
     public: int8_t getAssocPacketCount () const;
 
 
+    /** Gets the Sample Frame StartStopIndication value. Bits 11..10 and accompanying enable bits 23..22
+     *  are used together as the two-bit StartStopIndication for Data Packets using Sample Frames. The
+     *  following values are possible:
+     *    00 StartStopIndication_NA
+     *    01 StartStopIndication_First
+     *    10 StartStopIndication_Middle
+     *    11 StartStopIndication_Final
+     *  When either trailer is not present or enable bits are not set, StartStopIndication_NA is returned.
+     *  @return StartStopIndication value if the enable bits are set, or StartStopIndication_NA if not.
+     */
+    public: inline StartStopIndication getStartStopIndication () const {
+      boolNull bit11 = isBit11();
+      boolNull bit10 = isBit10();
+      if (bit11 == _NULL || bit10 == _NULL) {
+        return StartStopIndication_NA;
+      }
+      else if (bit11 == _FALSE) {
+        return (bit10==_FALSE)? StartStopIndication_NA : StartStopIndication_First;
+      }
+      else {
+        return (bit10==_FALSE)? StartStopIndication_Middle : StartStopIndication_Final;
+      }
+    }
+
+
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // Set
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -372,6 +411,33 @@ namespace vrt {
      *  @throws VRTException If this method is not supported.
      */
     public: void setAssocPacketCount (int8_t v);
+
+    /** <i>Optional functionality:</i> Sets the Sample Frame Start Stop Indication value.
+     *  Bits 11..10 and accompanying enable bits 23..22 are used together as the two-bit
+     *  StartStopIndication for Data Packets using Sample Frames. The following values are
+     *  possible:
+     *    00 StartStopIndication_NA
+     *    01 StartStopIndication_First
+     *    10 StartStopIndication_Middle
+     *    11 StartStopIndication_Final
+     *  @param v StartStopIndication value to set.
+     *  @throws VRTException If this method is not supported.
+     */
+    public: inline void setStartStopIndication (StartStopIndication v) {
+      switch(v) {
+        case StartStopIndication_NA:     setBit11(_FALSE); setBit10(_FALSE); break; // 00
+        case StartStopIndication_First:  setBit11(_FALSE); setBit10(_TRUE ); break; // 01
+        case StartStopIndication_Middle: setBit11(_TRUE ); setBit10(_FALSE); break; // 10
+        case StartStopIndication_Final:  setBit11(_TRUE ); setBit10(_TRUE ); break; // 11
+        default:                         setBit11(_NULL ); setBit10(_NULL ); break; // NULL
+      }
+    }
+
+    /** <i>Optional functionality:</i> Unsets the Sample Frame Start Stop Indication enable bits.
+     *  See {@link #setStartStopIndication}.
+     *  @throws VRTException If this method is not supported.
+     */
+    public: inline void unsetStartStopIndication () { setBit11(_NULL ); setBit10(_NULL ); }
 
     /** If the trailer is empty, delete it. */
     protected: void dropTrailerIfEmpty ();
@@ -654,7 +720,7 @@ namespace vrt {
      */
     public: inline double* getDataDouble (const PayloadFormat &pf, double *array) const {
       int32_t len = getScalarDataLength(pf);
-      PackUnpack::unpackAsDouble(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      PackUnpack::unpackAsDouble(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
       return array;
     }
 
@@ -669,7 +735,7 @@ namespace vrt {
     public: inline vector<double> getDataDouble (const PayloadFormat &pf) const {
       int32_t len = getScalarDataLength(pf);
         vector<double> array(len);
-        PackUnpack::unpackAsDouble(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+        PackUnpack::unpackAsDouble(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
         return array;
       }
 
@@ -686,7 +752,7 @@ namespace vrt {
      */
     public: inline float* getDataFloat (const PayloadFormat &pf, float *array) const {
       int32_t len = getScalarDataLength(pf);
-      PackUnpack::unpackAsFloat(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      PackUnpack::unpackAsFloat(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
       return array;
     }
 
@@ -701,7 +767,7 @@ namespace vrt {
     public: inline vector<float> getDataFloat (const PayloadFormat &pf) const {
       int32_t len = getScalarDataLength(pf);
         vector<float> array(len);
-        PackUnpack::unpackAsFloat(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+        PackUnpack::unpackAsFloat(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
         return array;
       }
 
@@ -718,7 +784,7 @@ namespace vrt {
      */
     public: inline int64_t* getDataLong (const PayloadFormat &pf, int64_t *array) const {
       int32_t len = getScalarDataLength(pf);
-      PackUnpack::unpackAsLong(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      PackUnpack::unpackAsLong(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
       return array;
     }
 
@@ -733,7 +799,7 @@ namespace vrt {
     public: inline vector<int64_t> getDataLong (const PayloadFormat &pf) const {
       int32_t len = getScalarDataLength(pf);
         vector<int64_t> array(len);
-        PackUnpack::unpackAsLong(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+        PackUnpack::unpackAsLong(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
         return array;
       }
 
@@ -750,7 +816,7 @@ namespace vrt {
      */
     public: inline int32_t* getDataInt (const PayloadFormat &pf, int32_t *array) const {
       int32_t len = getScalarDataLength(pf);
-      PackUnpack::unpackAsInt(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      PackUnpack::unpackAsInt(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
       return array;
     }
 
@@ -765,7 +831,7 @@ namespace vrt {
     public: inline vector<int32_t> getDataInt (const PayloadFormat &pf) const {
       int32_t len = getScalarDataLength(pf);
         vector<int32_t> array(len);
-        PackUnpack::unpackAsInt(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+        PackUnpack::unpackAsInt(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
         return array;
       }
 
@@ -782,7 +848,7 @@ namespace vrt {
      */
     public: inline int16_t* getDataShort (const PayloadFormat &pf, int16_t *array) const {
       int32_t len = getScalarDataLength(pf);
-      PackUnpack::unpackAsShort(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      PackUnpack::unpackAsShort(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
       return array;
     }
 
@@ -797,7 +863,7 @@ namespace vrt {
     public: inline vector<int16_t> getDataShort (const PayloadFormat &pf) const {
       int32_t len = getScalarDataLength(pf);
       vector<int16_t> array(len);
-      PackUnpack::unpackAsShort(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      PackUnpack::unpackAsShort(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
       return array;
     }
 
@@ -814,7 +880,7 @@ namespace vrt {
      */
     public: inline int8_t* getDataByte (const PayloadFormat &pf, int8_t *array) const {
       int32_t len = getScalarDataLength(pf);
-      PackUnpack::unpackAsByte(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      PackUnpack::unpackAsByte(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
       return array;
     }
 
@@ -829,7 +895,7 @@ namespace vrt {
     public: inline vector<int8_t> getDataByte (const PayloadFormat &pf) const {
       int32_t len = getScalarDataLength(pf);
         vector<int8_t> array(len);
-        PackUnpack::unpackAsByte(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+        PackUnpack::unpackAsByte(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
         return array;
       }
 
@@ -1161,7 +1227,7 @@ namespace vrt {
      */
     public: inline void setDataDouble (const PayloadFormat &pf, const double *array, size_t len) {
       setScalarDataLength(pf, (int32_t)len);
-      PackUnpack::packAsDouble(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      PackUnpack::packAsDouble(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
       }
 
     /** Packs the data using the values from a double array. If the underlying data is not double,
@@ -1174,7 +1240,7 @@ namespace vrt {
      */
     public: inline void setDataDouble (const PayloadFormat &pf, const vector<double> &array) {
       setScalarDataLength(pf, array.size());
-        PackUnpack::packAsDouble(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, array.size());
+        PackUnpack::packAsDouble(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, array.size());
       }
 
     /** Packs the data using the values from a float array. If the underlying data is not float,
@@ -1188,7 +1254,7 @@ namespace vrt {
      */
     public: inline void setDataFloat (const PayloadFormat &pf, const float *array, size_t len) {
       setScalarDataLength(pf, (int32_t)len);
-      PackUnpack::packAsFloat(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      PackUnpack::packAsFloat(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
     }
 
     /** Packs the data using the values from a float array. If the underlying data is not float,
@@ -1201,7 +1267,7 @@ namespace vrt {
      */
     public: inline void setDataFloat (const PayloadFormat &pf, const vector<float> &array) {
       setScalarDataLength(pf, array.size());
-        PackUnpack::packAsFloat(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, array.size());
+        PackUnpack::packAsFloat(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, array.size());
       }
 
     /** Packs the data using the values from a long array. If the underlying data is not long,
@@ -1215,7 +1281,7 @@ namespace vrt {
      */
     public: inline void setDataLong (const PayloadFormat &pf, const int64_t *array, size_t len) {
       setScalarDataLength(pf, (int32_t)len);
-      PackUnpack::packAsLong(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      PackUnpack::packAsLong(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
     }
 
     /** Packs the data using the values from a long array. If the underlying data is not long,
@@ -1228,7 +1294,7 @@ namespace vrt {
      */
     public: inline void setDataLong (const PayloadFormat &pf, const vector<int64_t> &array) {
       setScalarDataLength(pf, array.size());
-        PackUnpack::packAsLong(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, array.size());
+        PackUnpack::packAsLong(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, array.size());
       }
 
     /** Packs the data using the values from a int array. If the underlying data is not int,
@@ -1242,7 +1308,7 @@ namespace vrt {
      */
     public: inline void setDataInt (const PayloadFormat &pf, const int32_t *array, size_t len) {
       setScalarDataLength(pf, (int32_t)len);
-      PackUnpack::packAsInt(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      PackUnpack::packAsInt(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
     }
 
     /** Packs the data using the values from a int array. If the underlying data is not int,
@@ -1255,7 +1321,7 @@ namespace vrt {
      */
     public: inline void setDataInt (const PayloadFormat &pf, const vector<int32_t> &array) {
       setScalarDataLength(pf, array.size());
-        PackUnpack::packAsInt(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, array.size());
+        PackUnpack::packAsInt(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, array.size());
       }
 
     /** Packs the data using the values from a short array. If the underlying data is not short,
@@ -1269,7 +1335,7 @@ namespace vrt {
      */
     public: inline void setDataShort (const PayloadFormat &pf, const int16_t *array, size_t len) {
       setScalarDataLength(pf, (int32_t)len);
-      PackUnpack::packAsShort(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      PackUnpack::packAsShort(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
     }
 
     /** Packs the data using the values from a short array. If the underlying data is not short,
@@ -1282,7 +1348,7 @@ namespace vrt {
      */
     public: inline void setDataShort (const PayloadFormat &pf, const vector<int16_t> &array) {
       setScalarDataLength(pf, array.size());
-        PackUnpack::packAsShort(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, array.size());
+        PackUnpack::packAsShort(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, array.size());
       }
 
     /** Packs the data using the values from a byte array. If the underlying data is not byte,
@@ -1296,7 +1362,7 @@ namespace vrt {
      */
     public: inline void setDataByte (const PayloadFormat &pf, const int8_t *array, size_t len) {
       setScalarDataLength(pf, (int32_t)len);
-      PackUnpack::packAsByte(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+      PackUnpack::packAsByte(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
         }
 
     /** Packs the data using the values from a byte array. If the underlying data is not byte,
@@ -1309,7 +1375,7 @@ namespace vrt {
      */
     public: inline void setDataByte (const PayloadFormat &pf, const vector<int8_t> &array) {
       setScalarDataLength(pf, array.size());
-        PackUnpack::packAsByte(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, array.size());
+        PackUnpack::packAsByte(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, array.size());
       }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////

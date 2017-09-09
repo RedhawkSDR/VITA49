@@ -128,7 +128,7 @@ void BasicDataPacket::setAssocPacketCount (int8_t v) {
 		throw VRTException("Invalid associated packet count %d", v);
 	}
   else {
-	if (!hasTrailer()) shiftTrailer(+4);
+	if (!hasTrailer()) shiftTrailer(true);
     char val = (char)(0x80 | v); // include indicator bit
 	bbuf[getPacketLength()-1] = val;
 }
@@ -138,13 +138,13 @@ void BasicDataPacket::dropTrailerIfEmpty () {
   int32_t off = (getPacketLength() - 4) - 1;
 
   if ((bbuf[off] == 0) && ((bbuf[off+1] & 0xF0) == 0) && ((bbuf[off+3] & 0x80) == 0)) {
-    shiftTrailer(-4);
+    shiftTrailer(false);
   }
 }
 
 int32_t BasicDataPacket::getTrailer() const {
 	if (!hasTrailer()) return INT32_NULL;
-	return VRTMath::unpackInt(bbuf,getPayloadLength()+getHeaderLength(),BIG_ENDIAN);
+	return VRTMath::unpackInt(bbuf,getPayloadLength()+getPrologueLength(),BIG_ENDIAN);
 }
 
 boolNull BasicDataPacket::getTrailerBit (int32_t enable, int32_t indicator) const {
@@ -161,7 +161,7 @@ void BasicDataPacket::setTrailerBit (int32_t enable, int32_t indicator, boolNull
     dropTrailerIfEmpty();
 	}
   else {
-    if (!hasTrailer()) shiftTrailer(+4); // need to insert trailer
+    if (!hasTrailer()) shiftTrailer(true); // need to insert trailer
 	setStateEventBit(bbuf, getPacketLength()-4, enable, indicator, value);
 }
 }
@@ -269,7 +269,7 @@ void BasicDataPacket::setDataLength (const PayloadFormat &pf, int32_t length, bo
 // BEGIN TODO FIXME - additions from previous version of shared library
 void BasicDataPacket::swapPayloadBytes(const PayloadFormat &pf, const void* array){
 	int32_t len  = getPayloadLength() - getPadBitCount()/8; // only care if PadBitCount > 8
-	int32_t off  = getHeaderLength();
+	int32_t off  = getPrologueLength();
 	int32_t size = pf.getDataItemSize();
 
 	if (size == 16) {
@@ -307,13 +307,13 @@ void* BasicDataPacket::getData_normal(const PayloadFormat &pf,int position){
 		throw VRTException("Fast unpacking of given data format not supported");
 	}
 	//int32_t len  = getPayloadLength() - getPadBitCount()/8; // only care if PadBitCount > 8
-	int32_t off  = getHeaderLength()+position;
+	int32_t off  = getPrologueLength()+position;
 
 	return &bbuf[off];
 }
 //added for basic copy back of pointer
 /*void* BasicDataPacket::getData(){
-	return &bbuf[getHeaderLength()];
+	return &bbuf[getPrologueLength()];
 }*/
 /*void* BasicDataPacket::getDataShort (const PayloadFormat &pf, bool raw){
 	if (isNull(pf)) throw VRTException("Payload format is null");
@@ -326,7 +326,7 @@ void* BasicDataPacket::getData_normal(const PayloadFormat &pf,int position){
 	}
 	else {
 		vector<int16_t> array(len);
-		PackUnpack::unpackAsShort(pf, &bbuf[0], getHeaderLength(), &array[0], NULL, NULL, len);
+		PackUnpack::unpackAsShort(pf, &bbuf[0], getPrologueLength(), &array[0], NULL, NULL, len);
 		return &array[0];
 	}
 }*/
@@ -340,7 +340,7 @@ void __attribute__((hot)) *BasicDataPacket::getData (const PayloadFormat &pf, vo
 	}
 
 	int32_t len  = getPayloadLength() - getPadBitCount()/8; // only care if PadBitCount > 8
-	int32_t off  = getHeaderLength();
+	int32_t off  = getPrologueLength();
 	int32_t size = pf.getDataItemSize();
 
 	if (!convert || (size <= 8) || (BYTE_ORDER == BIG_ENDIAN)) {
@@ -383,7 +383,7 @@ void __attribute__((hot)) BasicDataPacket::setData (const PayloadFormat &pf, con
   if (((int)type) == -1) {
 		throw VRTException("Fast packing of given data format not supported");
 	}
-	int32_t off           = getHeaderLength();
+	int32_t off           = getPrologueLength();
 	int32_t size          = pf.getDataItemSize();
 	int32_t bitsPerSample = pf.getItemPackingFieldSize();
 

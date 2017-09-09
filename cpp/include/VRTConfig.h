@@ -124,7 +124,7 @@ namespace vrt {
     //  Version
     //////////////////////////////////////////////////////////////////////////////////////////////////
     /** Supported protocol versions. (<tt>V49</tt> = VITA 49.0, <tt>V49b</tt> = VITA 49.0b) */
-    enum VITAVersion { VITAVersion_V49, VITAVersion_V49b };
+    enum VITAVersion { VITAVersion_V49, VITAVersion_V49b, VITAVersion_V49d2 };
 
     /** The version number for the library, always <tt>0.1.0</tt> with this version. */
     string getLibraryVersion ();

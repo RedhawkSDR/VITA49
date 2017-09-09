@@ -48,8 +48,8 @@ namespace vrt {
     /** An extension data packet (with stream identifier).    */    PacketType_ExtData             = 3,
     /** A standard context packet (with stream identifier).   */    PacketType_Context             = 4,
     /** An extension context packet (with stream identifier). */    PacketType_ExtContext          = 5,
-    /** <b>Do Not Use:</b> Reserved for future use.           */    PacketType_reserved6           = 6,
-    /** <b>Do Not Use:</b> Reserved for future use.           */    PacketType_reserved7           = 7,
+    /** A standard command packet (with stream identifier).   */    PacketType_Command             = 6,
+    /** An extension command packet (with stream identifier). */    PacketType_ExtCommand          = 7,
     /** <b>Do Not Use:</b> Reserved for future use.           */    PacketType_reserved8           = 8,
     /** <b>Do Not Use:</b> Reserved for future use.           */    PacketType_reserved9           = 9,
     /** <b>Do Not Use:</b> Reserved for future use.           */    PacketType_reserved10          = 10,
@@ -61,6 +61,8 @@ namespace vrt {
   };
 #if NOT_USING_JNI
   bool PacketType_isData (PacketType pt);
+  bool PacketType_isContext (PacketType pt);
+  bool PacketType_isCommand (PacketType pt);
   bool PacketType_hasStreamIdentifier (PacketType pt);
 #endif
 
@@ -74,38 +76,38 @@ namespace vrt {
 
   /** Available numeric formats for data items.*/
   enum DataItemFormat {
-    /** Signed fixed-point.                         */    DataItemFormat_SignedInt    =  0,
-    /** Signed VRT, 1-bit exponent.                 */    DataItemFormat_SignedVRT1   =  1,
-    /** Signed VRT, 2-bit exponent.                 */    DataItemFormat_SignedVRT2   =  2,
-    /** Signed VRT, 3-bit exponent.                 */    DataItemFormat_SignedVRT3   =  3,
-    /** Signed VRT, 4-bit exponent.                 */    DataItemFormat_SignedVRT4   =  4,
-    /** Signed VRT, 5-bit exponent.                 */    DataItemFormat_SignedVRT5   =  5,
-    /** Signed VRT, 6-bit exponent.                 */    DataItemFormat_SignedVRT6   =  6,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved7    =  7,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved8    =  8,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved9    =  9,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved10   = 10,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved11   = 11,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved12   = 12,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved13   = 13,
-    /** 32-bit IEEE-754 floating-point.             */    DataItemFormat_Float        = 14,
-    /** 64-bit IEEE-754 floating-point.             */    DataItemFormat_Double       = 15,
-    /** Unsigned fixed-point.                       */    DataItemFormat_UnsignedInt  = 16,
-    /** Unsigned VRT, 1-bit exponent.               */    DataItemFormat_UnsignedVRT1 = 17,
-    /** Unsigned VRT, 2-bit exponent.               */    DataItemFormat_UnsignedVRT2 = 18,
-    /** Unsigned VRT, 3-bit exponent.               */    DataItemFormat_UnsignedVRT3 = 19,
-    /** Unsigned VRT, 4-bit exponent.               */    DataItemFormat_UnsignedVRT4 = 20,
-    /** Unsigned VRT, 5-bit exponent.               */    DataItemFormat_UnsignedVRT5 = 21,
-    /** Unsigned VRT, 6-bit exponent.               */    DataItemFormat_UnsignedVRT6 = 22,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved23   = 23,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved24   = 24,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved25   = 25,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved26   = 26,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved27   = 27,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved28   = 28,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved29   = 29,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved30   = 30,
-    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved31   = 31
+    /** Signed fixed-point.                         */    DataItemFormat_SignedInt     =  0,
+    /** Signed VRT, 1-bit exponent.                 */    DataItemFormat_SignedVRT1    =  1,
+    /** Signed VRT, 2-bit exponent.                 */    DataItemFormat_SignedVRT2    =  2,
+    /** Signed VRT, 3-bit exponent.                 */    DataItemFormat_SignedVRT3    =  3,
+    /** Signed VRT, 4-bit exponent.                 */    DataItemFormat_SignedVRT4    =  4,
+    /** Signed VRT, 5-bit exponent.                 */    DataItemFormat_SignedVRT5    =  5,
+    /** Signed VRT, 6-bit exponent.                 */    DataItemFormat_SignedVRT6    =  6,
+    /** Signed fixed-point non-normalized           */    DataItemFormat_SignedIntNN   =  7, // NEW in V49.2
+    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved8     =  8,
+    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved9     =  9,
+    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved10    = 10,
+    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved11    = 11,
+    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved12    = 12,
+    /** 16-bit IEEE-754 floating-point.             */    DataItemFormat_Float16       = 13, // NEW in V49.2
+    /** 32-bit IEEE-754 floating-point.             */    DataItemFormat_Float         = 14,
+    /** 64-bit IEEE-754 floating-point.             */    DataItemFormat_Double        = 15,
+    /** Unsigned fixed-point.                       */    DataItemFormat_UnsignedInt   = 16,
+    /** Unsigned VRT, 1-bit exponent.               */    DataItemFormat_UnsignedVRT1  = 17,
+    /** Unsigned VRT, 2-bit exponent.               */    DataItemFormat_UnsignedVRT2  = 18,
+    /** Unsigned VRT, 3-bit exponent.               */    DataItemFormat_UnsignedVRT3  = 19,
+    /** Unsigned VRT, 4-bit exponent.               */    DataItemFormat_UnsignedVRT4  = 20,
+    /** Unsigned VRT, 5-bit exponent.               */    DataItemFormat_UnsignedVRT5  = 21,
+    /** Unsigned VRT, 6-bit exponent.               */    DataItemFormat_UnsignedVRT6  = 22,
+    /** Unsigned fixed-point non-normalized         */    DataItemFormat_UnsignedIntNN = 23, // NEW in V49.2
+    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved24    = 24,
+    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved25    = 25,
+    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved26    = 26,
+    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved27    = 27,
+    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved28    = 28,
+    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved29    = 29,
+    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved30    = 30,
+    /** <b>Do Not Use:</b> Reserved for future use. */    DataItemFormat_reserved31    = 31
   };
 
   /** <b>Internal Use Only:</b> Determines if value format is signed. */
@@ -134,6 +136,7 @@ namespace vrt {
 
   /** Data types supported by a <tt>StandardDataPacket</tt>. */
   enum DataType {
+    // XXX - why the cryptic values? Something related to StandardDataPacket implementation
     /**  4-bit signed integer.                      */  DataType_Int4       = __INT64_C(0x00FFFFFA00010000),
     /**  8-bit signed integer.                      */  DataType_Int8       = __INT64_C(0x00FFFFFA00020000),
     /** 16-bit signed integer.                      */  DataType_Int16      = __INT64_C(0x00FFFFFA00030000),
@@ -146,7 +149,9 @@ namespace vrt {
     /**  8-bit unsigned integer.                    */  DataType_UInt8      = __INT64_C(0x00FFFFFA000A0000),
     /** 16-bit unsigned integer.                    */  DataType_UInt16     = __INT64_C(0x00FFFFFA000B0000),
     /** 32-bit unsigned integer.                    */  DataType_UInt32     = __INT64_C(0x00FFFFFA000C0000),
-    /** 64-bit unsigned integer.                    */  DataType_UInt64     = __INT64_C(0x00FFFFFA000D0000)
+    /** 64-bit unsigned integer.                    */  DataType_UInt64     = __INT64_C(0x00FFFFFA000D0000),
+    // XXX - Add half-precision float? added to end rather than insert above and shift everything below it
+    ///** 16-bit half-precision floating-point.       */  DataType_Float16    = __INT64_C(0x00FFFFFA000E0000)
   };
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,7 +179,7 @@ namespace vrt {
      *  <pre>
      *    MAX_PACKET_LENGTH = 65536*4
      *  </pre>
-     *  @see #getHeaderLength()
+     *  @see #getPacketLength()
      */
     public: static const int32_t MAX_PACKET_LENGTH = 65536*4;
 
@@ -187,6 +192,25 @@ namespace vrt {
      */
     public: static const int32_t MAX_HEADER_LENGTH = 7*4;
 
+    /** The maximum length of the packet specific prologue (PSP) in bytes (all optional fields
+     *  included). Note that in cases where optional fields are not included, the PSP will
+     *  be shorter.
+     *  <pre>
+     *    MAX_PKT_SPECIFIC_PROLOGUE_LENGTH = 10*4
+     *  </pre>
+     *  @see #getPktSpecificPrologueLength()
+     */
+    public: static const int32_t MAX_PKT_SPECIFIC_PROLOGUE_LENGTH = 10*4;
+
+    /** The maximum length of the prologue in bytes (all optional fields included). Note that
+     *  in cases where optional fields are not included, the prologue will be shorter.
+     *  <pre>
+     *    MAX_PROLOGUE_LENGTH = MAX_HEADER_LENGTH + MAX_PKT_SPECIFIC_PROLOGUE_LENGTH
+     *  </pre>
+     *  @see #getPrologueLength()
+     */
+    public: static const int32_t MAX_PROLOGUE_LENGTH = MAX_HEADER_LENGTH + MAX_PKT_SPECIFIC_PROLOGUE_LENGTH;
+
     /** The maximum length of the trailer in bytes.
      *  <pre>
      *    MAX_TRAILER_LENGTH = 1*4
@@ -196,15 +220,16 @@ namespace vrt {
     public: static const int32_t MAX_TRAILER_LENGTH = 1*4;
 
     /** The <b>de-facto</b> maximum length of the payload in bytes. Note that the de-jure limit
-     *  can be up to 28 bytes more than this when optional fields in the header and trailer are
-     *  dropped. In practice this difference is nearly meaningless since (as noted with
-     *  {@link #MAX_PACKET_LENGTH}) this value exceeds the limits the underlying transport protocols.
+     *  can be up to 28 bytes more than this when optional fields in the header, packet specific
+     *  prologue, and trailer are dropped. In practice this difference is nearly meaningless since
+     *  (as noted with {@link #MAX_PACKET_LENGTH}) this value exceeds the limits of the underlying
+     *  transport protocols.
      *  <pre>
-     *    MAX_PAYLOAD_LENGTH = MAX_PACKET_LENGTH - MAX_HEADER_LENGTH - MAX_TRAILER_LENGTH
+     *    MAX_PAYLOAD_LENGTH = MAX_PACKET_LENGTH - MAX_PROLOGUE_LENGTH - MAX_TRAILER_LENGTH
      *  </pre>
      *  @see #getPayloadLength()
      */
-    public: static const int32_t MAX_PAYLOAD_LENGTH = MAX_PACKET_LENGTH - MAX_HEADER_LENGTH - MAX_TRAILER_LENGTH;
+    public: static const int32_t MAX_PAYLOAD_LENGTH = MAX_PACKET_LENGTH - MAX_PROLOGUE_LENGTH - MAX_TRAILER_LENGTH;
 
     /** Represents a null VRT packet. */
     public: static const BasicVRTPacket NULL_PACKET;
@@ -235,7 +260,7 @@ namespace vrt {
      *  the required packet length of 4), but will have the underlying buffers pre-allocated
      *  as required.
      *  @param bufsize The anticipated buffer size.
-     */
+     */  // TODO - length of 4?? Implementation sets pkt size to 7 (max prologue size), which is the number of 32-bit words, not bytes.
     public: BasicVRTPacket (int32_t bufsize);
 
     /** Creates a new instance accessing the given data buffer.
@@ -245,6 +270,10 @@ namespace vrt {
      */
     public: BasicVRTPacket (const void *buf, size_t len, bool readOnly=false);
 
+    /** Creates a new instance accessing the given data buffer.
+     *  @param buf_ptr  The pointer to the packet buffer.
+     *  @param readOnly Should users of this instance be able to modify the underlying data buffer?
+     */
     public: BasicVRTPacket (vector<char> *buf_ptr, bool readOnly);
 
     /** Creates a new instance accessing the given data buffer.
@@ -306,8 +335,18 @@ namespace vrt {
      */
     public: static int64_t getStreamCode (const void *ptr);
 
+    /** Checks for prologue equality with another BasicVRTPacket. The prologues of two VRT packets are
+     *  considered equal if the content of the prologues is bit-for-bit identical. The contents of the
+     *  payload and trailer need not be equal for this method to return true. However, any two packets
+     *  for which {@link #equals} returns true, must have this method return true as well.
+     *  @param p The other packet.
+     *  @return true if they are identical, false otherwise. (This will always returns false if the
+     *          packet is null.)
+     */
+    public: bool prologueEquals (const BasicVRTPacket &p) const;
+
     /** Checks for header equality with another BasicVRTPacket. The headers of two VRT packets are
-     *  considered equal if the content of the payloads is bit-for-bit identical. The contents of the
+     *  considered equal if the content of the headers is bit-for-bit identical. The contents of the
      *  payload and trailer need not be equal for this method to return true. However, any two packets
      *  for which {@link #equals} returns true, must have this method return true as well.
      *  @param p The other packet.
@@ -316,9 +355,20 @@ namespace vrt {
      */
     public: bool headerEquals (const BasicVRTPacket &p) const;
 
+    /** Checks for packet specific prologue (PSP) equality with another BasicVRTPacket. The PSPs of
+     *  two VRT packets are considered equal if the content of the PSPs is bit-for-bit identical. The
+     *  contents of the payload and trailer need not be equal for this method to return true. However,
+     *  any two packets for which {@link #equals} returns true, must have this method return true as
+     *  well.
+     *  @param p The other packet.
+     *  @return true if they are identical, false otherwise. (This will always returns false if the
+     *          packet is null.)
+     */
+    public: bool pktSpecificPrologueEquals (const BasicVRTPacket &p) const;
+
     /** Checks for payload equality with another BasicVRTPacket. The payloads of two VRT packets are
      *  considered equal if the content of the payloads is bit-for-bit identical. The contents of the
-     *  header and trailer need not be equal for this method to return true. However, any two packets
+     *  prologue and trailer need not be equal for this method to return true. However, any two packets
      *  for which {@link #equals} returns true, must have this method return true as well. This
      *  will always return false if the tqo packets have different payload lengths.
      *  @param p The other packet.
@@ -397,23 +447,61 @@ namespace vrt {
       return PacketType_hasStreamIdentifier(getPacketType());
     }
 
-    /** <b>Internal use only:</b> Shifts the header. */
+    /** <b>Internal use only:</b> Shifts the header.
+     *  Creates or removes space for values in header.
+     *  @param field bit field used to identify if field is currently included and the offset
+     *         based on other fields that may be present.
+     *  @param bytes size of value to be included or removed.
+     *  @param present true if need space to store value associated with field, 
+     *         false if the value is not present in header.
+     */
     protected: void shiftHeader (int32_t field, int32_t bytes, bool present);
 
-    /** <b>Internal use only:</b> Shifts the trailer. */
-    protected: void shiftTrailer (int32_t bytes);
+    /** <b>Internal use only:</b> Shifts the trailer.
+     *  Add or removes trailer of size MAX_TRAILER_LENGTH.
+     *  @param add Indicates whether to add or remove trailer. If add is false, removes
+     *         trailer from the packet and unsets the Trailer bit in the header. If add is
+     *         true, increases packet by MAX_TRAILER_LENGTH and sets Trailer bit in header.
+     */
+    protected: void shiftTrailer (bool add);
+
+    /** <b>Internal use only:</b> Shifts the packet specific prologue (PSP).
+     *  Insert or remove bytes at given offset.
+     *  @param off Offset w/in PSP to insert/remove bytes. off>=0 indicates value exists already,
+     *             while off<0 indicates it is not present.
+     *  @param bytes Non-negative number of bytes to insert or remove.
+     *  @param add Indicates whether to add or remove bytes. Nothing is done if True and value exists,
+     *             or if False and value is not present.
+     *  @return Non-negative value of off param, regardless of action taken (or not taken).
+     */
+    protected: int32_t shiftPacketSpecificPrologue (int32_t off, int32_t bytes, bool add);
 
     /** <b>Internal use only:</b> Sets the packet length. */
     protected: void setPacketLength (int32_t v);
 
-    /** Does this packet have a trailer? */
-    protected: bool    hasTrailer () const;
+    /** Does this packet have a packet specific prologue? */
+    public: bool    hasPacketSpecificPrologue () const;
 
-    /** <b>Internal use only:</b> Shifts the payload. */
+    /** Does this packet have a trailer? */
+    public: bool    hasTrailer () const;
+
+    /** <b>Internal use only:</b> Shifts the payload.
+     *  Insert or remove bytes at given offset.
+     *  @param off Offset w/in payload to insert/remove bytes. off>=0 indicates value exists already,
+     *             while off<0 indicates it is not present.
+     *  @param bytes Non-negative number of bytes to insert or remove.
+     *  @param add Indicates whether to add or remove bytes. Nothing is done if True and value exists,
+     *             or if False and value is not present.
+     *  @return Non-negative value of off param, regardless of action taken (or not taken).
+     */
     protected: int32_t shiftPayload (int32_t off, int32_t bytes, bool add);
 
-    /** <b>Internal use only:</b> Is the packet type a data packet? */
+    /** Is the packet type a data packet? */
     public: bool isData () const;
+    /** Is the packet type a context packet? */
+    public: bool isContext () const;
+    /** Is the packet type a command packet? */
+    public: bool isCommand () const;
 
     /** Gets the specified bit from the trailer. By default all of the "is" methods that access the
      *  trailer call this method with the appropriate bit values (no other combinations of inputs
@@ -529,6 +617,17 @@ namespace vrt {
     /** Gets the packet type. */
     public: virtual PacketType getPacketType () const;
 
+    /** Data packets only: Gets the Signal Spectrum Data Mode (S). This indicates if a data
+     *  packet is used to convey Signal Spectrum Data.
+     *  <pre>
+     *    true  = Signal Data Packet contains spectral or frequency domain data.
+     *    false = Signal Data Packet contains time domain data.
+     *    null  = <i>Error: not a data packet</i>
+     *  </pre>
+     *  @return true or false as indicated above or null if this is a data packet.
+     */
+    public: virtual boolNull isSpectrumMode () const;
+
     /** Context packets only: Gets the Time Stamp Mode (TSM). This indicates if a context packet
      *  is being used to convey timing of context events related to the signal with fine or coarse
      *  resolution:
@@ -542,6 +641,47 @@ namespace vrt {
      *  @return true or false as indicated above or null if this is a data packet.
      */
     public: virtual boolNull isTimeStampMode () const;
+
+    /** Command packets only: Gets the Control/Ack Mode (ACK). This indicates if a command packet
+     *  is a Control or Ack subtype:
+     *  <pre>
+     *    true  = Ack subtype
+     *    false = Control subtype
+     *    null  = <i>Error: not a command packet</i>
+     *  </pre>
+     *  @return true or false as indicated above or null if this is not a command packet.
+     */
+    public: virtual boolNull isControlAckMode () const;
+
+    /** Command packets only: Gets the Stale TimeStamp Mode (T). This indicates how controls
+     *  are to be executed with stale or no timestamp, or in the case of ack packets, how the
+     *  controls were executed with regard to the timestamp.
+     *  <pre>
+     *    true  = Control: execute controls if time stamp is stale or expired, and execute controls
+     *                     immediately if no time stamp is present.
+     *            Ack: controls were executed at the specified time, or there was no time stamp
+     *                 present.
+     *    false = Control: do not execute controls if time stamp is stale, or there are no
+     *                     timing restrictions when no time stamp is present.
+     *            Ack: the controllee was unable to execute the controls at the specified time,
+     *            or the controllee does not implement time stamped controls.
+     *    null  = <i>Error: not a command packet</i>
+     *  </pre>
+     *  @return true or false as indicated above or null if this is not a command packet.
+     */
+    public: virtual boolNull isStaleTimeStampMode () const;
+
+    /** Command packets only: Gets the Cancel Mode (L). This indicates if a command packet
+     *  is a Control-Cancel packet:
+     *  <pre>
+     *    true  = Control-Cancel packet
+     *    false = Not a Control-Cancel packet (which leaves Control or one of the Ack subtypes).
+     *    null  = <i>Error: not a command packet</i>
+     *  </pre>
+     *  @return true or false as indicated above or null if this is not a command packet.
+     */
+    public: virtual boolNull isCancelMode () const;
+
 
     /** Gets the time stamp of the packet.
      *  @return The time stamp of the packet (never null).
@@ -576,13 +716,13 @@ namespace vrt {
 
     /** Gets the payload length in bytes. The payload length is a derived value computed as:
      *  <pre>
-     *    payloadLength = {@link #getPacketLength()} - {@link #getHeaderLength()} - {@link #getTrailerLength()}
+     *    payloadLength = {@link #getPacketLength()} - {@link #getPrologueLength()} - {@link #getTrailerLength()}
      *  </pre>
      *  The payload length will always be a multiple of 4-bytes.
      *  @return The length of the payload in bytes.
      */
     public: inline int32_t getPayloadLength () const {
-      return getPacketLength() - getHeaderLength() - getTrailerLength();
+      return getPacketLength() - getPrologueLength() - getTrailerLength();
     }
 
     /** Gets the number of pad bits inserted following the data in the payload such that the
@@ -604,12 +744,25 @@ namespace vrt {
      */
     public: virtual int32_t getPadBitCount () const;
 
-    /** Gets the header length in bytes (does not include trailer). The length of the header will be
-     *  a value <b>up to</b> {@link #MAX_HEADER_LENGTH}. The header length will always be a multiple
-     *  of 4-bytes.
+    /** Gets the header length in bytes (does not include packet specific prologue or trailer). The
+     *  length of the header will be a value <b>up to</b> {@link #MAX_HEADER_LENGTH}. The header length
+     *  will always be a multiple of 4-bytes.
      *  @return The length of the header in bytes.
      */
     public: virtual int32_t getHeaderLength () const;
+
+    /** Gets the packet specific prologue (PSP) length in bytes. The length of the PSP will be a value
+     *  <b>up to</b> {@link #MAX_PKT_SPECIFIC_PROLOGUE_LENGTH}. The PSP length will always be a multiple of 4-bytes.
+     *  @return The length of the packet specific prologue in bytes.
+     */
+    public: virtual int32_t getPktSpecificPrologueLength () const;
+
+    /** Gets the prologue length in bytes (includes header and packet specific prologue, but does not
+     *  include trailer). The length of the prologue will be a value <b>up to</b> {@link #MAX_PROLOGUE_LENGTH}.
+     *  The prologue length will always be a multiple of 4-bytes.
+     *  @return The length of the prologue in bytes.
+     */
+    public: virtual int32_t getPrologueLength () const;
 
     /** Gets the trailer length in bytes. Note that the presence of the trailer is an all-or-nothing,
      *  so this method return either {@link #MAX_TRAILER_LENGTH} or <tt>0</tt>.
@@ -673,12 +826,40 @@ namespace vrt {
      */
     public: virtual void setPacketType (PacketType t);
 
+    /** <i>Optional functionality:</i> Data packets only: Sets the Signal Spectrum Data Mode (S).
+     *  @param v The new value, see {@link #isSpectrumMode()} for details.
+     *  @throws VRTException If this method is not supported or if the packet type
+     *                                        doesn't support this setting.
+     */
+    public: virtual void setSpectrumMode (bool v);
+
     /** <i>Optional functionality:</i> Context packets only: Sets the Time Stamp Mode (TSM).
      *  @param v The new value, see {@link #isTimeStampMode()} for details.
      *  @throws VRTException If this method is not supported or if the packet type
      *                                        doesn't support this setting.
      */
     public: virtual void setTimeStampMode (bool v);
+
+    /** <i>Optional functionality:</i> Command packets only: Sets the Control/Ack Mode (ACK).
+     *  @param v The new value, see {@link #isControlAckMode()} for details.
+     *  @throws VRTException If this method is not supported or if the packet type
+     *                                        doesn't support this setting.
+     */
+    public: virtual void setControlAckMode (bool v);
+
+    /** <i>Optional functionality:</i> Command packets only: Gets the Stale TimeStamp Mode (T).
+     *  @param v The new value, see {@link #isStaleTimeStampMode()} for details.
+     *  @throws VRTException If this method is not supported or if the packet type
+     *                                        doesn't support this setting.
+     */
+    public: virtual void setStaleTimeStampMode (bool v);
+
+    /** <i>Optional functionality:</i> Command packets only: Gets the Cancel Mode (L).
+     *  @param v The new value, see {@link #isCancelMode()} for details.
+     *  @throws VRTException If this method is not supported or if the packet type
+     *                                        doesn't support this setting.
+     */
+    public: virtual void setCancelMode (bool v);
 
     /** <i>Optional functionality:</i> Sets the time stamp for the packet.
      *  @param v The new time stamp.
@@ -879,46 +1060,46 @@ namespace vrt {
     }
 
     /** Packs an 8-bit integer into the payload of the packet. */
-    protected: inline void packPayloadByte      (int32_t off, char     val) { VRTMath::packByte(    bbuf, getHeaderLength()+off, val); }
+    protected: inline void packPayloadByte      (int32_t off, char     val) { VRTMath::packByte(    bbuf, getPrologueLength()+off, val); }
     /** Packs a 16-bit integer into the payload of the packet. */
-    protected: inline void packPayloadShort     (int32_t off, int16_t  val) { VRTMath::packShort(   bbuf, getHeaderLength()+off, val); }
+    protected: inline void packPayloadShort     (int32_t off, int16_t  val) { VRTMath::packShort(   bbuf, getPrologueLength()+off, val); }
     /** Packs a 32-bit integer into the payload of the packet. */
-    protected: inline void packPayloadInt       (int32_t off, int32_t  val) { VRTMath::packInt(     bbuf, getHeaderLength()+off, val); }
+    protected: inline void packPayloadInt       (int32_t off, int32_t  val) { VRTMath::packInt(     bbuf, getPrologueLength()+off, val); }
     /** Packs a 64-bit integer into the payload of the packet. */
-    protected: inline void packPayloadLong      (int32_t off, int64_t  val) { VRTMath::packLong(    bbuf, getHeaderLength()+off, val); }
+    protected: inline void packPayloadLong      (int32_t off, int64_t  val) { VRTMath::packLong(    bbuf, getPrologueLength()+off, val); }
     /** Packs a 32-bit floating-point value into the payload of the packet. */
-    protected: inline void packPayloadFloat     (int32_t off, float    val) { VRTMath::packFloat(   bbuf, getHeaderLength()+off, val); }
+    protected: inline void packPayloadFloat     (int32_t off, float    val) { VRTMath::packFloat(   bbuf, getPrologueLength()+off, val); }
     /** Packs a 64-bit floating-point value into the payload of the packet. */
-    protected: inline void packPayloadDouble    (int32_t off, double   val) { VRTMath::packDouble(  bbuf, getHeaderLength()+off, val); }
+    protected: inline void packPayloadDouble    (int32_t off, double   val) { VRTMath::packDouble(  bbuf, getPrologueLength()+off, val); }
     /** Packs a <tt>boolNull</tt> value into the payload of the packet. */
-    protected: inline void packPayloadBoolNull  (int32_t off, boolNull val) { VRTMath::packBoolNull(bbuf, getHeaderLength()+off, val); }
+    protected: inline void packPayloadBoolNull  (int32_t off, boolNull val) { VRTMath::packBoolNull(bbuf, getPrologueLength()+off, val); }
     /** Packs a boolean value into the payload of the packet. */
-    protected: inline void packPayloadBoolean   (int32_t off, bool     val) { VRTMath::packBoolean( bbuf, getHeaderLength()+off, val); }
+    protected: inline void packPayloadBoolean   (int32_t off, bool     val) { VRTMath::packBoolean( bbuf, getPrologueLength()+off, val); }
     /** Packs a record value into the payload of the packet. */
-    protected: inline void packPayloadRecord    (int32_t off, Record   val) { VRTMath::packRecord(  bbuf, getHeaderLength()+off, val); }
+    protected: inline void packPayloadRecord    (int32_t off, Record   val) { VRTMath::packRecord(  bbuf, getPrologueLength()+off, val); }
     /** Packs a metadata block into the payload of the packet. */
-    protected: inline void packPayloadMetadata  (int32_t off, MetadataBlock       val, int32_t len      ) { VRTMath::packMetadata( bbuf, getHeaderLength()+off, val, len); }
+    protected: inline void packPayloadMetadata  (int32_t off, MetadataBlock       val, int32_t len      ) { VRTMath::packMetadata( bbuf, getPrologueLength()+off, val, len); }
     /** Packs a block of bytes into the payload of the packet. */
-    protected: inline void packPayloadBytes     (int32_t off, const vector<char> &val, int32_t len      ) { VRTMath::packBytes(    bbuf, getHeaderLength()+off, val, len); }
+    protected: inline void packPayloadBytes     (int32_t off, const vector<char> &val, int32_t len      ) { VRTMath::packBytes(    bbuf, getPrologueLength()+off, val, len); }
     /** Packs a block of bytes into the payload of the packet. */
-    protected: inline void packPayloadBytes     (int32_t off, const void         *val, int32_t len      ) { VRTMath::packBytes(    bbuf, getHeaderLength()+off, val, len); }
+    protected: inline void packPayloadBytes     (int32_t off, const void         *val, int32_t len      ) { VRTMath::packBytes(    bbuf, getPrologueLength()+off, val, len); }
     /** Packs a {@link TimeStamp} into the payload of the packet. */
-    protected: inline void packPayloadTimeStamp (int32_t off, TimeStamp           val, IntegerMode epoch) { VRTMath::packTimeStamp(bbuf, getHeaderLength()+off, val, epoch); }
+    protected: inline void packPayloadTimeStamp (int32_t off, TimeStamp           val, IntegerMode epoch) { VRTMath::packTimeStamp(bbuf, getPrologueLength()+off, val, epoch); }
     /** Packs a {@link InetAddress} into the payload of the packet. */
-    protected: inline void packPayloadInetAddr  (int32_t off, InetAddress         val                   ) { VRTMath::packInetAddr( bbuf, getHeaderLength()+off, val); }
+    protected: inline void packPayloadInetAddr  (int32_t off, InetAddress         val                   ) { VRTMath::packInetAddr( bbuf, getPrologueLength()+off, val); }
     /** Packs a {@link UUID} into the payload of the packet. */
-    protected: inline void packPayloadUUID      (int32_t off, UUID                val                   ) { VRTMath::packUUID(     bbuf, getHeaderLength()+off, val); }
+    protected: inline void packPayloadUUID      (int32_t off, UUID                val                   ) { VRTMath::packUUID(     bbuf, getPrologueLength()+off, val); }
 
     /** Packs an ASCII string into the payload of the packet. */
     protected: inline void packPayloadAscii (int32_t off, string val, int32_t len) {
       if (len < 0) { // compute max length
         int32_t max = -len;
         setPayloadLength(off+max);
-        int32_t act = VRTMath::packAscii(bbuf, getHeaderLength()+off, val, max);
+        int32_t act = VRTMath::packAscii(bbuf, getPrologueLength()+off, val, max);
         if (act < max) setPayloadLength(off+act);
       }
       else {
-        VRTMath::packAscii(bbuf, getHeaderLength()+off, val, len);
+        VRTMath::packAscii(bbuf, getPrologueLength()+off, val, len);
       }
     }
 
@@ -927,11 +1108,11 @@ namespace vrt {
       if (len < 0) { // compute max length
         int32_t max = -len;
         setPayloadLength(off+max);
-        int32_t act = VRTMath::packUTF8(bbuf, getHeaderLength()+off, val, max);
+        int32_t act = VRTMath::packUTF8(bbuf, getPrologueLength()+off, val, max);
         if (act < max) setPayloadLength(off+act);
       }
       else {
-        VRTMath::packUTF8(bbuf, getHeaderLength()+off, val, len);
+        VRTMath::packUTF8(bbuf, getPrologueLength()+off, val, len);
       }
     }
 
@@ -940,48 +1121,48 @@ namespace vrt {
       if (len < 0) { // compute max length
         int32_t max = -len;
         setPayloadLength(off+max);
-        int32_t act = VRTMath::packUTF8(bbuf, getHeaderLength()+off, val, max);
+        int32_t act = VRTMath::packUTF8(bbuf, getPrologueLength()+off, val, max);
         if (act < max) setPayloadLength(off+act);
       }
       else {
-        VRTMath::packUTF8(bbuf, getHeaderLength()+off, val, len);
+        VRTMath::packUTF8(bbuf, getPrologueLength()+off, val, len);
       }
     }
 
     /** Unpacks an 8-bit integer from the payload of the packet. */
-    protected: inline char          unpackPayloadByte      (int32_t off                        ) const { return VRTMath::unpackByte(     bbuf, getHeaderLength()+off); }
+    protected: inline char          unpackPayloadByte      (int32_t off                        ) const { return VRTMath::unpackByte(     bbuf, getPrologueLength()+off); }
     /** Unpacks a 16-bit integer from the payload of the packet. */
-    protected: inline int16_t       unpackPayloadShort     (int32_t off                        ) const { return VRTMath::unpackShort(    bbuf, getHeaderLength()+off); }
+    protected: inline int16_t       unpackPayloadShort     (int32_t off                        ) const { return VRTMath::unpackShort(    bbuf, getPrologueLength()+off); }
     /** Unpacks a 32-bit integer from the payload of the packet. */
-    protected: inline int32_t       unpackPayloadInt       (int32_t off                        ) const { return VRTMath::unpackInt(      bbuf, getHeaderLength()+off); }
+    protected: inline int32_t       unpackPayloadInt       (int32_t off                        ) const { return VRTMath::unpackInt(      bbuf, getPrologueLength()+off); }
     /** Unpacks a 64-bit integer from the payload of the packet. */
-    protected: inline int64_t       unpackPayloadLong      (int32_t off                        ) const { return VRTMath::unpackLong(     bbuf, getHeaderLength()+off); }
+    protected: inline int64_t       unpackPayloadLong      (int32_t off                        ) const { return VRTMath::unpackLong(     bbuf, getPrologueLength()+off); }
     /** Unpacks a 32-bit floating-point value from the payload of the packet. */
-    protected: inline float         unpackPayloadFloat     (int32_t off                        ) const { return VRTMath::unpackFloat(    bbuf, getHeaderLength()+off); }
+    protected: inline float         unpackPayloadFloat     (int32_t off                        ) const { return VRTMath::unpackFloat(    bbuf, getPrologueLength()+off); }
     /** Unpacks a 64-bit floating-point value from the payload of the packet. */
-    protected: inline double        unpackPayloadDouble    (int32_t off                        ) const { return VRTMath::unpackDouble(   bbuf, getHeaderLength()+off); }
+    protected: inline double        unpackPayloadDouble    (int32_t off                        ) const { return VRTMath::unpackDouble(   bbuf, getPrologueLength()+off); }
     /** Unpacks a <tt>boolNull</tt> value from the payload of the packet. */
-    protected: inline boolNull      unpackPayloadBoolNull  (int32_t off                        ) const { return VRTMath::unpackBoolNull( bbuf, getHeaderLength()+off); }
+    protected: inline boolNull      unpackPayloadBoolNull  (int32_t off                        ) const { return VRTMath::unpackBoolNull( bbuf, getPrologueLength()+off); }
     /** Unpacks a boolean value from the payload of the packet. */
-    protected: inline bool          unpackPayloadBoolean   (int32_t off                        ) const { return VRTMath::unpackBoolean(  bbuf, getHeaderLength()+off); }
+    protected: inline bool          unpackPayloadBoolean   (int32_t off                        ) const { return VRTMath::unpackBoolean(  bbuf, getPrologueLength()+off); }
     /** Unpacks a record from the payload of the packet. */
-    protected: inline void          unpackPayloadRecord    (int32_t off, Record &rec           ) const {        VRTMath::unpackRecord(   bbuf, getHeaderLength()+off, rec); }
+    protected: inline void          unpackPayloadRecord    (int32_t off, Record &rec           ) const {        VRTMath::unpackRecord(   bbuf, getPrologueLength()+off, rec); }
     /** Unpacks an ASCII string from the payload of the packet. */
-    protected: inline string        unpackPayloadAscii     (int32_t off,            int32_t len) const { return VRTMath::unpackAscii(    bbuf, getHeaderLength()+off, len); }
+    protected: inline string        unpackPayloadAscii     (int32_t off,            int32_t len) const { return VRTMath::unpackAscii(    bbuf, getPrologueLength()+off, len); }
     /** Unpacks a UTF-8 string from the payload of the packet. */
-    protected: inline wstring       unpackPayloadUTF8      (int32_t off,            int32_t len) const { return VRTMath::unpackUTF8(     bbuf, getHeaderLength()+off, len); }
+    protected: inline wstring       unpackPayloadUTF8      (int32_t off,            int32_t len) const { return VRTMath::unpackUTF8(     bbuf, getPrologueLength()+off, len); }
     /** Unpacks a metadata block from the payload of the packet. */
-    protected: inline MetadataBlock unpackPayloadMetadata  (int32_t off,            int32_t len) const { return VRTMath::unpackMetadata( bbuf, getHeaderLength()+off, len); }
+    protected: inline MetadataBlock unpackPayloadMetadata  (int32_t off,            int32_t len) const { return VRTMath::unpackMetadata( bbuf, getPrologueLength()+off, len); }
     /** Unpacks a block of bytes from the payload of the packet. */
-    protected: inline vector<char>  unpackPayloadBytes     (int32_t off,            int32_t len) const { return VRTMath::unpackBytes(    bbuf, getHeaderLength()+off, len); }
+    protected: inline vector<char>  unpackPayloadBytes     (int32_t off,            int32_t len) const { return VRTMath::unpackBytes(    bbuf, getPrologueLength()+off, len); }
     /** Unpacks a block of bytes from the payload of the packet. */
-    protected: inline void*         unpackPayloadBytes     (int32_t off, void *val, int32_t len) const { return VRTMath::unpackBytes(    bbuf, getHeaderLength()+off, val, len); }
+    protected: inline void*         unpackPayloadBytes     (int32_t off, void *val, int32_t len) const { return VRTMath::unpackBytes(    bbuf, getPrologueLength()+off, val, len); }
     /** Unpacks a {@link TimeStamp} from the payload of the packet. */
-    protected: inline TimeStamp     unpackPayloadTimeStamp (int32_t off, IntegerMode epoch     ) const { return VRTMath::unpackTimeStamp(bbuf, getHeaderLength()+off, epoch); }
+    protected: inline TimeStamp     unpackPayloadTimeStamp (int32_t off, IntegerMode epoch     ) const { return VRTMath::unpackTimeStamp(bbuf, getPrologueLength()+off, epoch); }
     /** Unpacks a {@link InetAddress} from the payload of the packet. */
-    protected: inline InetAddress   unpackPayloadInetAddr  (int32_t off                        ) const { return VRTMath::unpackInetAddr( bbuf, getHeaderLength()+off); }
+    protected: inline InetAddress   unpackPayloadInetAddr  (int32_t off                        ) const { return VRTMath::unpackInetAddr( bbuf, getPrologueLength()+off); }
     /** Unpacks a {@link UUID} from the payload of the packet. */
-    protected: inline UUID          unpackPayloadUUID      (int32_t off                        ) const { return VRTMath::unpackUUID(     bbuf, getHeaderLength()+off); }
+    protected: inline UUID          unpackPayloadUUID      (int32_t off                        ) const { return VRTMath::unpackUUID(     bbuf, getPrologueLength()+off); }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // Implement HasFields
@@ -1007,32 +1188,23 @@ namespace vrt {
    *     3  | Repeating            | Bool
    *     4  | EventTagSize         | Int32
    *     5  | ChannelTagSize       | Int32
-   *     6  | ItemPackingFieldSize | Int32
-   *     7  | DataItemSize         | Int32
-   *     8  | RepeatCount          | Int32
-   *     9  | VectorSize           | Int32
-   *     10 | DataType             | Int64
+   *     6  | DataItemFracSize     | Int32 - NEW in V49.2 and used only for Non-Normalized
+   *     7  | ItemPackingFieldSize | Int32
+   *     8  | DataItemSize         | Int32
+   *     9  | RepeatCount          | Int32
+   *     10 | VectorSize           | Int32
+   *     11 | DataType             | Int64
    *    ----+----------------------+---------------
    *  </pre>
    */
   class PayloadFormat : public VRTObject, public HasFields {
-    // We simulate a null value for a PayloadFormat by setting the reserved bits
-    // (which must be 0x0 in ANSI/VITA-49.0) to 0xF. We need to do this in the
-    // C++ version since the hi=0,lo=0 is a valid PayloadFormat (though one that
-    // users will rarely use). In earlier versions we initialized hi=-1,lo=-1
-    // but this caused various issues when it came to users doing something of
-    // the form:
-    //   PayloadFormat pf;
-    //   pf.setDataType(..);
-    //   ...
-    // Now on every set we simply mask off the bits being set with the mask that
-    // will force the other bits to be cleared. The use of MASK_VAL_LO is here
-    // for consistency/readability, it has no real use and should be optimized
-    // away by the compiler.
-    private: static const int32_t NULL_VAL_HI = 0x00000F000;   // null value for hi
-    private: static const int32_t NULL_VAL_LO = 0x000000000;   // null value for lo
-    private: static const int32_t MASK_VAL_HI = ~NULL_VAL_HI;  // clears null value for hi
-    private: static const int32_t MASK_VAL_LO = ~NULL_VAL_LO;  // clears null value for lo
+    // TODO - there are no reserved bits in V49.2, which is new since V49.0
+    //      - the bits that were reserved are now Data Item Frac Size
+
+    // Since the values 0x0000000000000000 and 0x8000000000000000 are both valid and
+    // 0xFFFFFFFFFFFFFFFF is invalid, this object uses -1 as the indicator for a null payload format.
+    private: static const int32_t NULL_VAL_HI = -1; // 0xFFFFFFFFF;   // null value for hi (-1)
+    private: static const int32_t NULL_VAL_LO = -1; // 0xFFFFFFFFF;   // null value for lo (-1)
 
     private: int32_t hi; // high-order bits
     private: int32_t lo; // low-order bits
@@ -1058,6 +1230,23 @@ namespace vrt {
      */
     public: PayloadFormat (RealComplexType type, DataItemFormat format, int32_t size);
 
+    /** Creates new instance. This is identical to
+     *  <tt>new PayloadFormat(true,RealComplexType.Real,format,false,0,0,size,size,1,1,fracSize)</tt>.
+     *  @param format        The data format used.
+     *  @param size          The data item size.
+     *  @param fracSize      The data item fraction size.
+     */
+    public: PayloadFormat (DataItemFormat format, int32_t size, int32_t fracSize);
+
+    /** Creates new instance. This is identical to
+     *  <tt>new PayloadFormat(true,type,format,false,0,0,size,size,1,1,fracSize)</tt>.
+     *  @param type          The real/complex type used.
+     *  @param format        The data format used.
+     *  @param size          The data item size.
+     *  @param fracSize      The data item fraction size.
+     */
+    public: PayloadFormat (RealComplexType type, DataItemFormat format, int32_t size, int32_t fracSize);
+
     /** Creates new instance.
      *  @param dataType     The data format used.
      *  @param realComplex  The real/complex type used.
@@ -1075,18 +1264,28 @@ namespace vrt {
      *  @param itemSize      The data item size.
      *  @param repeatCount   The repeat count.
      *  @param vectorSize    The vector size.
+     *  @param fracSize      The data item fraction size (default=0).
      */
     public: PayloadFormat (bool procEfficient, RealComplexType type, DataItemFormat format,
                            bool repeating, int32_t eventTagSize, int32_t chanTagSize, int32_t fieldSize,
-                           int32_t itemSize, int32_t repeatCount, int32_t vectorSize);
+                           int32_t itemSize, int32_t repeatCount, int32_t vectorSize, int32_t fracSize=0);
 
-    /** Is this object equal to null. Since the values 0x0000000000000000 and 0x8000000000000000
+    /** Is this object equal to null? Since the values 0x0000000000000000 and 0x8000000000000000
      *  are both valid and 0xFFFFFFFFFFFFFFFF is invalid, this object uses -1 as the indicator for
      *  a null payload format.
      */
     public: inline virtual bool isNullValue () const {
       return (hi == NULL_VAL_HI)
           && (lo == NULL_VAL_LO);
+    }
+
+    /** <i>Internal Use Only:</i> Clear all bits if object is equal to null.
+     * Only call this function from within a setter prior to setting desired bits.
+     * TODO - functional for now, but perhaps there is a better way
+     */
+    private: inline virtual void clearNull () {
+      if (isNullValue())
+        hi = lo = 0;
     }
 
     /** <i>Internal Use Only:</i> Creates new instance. */
@@ -1117,7 +1316,9 @@ namespace vrt {
 
     /** <i>Internal Use Only:</i> Sets the bits. */
     public: inline void setBits (int64_t bits) {
-      hi = ((int32_t)(bits >> 32)) & 0xFFFF0FFF;
+      // Note: previously reserved bits were forced to 0, but those bits are now DataItemFracSize
+      //hi = ((int32_t)(bits >> 32)) & 0xFFFF0FFF;
+      hi = (int32_t)(bits >> 32);
       lo = (int32_t)bits;
     }
 
@@ -1133,10 +1334,10 @@ namespace vrt {
      *  @param val true if Processing Efficient (byte-aligned) or false if Link Efficient (fewest bytes used).
      */
     public: inline void setProcessingEfficient (bool val) {
+      clearNull();
       int32_t mask = 0x80000000;
       int32_t set  = (val)? 0 : mask;
-      hi = (set | (hi & ~mask)) & MASK_VAL_HI;
-      lo = lo                   & MASK_VAL_LO;
+      hi = (set | (hi & ~mask));
     }
 
     /** Gets the real/complex type used.
@@ -1153,34 +1354,36 @@ namespace vrt {
      *  @throws VRTException If the specified value is unsupported.
      */
     public: inline void setRealComplexType (RealComplexType val) {
+      clearNull();
       int32_t mask = 0x60000000;
       int32_t set  = ((int32_t)val) << 29;
-      hi = (set | (hi & ~mask)) & MASK_VAL_HI;
-      lo = (lo                ) & MASK_VAL_LO;
+      hi = (set | (hi & ~mask));
     }
 
     /** <i>Utility method:</i> If this payload format matches one of the pre-defined data types,
-        and is stored without any "extra bits", return that type. Although technically "unsigned"
-        this method will recognize any 1-bit integer data as <tt>DataType_UInt1</tt>.
-        @return The data type or null if not a pre-defined type.
+     *  and is stored without any "extra bits", return that type. Although technically "unsigned"
+     *  this method will recognize any 1-bit integer data as <tt>DataType_UInt1</tt>.
+     *  Note: Considers all non-normalized data types as not pre-defined.
+     *  @return The data type or null if not a pre-defined type.
      */
     public: DataType getDataType () const;
 
     /** <i>Utility method:</i> Sets the payload format to match one of the pre-defined data types.
-        @param type The data type.
-        @throws NullPointerException if type is null.
+     *  Note: Considers all non-normalized data types as not pre-defined.
+     *  @param type The data type.
+     *  @throws NullPointerException if type is null.
      */
     public: void setDataType (DataType type);
 
     /** <i>Utility method:</i> Indicates if the payload format is complex.
-        @return <tt>true</tt> if the data format is complex, <tt>false</tt> if it is real.
+     *  @return <tt>true</tt> if the data format is complex, <tt>false</tt> if it is real.
      */
     public: inline bool isComplex () const {
       return (getRealComplexType() != RealComplexType_Real);
     }
 
     /** <i>Utility method:</i> Indicates if the payload format is signed.
-        @return <tt>true</tt> if the data format is signed, <tt>false</tt> if it is unsigned.
+     *  @return <tt>true</tt> if the data format is signed, <tt>false</tt> if it is unsigned.
      */
     public: inline bool isSigned () const {
       return (getDataItemFormat() < 16);
@@ -1200,10 +1403,10 @@ namespace vrt {
      *  @throws VRTException If the specified value is unsupported.
      */
     public: inline void setDataItemFormat (DataItemFormat val) {
+      clearNull();
       int32_t mask = 0x1F000000;
       int32_t set  = ((int32_t)val) << 24;
-      hi = (set | (hi & ~mask)) & MASK_VAL_HI;
-      lo = (lo                ) & MASK_VAL_LO;
+      hi = (set | (hi & ~mask));
     }
 
     /** Indicates if the sample-component repeat is used.
@@ -1218,10 +1421,10 @@ namespace vrt {
      *  @param val true if it is being used, false if not.
      */
     public: inline void setRepeating (bool val) {
+      clearNull();
       int32_t mask = 0x00800000;
       int32_t set  = (val)? mask : 0;
-      hi = (set | (hi & ~mask)) & MASK_VAL_HI;
-      lo = (lo                ) & MASK_VAL_LO;
+      hi = (set | (hi & ~mask));
     }
 
     /** Gets the event tag size.
@@ -1241,10 +1444,10 @@ namespace vrt {
       if ((val < 0) || (val > 7)) {
         throw VRTException("Value (%d) not in range of 0..7", val);
       }
+      clearNull();
       int32_t mask = 0x00700000;
       int32_t set  = val << 20;
-      hi = (set | (hi & ~mask)) & MASK_VAL_HI;
-      lo = (lo                ) & MASK_VAL_LO;
+      hi = (set | (hi & ~mask));
     }
 
     /** Gets the channel tag size.
@@ -1264,10 +1467,33 @@ namespace vrt {
       if ((val < 0) || (val > 15)) {
         throw VRTException("Value (%d) not in range of 0..15", val);
       }
+      clearNull();
       int32_t mask = 0x000F0000;
       int32_t set  = val << 16;
-      hi = (set | (hi & ~mask)) & MASK_VAL_HI;
-      lo = (lo                ) & MASK_VAL_LO;
+      hi = (set | (hi & ~mask));
+    }
+
+    /** Gets the data item fractional size.
+     *  @return The data item fractional size (0..15).
+     */
+    public: inline int32_t getDataItemFracSize () const {
+      int32_t mask = 0x0000F000;
+      int32_t val  = (hi & mask) >> 12;
+      return val;
+    }
+
+    /** Sets the data item fractional size.
+     *  @param val The data item fractional size (0..15).
+     *  @throws VRTException If the specified value is not in the allowable range.
+     */
+    public: inline void setDataItemFracSize (int32_t val) {
+      if ((val < 0) || (val > 15)) {
+        throw VRTException("Value (%d) not in range of 0..15", val);
+      }
+      clearNull();
+      int32_t mask = 0x0000F000;
+      int32_t set  = val << 12;
+      hi = (set | (hi & ~mask));
     }
 
     /** Gets the item packing field size.
@@ -1287,10 +1513,10 @@ namespace vrt {
       if ((val < 1) || (val > 64)) {
         throw VRTException("Value (%d) not in range of 1..64", val);
       }
+      clearNull();
       int32_t mask = 0x00000FC0;
       int32_t set  = (val-1) << 6;
-      hi = (set | (hi & ~mask)) & MASK_VAL_HI;
-      lo = (lo                ) & MASK_VAL_LO;
+      hi = (set | (hi & ~mask));
     }
 
     /** Gets the data item size.
@@ -1310,10 +1536,10 @@ namespace vrt {
       if ((val < 1) || (val > 64)) {
         throw VRTException("Value (%d) not in range of 1..64", val);
       }
+      clearNull();
       int32_t mask = 0x0000003F;
       int32_t set  = (val-1);
-      hi = (set | (hi & ~mask)) & MASK_VAL_HI;
-      lo = (lo                ) & MASK_VAL_LO;
+      hi = (set | (hi & ~mask));
     }
 
     /** Gets the repeat count.
@@ -1331,8 +1557,8 @@ namespace vrt {
       if ((val < 1) || (val > 65536)) {
         throw VRTException("Value (%d) not in range of 1..65536", val);
       }
-      hi = (hi                                 ) & MASK_VAL_HI;
-      lo = (((val-1) << 16) | (lo & 0x0000FFFF)) & MASK_VAL_LO;
+      clearNull();
+      lo = (((val-1) << 16) | (lo & 0x0000FFFF));
     }
 
     /** Gets the vector size.
@@ -1350,8 +1576,8 @@ namespace vrt {
       if ((val < 1) || (val > 65536)) {
         throw VRTException("Value (%d) not in range of 1..65536", val);
       }
-      hi = (hi                         ) & MASK_VAL_HI;
-      lo = ((val-1) | (lo & 0xFFFF0000)) & MASK_VAL_LO;
+      clearNull();
+      lo = ((val-1) | (lo & 0xFFFF0000));
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1376,6 +1602,8 @@ namespace vrt {
   const PayloadFormat PayloadFormat_INT32       (DataType_Int32);
   /** Standard payload format: Real, signed 64-bit integer. */
   const PayloadFormat PayloadFormat_INT64       (DataType_Int64);
+  ///** Standard payload format: Real, 16-bit float. */
+  //const PayloadFormat PayloadFormat_FLOAT16     (DataType_Float16);
   /** Standard payload format: Real, 32-bit float. */
   const PayloadFormat PayloadFormat_FLOAT32     (DataType_Float);
   /** Standard payload format: Real, 64-bit double. */
