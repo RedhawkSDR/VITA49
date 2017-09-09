@@ -20,6 +20,7 @@ latest unreleased development code for the latest released version.
 
 | Asset Version | Minimum REDHAWK Version Required |
 | ------------- | -------------------------------- |
+| 4.x           | 2.0                              |
 | 3.x           | 2.0                              |
 | 2.x           | 1.8                              |
 | 1.x           | 1.8                              |
