@@ -19,9 +19,10 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
-USAGE="Usage: $0 [path to vrt source]"
 
 vrt_path="../vrt/"
+USAGE="Usage: $0 [path to vrt source]
+    Default vrt source path: $vrt_path"
 
 if [ $# == 1 ]; then
   if [ -d "$1" ]; then
