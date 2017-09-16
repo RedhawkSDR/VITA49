@@ -527,6 +527,19 @@ namespace vrt {
     inline int32_t getCIFBitMask (IndicatorFieldEnum_t f) {
       return (int32_t) (0x1 << getCIFBitNumber(f)); // 1-hot bit mask for indicator field
     }
+    
+    /* Get the IndicatorFieldEnum from the CIF number and CIF bit number
+     * The top three (most-significant) bits of each 8-bit IndicatorFieldEnum_t are the CIF number
+     * The bottom five (least-significant) bits of each 8-bit IndicatorFieldEnum_t are the bit number
+     * CIF#: 0b11100000 = 0xE0 | Left-shift by 5, i.e. multiply by 32
+     * Bit#: 0b00011111 = 0x1F | Bitwise AND this bit-mask, i.e. modulo 32
+     * Add the shifted CIF number to the bit number for the IndicatorFieldEnum value.
+     * @param f Field of interest
+     * @return 1-hot CIF bit-mask
+     */
+    inline IndicatorFieldEnum_t getCIFEnum(int8_t cif, int8_t bit) {
+      return (IndicatorFieldEnum_t) (((cif & 0x7) << 5) + (bit & 0x1F));
+    }
 
   } END_NAMESPACE // namespace IndicatorFields
   using namespace IndicatorFields;

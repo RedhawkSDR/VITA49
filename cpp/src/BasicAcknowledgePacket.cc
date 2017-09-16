@@ -20,12 +20,12 @@
  */
 
 #include "BasicAcknowledgePacket.h"
-#include <bitset> // includes the popcount functions // TODO needed?
+#include <bitset> // includes the popcount functions
 
 using namespace vrt;
 using namespace protected_PSP;
 
-//TODO if the below is needed, consider moving to a .h file to be included
+//TODO consider moving to a .h file to be included
 //     rather than duplicating in multiple .cc files (also in BAsicContextPacket.cc)
 /** Basic population count. This algorithm comes from [1] and is believed to be
  *  nearly-identical to what is being done in Java. The use of GCC's
@@ -84,7 +84,7 @@ static inline vector<char> BasicAcknowledgePacket_createDefaultPacket () {
 // CONSTRUCTORS
 //======================================================================
 
-// TODO constructors
+// Constructors
 BasicAcknowledgePacket::BasicAcknowledgePacket (const BasicVRTPacket &p) :
   BasicVRTPacket(p)
 {
@@ -157,21 +157,37 @@ void BasicAcknowledgePacket::toStringStream (std::ostringstream &str) const {
   //Utilities::append(str, " Bandwidth="               ,getBandwidth()         ,"Hz" );
 }
 
+int32_t BasicAcknowledgePacket::getCif7Offset (int32_t attr, int32_t len) const {
+  UNUSED_VARIABLE(len);
+  int32_t cif7 = getContextIndicatorField7();
+  if (isNull(cif7)) {
+    throw VRTException("CIF7 is not enabled.");
+  }
+  int32_t mask = ~(attr ^ (attr - 1));
+  int32_t m    = cif7 & mask;
+  int32_t off  = (bitCount(m) * 4); // All fields are 32-bits
+  return ((cif7 & attr) != 0)? off: -off;  // -off if not present
+}
 
 int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
 
   // TODO How does CIF7 affect this class?
   
-  // TODO - if no warnings/errors, no payload, including no CIF0 that's normally always there
-  //      - But, Ack-W and Ack-E bits of Ctrl/AckSettings field are set in control packet
-  //        to indicate whether or not to include Warn/Error IndicatorFields,
-  //        and those bits are set in Ack packets if Warn/Error occurred regardless of whether
-  //        Warn/Error IFs were requested.
-  //        *XXX* SO, what indicates existence of Warn/Error IFs? packet/payload size? unclear *XXX*
-  //          - yes. getPayloadLen = PacketLen-PrologueLen == 0 when no WarnErrorIFs
-  //          - but, have to assume either or both WIF0 or EIF0 are present if anything is present
-  //          - also, if only free-form texual error exists, WIF0 AND EIF0 must be present and all 0's
-  //            and remaining bytes must be texual message
+  //      - if no warnings/errors, no payload, including no CIF0 that's normally always there
+  //      - Ack-W and Ack-E bits of Ctrl/AckSettings field are set in control packet to indicate
+  //        whether or not to include Warn/Error IndicatorFields, and Ack-W and Ack-E are set in
+  //        AckV and AckX packets if Warn/Error occurred regardless of whether Warn/Error fields
+  //        were requested.
+  //      - *XXX* SO, for AckV and AckX packets:
+  //          - If Ack-W bit is set, WIF0 must be present, even if all 0's.
+  //          - If Ack-E bit is set, WIF0 must be present, even if all 0's.
+  //          - If Ack-W bit is unset, WIF0 must not be present.
+  //          - If Ack-E bit is unset, EIF0 must not be present.
+  //          - Free-form texual error message, if present, will be determined based on packet
+  //            size. If payload length is larger than is necessary for all CIF and associated
+  //            32-bit warn/error fields, the remaining bytes are the texual message.
+  //          - To be safe, check for empty payload before continuing. This protects against the
+  //            case where Ack-W or Ack-E is set but there is no WIF0 or EIF0 or texual message.
   if (getPayloadLength() == 0) {
     // TODO - what's most appropriate, exception or NULL return? return -1?
     throw VRTException("Cannot get offset with zero-length payload.");
@@ -185,8 +201,9 @@ int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
   mask0 = mask1 = mask2 = mask3 = warnMask = 0xFFFFFFFF; // mask to use for CIFs before cifNum of interest
   // warnMask  OR'd  w/ all other masks for wifs
   // if error we're interested in, it'll include all warnings in offset
-  // if warning we're interested in, set them to have no affect
-  if ( (cifNum >> 3) >= 1) { // divide by 8 to see if looking for error
+  // if warning we're interested in, set warnMask to have no affect
+  //if ( (cifNum >> 3) >= 1) { // divide by 8 to see if looking for error
+  if ( (cifNum >> 3) == 0) { // divide by 8 to see if looking for warning
     warnMask = 0x0;
   }
   switch(cifNum & 0x7) { // mod 8 to ignore whether warning or error
@@ -223,15 +240,15 @@ int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
     // update wif0, cifLen, and offset values
     wif0 = VRTMath::unpackInt(bbuf, prologlen);
     cifOffset += 4;
-    cifLen += (4 + (bitCount((wif0 & 0x00FF)                   ) * 4)); // 4 bytes for each WIF present
-    off    +=      (bitCount((wif0 & 0xFF00) & (mask0|warnMask)) * 4);  // 4 bytes for each warning
+    cifLen += (4 + (bitCount((wif0 & 0x000000FF)                   ) * 4)); // 4 bytes for each WIF present
+    off    +=      (bitCount((wif0 & 0xFFFFFF00) & (mask0|warnMask)) * 4);  // 4 bytes for each warning
   }
   // XXX - always execute this even if looking for warning offset
   //       needed to update cifLen
   if (getErrorsGenerated()) {
     // update eif0 and cifLen values, but not offset values yet
     eif0 = VRTMath::unpackInt(bbuf, prologlen+cifLen);
-    cifLen += (4 + (bitCount((eif0 & 0x00FF)                   ) * 4)); // 4 bytes for each EIF present
+    cifLen += (4 + (bitCount((eif0 & 0x000000FF)                   ) * 4)); // 4 bytes for each EIF present
   }
   if (cifNum==0) return ((wif0 & field) != 0)? (off+cifLen): -(off+cifLen);  // -off if not present
 
@@ -300,7 +317,7 @@ int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
     // EIF0
     // already got eif0 above, use it.
     cifOffset += 4;
-    off += (bitCount((eif0 & 0xFF00) & mask0) * 4);  // 4 bytes for each error
+    off += (bitCount((eif0 & 0xFFFFFF00) & mask0) * 4);  // 4 bytes for each error
     if (cifNum==8) return ((eif0 & field) != 0)? (off+cifLen): -(off+cifLen);  // -off if not present
 
     // EIF1
@@ -395,7 +412,7 @@ int32_t BasicAcknowledgePacket::getContextIndicatorField0 (bool occurrence) cons
   int32_t prologlen = getPrologueLength();
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
   return VRTMath::unpackInt(bbuf, prologlen+cifOffset);
 }
@@ -406,7 +423,7 @@ int32_t BasicAcknowledgePacket::getContextIndicatorField0 (bool occurrence) cons
   int32_t cifOffset = 0;
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, getPrologueLength());
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
   return VRTMath::unpackInt(bbuf, getPrologueLength()+4+cifOffset);
 }*/
@@ -415,7 +432,7 @@ int32_t BasicAcknowledgePacket::getContextIndicatorField0 (bool occurrence) cons
   int32_t cifOffset = 0;
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, getPrologueLength());
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
   if (isCIF1Enable(occurrence)) cifOffset+=4;
   return VRTMath::unpackInt(bbuf, getPrologueLength()+4+cifOffset);
@@ -425,7 +442,7 @@ int32_t BasicAcknowledgePacket::getContextIndicatorField0 (bool occurrence) cons
   int32_t cifOffset = 0;
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, getPrologueLength());
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
       if (isCIF1Enable(occurrence)) cifOffset+=4;
   if (isCIF2Enable(occurrence)) cifOffset+=4;
@@ -436,7 +453,7 @@ int32_t BasicAcknowledgePacket::getContextIndicatorField0 (bool occurrence) cons
   int32_t cifOffset = 0;
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, getPrologueLength());
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
   if (isCIF1Enable(occurrence)) cifOffset+=4;
   if (isCIF2Enable(occurrence)) cifOffset+=4;
@@ -451,7 +468,7 @@ int32_t BasicAcknowledgePacket::getContextIndicatorField1 (bool occurrence) cons
   int32_t prologlen = getPrologueLength();
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
 
   // Check if cif1 is not enabled
@@ -468,7 +485,7 @@ int32_t BasicAcknowledgePacket::getContextIndicatorField2 (bool occurrence) cons
   int32_t prologlen = getPrologueLength();
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
 
   // Check if cif2 is not enabled
@@ -488,7 +505,7 @@ int32_t BasicAcknowledgePacket::getContextIndicatorField3 (bool occurrence) cons
   int32_t prologlen = getPrologueLength();
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
 
   // Check if cif3 is not enabled
@@ -509,7 +526,7 @@ int32_t BasicAcknowledgePacket::getContextIndicatorField7 (bool occurrence) cons
   int32_t prologlen = getPrologueLength();
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
 
   // Check if cif7 is not enabled
@@ -530,13 +547,12 @@ void BasicAcknowledgePacket::setContextIndicatorField0Bit (int32_t bit, bool set
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   if ((!occurrence && !getWarningsGenerated()) || (occurrence && !getErrorsGenerated()))
     throw VRTException("Attempt to set warning or error indicator field bit without Ack-W or Ack-E set.");
-  // TODO - setting Ack-W or Ack-E must shift payload to include space for WIF0 and/or EIF0
 
   int32_t cifOffset = 0;
   int32_t prologlen = getPrologueLength();
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
   int32_t cif0 = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
   int32_t val;
@@ -557,7 +573,7 @@ void BasicAcknowledgePacket::setContextIndicatorField1Bit (int32_t bit, bool set
   int32_t prologlen = getPrologueLength();
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
 
   // Check if cif1 is not enabled
@@ -584,7 +600,7 @@ void BasicAcknowledgePacket::setContextIndicatorField2Bit (int32_t bit, bool set
   int32_t prologlen = getPrologueLength();
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
 
   // Check if cif2 is not enabled
@@ -614,7 +630,7 @@ void BasicAcknowledgePacket::setContextIndicatorField3Bit (int32_t bit, bool set
   int32_t prologlen = getPrologueLength();
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
 
   // Check if cif3 is not enabled
@@ -645,7 +661,7 @@ void BasicAcknowledgePacket::setContextIndicatorField7Bit (int32_t bit, bool set
   int32_t prologlen = getPrologueLength();
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
 
   // Check if cif7 is not enabled
@@ -680,7 +696,7 @@ void BasicAcknowledgePacket::addCIF1 (bool add, bool occurrence) {
   int32_t prologlen = getPrologueLength();
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
   int32_t cif0 = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
 
@@ -709,7 +725,7 @@ void BasicAcknowledgePacket::addCIF2 (bool add, bool occurrence) {
   int32_t prologlen = getPrologueLength();
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
   int32_t cif0 = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
 
@@ -739,7 +755,7 @@ void BasicAcknowledgePacket::addCIF3 (bool add, bool occurrence) {
   int32_t prologlen = getPrologueLength();
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
   int32_t cif0 = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
 
@@ -769,7 +785,7 @@ void BasicAcknowledgePacket::addCIF7 (bool add, bool occurrence) {
   int32_t prologlen = getPrologueLength();
   if (occurrence && getWarningsGenerated()) {
     int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
-    cifOffset += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+    cifOffset += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
   }
   int32_t cif0 = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
 
@@ -806,7 +822,8 @@ void BasicAcknowledgePacket::setWarningsGenerated (bool set) {
     // XXX shiftPayload has a bug where offset of 0 cannot be used...
     // as a workaround, we can use shiftPacketSpecificPrologue when off=0
     //shiftPayload(0, 4, set); // offset is always 0 for WIF0
-    int32_t off = getPrologueLength()-getHeaderLength(); // size of packet specific prologue
+    //int32_t off = getPrologueLength()-getHeaderLength(); // size of packet specific prologue
+    int32_t off = getPktSpecificPrologueLength(); // size of packet specific prologue
     if (set) off = -off; // negative if not already there
     off = shiftPacketSpecificPrologue(off, 4, set);
   }
@@ -829,25 +846,126 @@ void BasicAcknowledgePacket::setErrorsGenerated (bool set) {
     int32_t prologlen = getPrologueLength();
     if ((field & ACK_W_BIT) != 0) {
       int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
-      off += (4 + (bitCount(wif0 & 0x00FF) * 4)); // 4 bytes for each WIF present
+      off += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
       if (set) off = -off; // negative if not already there
       off = shiftPayload(off, 4, set);
     }
     else {
       // XXX shiftPayload has a bug where offset of 0 cannot be used...
       // as a workaround, we can use shiftPacketSpecificPrologue when off=0
-      off = prologlen-getHeaderLength(); // size of packet specific prologue
+      //off = prologlen-getHeaderLength(); // size of packet specific prologue
+      off = getPktSpecificPrologueLength(); // size of packet specific prologue
       if (set) off = -off; // negative if not already there
       off = shiftPacketSpecificPrologue(off, 4, set);
     }
   }
 }
 
+std::vector<WarningErrorField_t> BasicAcknowledgePacket::getWarnings() const {
+  std::vector<WarningErrorField_t> warnings;
+  if (getPayloadLength() == 0 || !getWarningsGenerated()) {
+    return warnings;
+  }
+  int32_t prologlen = getPrologueLength();
+  int32_t wif0      = VRTMath::unpackInt(bbuf, prologlen);
+  int32_t cifOffset = 4;                                   // offset of next CIF after WIF0
+  int32_t cifLen    = (4 + 4*bitCount(wif0 & 0x000000FF)); // 4 bytes for each WIF present
+  if (getErrorsGenerated()) {
+    // update eif0 and cifLen values
+    int32_t eif     = VRTMath::unpackInt(bbuf, prologlen+cifLen);
+    cifLen         += (4 + 4*bitCount(eif & 0x000000FF)); // 4 bytes for each EIF present
+  }
+  // WIF0
+  int32_t off = 0;
+  WarningErrorField_t wef;
+  for (int32_t idx=31; idx > 7; idx--) { // do not include WIF enable bits
+    if (((wif0>>idx) & 0x1) != 0) {
+      wef.field = getCIFEnum(0, idx);
+      wef.responseField = VRTMath::unpackInt(bbuf, prologlen+cifLen+off);
+      warnings.push_back(wef);
+      off += 4;
+    }
+  }
+  // WIF1-3
+  int32_t wif;
+  for (int8_t cif=1; cif <= 3; cif++) {
+    // Continue if CIF is not enabled via CIF0 enable bits...
+    if ((wif0 & (0x1 << cif)) == 0) continue;
+    wif = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
+    cifOffset += 4;
+    for (int32_t idx=31; idx > 0; idx--) { // do not include reserved bit 0
+      if (((wif>>idx) & 0x1) != 0) {
+        wef.field = getCIFEnum(cif, idx);
+        wef.responseField = VRTMath::unpackInt(bbuf, prologlen+cifLen+off);
+        warnings.push_back(wef);
+        off += 4;
+      }
+    }
+  }
+  return warnings;
+}
 
-// TODO other virtual/non-virtual IndicatorFieldProvider methods that need to be overridden
+std::vector<WarningErrorField_t> BasicAcknowledgePacket::getErrors() const {
+  std::vector<WarningErrorField_t> errors;
+  if (getPayloadLength() == 0 || !getErrorsGenerated()) {
+    return errors;
+  }
+  int32_t prologlen = getPrologueLength();
+  int32_t cifOffset = 0;                    // offset to nex CIF
+  int32_t cifLen    = 0;                    // total length of CIF block
+  int32_t off       = 0;                    // offset into fields
+  if (getWarningsGenerated()) {
+    // update cifOffset, cifLen, and off values to advance past warnings
+    int32_t wif0  = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
+    cifOffset    += 4;
+    cifLen       += (4 + 4*bitCount(wif0 & 0x000000FF)); // 4 bytes for each WIF present
+    off          += (    4*bitCount(wif0 & 0xFFFFFF00)); // 4 bytes for each bit enabled
+    // CIF1-3
+    int32_t wif;
+    for (int8_t cif=1; cif <= 3; cif++) {
+      // Continue if CIF is not enabled via CIF0 enable bits...
+      if ((wif0 & (0x1 << cif)) == 0) continue;
+      wif = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
+      cifOffset += 4;
+      off       += (4*bitCount(wif & 0xFFFFFF00)); // 4 bytes for each bit enabled
+    }
+    // cifOffset should equal cifLen unless there's a WIF7, which we want to skip past anyway
+    cifOffset = cifLen;
+  }
+  int32_t eif0 = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
+  cifOffset   += 4;
+  cifLen      += (4 + 4*bitCount(eif0 & 0x000000FF)); // 4 bytes for each EIF present
+  // EIF0
+  WarningErrorField_t wef;
+  for (int32_t idx=31; idx > 7; idx--) { // do not include EIF enable bits
+    if (((eif0>>idx) & 0x1) != 0) {
+      wef.field = getCIFEnum(0, idx);
+      wef.responseField = VRTMath::unpackInt(bbuf, prologlen+cifLen+off);
+      errors.push_back(wef);
+      off += 4;
+    }
+  }
+  // WIF1-3
+  int32_t eif;
+  for (int8_t cif=1; cif <= 3; cif++) {
+    // Continue if CIF is not enabled via CIF0 enable bits...
+    if ((eif0 & (0x1 << cif)) == 0) continue;
+    eif = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
+    cifOffset += 4;
+    for (int32_t idx=31; idx > 0; idx--) { // do not include reserved bit 0
+      if (((eif>>idx) & 0x1) != 0) {
+        wef.field = getCIFEnum(cif, idx);
+        wef.responseField = VRTMath::unpackInt(bbuf, prologlen+cifLen+off);
+        errors.push_back(wef);
+        off += 4;
+      }
+    }
+  }
+  return errors;
+}
 
 
-// TODO Warn/ErrorIndicator specific functions
+// TODO Warn/ErrorIndicator specific functions?
 
 
 /** TODO - implement HasFields methods for BasicAcknowledgePacket 

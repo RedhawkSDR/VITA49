@@ -44,7 +44,6 @@ namespace vrt {
   /*****************************************************************************/
 
   // Only needed for Acknowledge Packet sub-type (AckX and AckV)
-  using namespace IndicatorFields;
   typedef struct WarningErrorField {
     IndicatorFieldEnum_t field;
     int32_t responseField;
@@ -160,18 +159,23 @@ namespace vrt {
     //======================================================================
 
     /** Gets the offset for the given context indicator field relative to the location of the first
-     *  occurrence of CIF0. For CIF7 indicator fields, returns the byte offset from beginning of any
-     *  arbitrary CIF[0-3] field offset. For example, 
-     *  total offset = getOffset(<CIF[0-3] field>) + getOffset(<CIF7 attribute>)
-     *  Also, for access to the second occurrence of CIFs (i.e. Error fields in Ack packets), add 8
+     *  occurrence of CIF0. CIF7 is considered an invalid CIF number.
+     *  For access to the second occurrence of CIFs (i.e. Error fields in Ack packets), add 8
      *  to the CIF number, effectively setting the 4th bit (mod8 gives field, div8 gives occurrence).
      *  @param cifNum number of CIF that field belongs to.
      *  @param field bitmask associated with field of interest.
      *  @return offset in bytes from beginning of CIF payload, or CIF7 as described above.
      *  @throws VRTException If the CIF number is invalid.
      */
-    //  TODO - add CIF7?
     protected: virtual int32_t getOffset (int8_t cifNum, int32_t field) const;
+
+    /** Gets the offset of the CIF7 attribute
+     *  Offset is from the start of a field of size specified.
+     *  @param attr CIF7 attribute bitmask
+     *  @param len Length of the field
+     *  @return Offset from start of field
+     */
+    protected: virtual int32_t getCif7Offset (int32_t attr, int32_t len) const;
 
     /** Gets the length of the given field when present (-1 if variable, -2 if not found).
      *  @param cifNum number of CIF that field belongs to.
@@ -307,7 +311,7 @@ namespace vrt {
       setL(getCIFNumber(field), getCIFBitMask(field), val);
     }
 
-    public: std::vector<WarningErrorField_t> getWarnings() const; // TODO
+    public: std::vector<WarningErrorField_t> getWarnings() const;
 
     // Error Fields
     public: int32_t getError(IndicatorFieldEnum_t field) const {
@@ -317,7 +321,7 @@ namespace vrt {
       setL(getCIFNumber(field) | 0x8, getCIFBitMask(field), val);
     }
 
-    public: std::vector<WarningErrorField_t> getErrors() const; // TODO
+    public: std::vector<WarningErrorField_t> getErrors() const;
 
 
     // TODO - get free-form (textual) message

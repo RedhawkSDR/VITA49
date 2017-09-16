@@ -20,12 +20,12 @@
  */
 
 #include "BasicCommandPacket.h"
-#include <bitset> // includes the popcount functions // TODO needed?
+#include <bitset> // includes the popcount functions
 
 using namespace vrt;
 using namespace protected_PSP;
 
-//TODO if the below is needed, consider moving to a .h file to be included
+// Consider moving to a .h file to be included
 //     rather than duplicating in multiple .cc files (also in BAsicContextPacket.cc)
 /** Basic population count. This algorithm comes from [1] and is believed to be
  *  nearly-identical to what is being done in Java. The use of GCC's
@@ -165,6 +165,7 @@ std::string BasicCommandPacket::getPacketValid (bool strict, int32_t length) con
 void BasicCommandPacket::toStringStream (std::ostringstream &str) const {
   BasicVRTPacket::toStringStream(str);
   // TODO add ControlAck settings (16 bits)
+  // TODO add Message ID
   // TODO add Controllee ID
   // TODO add Controller ID
   //Utilities::append(str, " ChangePacket="            ,isChangePacket()             );
@@ -188,7 +189,7 @@ int32_t BasicCommandPacket::getPktSpecificPrologueLength () const {
   int32_t ids = (cas & (CONTROL_CE_BIT|CONTROL_CR_BIT));  // ids present
   int32_t len = 4  * (2                       )  // mandatory ctrl/ack and msgID
               + 4  * (bitCount(ids           ))  // at least 4 bytes if ID is present
-              + 12 * (bitCount(ids & (cas<<1))); // 12 additional bytes if 32-byte ID
+              + 12 * (bitCount(ids & (cas<<1))); // 12 additional bytes if 16-byte ID
   return len; 
 }
 
