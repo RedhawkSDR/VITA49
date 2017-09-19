@@ -387,18 +387,22 @@ int32_t BasicAcknowledgePacket::getFieldLen (int8_t cifNum, int32_t field) const
 
 int32_t BasicAcknowledgePacket::getL (int8_t cifNum, int32_t bit) const {
   int32_t off = getOffset(cifNum, bit);
-  if (off < 0) return INT32_NULL;
+  // Note: INT32_NULL is a valid value, but zero (WEF_NULL) is not.
+  if (off < 0) return WEF_NULL;
   return VRTMath::unpackInt(bbuf, off+getPrologueLength());
 }
 void BasicAcknowledgePacket::setL (int8_t cifNum, int32_t bit, int32_t val) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   int32_t off = getOffset(cifNum, bit);
-  bool present = !isNull(val);
+  // Note: INT32_NULL is a valid value, but zero (WEF_NULL) is not.
+  bool present = (val != WEF_NULL); // !isNull(val);
 
   setContextIndicatorFieldBit(cifNum, bit, present);
   off = shiftPayload(off, 4, present);
 
-  if (!isNull(val)) {
+  // Note: INT32_NULL is a valid value, but zero (WEF_NULL) is not.
+  //if (!isNull(val)) {
+  if (val != WEF_NULL) {
     VRTMath::packInt(bbuf, off+getPrologueLength(), val);
   }
 }

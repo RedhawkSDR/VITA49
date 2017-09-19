@@ -35,13 +35,43 @@ namespace vrt {
   using namespace VRTMath;
   using namespace IndicatorFields;
 
-  /*****************************************************************************/
-  /*****************************************************************************/
-  /**                                                                         **/
-  /**                      BasicAcknowledgePacket (AckV and AckX)             **/
-  /**                                                                         **/
-  /*****************************************************************************/
-  /*****************************************************************************/
+  namespace WarningErrorTypes {
+    static const int32_t WEF_NULL                    = 0x00000000;
+    static const int32_t WEF_NO_WARNING_ERROR        = 0x00000000;
+    static const int32_t WEF_RESERVED_0              = 0x00000001;
+    static const int32_t WEF_USER_DEFINED_1          = 0x00000002;
+    static const int32_t WEF_USER_DEFINED_2          = 0x00000004;
+    static const int32_t WEF_USER_DEFINED_3          = 0x00000008;
+    static const int32_t WEF_USER_DEFINED_4          = 0x00000010;
+    static const int32_t WEF_USER_DEFINED_5          = 0x00000020;
+    static const int32_t WEF_USER_DEFINED_6          = 0x00000040;
+    static const int32_t WEF_USER_DEFINED_7          = 0x00000080;
+    static const int32_t WEF_USER_DEFINED_8          = 0x00000100;
+    static const int32_t WEF_USER_DEFINED_9          = 0x00000200;
+    static const int32_t WEF_USER_DEFINED_10         = 0x00000400;
+    static const int32_t WEF_USER_DEFINED_11         = 0x00000800;
+    static const int32_t WEF_USER_DEFINED_12         = 0x00001000;
+    static const int32_t WEF_USER_DEFINED_13         = 0x00002000;
+    static const int32_t WEF_USER_DEFINED_14         = 0x00004000;
+    static const int32_t WEF_USER_DEFINED_15         = 0x00008000;
+    static const int32_t WEF_USER_DEFINED_16         = 0x00010000;
+    static const int32_t WEF_USER_DEFINED_17         = 0x00020000;
+    static const int32_t WEF_USER_DEFINED_18         = 0x00040000;
+    static const int32_t WEF_USER_DEFINED_19         = 0x00080000;
+    static const int32_t WEF_USER_DEFINED_20         = 0x00100000;
+    static const int32_t WEF_USER_DEFINED_21         = 0x00200000;
+    static const int32_t WEF_USER_DEFINED_22         = 0x00400000;
+    static const int32_t WEF_USER_DEFINED_23         = 0x00800000;
+    static const int32_t WEF_RESERVED_24             = 0x01000000;
+    static const int32_t TIMESTAMP_PROBLEM           = 0x02000000;
+    static const int32_t PARAM_INVALID               = 0x04000000;
+    static const int32_t PARAM_UNSUPPORTED_PRECISION = 0x08000000;
+    static const int32_t PARAM_OUT_OF_RANGE          = 0x10000000;
+    static const int32_t ERRONEOUS_FIELD             = 0x20000000;
+    static const int32_t HARDWARE_DEVICE_FAILURE     = 0x40000000;
+    static const int32_t FIELD_NOT_EXECUTED          = 0x80000000;
+  }
+  using namespace WarningErrorTypes;
 
   // Only needed for Acknowledge Packet sub-type (AckX and AckV)
   typedef struct WarningErrorField {
@@ -49,12 +79,17 @@ namespace vrt {
     int32_t responseField;
   } WarningErrorField_t;
 
+  /*****************************************************************************/
+  /*****************************************************************************/
+  /**                                                                         **/
+  /**                      BasicAcknowledgePacket (AckV and AckX)             **/
+  /**                                                                         **/
+  /*****************************************************************************/
+  /*****************************************************************************/
   class BasicAcknowledgePacket : public BasicCommandPacket, public IndicatorFieldProvider {
 
     //======================================================================
     // CONSTRUCTORS
-    //======================================================================
-    // TODO - set header to necessary settings
     //======================================================================
 
     /** Basic destructor. */
@@ -186,8 +221,32 @@ namespace vrt {
     // TODO - do CIF7 attributes affect this function?
     protected: virtual int32_t getFieldLen (int8_t cifNum, int32_t field) const;
 
+    /** Get 32-bits from buffer as a 32-bit integer.
+     *  Note: INT32_NULL is a valid value (0x80000000==FIELD_NOT_EXECUTED) in
+     *  the context of Warning and Error fields. The value zero (0x0==WEF_NULL)
+     *  has the same meaning as NULL in this context. This function returns 0x0
+     *  (which is WEF_NULL==WEF_NO_WARNING_ERROR==0x0) when the field does not
+     *  exist. This function returns 0x80000000 (i.e. INT32_NULL) when the field
+     *  contains that value.
+     *  @param cifNum Indicator field number
+     *  @param bit Bit mask of field.
+     *  @return 32-bit integer from buffer.
+     */
     protected: virtual int32_t getL (int8_t cifNum, int32_t bit) const;
+
+    /** Set 32-bits of buffer from a 32-bit integer.
+     *  Note: INT32_NULL is a valid value (0x80000000==FIELD_NOT_EXECUTED) in
+     *  the context of Warning and Error fields. The value zero (0x0==WEF_NULL)
+     *  has the same meaning as NULL in this context. This function removes the
+     *  field when set to 0x0 (which is WEF_NULL==WEF_NO_WARNING_ERROR==0x0).
+     *  This function sets the value 0x80000000 (i.e. INT32_NULL) when the 
+     *  argument contains that value.
+     *  @param cifNum Indicator field number
+     *  @param bit Bit mask of field.
+     *  @param val 32-bit integer.
+     */
     protected: virtual void setL (int8_t cifNum, int32_t bit, int32_t val);
+
     // Warnings and Errors are always a single 32-bit field. Throw VRTException("Not Implemented b/c not useful.");
     protected: virtual int8_t getB (int8_t cifNum, int32_t bit, int32_t xoff) const {
       UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(xoff);
@@ -274,9 +333,6 @@ namespace vrt {
     //Acknowledge-E
     public: virtual void setErrorsGenerated (bool set);
 
-    // TODO - what other virtual (or non-virtual) functions from IndFieldProv class need to be overridden?
-
-
     //======================================================================
     // ACKNOWLEDGE PACKET METHODS
     //======================================================================
@@ -304,32 +360,103 @@ namespace vrt {
     }
 
     // Warning Fields
+
+    /** Gets the warning bit field for the specified indicator field.
+     *  @param field Indicator field
+     *  @return Warning bit field (0x0 or WEF_NULL or 
+     *  WEF_NO_WARNING_ERROR if no warnings).
+     */
     public: int32_t getWarning(IndicatorFieldEnum_t field) const {
       return getL(getCIFNumber(field), getCIFBitMask(field));
     }
+
+    /** Sets the warning bit field for the specified indicator field.
+     *  @param field Indicator field
+     *  @param val Warning bit field (0x0 or WEF_NULL or 
+     *  WEF_NO_WARNING_ERROR if no warnings).
+     */
     public: void setWarning(IndicatorFieldEnum_t field, int32_t val) {
       setL(getCIFNumber(field), getCIFBitMask(field), val);
     }
+    
+    /** Adds one or more warnings to the warning bit field for the specified
+     *  indicator field. 
+     *  @param field Indicator field
+     *  @param val Warning bit field to add (set) to the warning bit field. 
+     */
+    public: void addWarning(IndicatorFieldEnum_t field, int32_t val) {
+      if (val == WEF_NULL) return;
+      int32_t bits = getL(getCIFNumber(field), getCIFBitMask(field));
+      setL(getCIFNumber(field), getCIFBitMask(field), val | bits);
+    }
 
+    /** Removes one or more warnings from the warning bit field for the
+     *  specified indicator field.
+     *  @param field Indicator field
+     *  @param val Warning bit field to remove (unset) from the warning bit
+     *  field.
+     */
+    public: void removeWarning(IndicatorFieldEnum_t field, int32_t val) {
+      if (val == WEF_NULL) return;
+      int32_t bits = getL(getCIFNumber(field), getCIFBitMask(field));
+      setL(getCIFNumber(field), getCIFBitMask(field), ~val & bits);
+    }
+
+    /** Gets all warnings for all indicator fields.
+     *  @return Vector of warnings.
+     */
     public: std::vector<WarningErrorField_t> getWarnings() const;
 
     // Error Fields
+    
+    /** Gets the error bit field for the specified indicator field.
+     *  @param field Indicator field
+     *  @return Error bit field (0x0 or WEF_NULL or 
+     *  WEF_NO_WARNING_ERROR if no errors).
+     */
     public: int32_t getError(IndicatorFieldEnum_t field) const {
       return getL(getCIFNumber(field) | 0x8, getCIFBitMask(field));
     }
+
+    /** Sets the error bit field for the specified indicator field.
+     *  @param field Indicator field
+     *  @param val Error bit field (0x0 or WEF_NULL or 
+     *  WEF_NO_WARNING_ERROR if no errors).
+     */
     public: void setError(IndicatorFieldEnum_t field, int32_t val){
       setL(getCIFNumber(field) | 0x8, getCIFBitMask(field), val);
     }
+    
+    /** Adds one or more errors to the error bit field for the specified
+     *  indicator field.
+     *  @param field Indicator field
+     *  @param val Error bit field to add (set) to the error bit field.
+     */
+    public: void addError(IndicatorFieldEnum_t field, int32_t val) {
+      if (val == WEF_NULL) return;
+      int32_t bits = getL(getCIFNumber(field) | 0x8, getCIFBitMask(field));
+      setL(getCIFNumber(field) | 0x8, getCIFBitMask(field), val | bits);
+    }
 
+    /** Removes one or more errors from the error bit field for the
+     *  specified indicator field.
+     *  @param field Indicator field
+     *  @param val Error bit field to remove (unset) from the error bit
+     *  field.
+     */
+    public: void removeError(IndicatorFieldEnum_t field, int32_t val) {
+      if (val == WEF_NULL) return;
+      int32_t bits = getL(getCIFNumber(field) | 0x8, getCIFBitMask(field));
+      setL(getCIFNumber(field) | 0x8, getCIFBitMask(field), ~val & bits);
+    }
+
+    /** Gets all errors for all indicator fields.
+     *  @return Vector of errors.
+     */
     public: std::vector<WarningErrorField_t> getErrors() const;
 
 
     // TODO - get free-form (textual) message
-
-
-    // TODO - add getters/setters for each possible error/warning bit?
-
-
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // Implement HasFields
