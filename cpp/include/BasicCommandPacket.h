@@ -229,73 +229,73 @@ namespace vrt {
     public: void setActionFlag (bool set);
 
     //Control-P
-    public: bool isPartialChangePermitted() const;
+    public: bool isPartialChangePermitted () const;
     public: void setPartialChangePermitted (bool set);
 
     //Control-W
-    public: bool isWarningsPermitted() const;
+    public: bool isWarningsPermitted () const;
     public: void setWarningsPermitted (bool set);
 
     //Control-E
-    public: bool isErrorsPermitted() const;
+    public: bool isErrorsPermitted () const;
     public: void setErrorsPermitted (bool set);
 
     //Control-NK
-    public: bool getNotAckOnly() const;
+    public: bool getNotAckOnly () const;
     public: void setNotAckOnly (bool set);
 
     //Control-QV
-    public: bool getRequestValidationAcknowledge() const;
+    public: bool getRequestValidationAcknowledge () const;
     public: void setRequestValidationAcknowledge (bool set);
 
     //Control-QX
-    public: bool getRequestExecutionAcknowledge() const;
+    public: bool getRequestExecutionAcknowledge () const;
     public: void setRequestExecutionAcknowledge (bool set);
 
     //Control-QS
-    public: bool getRequestQueryAcknowledge() const;
+    public: bool getRequestQueryAcknowledge () const;
     public: void setRequestQueryAcknowledge (bool set);
 
     //Acknowledge-SX
-    public: bool getActionExecuted() const;
+    public: bool getActionExecuted () const;
     public: void setActionExecuted (bool set);
 
     //Acknowledge-P
-    public: bool getPartialAction() const;
+    public: bool getPartialAction () const;
     public: void setPartialAction (bool set);
 
     //Acknowledge-W
-    public: bool getWarningsGenerated() const;
+    public: bool getWarningsGenerated () const;
     public: virtual void setWarningsGenerated (bool set);
 
     //Acknowledge-E
-    public: bool getErrorsGenerated() const;
+    public: bool getErrorsGenerated () const;
     public: virtual void setErrorsGenerated (bool set);
 
     // Rest of Packet Specific Prologue for Command Packets
     // Message ID - 32Bit Number
-    public: int32_t getMessageID() const;
-    public: void setMessageID(int32_t val);
+    public: int32_t getMessageID () const;
+    public: void setMessageID (int32_t val);
 
     // Controllee ID/UUID
     // TODO - update to use methods/classes provided by UUID.h
-    public: int32_t getControlleeIDNumber() const;
-    public: void setControlleeIDNumber(int32_t val);
+    public: int32_t getControlleeIDNumber () const;
+    public: void setControlleeIDNumber (int32_t val);
 
-    public: string getControlleeUUID() const;
-    public: void setControlleeUUID(string val);
-    public: void getControlleeUUID(int32_t& val0, int32_t& val1, int32_t& val2, int32_t& val3) const;
-    public: void setControlleeUUID(int32_t val0, int32_t val1, int32_t val2, int32_t val3);
+    public: string getControlleeUUID () const;
+    public: void setControlleeUUID (string val);
+    public: void getControlleeUUID (int32_t& val0, int32_t& val1, int32_t& val2, int32_t& val3) const;
+    public: void setControlleeUUID (int32_t val0, int32_t val1, int32_t val2, int32_t val3);
 
     // Controller ID/UUID
     // TODO - update to use methods/classes provided by UUID.h
-    public: int32_t getControllerIDNumber() const;
-    public: void setControllerIDNumber(int32_t val);
+    public: int32_t getControllerIDNumber () const;
+    public: void setControllerIDNumber (int32_t val);
 
-    public: string getControllerUUID() const;
-    public: void setControllerUUID(string val);
-    public: void getControllerUUID(int32_t& val0, int32_t& val1, int32_t& val2, int32_t& val3) const;
-    public: void setControllerUUID(int32_t val0, int32_t val1, int32_t val2, int32_t val3);
+    public: string getControllerUUID () const;
+    public: void setControllerUUID (string val);
+    public: void getControllerUUID (int32_t& val0, int32_t& val1, int32_t& val2, int32_t& val3) const;
+    public: void setControllerUUID (int32_t val0, int32_t val1, int32_t val2, int32_t val3);
 
     
     // HELPERS
@@ -308,19 +308,19 @@ namespace vrt {
     protected: virtual void setCtrlAckSettingsBit (int32_t bit, bool set);
 
     // Optional PSP fields - getters
-    private: int32_t getOffset(bool controller) const; // TODO why not name it getPspOffset(...)?
-    private: int32_t getFieldLen(bool controller) const; // TODO why not name it getPspFieldLen(...)?
-    private: int32_t getControlIDNumber(bool controller) const;
-    private: void getControlUUID(bool controller,
-                                 int32_t& val0, int32_t& val1, int32_t& val2, int32_t& val3) const;
+    private: int32_t getOffset (bool controller) const; // TODO why not name it getPspOffset(...)?
+    private: int32_t getFieldLen (bool controller) const; // TODO why not name it getPspFieldLen(...)?
+    private: int32_t getControlIDNumber (bool controller) const;
+    private: void getControlUUID (bool controller,
+                                  int32_t& val0, int32_t& val1, int32_t& val2, int32_t& val3) const;
     // delim=0 will produce string with no delimiters
-    private: string getControlUUID(bool controller, char delim='-') const;
+    private: string getControlUUID (bool controller, char delim='-') const;
 
     // Optional PSP fields - setters
-    private: void setControlIDNumber(bool controller, int32_t val); // TODO ... again ^^
-    private: void setControlUUID(bool controller,
-                                 int32_t val0, int32_t val1, int32_t val2, int32_t val3);
-    private: void setControlUUID(bool controller, string val);
+    private: void setControlIDNumber (bool controller, int32_t val); // TODO ... again ^^
+    private: void setControlUUID (bool controller,
+                                  int32_t val0, int32_t val1, int32_t val2, int32_t val3);
+    private: void setControlUUID (bool controller, string val);
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////

@@ -73,11 +73,117 @@ namespace vrt {
   }
   using namespace WarningErrorTypes;
 
-  // Only needed for Acknowledge Packet sub-type (AckX and AckV)
+  /** Struct to represent an indicator field and associated warning or error
+   *  field. Only needed for Acknowledge Packet sub-type (AckX and AckV)
+   */
   typedef struct WarningErrorField {
-    IndicatorFieldEnum_t field;
-    int32_t responseField;
+    IndicatorFieldEnum_t field; ///< Indicator field enumeration
+    int32_t responseField;      ///< Warning/Error bit field
   } WarningErrorField_t;
+
+  // Constant to use in place of CIF# for getting offset to Free-form Warning/Error message
+  static const int8_t FREE_FORM_MESSAGE = (int8_t) 0xFF; // (int8_t) 0xFF == -1
+
+  /** Struct to assist getting/setting Free-form Warning/Error Message Field */
+  typedef struct FreeFormMessage {
+    /** Default constructor for empty Free-form Warning/Error message. */
+    FreeFormMessage () : bbuf(0) {
+    }
+    /** Constructor that accepts a Free-form Warning/Error message as a string.
+     *  The string message is stored as a null-terminated byte-buffer. The size
+     *  of the resulting byte-buffer is one byte more than the number of
+     *  characters in the input message string.
+     *  @param msg Message string
+     */
+    FreeFormMessage (const std::string msg) : 
+          bbuf(msg.size()+1) { // one extra for null terminator
+      if (msg.size()==0) {
+        bbuf.resize(0);
+      } else {
+        memcpy(&bbuf[0], &msg[0], msg.size());
+        bbuf[msg.size()] = '\0';
+      }
+    }
+    /** Constructor that accepts a Free-form Warning/Error message as a byte-
+     *  buffer. A null-terminator is NOT added to the byte sequence. If null-
+     *  termination is desired, it must be included in the input byte-buffer.
+     *  The size of the resulting byte-buffer is equal to the size of input
+     *  message byte-buffer.
+     *  @param msg Message byte-buffer
+     *  @param len Size of byte-buffer
+     */
+    FreeFormMessage (const char* msg, const size_t len) : bbuf(len) {
+      memcpy(&bbuf[0], msg, len);
+    }
+    /** Sets Free-form Warning/Error message from a string. The string message
+     *  is stored as a null-terminated byte-buffer. The size of the resulting
+     *  byte-buffer is one byte more than the number of characters in the input
+     *  message string.
+     *  @param msg Message string
+     */
+    void setMessage(const std::string msg) {
+      if (msg.size()==0) {
+        bbuf.resize(0);
+      } else {
+        bbuf.resize(msg.size()+1); // one extra for null terminator
+        memcpy(&bbuf[0], &msg[0], msg.size());
+        bbuf[msg.size()] = '\0';
+      }
+    }
+    /** Sets Free-form Warning/Error message from a byte-buffer. A null-
+     *  terminator is NOT added to the byte sequence. If null-termination is
+     *  desired, it must be included in the input byte-buffer. The size of the
+     *  resulting byte-buffer is equal to the size of input message byte-buffer.
+     *  @param msg Message byte-buffer
+     *  @param len Size of byte-buffer
+     */
+    void setMessage(const char* msg, const size_t len) {
+      bbuf.resize(len);
+      memcpy(&bbuf[0], msg, len);
+    }
+    /** Gets the string representation of the Free-form Warning/Error message.
+     *  A message with a null-terminator as the last byte will not include the
+     *  null-terminator in the string representation (i.e. the length of the
+     *  string will be one less than the size of the message byte-buffer).
+     *  Otherwise, the size of the string will be equal to the size of the byte-
+     *  buffer. An empty message results in an empty string.
+     *  @return String representation of the message
+     */
+    std::string text () const {
+      if (bbuf.size() == 0) { // no/empty message
+        return "";
+      } else if (bbuf[bbuf.size()-1] == '\0') { // null terminated c-string
+        return std::string((char*) &bbuf[0]);
+      } else { // non null terminated char array
+        return std::string((char*) &bbuf[0], bbuf.size());
+      }
+    }
+    /** Gets a const pointer to the first byte of the Free-form Warning/Error
+     *  message byte-buffer. This is intended as a read-only pointer that must
+     *  be used in conjunction with size() method. Use one of the setMessage()
+     *  methods to set or modify the message.
+     *  Warning: the pointer is not guaranteed to be valid, and may in fact
+     *  become invalid if either setMessage() method is called afterward. Use
+     *  with caution.
+     *  @return Message byte-buffer pointer
+     */
+    const char* buffer () const {
+      return &bbuf[0];
+    }
+    /** Gets size of Free-form Warning/Error message.
+     *  @return Size of message (byte-buffer)
+     */
+    size_t size () const {
+      return bbuf.size();
+    }
+    /** Is Free-form Warning/Error message empty/blank?
+     *  @return True if message is empty; False otherwise.
+     */
+    bool empty () const {
+      return bbuf.size()==0;
+    }
+    std::vector<char> bbuf; ///> Internal byte-buffer containing the message
+  } FreeFormMessage_t;
 
   /*****************************************************************************/
   /*****************************************************************************/
@@ -197,9 +303,10 @@ namespace vrt {
      *  occurrence of CIF0. CIF7 is considered an invalid CIF number.
      *  For access to the second occurrence of CIFs (i.e. Error fields in Ack packets), add 8
      *  to the CIF number, effectively setting the 4th bit (mod8 gives field, div8 gives occurrence).
-     *  @param cifNum number of CIF that field belongs to.
-     *  @param field bitmask associated with field of interest.
-     *  @return offset in bytes from beginning of CIF payload, or CIF7 as described above.
+     *  For the Free-form Warning/Error Message Field, set the CIF# to 0xFF (-1).
+     *  @param cifNum number of CIF that field belongs to; or -1 for Free-form message field.
+     *  @param field bitmask associated with field of interest; ignored for Free-form message field.
+     *  @return offset in bytes from beginning of CIF payload.
      *  @throws VRTException If the CIF number is invalid.
      */
     protected: virtual int32_t getOffset (int8_t cifNum, int32_t field) const;
@@ -455,8 +562,20 @@ namespace vrt {
      */
     public: std::vector<WarningErrorField_t> getErrors() const;
 
+    /** Is there a Free-form Warning/Error Message Field
+     *  @return True if Free-form Message; False otherwise
+     */
+    public: bool hasFreeFormMessage() const;
 
-    // TODO - get free-form (textual) message
+    /** Gets Free-form Warning/Error Message Field
+     *  @return Free-form message
+     */
+    public: FreeFormMessage_t getFreeFormMessage() const;
+
+    /** Sets Free-form Warning/Error Message Field
+     *  @param msg Free-form message
+     */
+    public: void setFreeFormMessage(const FreeFormMessage_t msg);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // Implement HasFields

@@ -642,7 +642,8 @@ namespace vrt {
     //////////////////////////////////////////////////////////////////////////////////////////////////
 
     // BEGIN TODO FIXME - additions from previous version of shared library
-    public: void swapPayloadBytes(const PayloadFormat &pf, const void* array);
+//    public: void swapPayloadBytes(const PayloadFormat &pf, const void* array);
+    public: void swapPayloadBytes(const PayloadFormat &pf);
     public: void* getData_normal(const PayloadFormat &pf, int position);
     //public: void* getData();
     //public: void* getDataShort (const PayloadFormat &pf, bool raw);

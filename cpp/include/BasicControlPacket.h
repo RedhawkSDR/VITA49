@@ -150,7 +150,7 @@ namespace vrt {
     // IndicatorFieldProvider also provides this method, but returns value of Change Indicator
     // as is appropriate for BasicContextPacket.
     // BasicControlPackets should default to BasicCommandPacket's implementation; ensure that here.
-    public: virtual bool isChangePacket() const {
+    public: virtual bool isChangePacket () const {
       return BasicCommandPacket::isChangePacket(); // could just return true instead
     }
 

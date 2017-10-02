@@ -527,7 +527,6 @@ int32_t BasicContextPacket::getCif7Offset (int32_t attr, int32_t len) const {
   return ((cif7 & attr) != 0)? off: -off;  // -off if not present
 }
 
-// TODO - use of CIF7 is a special case that massively changes this calculation
 int32_t __attribute__((hot)) BasicContextPacket::getOffset (int8_t cifNum, int32_t field) const {
   // Since this is the most-used method in the class and often sees millions and
   // millions of calls within a typical application, it has been heavily
@@ -665,9 +664,9 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int8_t cifNum, int32
           // TODO - determine size of field and add to off1= w/ cif7Add and cif7Mult applied
         }
 
-      // Only count SPECTRUM since it is the only field between the previous
-      // and next variable length fields. SPECTRUM is 56-octets.
-      if ((cif1 & mask1 & protected_CIF1::SPECTRUM_mask) != 0) off1 += (cif7Add + (56*cif7Mult));
+        // Only count SPECTRUM since it is the only field between the previous
+        // and next variable length fields. SPECTRUM is 56-octets.
+        if ((cif1 & mask1 & protected_CIF1::SPECTRUM_mask) != 0) off1 += (cif7Add + (56*cif7Mult));
 
         // SECTOR_SCN_STP is also variable length, since it comes after CIFS_ARRAY
         // we nest it here so the check can be skipped.
@@ -698,10 +697,8 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int8_t cifNum, int32
     off += off1;
     if (cifNum == 1) return ((cif1 & field) != 0)? off : -off;  // -off if not present
   } else {
-    // TODO - might be better to return NULL to indicate invalid CIF
-    //      - offset value is wrong anyway because the CIF would have to be added first,
-    //        adding at least 4 bytes to the needed offset
-    if (cifNum == 1) return -off;  // -off since not present
+    // return NULL to indicate invalid CIF
+    if (cifNum == 1) return INT32_NULL;
   }
 
   // CIF2
@@ -714,10 +711,8 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int8_t cifNum, int32
     off += off2;
     if (cifNum == 2) return ((cif2 & field) != 0)? off : -off;  // -off if not present
   } else {
-    // TODO - might be better to return NULL to indicate invalid CIF
-    //      - offset value is wrong anyway because the CIF would have to be added first,
-    //        adding at least 4 bytes to the needed offset
-    if (cifNum == 2) return -off;  // -off since not present
+    // return NULL to indicate invalid CIF
+    if (cifNum == 2) return INT32_NULL;
   }
 
   // CIF3
@@ -757,14 +752,11 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int8_t cifNum, int32
     off += off3;
     if (cifNum == 3) return ((cif3 & field) != 0)? off : -off;  // -off if not present
   } else {
-    // TODO - might be better to return NULL to indicate invalid CIF
-    //      - offset value is wrong anyway because the CIF would have to be added first,
-    //        adding at least 4 bytes to the needed offset
-    if (cifNum == 3) return -off;  // -off since not present
+    // return NULL to indicate invalid CIF
+    if (cifNum == 3) return INT32_NULL;
   }
-  // XXX - should never get here since CIF3 defines the last potential part of payload
-  // TODO - might be better to return NULL to indicate invalid CIF
-  return -off;
+  // should never get here since CIF3 defines the last potential part of payload
+  throw VRTException("Invalid Context Indicator Field number (undefined).");
 }
 
 // TODO - update with new CIFs

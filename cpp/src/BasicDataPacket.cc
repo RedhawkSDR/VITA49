@@ -267,7 +267,8 @@ void BasicDataPacket::setDataLength (const PayloadFormat &pf, int32_t length, bo
 }
 
 // BEGIN TODO FIXME - additions from previous version of shared library
-void BasicDataPacket::swapPayloadBytes(const PayloadFormat &pf, const void* array){
+//void BasicDataPacket::swapPayloadBytes(const PayloadFormat &pf, const void* array){
+void BasicDataPacket::swapPayloadBytes(const PayloadFormat &pf){
 	int32_t len  = getPayloadLength() - getPadBitCount()/8; // only care if PadBitCount > 8
 	int32_t off  = getPrologueLength();
 	int32_t size = pf.getDataItemSize();

@@ -1,4 +1,4 @@
-/*
+/* ===================== COPYRIGHT NOTICE =====================
  * This file is protected by Copyright. Please refer to the COPYRIGHT file
  * distributed with this source distribution.
  *
@@ -16,6 +16,7 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see http://www.gnu.org/licenses/.
+ * ============================================================
  */
 
 #ifndef _IndicatorFields_h
@@ -36,210 +37,274 @@
 # include "Record.h"
 #endif /* NOT_USING_JNI */
 
+using namespace std;
 
 namespace vrt {
-  using namespace std;
-  using namespace VRTMath;
-
-  // originally from BasicContextPacket.h
-  class AbstractGeolocation;  // declared below
-  class Geolocation;          // declared below
-  class Ephemeris;            // declared below
-  class ContextAssocLists;    // declared below
-  class GeoSentences;         // declared below
-
-
+  /** Context/Control Indicator Fields and functions to retrieve CIF number and
+   * field bitmask from the enumerated value, as well as the reverse.
+   */
   namespace IndicatorFields {
-  
-    typedef enum IndicatorFieldEnum {
+    /** Enumeration of all Context/Control Indicator Fields. The enumerated
+     *  value can be programatically converted to the CIF# and bitmask. The most
+     *  significant 3 bits (left-most) are the CIF#, and the least significant
+     *  5 bits are the number of left shifts to apply to 0x1 to get the one-hot
+     *  bitmask for the field. As such, a right-shift of the enumerated value
+     *  (which is mathematically equivalent to a divide by 32) provides the
+     *  CIF#, and a bitwise AND of the enumerated value with 0x1F (which is
+     *  mathematically equivalent to a modulo 32) provides the number of bit
+     *  shifts needed to produce the bitmask. The comments for each enumeration
+     *  present this information as well in the following form: <br>
+     *  <b> \<Field Key\> \<Bit #\> \<Description of field\> (\<CIF#\>,\<Bitmask\>) \<==\> \<CIF# bits\> \<Shift# bits\> = \<Enumerated Value\> </b><br>
+     *  Note that there are gaps in the enumrated values that are reserved for
+     *  potential future CIFs 4, 5, and 6.
+     */
+    enum IndicatorFieldEnum {
       // CIF0 - Legacy Fields and CIF Enables - Starts at 0*32 = 0
-      // CIF Key                Bit #   Description                           (CIF,Bitmask)  <==> CIF|Shift = Enum Value
-      CIF0_RESERVED_0 = 0,   // Bit 0   Reserved                              (0,0x00000001) <==> 000 00000 =   0
-      CIF1_ENABLE,           // Bit 1   CIF1 Enable                           (0,0x00000002) <==> 000 00001 =   1
-      CIF2_ENABLE,           // Bit 2   CIF2 Enable                           (0,0x00000004) <==> 000 00010 =   2
-      CIF3_ENABLE,           // Bit 3   CIF3 Enable                           (0,0x00000008) <==> 000 00011 =   3
-      CIF0_RESERVED_4,       // Bit 4   Reserved                              (0,0x00000010) <==> 000 00100 =   4
-      CIF0_RESERVED_5,       // Bit 5   Reserved                              (0,0x00000020) <==> 000 00101 =   5
-      CIF0_RESERVED_6,       // Bit 6   Reserved                              (0,0x00000040) <==> 000 00110 =   6
-      CIF7_ENABLE,           // Bit 7   Field Attributes Enable               (0,0x00000080) <==> 000 00111 =   7
-      CONTEXT_ASOC,          // Bit 8   Context Association Lists             (0,0x00000100) <==> 000 01000 =   8
-      GPS_ASCII,             // Bit 9   GPS ASCII                             (0,0x00000200) <==> 000 01001 =   9
-      EPHEM_REF,             // Bit 10  Ephemeris Ref ID                      (0,0x00000400) <==> 000 01010 =  10
-      REL_EPHEM,             // Bit 11  Relative Ephemeris                    (0,0x00000800) <==> 000 01011 =  11
-      ECEF_EPHEM,            // Bit 12  ECEF Ephemeris                        (0,0x00001000) <==> 000 01100 =  12
-      INS_EPHEM,             // Bit 13  Formatted INS                         (0,0x00002000) <==> 000 01101 =  13
-      GPS_EPHEM,             // Bit 14  Formatted GPS                         (0,0x00004000) <==> 000 01110 =  14
-      DATA_FORMAT,           // Bit 15  Signal Data Packet Payload Format     (0,0x00008000) <==> 000 01111 =  15
-      STATE_EVENT,           // Bit 16  State/Event Indicators                (0,0x00010000) <==> 000 10000 =  16
-      DEVICE_ID,             // Bit 17  Device Identifier                     (0,0x00020000) <==> 000 10001 =  17
-      TEMPERATURE,           // Bit 18  Temperature                           (0,0x00040000) <==> 000 10010 =  18
-      TIME_CALIB,            // Bit 19  Timestamp Calibration Time            (0,0x00080000) <==> 000 10011 =  19
-      TIME_ADJUST,           // Bit 20  Timestamp Adjustment                  (0,0x00100000) <==> 000 10100 =  20
-      SAMPLE_RATE,           // Bit 21  Sample Rate                           (0,0x00200000) <==> 000 10101 =  21
-      OVER_RANGE,            // Bit 22  Over-range Count                      (0,0x00400000) <==> 000 10110 =  22
-      GAIN,                  // Bit 23  Gain                                  (0,0x00800000) <==> 000 10111 =  23
-      REF_LEVEL,             // Bit 24  Reference Level                       (0,0x01000000) <==> 000 11000 =  24
-      IF_OFFSET,             // Bit 25  IF Band Offset                        (0,0x02000000) <==> 000 11001 =  25
-      RF_OFFSET,             // Bit 26  RF Reference Frequency Offset         (0,0x04000000) <==> 000 11010 =  26
-      RF_FREQ,               // Bit 27  RF Reference Frequency                (0,0x08000000) <==> 000 11011 =  27
-      IF_FREQ,               // Bit 28  IF Reference Frequency                (0,0x10000000) <==> 000 11100 =  28
-      BANDWIDTH,             // Bit 29  Bandwidth                             (0,0x20000000) <==> 000 11101 =  29
-      REF_POINT,             // Bit 30  Reference Point Indentifier           (0,0x40000000) <==> 000 11110 =  30
-      CHANGE_IND,            // Bit 31  Context Field Change Indicator        (0,0x80000000) <==> 000 11111 =  31
+      // CIF Key                  Bit #   Description                           (CIF,Bitmask)  <==> CIF|Shift = Enum Value
+      CIF0_RESERVED_0 = 0,   ///< Bit 0   Reserved                              (0,0x00000001) <==> 000 00000 =   0
+      CIF1_ENABLE,           ///< Bit 1   CIF1 Enable                           (0,0x00000002) <==> 000 00001 =   1
+      CIF2_ENABLE,           ///< Bit 2   CIF2 Enable                           (0,0x00000004) <==> 000 00010 =   2
+      CIF3_ENABLE,           ///< Bit 3   CIF3 Enable                           (0,0x00000008) <==> 000 00011 =   3
+      CIF0_RESERVED_4,       ///< Bit 4   Reserved                              (0,0x00000010) <==> 000 00100 =   4
+      CIF0_RESERVED_5,       ///< Bit 5   Reserved                              (0,0x00000020) <==> 000 00101 =   5
+      CIF0_RESERVED_6,       ///< Bit 6   Reserved                              (0,0x00000040) <==> 000 00110 =   6
+      CIF7_ENABLE,           ///< Bit 7   Field Attributes Enable               (0,0x00000080) <==> 000 00111 =   7
+      CONTEXT_ASOC,          ///< Bit 8   Context Association Lists             (0,0x00000100) <==> 000 01000 =   8
+      GPS_ASCII,             ///< Bit 9   GPS ASCII                             (0,0x00000200) <==> 000 01001 =   9
+      EPHEM_REF,             ///< Bit 10  Ephemeris Ref ID                      (0,0x00000400) <==> 000 01010 =  10
+      REL_EPHEM,             ///< Bit 11  Relative Ephemeris                    (0,0x00000800) <==> 000 01011 =  11
+      ECEF_EPHEM,            ///< Bit 12  ECEF Ephemeris                        (0,0x00001000) <==> 000 01100 =  12
+      INS_EPHEM,             ///< Bit 13  Formatted INS                         (0,0x00002000) <==> 000 01101 =  13
+      GPS_EPHEM,             ///< Bit 14  Formatted GPS                         (0,0x00004000) <==> 000 01110 =  14
+      DATA_FORMAT,           ///< Bit 15  Signal Data Packet Payload Format     (0,0x00008000) <==> 000 01111 =  15
+      STATE_EVENT,           ///< Bit 16  State/Event Indicators                (0,0x00010000) <==> 000 10000 =  16
+      DEVICE_ID,             ///< Bit 17  Device Identifier                     (0,0x00020000) <==> 000 10001 =  17
+      TEMPERATURE,           ///< Bit 18  Temperature                           (0,0x00040000) <==> 000 10010 =  18
+      TIME_CALIB,            ///< Bit 19  Timestamp Calibration Time            (0,0x00080000) <==> 000 10011 =  19
+      TIME_ADJUST,           ///< Bit 20  Timestamp Adjustment                  (0,0x00100000) <==> 000 10100 =  20
+      SAMPLE_RATE,           ///< Bit 21  Sample Rate                           (0,0x00200000) <==> 000 10101 =  21
+      OVER_RANGE,            ///< Bit 22  Over-range Count                      (0,0x00400000) <==> 000 10110 =  22
+      GAIN,                  ///< Bit 23  Gain                                  (0,0x00800000) <==> 000 10111 =  23
+      REF_LEVEL,             ///< Bit 24  Reference Level                       (0,0x01000000) <==> 000 11000 =  24
+      IF_OFFSET,             ///< Bit 25  IF Band Offset                        (0,0x02000000) <==> 000 11001 =  25
+      RF_OFFSET,             ///< Bit 26  RF Reference Frequency Offset         (0,0x04000000) <==> 000 11010 =  26
+      RF_FREQ,               ///< Bit 27  RF Reference Frequency                (0,0x08000000) <==> 000 11011 =  27
+      IF_FREQ,               ///< Bit 28  IF Reference Frequency                (0,0x10000000) <==> 000 11100 =  28
+      BANDWIDTH,             ///< Bit 29  Bandwidth                             (0,0x20000000) <==> 000 11101 =  29
+      REF_POINT,             ///< Bit 30  Reference Point Indentifier           (0,0x40000000) <==> 000 11110 =  30
+      CHANGE_IND,            ///< Bit 31  Context Field Change Indicator        (0,0x80000000) <==> 000 11111 =  31
 
       // CIF1 - Spatial, Signal, Spectral, I/O, Control - Starts at 1*32 = 32
-      CIF1_RESERVED_0 = 32,  // Bit 0   Reserved                              (1,0x00000001) <==> 001 00000 =  32
-      BUFFER_SZ,             // Bit 1   Buffer Size                           (1,0x00000002) <==> 001 00001 =  33
-      VER_BLD_CODE,          // Bit 2   Version and Build Code                (1,0x00000004) <==> ...
-      V49_COMPL,             // Bit 3   V49 Spec Compliance                   (1,0x00000008)
-      HEALTH_STATUS,         // Bit 4   Health Status                         (1,0x00000010)
-      DISCRETE_IO64,         // Bit 5   Distrete I/O (64-bit)                 (1,0x00000020)
-      DISCRETE_IO32,         // Bit 6   Discrete I/O (32-bit)                 (1,0x00000040)
-      INDEX_LIST,            // Bit 7   Index List                            (1,0x00000080)
-      CIF1_RESERVED_8,       // Bit 8   Reserved                              (1,0x00000100)
-      SECTOR_SCN_STP,        // Bit 9   Sector Scan/Step                      (1,0x00000200)
-      SPECTRUM,              // Bit 10  Spectrum                              (1,0x00000400)
-      CIFS_ARRAY,            // Bit 11  Array of CIFS                         (1,0x00000800)
-      CIF1_RESERVED_12,      // Bit 12  Reserved                              (1,0x00001000)
-      AUX_BANDWIDTH,         // Bit 13  Aux Bandwidth                         (1,0x00002000)
-      AUX_GAIN,              // Bit 14  Aux Gain                              (1,0x00004000)
-      AUX_FREQUENCY,         // Bit 15  Aux Frequency                         (1,0x00008000)
-      SNR_NOISE,             // Bit 16  SNR/Noise Figure                      (1,0x00010000)
-      ICPT_PTS_2_3,          // Bit 17  2nd and 3rd-Order Intercept Points    (1,0x00020000)
-      COMPRESS_PT,           // Bit 18  Compression Point                     (1,0x00040000)
-      THRESHOLD,             // Bit 19  Threshold                             (1,0x00080000)
-      EB_NO_BER,             // Bit 20  Eb/No BER                             (1,0x00100000)
-      CIF1_RESERVED_21,      // Bit 21  Reserved                              (1,0x00200000)
-      CIF1_RESERVED_22,      // Bit 22  Reserved                              (1,0x00400000)
-      CIF1_RESERVED_23,      // Bit 23  Reserved                              (1,0x00800000)
-      RANGE,                 // Bit 24  Range (Distance)                      (1,0x01000000)
-      BEAMWIDTH,             // Bit 25  Beamwidth                             (1,0x02000000)
-      CIF1_RESERVED_26,      // Bit 26  Reserved                              (1,0x04000000)
-      CIF1_RESERVED_27,      // Bit 27  Reserved                              (1,0x08000000)
-      PNT_ANGL_2D_ST,        // Bit 28  2-D Pointing Angle (structured)       (1,0x10000000)
-      PNT_ANGL_2D_SI,        // Bit 29  2-D Pointing Angle (simple)           (1,0x20000000)
-      POLARIZATION,          // Bit 30  Polarization                          (1,0x40000000)
-      PHASE,                 // Bit 31  Phase                                 (1,0x80000000)
+      CIF1_RESERVED_0 = 32,  ///< Bit 0   Reserved                              (1,0x00000001) <==> 001 00000 =  32
+      BUFFER_SZ,             ///< Bit 1   Buffer Size                           (1,0x00000002) <==> 001 00001 =  33
+      VER_BLD_CODE,          ///< Bit 2   Version and Build Code                (1,0x00000004) <==> ...
+      V49_COMPL,             ///< Bit 3   V49 Spec Compliance                   (1,0x00000008)
+      HEALTH_STATUS,         ///< Bit 4   Health Status                         (1,0x00000010)
+      DISCRETE_IO64,         ///< Bit 5   Distrete I/O (64-bit)                 (1,0x00000020)
+      DISCRETE_IO32,         ///< Bit 6   Discrete I/O (32-bit)                 (1,0x00000040)
+      INDEX_LIST,            ///< Bit 7   Index List                            (1,0x00000080)
+      CIF1_RESERVED_8,       ///< Bit 8   Reserved                              (1,0x00000100)
+      SECTOR_SCN_STP,        ///< Bit 9   Sector Scan/Step                      (1,0x00000200)
+      SPECTRUM,              ///< Bit 10  Spectrum                              (1,0x00000400)
+      CIFS_ARRAY,            ///< Bit 11  Array of CIFS                         (1,0x00000800)
+      CIF1_RESERVED_12,      ///< Bit 12  Reserved                              (1,0x00001000)
+      AUX_BANDWIDTH,         ///< Bit 13  Aux Bandwidth                         (1,0x00002000)
+      AUX_GAIN,              ///< Bit 14  Aux Gain                              (1,0x00004000)
+      AUX_FREQUENCY,         ///< Bit 15  Aux Frequency                         (1,0x00008000)
+      SNR_NOISE,             ///< Bit 16  SNR/Noise Figure                      (1,0x00010000)
+      ICPT_PTS_2_3,          ///< Bit 17  2nd and 3rd-Order Intercept Points    (1,0x00020000)
+      COMPRESS_PT,           ///< Bit 18  Compression Point                     (1,0x00040000)
+      THRESHOLD,             ///< Bit 19  Threshold                             (1,0x00080000)
+      EB_NO_BER,             ///< Bit 20  Eb/No BER                             (1,0x00100000)
+      CIF1_RESERVED_21,      ///< Bit 21  Reserved                              (1,0x00200000)
+      CIF1_RESERVED_22,      ///< Bit 22  Reserved                              (1,0x00400000)
+      CIF1_RESERVED_23,      ///< Bit 23  Reserved                              (1,0x00800000)
+      RANGE,                 ///< Bit 24  Range (Distance)                      (1,0x01000000)
+      BEAMWIDTH,             ///< Bit 25  Beamwidth                             (1,0x02000000)
+      CIF1_RESERVED_26,      ///< Bit 26  Reserved                              (1,0x04000000)
+      CIF1_RESERVED_27,      ///< Bit 27  Reserved                              (1,0x08000000)
+      PNT_ANGL_2D_ST,        ///< Bit 28  2-D Pointing Angle (structured)       (1,0x10000000)
+      PNT_ANGL_2D_SI,        ///< Bit 29  2-D Pointing Angle (simple)           (1,0x20000000)
+      POLARIZATION,          ///< Bit 30  Polarization                          (1,0x40000000)
+      PHASE,                 ///< Bit 31  Phase                                 (1,0x80000000)
       
       // CIF2 - Identifiers (tags) - Starts at 2*32 = 64
-      CIF2_RESERVED_0 = 64,  // Bit 0   Reserved                              (2,0x00000001) <==> 010 00000 =  64
-      SPATIAL_REF_TYPE,      // Bit 1   Spatial Reference Type                (2,0x00000002)
-      SPATIAL_SCAN_TYPE,     // Bit 2   Spatial Scan Type                     (2,0x00000004)
-      RF_FOOTPRINT_RANGE,    // Bit 3   RF Footprint Range                    (2,0x00000008)
-      RF_FOOTPRINT,          // Bit 4   RF Footprint                          (2,0x00000010)
-      COMM_PRIORITY_ID,      // Bit 5   Communication Priority ID             (2,0x00000020)
-      FUNCT_PRIORITY_ID,     // Bit 6   Function Priority ID                  (2,0x00000040)
-      EVENT_ID,              // Bit 7   Event ID                              (2,0x00000080)
-      MODE_ID,               // Bit 8   Mode ID                               (2,0x00000100) <==> 010 01000 = 72
-      FUNCTION_ID,           // Bit 9   Function ID                           (2,0x00000200)
-      MODULATION_TYPE,       // Bit 10  Modulation Type                       (2,0x00000400)
-      MODULATION_CLASS,      // Bit 11  Modulation Class                      (2,0x00000800)
-      EMS_DEVICE_INSTANCE,   // Bit 12  EMS Device Instance                   (2,0x00001000)
-      EMS_DEVICE_TYPE,       // Bit 13  EMS Device Type                       (2,0x00002000)
-      EMS_DEVICE_CLASS,      // Bit 14  EMS Device Class                      (2,0x00004000)
-      PLATFORM_DISPLAY,      // Bit 15  Platform Display                      (2,0x00008000)
-      PLATFORM_INSTANCE,     // Bit 16  Platform Instance                     (2,0x00010000)
-      PLATFORM_CLASS,        // Bit 17  Platform Class                        (2,0x00020000)
-      OPERATOR,              // Bit 18  Operator                              (2,0x00040000)
-      COUNTRY_CODE,          // Bit 19  Country Code                          (2,0x00080000)
-      TRACK_ID,              // Bit 20  Track ID                              (2,0x00100000)
-      INFORMATION_SOURCE,    // Bit 21  Information Source                    (2,0x00200000)
-      CONTROLLER_UUID,       // Bit 22  Controller UUID                       (2,0x00400000)
-      CONTROLLER_ID,         // Bit 23  Controller ID                         (2,0x00800000)
-      CONTROLLEE_UUID,       // Bit 24  Controllee UUID                       (2,0x01000000)
-      CONTROLLEE_ID,         // Bit 25  Controllee ID                         (2,0x02000000)
-      CITED_MESSAGE_ID,      // Bit 26  Cited Message ID                      (2,0x04000000)
-      CHILDREN_SID,          // Bit 27  Child(ren) SID                        (2,0x08000000)
-      PARENTS_SID,           // Bit 28  Parent(s) SID                         (2,0x10000000)
-      SIBLINGS_SID,          // Bit 29  Sibling(s) SID                        (2,0x20000000)
-      CITED_SID,             // Bit 30  Cited SID                             (2,0x40000000)
-      BIND,                  // Bit 31  Bind                                  (2,0x80000000)
+      CIF2_RESERVED_0 = 64,  ///< Bit 0   Reserved                              (2,0x00000001) <==> 010 00000 =  64
+      SPATIAL_REF_TYPE,      ///< Bit 1   Spatial Reference Type                (2,0x00000002)
+      SPATIAL_SCAN_TYPE,     ///< Bit 2   Spatial Scan Type                     (2,0x00000004)
+      RF_FOOTPRINT_RANGE,    ///< Bit 3   RF Footprint Range                    (2,0x00000008)
+      RF_FOOTPRINT,          ///< Bit 4   RF Footprint                          (2,0x00000010)
+      COMM_PRIORITY_ID,      ///< Bit 5   Communication Priority ID             (2,0x00000020)
+      FUNCT_PRIORITY_ID,     ///< Bit 6   Function Priority ID                  (2,0x00000040)
+      EVENT_ID,              ///< Bit 7   Event ID                              (2,0x00000080)
+      MODE_ID,               ///< Bit 8   Mode ID                               (2,0x00000100) <==> 010 01000 = 72
+      FUNCTION_ID,           ///< Bit 9   Function ID                           (2,0x00000200)
+      MODULATION_TYPE,       ///< Bit 10  Modulation Type                       (2,0x00000400)
+      MODULATION_CLASS,      ///< Bit 11  Modulation Class                      (2,0x00000800)
+      EMS_DEVICE_INSTANCE,   ///< Bit 12  EMS Device Instance                   (2,0x00001000)
+      EMS_DEVICE_TYPE,       ///< Bit 13  EMS Device Type                       (2,0x00002000)
+      EMS_DEVICE_CLASS,      ///< Bit 14  EMS Device Class                      (2,0x00004000)
+      PLATFORM_DISPLAY,      ///< Bit 15  Platform Display                      (2,0x00008000)
+      PLATFORM_INSTANCE,     ///< Bit 16  Platform Instance                     (2,0x00010000)
+      PLATFORM_CLASS,        ///< Bit 17  Platform Class                        (2,0x00020000)
+      OPERATOR,              ///< Bit 18  Operator                              (2,0x00040000)
+      COUNTRY_CODE,          ///< Bit 19  Country Code                          (2,0x00080000)
+      TRACK_ID,              ///< Bit 20  Track ID                              (2,0x00100000)
+      INFORMATION_SOURCE,    ///< Bit 21  Information Source                    (2,0x00200000)
+      CONTROLLER_UUID,       ///< Bit 22  Controller UUID                       (2,0x00400000)
+      CONTROLLER_ID,         ///< Bit 23  Controller ID                         (2,0x00800000)
+      CONTROLLEE_UUID,       ///< Bit 24  Controllee UUID                       (2,0x01000000)
+      CONTROLLEE_ID,         ///< Bit 25  Controllee ID                         (2,0x02000000)
+      CITED_MESSAGE_ID,      ///< Bit 26  Cited Message ID                      (2,0x04000000)
+      CHILDREN_SID,          ///< Bit 27  Child(ren) SID                        (2,0x08000000)
+      PARENTS_SID,           ///< Bit 28  Parent(s) SID                         (2,0x10000000)
+      SIBLINGS_SID,          ///< Bit 29  Sibling(s) SID                        (2,0x20000000)
+      CITED_SID,             ///< Bit 30  Cited SID                             (2,0x40000000)
+      BIND,                  ///< Bit 31  Bind                                  (2,0x80000000)
       
       // CIF3 - Temporal, Environmental - Starts at 3*32 = 96
-      CIF3_RESERVED_0 = 96,  // Bit 0   Reserved                              (3,0x00000001) <==> 011 00000 =  96
-      NETWORK_ID,            // Bit 1   Network ID                            (3,0x00000002)
-      TROPOSPHERIC_STATE,    // Bit 2   Tropospheric State                    (3,0x00000004)
-      SEA_AND_SWELL_STATE,   // Bit 3   Sea and Swell State                   (3,0x00000008)
-      BAROMETRIC_PRESSURE,   // Bit 4   Barometric Pressure                   (3,0x00000010)
-      HUMIDITY,              // Bit 5   Humidity                              (3,0x00000020)
-      SEA_GROUND_TEMP,       // Bit 6   Sea/Ground Temperature                (3,0x00000040)
-      AIR_TEMP,              // Bit 7   Air Temperature                       (3,0x00000080)
-      CIF3_RESERVED_8,       // Bit 8   Reserved                              (3,0x00000100)
-      CIF3_RESERVED_9,       // Bit 9   Reserved                              (3,0x00000200)
-      CIF3_RESERVED_10,      // Bit 10  Reserved                              (3,0x00000400)
-      CIF3_RESERVED_11,      // Bit 11  Reserved                              (3,0x00000800)
-      CIF3_RESERVED_12,      // Bit 12  Reserved                              (3,0x00001000)
-      CIF3_RESERVED_13,      // Bit 13  Reserved                              (3,0x00002000)
-      CIF3_RESERVED_14,      // Bit 14  Reserved                              (3,0x00004000)
-      CIF3_RESERVED_15,      // Bit 15  Reserved                              (3,0x00008000)
-      SHELF_LIFE,            // Bit 16  Shelf Life                            (3,0x00010000)
-      AGE,                   // Bit 17  Age                                   (3,0x00020000)
-      CIF3_RESERVED_18,      // Bit 18  Reserved                              (3,0x00040000)
-      CIF3_RESERVED_19,      // Bit 19  Reserved                              (3,0x00080000)
-      JITTER,                // Bit 20  Jitter                                (3,0x00100000)
-      DWELL,                 // Bit 21  Dwell                                 (3,0x00200000)
-      DURATION,              // Bit 22  Duration                              (3,0x00400000)
-      PERIOD,                // Bit 23  Period                                (3,0x00800000)
-      PULSE_WIDTH,           // Bit 24  Pulse Width                           (3,0x01000000)
-      OFFSET_TIME,           // Bit 25  Offset Time                           (3,0x02000000)
-      FALL_TIME,             // Bit 26  Fall Time                             (3,0x04000000)
-      RISE_TIME,             // Bit 27  Rise Time                             (3,0x08000000)
-      CIF3_RESERVED_28,      // Bit 28  Reserved                              (3,0x10000000)
-      CIF3_RESERVED_29,      // Bit 29  Reserved                              (3,0x20000000)
-      TIMESTAMP_SKEW,        // Bit 30  Timestamp Skew                        (3,0x40000000)
-      TIMESTAMP_DETAILS,     // Bit 31  Timestamp Details                     (3,0x80000000) <==> 011 11111 = 127
+      CIF3_RESERVED_0 = 96,  ///< Bit 0   Reserved                              (3,0x00000001) <==> 011 00000 =  96
+      NETWORK_ID,            ///< Bit 1   Network ID                            (3,0x00000002)
+      TROPOSPHERIC_STATE,    ///< Bit 2   Tropospheric State                    (3,0x00000004)
+      SEA_AND_SWELL_STATE,   ///< Bit 3   Sea and Swell State                   (3,0x00000008)
+      BAROMETRIC_PRESSURE,   ///< Bit 4   Barometric Pressure                   (3,0x00000010)
+      HUMIDITY,              ///< Bit 5   Humidity                              (3,0x00000020)
+      SEA_GROUND_TEMP,       ///< Bit 6   Sea/Ground Temperature                (3,0x00000040)
+      AIR_TEMP,              ///< Bit 7   Air Temperature                       (3,0x00000080)
+      CIF3_RESERVED_8,       ///< Bit 8   Reserved                              (3,0x00000100)
+      CIF3_RESERVED_9,       ///< Bit 9   Reserved                              (3,0x00000200)
+      CIF3_RESERVED_10,      ///< Bit 10  Reserved                              (3,0x00000400)
+      CIF3_RESERVED_11,      ///< Bit 11  Reserved                              (3,0x00000800)
+      CIF3_RESERVED_12,      ///< Bit 12  Reserved                              (3,0x00001000)
+      CIF3_RESERVED_13,      ///< Bit 13  Reserved                              (3,0x00002000)
+      CIF3_RESERVED_14,      ///< Bit 14  Reserved                              (3,0x00004000)
+      CIF3_RESERVED_15,      ///< Bit 15  Reserved                              (3,0x00008000)
+      SHELF_LIFE,            ///< Bit 16  Shelf Life                            (3,0x00010000)
+      AGE,                   ///< Bit 17  Age                                   (3,0x00020000)
+      CIF3_RESERVED_18,      ///< Bit 18  Reserved                              (3,0x00040000)
+      CIF3_RESERVED_19,      ///< Bit 19  Reserved                              (3,0x00080000)
+      JITTER,                ///< Bit 20  Jitter                                (3,0x00100000)
+      DWELL,                 ///< Bit 21  Dwell                                 (3,0x00200000)
+      DURATION,              ///< Bit 22  Duration                              (3,0x00400000)
+      PERIOD,                ///< Bit 23  Period                                (3,0x00800000)
+      PULSE_WIDTH,           ///< Bit 24  Pulse Width                           (3,0x01000000)
+      OFFSET_TIME,           ///< Bit 25  Offset Time                           (3,0x02000000)
+      FALL_TIME,             ///< Bit 26  Fall Time                             (3,0x04000000)
+      RISE_TIME,             ///< Bit 27  Rise Time                             (3,0x08000000)
+      CIF3_RESERVED_28,      ///< Bit 28  Reserved                              (3,0x10000000)
+      CIF3_RESERVED_29,      ///< Bit 29  Reserved                              (3,0x20000000)
+      TIMESTAMP_SKEW,        ///< Bit 30  Timestamp Skew                        (3,0x40000000)
+      TIMESTAMP_DETAILS,     ///< Bit 31  Timestamp Details                     (3,0x80000000) <==> 011 11111 = 127
       
       // CIF4 - Reserved - Starts at 4*32 = 128
-      CIF4_RESERVED_0 = 128, // Bit 0   Reserved                              (4,0x00000001) <==> 100 00000 = 128
+      CIF4_RESERVED_0 = 128, ///< Bit 0   Reserved                              (4,0x00000001) <==> 100 00000 = 128
       /* Bits 1-31 reserved/undefined */
       
       // CIF5 - Reserved - Starts at 5*32 = 160
-      CIF5_RESERVED_0 = 160, // Bit 0   Reserved                              (5,0x00000001) <==> 101 00000 = 160
+      CIF5_RESERVED_0 = 160, ///< Bit 0   Reserved                              (5,0x00000001) <==> 101 00000 = 160
       /* Bits 1-31 reserved/undefined */
 
       // CIF6 - Reserved - Starts at 6*32 = 192
-      CIF6_RESERVED_0 = 192, // Bit 0   Reserved                              (6,0x00000001) <==> 110 00000 = 192
+      CIF6_RESERVED_0 = 192, ///< Bit 0   Reserved                              (6,0x00000001) <==> 110 00000 = 192
       /* Bits 1-31 reserved/undefined */
 
       // CIF7 - Attributes - Starts at 7*32 = 224
-      CIF7_RESERVED_0 = 224, // Bit 0   Reserved                              (7,0x00000001) <==> 111 00000 = 224
-      CIF7_RESERVED_1,       // Bit 1   Reserved                              (7,0x00000002)
-      CIF7_RESERVED_2,       // Bit 2   Reserved                              (7,0x00000004)
-      CIF7_RESERVED_3,       // Bit 3   Reserved                              (7,0x00000008)
-      CIF7_RESERVED_4,       // Bit 4   Reserved                              (7,0x00000010)
-      CIF7_RESERVED_5,       // Bit 5   Reserved                              (7,0x00000020)
-      CIF7_RESERVED_6,       // Bit 6   Reserved                              (7,0x00000040)
-      CIF7_RESERVED_7,       // Bit 7   Reserved                              (7,0x00000080)
-      CIF7_RESERVED_8,       // Bit 8   Reserved                              (7,0x00000100)
-      CIF7_RESERVED_9,       // Bit 9   Reserved                              (7,0x00000200)
-      CIF7_RESERVED_10,      // Bit 10  Reserved                              (7,0x00000400)
-      CIF7_RESERVED_11,      // Bit 11  Reserved                              (7,0x00000800)
-      CIF7_RESERVED_12,      // Bit 12  Reserved                              (7,0x00001000)
-      CIF7_RESERVED_13,      // Bit 13  Reserved                              (7,0x00002000)
-      CIF7_RESERVED_14,      // Bit 14  Reserved                              (7,0x00004000)
-      CIF7_RESERVED_15,      // Bit 15  Reserved                              (7,0x00008000)
-      CIF7_RESERVED_16,      // Bit 16  Reserved                              (7,0x00010000)
-      CIF7_RESERVED_17,      // Bit 17  Reserved                              (7,0x00020000)
-      CIF7_RESERVED_18,      // Bit 18  Reserved                              (7,0x00040000)
-      BELIEF,                // Bit 19  Belief                                (7,0x00080000)
-      PROBABILITY,           // Bit 20  Probability                           (7,0x00100000)
-      THIRD_DERIVATIVE,      // Bit 21  3rd Derivative                        (7,0x00200000)
-      SECOND_DERIVATIVE,     // Bit 22  2nd Derivative (Accelleration)        (7,0x00400000)
-      FIRST_DERIVATIVE,      // Bit 23  1st Derivative (Velocity)             (7,0x00800000)
-      ACCURACY,              // Bit 24  Accuracy                              (7,0x01000000)
-      PRECISION,             // Bit 25  Precision                             (7,0x02000000)
-      MIN_VALUE,             // Bit 26  Min Value                             (7,0x04000000)
-      MAX_VALUE,             // Bit 27  Max Value                             (7,0x08000000)
-      STANDARD_DEVIATION,    // Bit 28  Standard Deviation                    (7,0x10000000)
-      MEDIAN_VALUE,          // Bit 29  Median Value                          (7,0x20000000)
-      AVERAGE_VALUE,         // Bit 30  Average Value                         (7,0x40000000)
-      CURRENT_VALUE          // Bit 31  Current Value                         (7,0x80000000) <==> 111 11111 = 255
+      CIF7_RESERVED_0 = 224, ///< Bit 0   Reserved                              (7,0x00000001) <==> 111 00000 = 224
+      CIF7_RESERVED_1,       ///< Bit 1   Reserved                              (7,0x00000002)
+      CIF7_RESERVED_2,       ///< Bit 2   Reserved                              (7,0x00000004)
+      CIF7_RESERVED_3,       ///< Bit 3   Reserved                              (7,0x00000008)
+      CIF7_RESERVED_4,       ///< Bit 4   Reserved                              (7,0x00000010)
+      CIF7_RESERVED_5,       ///< Bit 5   Reserved                              (7,0x00000020)
+      CIF7_RESERVED_6,       ///< Bit 6   Reserved                              (7,0x00000040)
+      CIF7_RESERVED_7,       ///< Bit 7   Reserved                              (7,0x00000080)
+      CIF7_RESERVED_8,       ///< Bit 8   Reserved                              (7,0x00000100)
+      CIF7_RESERVED_9,       ///< Bit 9   Reserved                              (7,0x00000200)
+      CIF7_RESERVED_10,      ///< Bit 10  Reserved                              (7,0x00000400)
+      CIF7_RESERVED_11,      ///< Bit 11  Reserved                              (7,0x00000800)
+      CIF7_RESERVED_12,      ///< Bit 12  Reserved                              (7,0x00001000)
+      CIF7_RESERVED_13,      ///< Bit 13  Reserved                              (7,0x00002000)
+      CIF7_RESERVED_14,      ///< Bit 14  Reserved                              (7,0x00004000)
+      CIF7_RESERVED_15,      ///< Bit 15  Reserved                              (7,0x00008000)
+      CIF7_RESERVED_16,      ///< Bit 16  Reserved                              (7,0x00010000)
+      CIF7_RESERVED_17,      ///< Bit 17  Reserved                              (7,0x00020000)
+      CIF7_RESERVED_18,      ///< Bit 18  Reserved                              (7,0x00040000)
+      BELIEF,                ///< Bit 19  Belief                                (7,0x00080000)
+      PROBABILITY,           ///< Bit 20  Probability                           (7,0x00100000)
+      THIRD_DERIVATIVE,      ///< Bit 21  3rd Derivative                        (7,0x00200000)
+      SECOND_DERIVATIVE,     ///< Bit 22  2nd Derivative (Accelleration)        (7,0x00400000)
+      FIRST_DERIVATIVE,      ///< Bit 23  1st Derivative (Velocity)             (7,0x00800000)
+      ACCURACY,              ///< Bit 24  Accuracy                              (7,0x01000000)
+      PRECISION,             ///< Bit 25  Precision                             (7,0x02000000)
+      MIN_VALUE,             ///< Bit 26  Min Value                             (7,0x04000000)
+      MAX_VALUE,             ///< Bit 27  Max Value                             (7,0x08000000)
+      STANDARD_DEVIATION,    ///< Bit 28  Standard Deviation                    (7,0x10000000)
+      MEDIAN_VALUE,          ///< Bit 29  Median Value                          (7,0x20000000)
+      AVERAGE_VALUE,         ///< Bit 30  Average Value                         (7,0x40000000)
+      CURRENT_VALUE          ///< Bit 31  Current Value                         (7,0x80000000) <==> 111 11111 = 255
 
-    } IndicatorFieldEnum_t; // IndicatorFieldEnum_t
+    }; // IndicatorFieldEnum_t
 
+    /** Typedef of enumeration of all Context/Control Indicator Fields. */
+    typedef IndicatorFieldEnum IndicatorFieldEnum_t;
+
+    /** Get the CIF number from the IndicatorFieldEnum_t
+     * The top three (most-significant) bits of each 8-bit IndicatorFieldEnum_t are the CIF number
+     * The bottom five (least-significant) bits of each 8-bit IndicatorFieldEnum_t are the bit number
+     * CIF#: 0b11100000 = 0xE0 | Right-shift by 5, i.e. divide by 32
+     * Bit#: 0b00011111 = 0x1F | Bitwise AND this bit-mask, i.e. modulo 32
+     * @param f Field of interest
+     * @return CIF number
+     */
+    inline int8_t getCIFNumber (IndicatorFieldEnum_t f) {
+      return (int8_t) ((f >> 5) & 0xFF); // divide by 32
+    }
+
+    /** Get the CIF bit number from the IndicatorFieldEnum_t
+     * The top three (most-significant) bits of each 8-bit IndicatorFieldEnum_t are the CIF number
+     * The bottom five (least-significant) bits of each 8-bit IndicatorFieldEnum_t are the bit number
+     * CIF#: 0b11100000 = 0xE0 | Right-shift by 5, i.e. divide by 32
+     * Bit#: 0b00011111 = 0x1F | Bitwise AND this bit-mask, i.e. modulo 32
+     * @param f Field of interest
+     * @return CIF bit number
+     */
+    inline int8_t getCIFBitNumber (IndicatorFieldEnum_t f) {
+      return (int8_t) (f & 0x1F); // modulo 32
+    }
+
+    /** Get the 1-hot bit mask from IndicatorFieldEnum_t
+     * The top three (most-significant) bits of each 8-bit IndicatorFieldEnum_t are the CIF number
+     * The bottom five (least-significant) bits of each 8-bit IndicatorFieldEnum_t are the bit number
+     * CIF#: 0b11100000 = 0xE0 | Right-shift by 5, i.e. divide by 32
+     * Bit#: 0b00011111 = 0x1F | Bitwise AND this bit-mask, i.e. modulo 32
+     * @param f Field of interest
+     * @return 1-hot CIF bit-mask
+     */
+    inline int32_t getCIFBitMask (IndicatorFieldEnum_t f) {
+      return (int32_t) (0x1 << getCIFBitNumber(f)); // 1-hot bit mask for indicator field
+    }
+    
+    /** Get the IndicatorFieldEnum from the CIF number and CIF bit number
+     * The top three (most-significant) bits of each 8-bit IndicatorFieldEnum_t are the CIF number
+     * The bottom five (least-significant) bits of each 8-bit IndicatorFieldEnum_t are the bit number
+     * CIF#: 0b11100000 = 0xE0 | Left-shift by 5, i.e. multiply by 32
+     * Bit#: 0b00011111 = 0x1F | Bitwise AND this bit-mask, i.e. modulo 32
+     * Add the shifted CIF number to the bit number for the IndicatorFieldEnum value.
+     * @param cif CIF number
+     * @param bit Bit number
+     * @return IndicatorFieldEnum value corresponding with cif and bit.
+     */
+    inline IndicatorFieldEnum_t getCIFEnum(int8_t cif, int8_t bit) {
+      return (IndicatorFieldEnum_t) (((cif & 0x7) << 5) + (bit & 0x1F));
+    }
+  
+    /** <b>Internal Use Only:</b> Bitmasks for CIF0 fields (Legacy Fields and
+     *  CIF Enables).
+     */
     namespace protected_CIF0 {
 
-      // Bitmasks                                                      Field Size (# of 32-bit words)
+      /** CIF0 Bitmasks
+       *  Bitmask:                                                     Field Size (# of 32-bit words)
+       */
       static const int32_t CIF0_RESERVED_0_mask       = 0x00000001; // N/A (0)
       static const int32_t CIF1_ENABLE_mask           = 0x00000002; // 1
       static const int32_t CIF2_ENABLE_mask           = 0x00000004; // 1
@@ -273,26 +338,35 @@ namespace vrt {
       static const int32_t REF_POINT_mask             = 0x40000000; // 1 (Section 9.2)
       static const int32_t CHANGE_IND_mask            = 0x80000000; // N/A (0)
 
-      // Field lengths
-      // Note: Enable bits for CIF1/2/3/7 are included as 4-byte lengths, and the
-      //       methods that use these values must have the logic to know that the
-      //       additional CIFs appear prior to the rest of CIF0's fields.
+      /** CIF0 Field lengths
+       *  Note: Enable bits for CIF1/2/3/7 are included as 4-byte lengths, and the
+       *        methods that use these values must have the logic to know that the
+       *        additional CIFs appear prior to the rest of CIF0's fields.
+       *  Note: GPS_ASCII_mask and CONTEXT_ASSOC_mask are not present because
+       *        they have variable length that must be determined for each case.
+       */
+      /** 4-byte fields */
       static const int32_t CTX_4_OCTETS  = REF_POINT_mask     | REF_LEVEL_mask     | GAIN_mask          | OVER_RANGE_mask
                                          | TIME_CALIB_mask    | TEMPERATURE_mask   | STATE_EVENT_mask   | EPHEM_REF_mask
                                          | CIF1_ENABLE_mask   | CIF2_ENABLE_mask   | CIF3_ENABLE_mask   | CIF7_ENABLE_mask;
+      /** 8-byte fields */
       static const int32_t CTX_8_OCTETS  = BANDWIDTH_mask     | IF_FREQ_mask       | RF_FREQ_mask       | RF_OFFSET_mask
                                          | IF_OFFSET_mask     | SAMPLE_RATE_mask   | TIME_ADJUST_mask   | DEVICE_ID_mask
                                          | DATA_FORMAT_mask;
+      /** 44-byte fields */
       static const int32_t CTX_44_OCTETS = GPS_EPHEM_mask     | INS_EPHEM_mask     | REL_EPHEM_mask;
+      /** 52-byte fields */
       static const int32_t CTX_52_OCTETS = ECEF_EPHEM_mask;
       // others (variable): GPS_ASCII_mask CONTEXT_ASOC_mask
 
     } END_NAMESPACE // protected_CIF0 namespace
 
-    // CIF1 - Spatial, Signal, Spectral, I/O, and Control
+    /** <b>Internal Use Only:</b> Bitmasks for CIF1 fields (Spatial, Signal,
+     * Spectral, I/O, and Control fields)
+     */
     namespace protected_CIF1 {
 
-      // Bitmasks                                                      Field Size (# of 32-bit words)
+      /** Bitmasks                                                     Field Size (# of 32-bit words) */
       static const int32_t CIF1_RESERVED_0_mask       = 0x00000001; // N/A (0)
       static const int32_t BUFFER_SZ_mask             = 0x00000002; // 1
       static const int32_t VER_BLD_CODE_mask          = 0x00000004; // 1
@@ -326,7 +400,7 @@ namespace vrt {
       static const int32_t POLARIZATION_mask          = 0x40000000; // 1
       static const int32_t PHASE_mask                 = 0x80000000; // 1
 
-      // define field lengths
+      /** define field lengths */
       static const int32_t CTX_4_OCTETS = PHASE_mask | POLARIZATION_mask | PNT_ANGL_2D_SI_mask | BEAMWIDTH_mask | RANGE_mask
                                         | EB_NO_BER_mask | THRESHOLD_mask | COMPRESS_PT_mask | ICPT_PTS_2_3_mask
                                         | SNR_NOISE_mask | AUX_GAIN_mask | DISCRETE_IO32_mask | HEALTH_STATUS_mask
@@ -342,10 +416,11 @@ namespace vrt {
 
     } END_NAMESPACE // protected_CIF1 namespace
 
-    // CIF2 - Identifiers (tags)
+    /** <b>Internal Use Only:</b> Bitmasks for CIF2 fields (Identifiers (tags)).
+     */
     namespace protected_CIF2 {
       
-      // Bitmasks                                                      Field Size (# of 32-bit words)
+      /** Bitmasks                                                     Field Size (# of 32-bit words) */
       static const int32_t CIF2_RESERVED_0_mask       = 0x00000001; // N/A (0)
       static const int32_t SPATIAL_REF_TYPE_mask      = 0x00000002; // 1 (Section 9.8.11 for the next 2)
       static const int32_t SPATIAL_SCAN_TYPE_mask     = 0x00000004; // 1
@@ -379,7 +454,7 @@ namespace vrt {
       static const int32_t CITED_SID_mask             = 0x40000000; // 1
       static const int32_t BIND_mask                  = 0x80000000; // 1 (Section 9.8.1)
       
-      // define field lengths
+      /** define field lengths */
       static const int32_t CTX_4_OCTETS  = BIND_mask | CITED_SID_mask | SIBLINGS_SID_mask | PARENTS_SID_mask | CHILDREN_SID_mask
                                          | CITED_MESSAGE_ID_mask | CONTROLLEE_ID_mask | CONTROLLER_ID_mask
                                          | INFORMATION_SOURCE_mask | TRACK_ID_mask | COUNTRY_CODE_mask | OPERATOR_mask
@@ -392,10 +467,12 @@ namespace vrt {
 
     } END_NAMESPACE // protected_CIF2 namespace
 
-    // CIF3 - Temporal, Environmental
+    /** <b>Internal Use Only:</b> Bitmasks for CIF3 fields (Temporal and
+     * Environmental fields).
+     */
     namespace protected_CIF3 {
 
-      // Bitmasks                                                      Field Size (# of 32-bit words)
+      /** Bitmasks                                                     Field Size (# of 32-bit words) */
       static const int32_t CIF3_RESERVED_0_mask       = 0x00000001; // N/A (0)
       static const int32_t NETWORK_ID_mask            = 0x00000002; // 1 (Section 9.8.13)
       static const int32_t TROPOSPHERIC_STATE_mask    = 0x00000004; // 1
@@ -430,13 +507,13 @@ namespace vrt {
       static const int32_t TIMESTAMP_SKEW_mask        = 0x40000000; // 2 (Section 9.7.3.2)
       static const int32_t TIMESTAMP_DETAILS_mask     = 0x80000000; // 2 (Section 9.7.3.4)
 
-      // define field lengths
+      /** define field lengths */
       static const int32_t CTX_4_OCTETS = AIR_TEMP_mask | SEA_GROUND_TEMP_mask | HUMIDITY_mask | BAROMETRIC_PRESSURE_mask
                                         | SEA_AND_SWELL_STATE_mask | TROPOSPHERIC_STATE_mask | NETWORK_ID_mask;
       static const int32_t CTX_8_OCTETS = TIMESTAMP_DETAILS_mask | TIMESTAMP_SKEW_mask | RISE_TIME_mask | FALL_TIME_mask
                                         | OFFSET_TIME_mask | PULSE_WIDTH_mask | PERIOD_mask | DURATION_mask
                                         | DWELL_mask | JITTER_mask;
-      // This indicates the field is the same size as the timestamps, as defined by TSI and TSF bits in header
+      /** This indicates the field is the same size as the timestamps, as defined by TSI and TSF bits in header */
       static const int32_t CTX_TSTAMP_OCTETS = AGE_mask | SHELF_LIFE_mask;
 
     } END_NAMESPACE // protected_CIF3 namespace
@@ -445,10 +522,11 @@ namespace vrt {
     // CIF5 -- reserved/undefined
     // CIF6 -- reserved/undefined
 
-    // CIF7 - Attributes
+    /** <b>Internal Use Only:</b> Bitmasks for CIF7 fields (Attributes).
+     */
     namespace protected_CIF7 {
 
-      // Bitmasks                                                      Attribute Size (in 32-bit words OR relation to field)
+      /** Bitmasks                                                     Attribute Size (in 32-bit words OR relation to field) */
       static const int32_t CIF7_RESERVED_0_mask       = 0x00000001; // N/A (0)
       static const int32_t CIF7_RESERVED_1_mask       = 0x00000002; // N/A (0)
       static const int32_t CIF7_RESERVED_2_mask       = 0x00000004; // N/A (0)
@@ -482,9 +560,9 @@ namespace vrt {
       static const int32_t AVERAGE_VALUE_mask         = 0x40000000; // same as field it describes
       static const int32_t CURRENT_VALUE_mask         = 0x80000000; // same as field it describes
 
-      // Attribute sizes (Section 9.12)
+      /** Attribute sizes (Section 9.12) */
       static const int32_t CTX_4_OCTETS    = PROBABILITY_mask | BELIEF_mask; // These are 4 bytes regardless of field
-      // These essentially apply a multiplier to the size of the original field for each attr included
+      /** These essentially apply a multiplier to the size of the original field for each attr included */
       static const int32_t CTX_SAME_OCTETS = CURRENT_VALUE_mask | AVERAGE_VALUE_mask | MEDIAN_VALUE_mask 
                                            | STANDARD_DEVIATION_mask | MAX_VALUE_mask | MIN_VALUE_mask | PRECISION_mask 
                                            | ACCURACY_mask | FIRST_DERIVATIVE_mask | SECOND_DERIVATIVE_mask
@@ -492,60 +570,18 @@ namespace vrt {
 
     } END_NAMESPACE // protected_CIF7 namespace
 
-    /* Get the CIF number from the IndicatorFieldEnum_t
-     * The top three (most-significant) bits of each 8-bit IndicatorFieldEnum_t are the CIF number
-     * The bottom five (least-significant) bits of each 8-bit IndicatorFieldEnum_t are the bit number
-     * CIF#: 0b11100000 = 0xE0 | Right-shift by 5, i.e. divide by 32
-     * Bit#: 0b00011111 = 0x1F | Bitwise AND this bit-mask, i.e. modulo 32
-     * @param f Field of interest
-     * @return CIF number
-     */
-    inline int8_t getCIFNumber (IndicatorFieldEnum_t f) {
-      return (int8_t) ((f >> 5) & 0xFF); // divide by 32
-    }
-
-    /* Get the CIF bit number from the IndicatorFieldEnum_t
-     * The top three (most-significant) bits of each 8-bit IndicatorFieldEnum_t are the CIF number
-     * The bottom five (least-significant) bits of each 8-bit IndicatorFieldEnum_t are the bit number
-     * CIF#: 0b11100000 = 0xE0 | Right-shift by 5, i.e. divide by 32
-     * Bit#: 0b00011111 = 0x1F | Bitwise AND this bit-mask, i.e. modulo 32
-     * @param f Field of interest
-     * @return CIF bit number
-     */
-    inline int8_t getCIFBitNumber (IndicatorFieldEnum_t f) {
-      return (int8_t) (f & 0x1F); // modulo 32
-    }
-
-    /* Get the 1-hot bit mask from IndicatorFieldEnum_t
-     * The top three (most-significant) bits of each 8-bit IndicatorFieldEnum_t are the CIF number
-     * The bottom five (least-significant) bits of each 8-bit IndicatorFieldEnum_t are the bit number
-     * CIF#: 0b11100000 = 0xE0 | Right-shift by 5, i.e. divide by 32
-     * Bit#: 0b00011111 = 0x1F | Bitwise AND this bit-mask, i.e. modulo 32
-     * @param f Field of interest
-     * @return 1-hot CIF bit-mask
-     */
-    inline int32_t getCIFBitMask (IndicatorFieldEnum_t f) {
-      return (int32_t) (0x1 << getCIFBitNumber(f)); // 1-hot bit mask for indicator field
-    }
-    
-    /* Get the IndicatorFieldEnum from the CIF number and CIF bit number
-     * The top three (most-significant) bits of each 8-bit IndicatorFieldEnum_t are the CIF number
-     * The bottom five (least-significant) bits of each 8-bit IndicatorFieldEnum_t are the bit number
-     * CIF#: 0b11100000 = 0xE0 | Left-shift by 5, i.e. multiply by 32
-     * Bit#: 0b00011111 = 0x1F | Bitwise AND this bit-mask, i.e. modulo 32
-     * Add the shifted CIF number to the bit number for the IndicatorFieldEnum value.
-     * @param f Field of interest
-     * @return 1-hot CIF bit-mask
-     */
-    inline IndicatorFieldEnum_t getCIFEnum(int8_t cif, int8_t bit) {
-      return (IndicatorFieldEnum_t) (((cif & 0x7) << 5) + (bit & 0x1F));
-    }
-
   } END_NAMESPACE // namespace IndicatorFields
   using namespace IndicatorFields;
-  
 
   // Classes originally from BasicContextPacket.h
+
+  using namespace VRTMath;
+
+  class AbstractGeolocation;  // declared below
+  class Geolocation;          // declared below
+  class Ephemeris;            // declared below
+  class ContextAssocLists;    // declared below
+  class GeoSentences;         // declared below
 
   /** Represents a GPS or INS geolocation fix. <i>The fact that {@link GeoSentences}
    *  does not extend this class is not accidental.</i>
@@ -1149,26 +1185,24 @@ namespace vrt {
     /**********************************************************/
 
     /** Gets the offset for the given context indicator field relative to the location of the first
-     *  occurrence of CIF0. For CIF7 indicator fields, returns the byte offset from beginning of any
-     *  arbitrary CIF[0-3] field offset. For example, 
-     *  total offset = getOffset(<CIF[0-3] field>) + getOffset(<CIF7 attribute>)
-     *  Also, for access to the second occurrence of CIFs (i.e. Error fields in Ack packets), add 8
+     *  occurrence of CIF0. 
+     *  For access to the second occurrence of CIFs (i.e. Error fields in Ack packets), add 8
      *  to the CIF number, effectively setting the 4th bit (mod8 gives field, div8 gives occurrence).
      *  @param cifNum number of CIF that field belongs to.
      *  @param field bitmask associated with field of interest.
      *  @return offset in bytes from beginning of CIF payload, or CIF7 as described above.
      *  @throws VRTException If the CIF number is invalid.
      */
-    //  TODO - add CIF7
     protected: virtual int32_t getOffset (int8_t cifNum, int32_t field) const = 0;
     protected: virtual int32_t getOffset (IndicatorFieldEnum_t field) const {
       return getOffset(getCIFNumber(field), getCIFBitMask(field));
     }
     // Used for getting attribute of a field, based on CIF7 attributes
     // A negative return value means attribute not present.
+    // A NULL return value means the entire CIF is not present.
     // @return offset to attribute of specified field
     // @throws VRTException when field has invalid length (size)
-    // @throws VRTException when field is not present
+    // @throws VRTException when field is not present (TODO - or return NULL?)
     protected: virtual int32_t getOffset (int8_t cifNum, int32_t field, int32_t cif7) const {
       int32_t fieldOffset = getOffset(cifNum, field);
       if (fieldOffset < 0) throw VRTException("Cannot get attribute of a field that is not present.");
@@ -1316,12 +1350,12 @@ namespace vrt {
      *  @throws VRTException If the CIF number is invalid.
      */
     protected: virtual int32_t getContextIndicatorField (int8_t cifNum) const {
-      switch(cifNum%8) {
-        case 0: return getContextIndicatorField0(cifNum/8);
-        case 1: return getContextIndicatorField1(cifNum/8);
-        case 2: return getContextIndicatorField2(cifNum/8);
-        case 3: return getContextIndicatorField3(cifNum/8);
-        case 7: return getContextIndicatorField7(cifNum/8);
+      switch(cifNum&0xF7) { // Ignore bit 3 (occurrence)
+        case 0: return getContextIndicatorField0(cifNum&0x08);
+        case 1: return getContextIndicatorField1(cifNum&0x08);
+        case 2: return getContextIndicatorField2(cifNum&0x08);
+        case 3: return getContextIndicatorField3(cifNum&0x08);
+        case 7: return getContextIndicatorField7(cifNum&0x08);
         default:
           throw VRTException("Invalid Context Indicator Field number.");
       }
@@ -1362,12 +1396,12 @@ namespace vrt {
       setContextIndicatorFieldBit(getCIFNumber(field) | (((int8_t)occurrence)<<3), getCIFBitMask(field), set);
     }
     protected: virtual void setContextIndicatorFieldBit (int8_t cifNum, int32_t bit, bool set) {
-      switch(cifNum%8) {
-        case 0: return setContextIndicatorField0Bit(bit, set, cifNum/8);
-        case 1: return setContextIndicatorField1Bit(bit, set, cifNum/8);
-        case 2: return setContextIndicatorField2Bit(bit, set, cifNum/8);
-        case 3: return setContextIndicatorField3Bit(bit, set, cifNum/8);
-        case 7: return setContextIndicatorField7Bit(bit, set, cifNum/8);
+      switch(cifNum&0xF7) { // Ignore bit 3 (occurrence)
+        case 0: return setContextIndicatorField0Bit(bit, set, cifNum&0x08);
+        case 1: return setContextIndicatorField1Bit(bit, set, cifNum&0x08);
+        case 2: return setContextIndicatorField2Bit(bit, set, cifNum&0x08);
+        case 3: return setContextIndicatorField3Bit(bit, set, cifNum&0x08);
+        case 7: return setContextIndicatorField7Bit(bit, set, cifNum&0x08);
         default:
           throw VRTException("Invalid Context Indicator Field number.");
       }

@@ -180,7 +180,7 @@ int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
   //        were requested.
   //      - *XXX* SO, for AckV and AckX packets:
   //          - If Ack-W bit is set, WIF0 must be present, even if all 0's.
-  //          - If Ack-E bit is set, WIF0 must be present, even if all 0's.
+  //          - If Ack-E bit is set, EIF0 must be present, even if all 0's.
   //          - If Ack-W bit is unset, WIF0 must not be present.
   //          - If Ack-E bit is unset, EIF0 must not be present.
   //          - Free-form texual error message, if present, will be determined based on packet
@@ -189,8 +189,7 @@ int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
   //          - To be safe, check for empty payload before continuing. This protects against the
   //            case where Ack-W or Ack-E is set but there is no WIF0 or EIF0 or texual message.
   if (getPayloadLength() == 0) {
-    // TODO - what's most appropriate, exception or NULL return? return -1?
-    throw VRTException("Cannot get offset with zero-length payload.");
+    //throw VRTException("Cannot get offset with zero-length payload.");
     return INT32_NULL;
   }
 
@@ -206,7 +205,9 @@ int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
   if ( (cifNum >> 3) == 0) { // divide by 8 to see if looking for warning
     warnMask = 0x0;
   }
-  switch(cifNum & 0x7) { // mod 8 to ignore whether warning or error
+  // if valid WIF or EIF (i.e. <=15), this will mod 8 to ignore whether warning or error
+  // if not, this will preserve the most-significant-bits and cause bit3 to be 0
+  switch(cifNum & 0xF7) {
     case 0:
       mask0 = ~(field ^ (field - 1));
       break;
@@ -220,11 +221,13 @@ int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
       mask3 = ~(field ^ (field - 1));
       break;
     case 7:
-      // TODO - what happens here?
-      return -1;
+      throw VRTException("Invalid Indicator Field number (CIF7).");
       //break;
     default:
-      throw VRTException("Invalid Indicator Field number (undefined).");
+      // If cifNum == 0xFF, we're looking for the free-form message at the end
+      if (cifNum != FREE_FORM_MESSAGE) {
+        throw VRTException("Invalid Indicator Field number (undefined).");
+      } // else looking for free-form message; continue without error
       break;
   } // switch(cifNum)
 
@@ -242,6 +245,8 @@ int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
     cifOffset += 4;
     cifLen += (4 + (bitCount((wif0 & 0x000000FF)                   ) * 4)); // 4 bytes for each WIF present
     off    +=      (bitCount((wif0 & 0xFFFFFF00) & (mask0|warnMask)) * 4);  // 4 bytes for each warning
+  } else if ((cifNum&0xF8) == 0x00) { // if WIF0-7
+    return INT32_NULL;
   }
   // XXX - always execute this even if looking for warning offset
   //       needed to update cifLen
@@ -249,6 +254,8 @@ int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
     // update eif0 and cifLen values, but not offset values yet
     eif0 = VRTMath::unpackInt(bbuf, prologlen+cifLen);
     cifLen += (4 + (bitCount((eif0 & 0x000000FF)                   ) * 4)); // 4 bytes for each EIF present
+  } else if ((cifNum&0xF8) == 0x08) { // if EIF0-7
+    return INT32_NULL;
   }
   if (cifNum==0) return ((wif0 & field) != 0)? (off+cifLen): -(off+cifLen);  // -off if not present
 
@@ -261,11 +268,8 @@ int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
       cifOffset += 4; // increment for next CIF
       off += (bitCount(wif1 & (mask1|warnMask)) * 4);  // 4 bytes for each warning
       if (cifNum == 1) return ((wif1 & field) != 0)? (off+cifLen) : -(off+cifLen);  // -off if not present
-    } else {
-      // TODO - might be better to return NULL to indicate invalid CIF
-      //      - offset value is wrong anyway because the CIF would have to be added first,
-      //        adding at least 4 bytes to the needed offset
-      if (cifNum == 1) return -(off+cifLen);  // -off since not present
+    } else if (cifNum == 1) {
+      return INT32_NULL;
     }
 
     // WIF2
@@ -274,11 +278,8 @@ int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
       cifOffset += 4; // increment for next CIF
       off += (bitCount(wif2 & (mask2|warnMask)) * 4);  // 4 bytes for each warning
       if (cifNum == 2) return ((wif2 & field) != 0)? (off+cifLen) : -(off+cifLen);  // -off if not present
-    } else {
-      // TODO - might be better to return NULL to indicate invalid CIF
-      //      - offset value is wrong anyway because the CIF would have to be added first,
-      //        adding at least 4 bytes to the needed offset
-      if (cifNum == 2) return -(off+cifLen);  // -off since not present
+    } else if (cifNum == 2) {
+      return INT32_NULL;
     }
 
     // WIF3
@@ -287,28 +288,14 @@ int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
       cifOffset += 4; // increment for next CIF
       off += (bitCount(wif3 & (mask3|warnMask)) * 4);  // 4 bytes for each warning
       if (cifNum == 3) return ((wif3 & field) != 0)? (off+cifLen) : -(off+cifLen);  // -off if not present
-    } else {
-      // TODO - might be better to return NULL to indicate invalid CIF
-      //      - offset value is wrong anyway because the CIF would have to be added first,
-      //        adding at least 4 bytes to the needed offset
-      if (cifNum == 3) return -(off+cifLen);  // -off since not present
+    } else if (cifNum == 3) {
+      return INT32_NULL;
     }
 
     // WIF7
-    // TODO FIXME XXX - what needs to happen here?
-    //   - at least test if enabled and increment cifOffset
     if((wif0 & protected_CIF0::CIF7_ENABLE_mask) != 0) {
-      //int32_t wif7 = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
       cifOffset += 4; // increment for next CIF
-      //off += (bitCount(wif7 & (mask7|warnMask)) * 4);  // 4 bytes for each warning
-      //if (cifNum == 7) return ((wif7 & field) != 0)? (off+cifLen) : -(off+cifLen);  // -off if not present
-    } //else {
-      // TODO - might be better to return NULL to indicate invalid CIF
-      //      - offset value is wrong anyway because the CIF would have to be added first,
-      //        adding at least 4 bytes to the needed offset
-      //if (cifNum == 7) return -(off+cifLen);  // -off since not present
-    //}
-
+    }
   }
 
   // now do eif0,1,2,3,7
@@ -326,11 +313,8 @@ int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
       cifOffset += 4; // increment for next CIF
       off += (bitCount(eif1 & mask1) * 4);  // 4 bytes for each error
       if (cifNum == 9) return ((eif1 & field) != 0)? (off+cifLen) : -(off+cifLen);  // -off if not present
-    } else {
-      // TODO - might be better to return NULL to indicate invalid CIF
-      //      - offset value is wrong anyway because the CIF would have to be added first,
-      //        adding at least 4 bytes to the needed offset
-      if (cifNum == 9) return -(off+cifLen);  // -off since not present
+    } else if (cifNum == 9) {
+      return INT32_NULL;
     }
 
     // EIF2
@@ -339,11 +323,8 @@ int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
       cifOffset += 4; // increment for next CIF
       off += (bitCount(eif2 & mask2) * 4);  // 4 bytes for each error
       if (cifNum == 10) return ((eif2 & field) != 0)? (off+cifLen) : -(off+cifLen);  // -off if not present
-    } else {
-      // TODO - might be better to return NULL to indicate invalid CIF
-      //      - offset value is wrong anyway because the CIF would have to be added first,
-      //        adding at least 4 bytes to the needed offset
-      if (cifNum == 10) return -(off+cifLen);  // -off since not present
+    } else if (cifNum == 10) {
+      return INT32_NULL;
     }
 
     // EIF3
@@ -352,49 +333,60 @@ int32_t BasicAcknowledgePacket::getOffset (int8_t cifNum, int32_t field) const {
       cifOffset += 4; // increment for next CIF
       off += (bitCount(eif3 & mask3) * 4);  // 4 bytes for each error
       if (cifNum == 11) return ((eif3 & field) != 0)? (off+cifLen) : -(off+cifLen);  // -off if not present
-    } else {
-      // TODO - might be better to return NULL to indicate invalid CIF
-      //      - offset value is wrong anyway because the CIF would have to be added first,
-      //        adding at least 4 bytes to the needed offset
-      if (cifNum == 11) return -(off+cifLen);  // -off since not present
+    } else if (cifNum == 11) {
+      return INT32_NULL;
     }
-
-    /*// EIF7
-    if((eif0 & protected_CIF0::CIF7_ENABLE_mask) != 0) {
-      int32_t eif7 = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
-      cifOffset += 4; // increment for next CIF
-      off += (bitCount(eif7 & mask7) * 4);  // 4 bytes for each error
-      if (cifNum == 15) return ((eif7 & field) != 0)? (off+cifLen) : -(off+cifLen);  // -off if not present
-    } else {
-      // TODO - might be better to return NULL to indicate invalid CIF
-      //      - offset value is wrong anyway because the CIF would have to be added first,
-      //        adding at least 4 bytes to the needed offset
-      if (cifNum == 15) return -(off+cifLen);  // -off since not present
-    }*/
   }
   
-  // XXX - should never get here since EIF3 defines the last potential part of payload
-  // TODO - might be better to return NULL to indicate invalid cifNum
-  return -(off + cifLen);
+  // XXX - If valid CIF#, should never get here since EIF3 defines the last potential Warn/Error field.
+  //       The only valid way to reach here is when looking for free-form message (i.e. cifNum==0xFF)
+  if (cifNum == FREE_FORM_MESSAGE) {
+    return (getPayloadLength() > (off+cifLen))? (off+cifLen) : -(off+cifLen);
+  } else {
+    throw VRTException("Invalid CIF number.");
+  }
 }
 
 int32_t BasicAcknowledgePacket::getFieldLen (int8_t cifNum, int32_t field) const {
   // Warnings and Errors are always a single 32-bit field.
   // TODO - what about CIF7 impact on this?
-  UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(field);
-  return 4; // 4-bytes = 32-bits
+  // if valid WIF or EIF (i.e. <=15), this will mod 8 to ignore whether warning or error
+  // if not, this will preserve the most-significant-bits and cause bit3 to be 0
+  switch(cifNum & 0xF7) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+      return 4; // 4-bytes = 32-bits
+      //break;
+    case 7:
+      throw VRTException("Invalid Indicator Field number (CIF7).");
+      //break;
+    default:
+      // If cifNum == 0xFF, we're looking for the free-form message at the end
+      if (cifNum == FREE_FORM_MESSAGE) {
+        // looking for length of free-form message
+        int32_t off = getOffset(FREE_FORM_MESSAGE, field);
+        return (isNull(off) || off<0)? 0 : getPayloadLength()-off;
+      }
+      break;
+  } // switch(cifNum)
+  throw VRTException("Invalid Indicator Field number (undefined).");
 }
 
 int32_t BasicAcknowledgePacket::getL (int8_t cifNum, int32_t bit) const {
   int32_t off = getOffset(cifNum, bit);
-  // Note: INT32_NULL is a valid value, but zero (WEF_NULL) is not.
-  if (off < 0) return WEF_NULL;
+  // Note: INT32_NULL is a valid field value, but zero (WEF_NULL) is not.
+  if (isNull(off) || off<0) return WEF_NULL;
   return VRTMath::unpackInt(bbuf, off+getPrologueLength());
 }
 void BasicAcknowledgePacket::setL (int8_t cifNum, int32_t bit, int32_t val) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   int32_t off = getOffset(cifNum, bit);
-  // Note: INT32_NULL is a valid value, but zero (WEF_NULL) is not.
+  if (isNull(off)) {
+    throw VRTException("Indicator Field not enabled; enable Indicator Field first.");
+  }
+  // Note: INT32_NULL is a valid field value, but zero (WEF_NULL) is not.
   bool present = (val != WEF_NULL); // !isNull(val);
 
   setContextIndicatorFieldBit(cifNum, bit, present);
@@ -968,8 +960,44 @@ std::vector<WarningErrorField_t> BasicAcknowledgePacket::getErrors() const {
   return errors;
 }
 
+bool BasicAcknowledgePacket::hasFreeFormMessage () const {
+  int32_t off = getOffset(FREE_FORM_MESSAGE, 0);
+  return (isNull(off) || off < 0)? false : true;
+}
 
-// TODO Warn/ErrorIndicator specific functions?
+FreeFormMessage_t BasicAcknowledgePacket::getFreeFormMessage () const {
+  int32_t off = getOffset(FREE_FORM_MESSAGE, 0);
+  if (isNull(off) || off < 0) {
+    return FreeFormMessage_t();
+  } else {
+    int32_t prologlen = getPrologueLength();
+    int32_t packetlen = getPacketLength();
+    return FreeFormMessage_t(&bbuf[prologlen+off], packetlen-prologlen-off);
+  }
+}
+
+void BasicAcknowledgePacket::setFreeFormMessage (const FreeFormMessage_t msg) {
+  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
+  int32_t off = getOffset(FREE_FORM_MESSAGE, 0);
+  if (isNull(off)) {
+    throw VRTException("Can not set free-form message if Ack-W and Ack-E are both unset.");
+  }
+  int32_t prologlen = getPrologueLength();
+  
+  // If one exists, remove it
+  if (off > 0 ) {
+    int32_t oldmsglen = getPacketLength()-prologlen-off;
+    off = shiftPayload(off, oldmsglen, false);
+    off = -off;
+  }
+
+  if (!msg.empty()) {
+    size_t words = size_t((msg.size()+3)/4); // whole 4-byte words
+    off = shiftPayload(off, 4*words, true);
+    //memcpy(&bbuf[off+prologlen], msg.buffer(), msg.size());
+    VRTMath::packBytes(bbuf, off+prologlen, msg.buffer(), msg.size());
+  }
+}
 
 
 /** TODO - implement HasFields methods for BasicAcknowledgePacket 
