@@ -383,6 +383,14 @@ namespace vrt {
       UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(val);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports setL.");
     }
+    protected: virtual UUID getUUID (int8_t cifNum, int32_t bit) const {
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit);
+      throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
+    }
+    protected: virtual void setUUID (int8_t cifNum, int32_t bit, const UUID &val){
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(val);
+      throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports setL.");
+    }
     protected: virtual void setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen) {
       UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(val); UNUSED_VARIABLE(oldLen);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports setL.");

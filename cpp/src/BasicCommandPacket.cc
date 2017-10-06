@@ -343,7 +343,14 @@ int32_t BasicCommandPacket::getControlleeIDNumber() const {
 void BasicCommandPacket::setControlleeIDNumber(int32_t val) {
   setControlIDNumber(false, val); // (controller=false)
 }
+UUID BasicCommandPacket::getControlleeUUID () const {
+  return getControlUUID(false); // (controller=false)
+}
+void BasicCommandPacket::setControlleeUUID (const UUID &val) {
+  setControlUUID(false, val); // (controller=false)
+}
 
+/* deprecated - using UUID lib instead
 void BasicCommandPacket::getControlleeUUID(int32_t& val0, int32_t& val1, int32_t& val2, int32_t& val3) const {
   getControlUUID(false, val0, val1, val2, val3); // (controller=false)
 }
@@ -356,6 +363,7 @@ std::string BasicCommandPacket::getControlleeUUID() const {
 void BasicCommandPacket::setControlleeUUID(std::string val) {
   setControlUUID(false, val); // (controller=false)
 }
+*/
 
 // Controller ID/UUID
 int32_t BasicCommandPacket::getControllerIDNumber() const {
@@ -364,7 +372,14 @@ int32_t BasicCommandPacket::getControllerIDNumber() const {
 void BasicCommandPacket::setControllerIDNumber(int32_t val) {
   setControlIDNumber(true, val); // (controller=true)
 }
+UUID BasicCommandPacket::getControllerUUID () const {
+  return getControlUUID(true); // (controller=true)
+}
+void BasicCommandPacket::setControllerUUID (const UUID &val) {
+  setControlUUID(true, val); // (controller=true)
+}
 
+/* deprecated - using UUID lib instead
 void BasicCommandPacket::getControllerUUID(int32_t& val0, int32_t& val1, int32_t& val2, int32_t& val3) const {
   getControlUUID(true, val0, val1, val2, val3); // (controller=true)
 }
@@ -377,6 +392,7 @@ std::string BasicCommandPacket::getControllerUUID() const {
 void BasicCommandPacket::setControllerUUID(std::string val) {
   setControlUUID(true, val); // (controller=true)
 }
+*/
 
 
 // Helpers
@@ -418,45 +434,10 @@ int32_t BasicCommandPacket::getFieldLen(bool controller) const {
 int32_t BasicCommandPacket::getControlIDNumber (bool controller) const {
   int32_t off = getOffset(controller);
   if (off<0) return INT32_NULL;
-  if (getFieldLen(controller)==4) { // ID
-    return VRTMath::unpackInt(bbuf, getHeaderLength()+off);
-  }
-  else { // UUID
+  if (getFieldLen(controller)!=4) {
     throw VRTException("Cannot get ID Number when Format=UUID.");
   }
-}
-
-void BasicCommandPacket::getControlUUID (bool controller,
-                         int32_t& val0, int32_t& val1, int32_t& val2, int32_t& val3) const {
-  int32_t off = getOffset(controller);
-  if (off<0) {
-    val0 = val1 = val2 = val3 = INT32_NULL;
-    return;
-  }
-  if (getFieldLen(controller)==16) { // UUID
-    val0 = VRTMath::unpackInt(bbuf, getHeaderLength()+off   );
-    val1 = VRTMath::unpackInt(bbuf, getHeaderLength()+off+4 );
-    val2 = VRTMath::unpackInt(bbuf, getHeaderLength()+off+8 );
-    val3 = VRTMath::unpackInt(bbuf, getHeaderLength()+off+12);
-  }
-  else { // ID Number
-    throw VRTException("Cannot get UUID when Format=ID Number.");
-  }
-}
-
-std::string BasicCommandPacket::getControlUUID (bool controller, char delim) const {
-  if (getOffset(controller)<0) return "";
-  int32_t val0, val1, val2, val3;
-  getControlUUID(controller, val0, val1, val2, val3);
-  std::stringstream ss;
-  // X bytes at a time, where X = 4, 2, 2, 2, 6 (required width is 2X)
-  ss<<std::uppercase<<std::setfill('0')<<std::hex<<std::setw(8)<< val0;                 if (delim>0) ss<< delim;
-  ss<<std::uppercase<<std::setfill('0')<<std::hex<<std::setw(4)<< ((val0 >> 2) & 0xFF); if (delim>0) ss<< delim;
-  ss<<std::uppercase<<std::setfill('0')<<std::hex<<std::setw(4)<< ((val0     ) & 0xFF); if (delim>0) ss<< delim;
-  ss<<std::uppercase<<std::setfill('0')<<std::hex<<std::setw(4)<< ((val0 >> 2) & 0xFF); if (delim>0) ss<< delim;
-  ss<<std::uppercase<<std::setfill('0')<<std::hex<<std::setw(4)<< ((val2     ) & 0xFF); // no delim this time
-  ss<<std::uppercase<<std::setfill('0')<<std::hex<<std::setw(8)<< val3;
-  return ss.str();
+  return VRTMath::unpackInt(bbuf, getHeaderLength()+off);
 }
 
 void BasicCommandPacket::setControlIDNumber (bool controller, int32_t val) {
@@ -497,6 +478,89 @@ void BasicCommandPacket::setControlIDNumber (bool controller, int32_t val) {
   }
 }
 
+UUID BasicCommandPacket::getControlUUID (bool controller) const {
+  int32_t off = getOffset(controller);
+  if (off<0) return UUID(); // return NULL UUID
+  if (getFieldLen(controller)!=16) {
+    throw VRTException("Cannot get UUID when Format=ID Number.");
+  }
+  return VRTMath::unpackUUID(bbuf, getHeaderLength()+off);
+}
+
+void BasicCommandPacket::setControlUUID (bool controller, const UUID &val) {
+  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
+
+  int32_t off = getOffset(controller);
+  bool add = !isNull(val);
+
+  if (off<0 && !add) return; // already set to null
+
+  int32_t oldLen = getFieldLen(controller);
+  if (off>0 && add && oldLen==16) {
+    // present, no change in size
+    VRTMath::packUUID(bbuf, getHeaderLength()+off, val);
+  }
+  else {
+    if (off>0) {
+      // remove existing ID or UUID
+      if (!controller) setCtrlAckSettingsBit(CONTROL_CE_BIT, false);
+      else             setCtrlAckSettingsBit(CONTROL_CR_BIT, false);
+      shiftPacketSpecificPrologue(off, oldLen, false);
+      off = -off;
+    }
+
+    if (add) {
+      // add field and set value
+      if (!controller) {
+        setCtrlAckSettingsBit(CONTROL_CE_BIT, true);
+        setCtrlAckSettingsBit(CONTROL_IE_BIT, true);
+      }
+      else {
+        setCtrlAckSettingsBit(CONTROL_CR_BIT, true);
+        setCtrlAckSettingsBit(CONTROL_IR_BIT, true);
+      }
+      off = shiftPacketSpecificPrologue(off, 16, true);
+      VRTMath::packUUID(bbuf, getHeaderLength()+off, val);
+    }
+  }
+}
+
+/* deprecated - using UUID lib instead
+void BasicCommandPacket::getControlUUID (bool controller,
+                         int32_t& val0, int32_t& val1, int32_t& val2, int32_t& val3) const {
+  int32_t off = getOffset(controller);
+  if (off<0) {
+    val0 = val1 = val2 = val3 = INT32_NULL;
+    return;
+  }
+  if (getFieldLen(controller)==16) { // UUID
+    val0 = VRTMath::unpackInt(bbuf, getHeaderLength()+off   );
+    val1 = VRTMath::unpackInt(bbuf, getHeaderLength()+off+4 );
+    val2 = VRTMath::unpackInt(bbuf, getHeaderLength()+off+8 );
+    val3 = VRTMath::unpackInt(bbuf, getHeaderLength()+off+12);
+  }
+  else { // ID Number
+    throw VRTException("Cannot get UUID when Format=ID Number.");
+  }
+}
+
+std::string BasicCommandPacket::getControlUUID (bool controller, char delim) const {
+  if (getOffset(controller)<0) return "";
+  int32_t val0, val1, val2, val3;
+  getControlUUID(controller, val0, val1, val2, val3);
+  std::stringstream ss;
+  // X bytes at a time, where X = 4, 2, 2, 2, 6 (required width is 2X)
+  ss<<std::uppercase<<std::setfill('0')<<std::hex<<std::setw(8)<< val0;                 if (delim>0) ss<< delim;
+  ss<<std::uppercase<<std::setfill('0')<<std::hex<<std::setw(4)<< ((val0 >> 2) & 0xFF); if (delim>0) ss<< delim;
+  ss<<std::uppercase<<std::setfill('0')<<std::hex<<std::setw(4)<< ((val0     ) & 0xFF); if (delim>0) ss<< delim;
+  ss<<std::uppercase<<std::setfill('0')<<std::hex<<std::setw(4)<< ((val0 >> 2) & 0xFF); if (delim>0) ss<< delim;
+  ss<<std::uppercase<<std::setfill('0')<<std::hex<<std::setw(4)<< ((val2     ) & 0xFF); // no delim this time
+  ss<<std::uppercase<<std::setfill('0')<<std::hex<<std::setw(8)<< val3;
+  return ss.str();
+}
+*/
+
+/* deprecated - using UUID lib instead
 void BasicCommandPacket::setControlUUID (bool controller,
                          int32_t val0, int32_t val1, int32_t val2, int32_t val3) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
@@ -576,6 +640,7 @@ void BasicCommandPacket::setControlUUID (bool controller, std::string val) {
   }
   setControlUUID(controller, val0, val1, val2, val3);
 }
+*/
 
 
 /* Initial implementation - preserved for debug if there are errors

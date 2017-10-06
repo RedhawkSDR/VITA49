@@ -285,6 +285,12 @@ namespace vrt {
     /** Packs a 64-bit integer from the payload at the indicated position. */
     protected: virtual void setX (int8_t cifNum, int32_t bit, int64_t val);
 
+    /** Unpacks a 128-bit UUID from the payload at the indicated position. */
+    protected: virtual UUID getUUID (int8_t cifNum, int32_t bit) const;
+
+    /** Packs a 128-bit UUID from the payload at the indicated position. */
+    protected: virtual void setUUID (int8_t cifNum, int32_t bit, const UUID &val);
+
     /** Gets a block of data. */
     protected: virtual void setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen);
 

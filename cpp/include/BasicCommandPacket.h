@@ -24,6 +24,7 @@
 
 #include "BasicVRTPacket.h"
 //#include "VRTConfig.h"
+#include "UUID.h"
 #include <cstring>
 #include <vector>
 #include <sstream>
@@ -278,26 +279,17 @@ namespace vrt {
     public: void setMessageID (int32_t val);
 
     // Controllee ID/UUID
-    // TODO - update to use methods/classes provided by UUID.h
     public: int32_t getControlleeIDNumber () const;
     public: void setControlleeIDNumber (int32_t val);
-
-    public: string getControlleeUUID () const;
-    public: void setControlleeUUID (string val);
-    public: void getControlleeUUID (int32_t& val0, int32_t& val1, int32_t& val2, int32_t& val3) const;
-    public: void setControlleeUUID (int32_t val0, int32_t val1, int32_t val2, int32_t val3);
+    public: UUID getControlleeUUID () const;
+    public: void setControlleeUUID (const UUID &val);
 
     // Controller ID/UUID
-    // TODO - update to use methods/classes provided by UUID.h
     public: int32_t getControllerIDNumber () const;
     public: void setControllerIDNumber (int32_t val);
+    public: UUID getControllerUUID () const;
+    public: void setControllerUUID (const UUID &val);
 
-    public: string getControllerUUID () const;
-    public: void setControllerUUID (string val);
-    public: void getControllerUUID (int32_t& val0, int32_t& val1, int32_t& val2, int32_t& val3) const;
-    public: void setControllerUUID (int32_t val0, int32_t val1, int32_t val2, int32_t val3);
-
-    
     // HELPERS
     protected: virtual int32_t getCtrlAckSettingsField () const {
       return VRTMath::unpackInt(bbuf, getHeaderLength());
@@ -307,20 +299,41 @@ namespace vrt {
     }
     protected: virtual void setCtrlAckSettingsBit (int32_t bit, bool set);
 
-    // Optional PSP fields - getters
     private: int32_t getOffset (bool controller) const; // TODO why not name it getPspOffset(...)?
     private: int32_t getFieldLen (bool controller) const; // TODO why not name it getPspFieldLen(...)?
+
+    // Optional PSP fields - getters
     private: int32_t getControlIDNumber (bool controller) const;
+    private: UUID getControlUUID (bool controller) const;
+
+    // Optional PSP fields - setters
+    private: void setControlIDNumber (bool controller, int32_t val);
+    private: void setControlUUID (bool controller, const UUID &val);
+
+
+    /* deprecated - using UUID lib instead
+    public: string getControlleeUUID () const;
+    public: void setControlleeUUID (string val);
+    public: void getControlleeUUID (int32_t& val0, int32_t& val1, int32_t& val2, int32_t& val3) const;
+    public: void setControlleeUUID (int32_t val0, int32_t val1, int32_t val2, int32_t val3);
+    */
+    /* deprecated - using UUID lib instead
+    public: string getControllerUUID () const;
+    public: void setControllerUUID (string val);
+    public: void getControllerUUID (int32_t& val0, int32_t& val1, int32_t& val2, int32_t& val3) const;
+    public: void setControllerUUID (int32_t val0, int32_t val1, int32_t val2, int32_t val3);
+    */
+    /* deprecated - using UUID lib instead
     private: void getControlUUID (bool controller,
                                   int32_t& val0, int32_t& val1, int32_t& val2, int32_t& val3) const;
     // delim=0 will produce string with no delimiters
     private: string getControlUUID (bool controller, char delim='-') const;
-
-    // Optional PSP fields - setters
-    private: void setControlIDNumber (bool controller, int32_t val); // TODO ... again ^^
+    */
+    /* deprecated - using UUID lib instead
     private: void setControlUUID (bool controller,
                                   int32_t val0, int32_t val1, int32_t val2, int32_t val3);
     private: void setControlUUID (bool controller, string val);
+    */
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////////

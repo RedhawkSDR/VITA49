@@ -313,19 +313,19 @@ namespace vrt {
       static const int32_t CIF0_RESERVED_5_mask       = 0x00000020; // N/A (0)
       static const int32_t CIF0_RESERVED_6_mask       = 0x00000040; // N/A (0)
       static const int32_t CIF7_ENABLE_mask           = 0x00000080; // 1
-      static const int32_t CONTEXT_ASOC_mask          = 0x00000100; // variable (Section 9.13.2)
-      static const int32_t GPS_ASCII_mask             = 0x00000200; // variable (Section 9.4.7)
+      static const int32_t CONTEXT_ASOC_mask          = 0x00000100; // variable (See V49.2 spec Section 9.13.2)
+      static const int32_t GPS_ASCII_mask             = 0x00000200; // variable (See V49.2 spec Section 9.4.7)
       static const int32_t EPHEM_REF_mask             = 0x00000400; // 1
-      static const int32_t REL_EPHEM_mask             = 0x00000800; // 11 (Section 9.4.10)
+      static const int32_t REL_EPHEM_mask             = 0x00000800; // 11 (See V49.2 spec Section 9.4.10)
       static const int32_t ECEF_EPHEM_mask            = 0x00001000; // 13
       static const int32_t INS_EPHEM_mask             = 0x00002000; // 11
       static const int32_t GPS_EPHEM_mask             = 0x00004000; // 11
-      static const int32_t DATA_FORMAT_mask           = 0x00008000; // 2 (Section 9.13.3)
-      static const int32_t STATE_EVENT_mask           = 0x00010000; // 1 (Section 9.10 incorrectly listed as CIF1/16)
+      static const int32_t DATA_FORMAT_mask           = 0x00008000; // 2 (See V49.2 spec Section 9.13.3)
+      static const int32_t STATE_EVENT_mask           = 0x00010000; // 1 (See V49.2 spec Section 9.10 incorrectly listed as CIF1/16)
       static const int32_t DEVICE_ID_mask             = 0x00020000; // 2
-      static const int32_t TEMPERATURE_mask           = 0x00040000; // 1 (Section 9.10 incorrectly listed as CIF1/18)
-      static const int32_t TIME_CALIB_mask            = 0x00080000; // 1 (Section 9.7.3.3)
-      static const int32_t TIME_ADJUST_mask           = 0x00100000; // 2 (Section 9.7.3.1)
+      static const int32_t TEMPERATURE_mask           = 0x00040000; // 1 (See V49.2 spec Section 9.10 incorrectly listed as CIF1/18)
+      static const int32_t TIME_CALIB_mask            = 0x00080000; // 1 (See V49.2 spec Section 9.7.3.3)
+      static const int32_t TIME_ADJUST_mask           = 0x00100000; // 2 (See V49.2 spec Section 9.7.3.1)
       static const int32_t SAMPLE_RATE_mask           = 0x00200000; // 2
       static const int32_t OVER_RANGE_mask            = 0x00400000; // 1
       static const int32_t GAIN_mask                  = 0x00800000; // 1
@@ -335,7 +335,7 @@ namespace vrt {
       static const int32_t RF_FREQ_mask               = 0x08000000; // 2
       static const int32_t IF_FREQ_mask               = 0x10000000; // 2
       static const int32_t BANDWIDTH_mask             = 0x20000000; // 2
-      static const int32_t REF_POINT_mask             = 0x40000000; // 1 (Section 9.2)
+      static const int32_t REF_POINT_mask             = 0x40000000; // 1 (See V49.2 spec Section 9.2)
       static const int32_t CHANGE_IND_mask            = 0x80000000; // N/A (0)
 
       /** CIF0 Field lengths
@@ -368,17 +368,17 @@ namespace vrt {
 
       /** Bitmasks                                                     Field Size (# of 32-bit words) */
       static const int32_t CIF1_RESERVED_0_mask       = 0x00000001; // N/A (0)
-      static const int32_t BUFFER_SZ_mask             = 0x00000002; // 1
+      static const int32_t BUFFER_SZ_mask             = 0x00000002; // 2
       static const int32_t VER_BLD_CODE_mask          = 0x00000004; // 1
       static const int32_t V49_COMPL_mask             = 0x00000008; // 1
-      static const int32_t HEALTH_STATUS_mask         = 0x00000010; // 1 (Section 9.10)
+      static const int32_t HEALTH_STATUS_mask         = 0x00000010; // 1 (See V49.2 spec Section 9.10)
       static const int32_t DISCRETE_IO64_mask         = 0x00000020; // 2
       static const int32_t DISCRETE_IO32_mask         = 0x00000040; // 1
-      static const int32_t INDEX_LIST_mask            = 0x00000080; // variable (Section 9.3.2)
+      static const int32_t INDEX_LIST_mask            = 0x00000080; // variable (See V49.2 spec Section 9.3.2)
       static const int32_t CIF1_RESERVED_8_mask       = 0x00000100; // N/A (0)
-      static const int32_t SECTOR_SCN_STP_mask        = 0x00000200; // variable (Section 9.6.2)
+      static const int32_t SECTOR_SCN_STP_mask        = 0x00000200; // variable (See V49.2 spec Section 9.6.2)
       static const int32_t SPECTRUM_mask              = 0x00000400; // 14
-      static const int32_t CIFS_ARRAY_mask            = 0x00000800; // variable (Section 9.13.1)
+      static const int32_t CIFS_ARRAY_mask            = 0x00000800; // variable (See V49.2 spec Section 9.13.1)
       static const int32_t CIF1_RESERVED_12_mask      = 0x00001000; // N/A (0)
       static const int32_t AUX_BANDWIDTH_mask         = 0x00002000; // 2
       static const int32_t AUX_GAIN_mask              = 0x00004000; // 1
@@ -395,7 +395,7 @@ namespace vrt {
       static const int32_t BEAMWIDTH_mask             = 0x02000000; // 1
       static const int32_t CIF1_RESERVED_26_mask      = 0x04000000; // N/A (0)
       static const int32_t CIF1_RESERVED_27_mask      = 0x08000000; // N/A (0)
-      static const int32_t PNT_ANGL_2D_ST_mask        = 0x10000000; // variable (Section 9.4.1)
+      static const int32_t PNT_ANGL_2D_ST_mask        = 0x10000000; // variable (See V49.2 spec Section 9.4.1)
       static const int32_t PNT_ANGL_2D_SI_mask        = 0x20000000; // 1
       static const int32_t POLARIZATION_mask          = 0x40000000; // 1
       static const int32_t PHASE_mask                 = 0x80000000; // 1
@@ -404,8 +404,8 @@ namespace vrt {
       static const int32_t CTX_4_OCTETS = PHASE_mask | POLARIZATION_mask | PNT_ANGL_2D_SI_mask | BEAMWIDTH_mask | RANGE_mask
                                         | EB_NO_BER_mask | THRESHOLD_mask | COMPRESS_PT_mask | ICPT_PTS_2_3_mask
                                         | SNR_NOISE_mask | AUX_GAIN_mask | DISCRETE_IO32_mask | HEALTH_STATUS_mask
-                                        | V49_COMPL_mask | VER_BLD_CODE_mask | BUFFER_SZ_mask;
-      static const int32_t CTX_8_OCTETS = AUX_FREQUENCY_mask | AUX_BANDWIDTH_mask | DISCRETE_IO64_mask;
+                                        | V49_COMPL_mask | VER_BLD_CODE_mask;
+      static const int32_t CTX_8_OCTETS = AUX_FREQUENCY_mask | AUX_BANDWIDTH_mask | DISCRETE_IO64_mask | BUFFER_SZ_mask;
       static const int32_t CTX_56_OCTETS = SPECTRUM_mask;
       // others (variable) :
       //                     PNT_ANGL_2D_ST_mask TODO
@@ -422,37 +422,37 @@ namespace vrt {
       
       /** Bitmasks                                                     Field Size (# of 32-bit words) */
       static const int32_t CIF2_RESERVED_0_mask       = 0x00000001; // N/A (0)
-      static const int32_t SPATIAL_REF_TYPE_mask      = 0x00000002; // 1 (Section 9.8.11 for the next 2)
+      static const int32_t SPATIAL_REF_TYPE_mask      = 0x00000002; // 1 (See V49.2 spec Section 9.8.11 for the next 2)
       static const int32_t SPATIAL_SCAN_TYPE_mask     = 0x00000004; // 1
-      static const int32_t RF_FOOTPRINT_RANGE_mask    = 0x00000008; // 1 (Section 9.8.12 for the next 2)
+      static const int32_t RF_FOOTPRINT_RANGE_mask    = 0x00000008; // 1 (See V49.2 spec Section 9.8.12 for the next 2)
       static const int32_t RF_FOOTPRINT_mask          = 0x00000010; // 1
-      static const int32_t COMM_PRIORITY_ID_mask      = 0x00000020; // 1 (Section 9.8.10 for the next 5)
+      static const int32_t COMM_PRIORITY_ID_mask      = 0x00000020; // 1 (See V49.2 spec Section 9.8.10 for the next 5)
       static const int32_t FUNCT_PRIORITY_ID_mask     = 0x00000040; // 1
       static const int32_t EVENT_ID_mask              = 0x00000080; // 1
       static const int32_t MODE_ID_mask               = 0x00000100; // 1
       static const int32_t FUNCTION_ID_mask           = 0x00000200; // 1
-      static const int32_t MODULATION_TYPE_mask       = 0x00000400; // 1 (Section 9.8.9 for the next 5)
+      static const int32_t MODULATION_TYPE_mask       = 0x00000400; // 1 (See V49.2 spec Section 9.8.9 for the next 5)
       static const int32_t MODULATION_CLASS_mask      = 0x00000800; // 1
       static const int32_t EMS_DEVICE_INSTANCE_mask   = 0x00001000; // 1
       static const int32_t EMS_DEVICE_TYPE_mask       = 0x00002000; // 1
       static const int32_t EMS_DEVICE_CLASS_mask      = 0x00004000; // 1
-      static const int32_t PLATFORM_DISPLAY_mask      = 0x00008000; // 1 (Section 9.8.8 for the next 3)
+      static const int32_t PLATFORM_DISPLAY_mask      = 0x00008000; // 1 (See V49.2 spec Section 9.8.8 for the next 3)
       static const int32_t PLATFORM_INSTANCE_mask     = 0x00010000; // 1
       static const int32_t PLATFORM_CLASS_mask        = 0x00020000; // 1
-      static const int32_t OPERATOR_mask              = 0x00040000; // 1 (Section 9.8.7 for the next 2)
+      static const int32_t OPERATOR_mask              = 0x00040000; // 1 (See V49.2 spec Section 9.8.7 for the next 2)
       static const int32_t COUNTRY_CODE_mask          = 0x00080000; // 1
-      static const int32_t TRACK_ID_mask              = 0x00100000; // 1 (Section 9.8.6)
-      static const int32_t INFORMATION_SOURCE_mask    = 0x00200000; // 1 (Section 9.8.5)
-      static const int32_t CONTROLLER_UUID_mask       = 0x00400000; // 4 (Section 9.8.3 for the next 5)
+      static const int32_t TRACK_ID_mask              = 0x00100000; // 1 (See V49.2 spec Section 9.8.6)
+      static const int32_t INFORMATION_SOURCE_mask    = 0x00200000; // 1 (See V49.2 spec Section 9.8.5)
+      static const int32_t CONTROLLER_UUID_mask       = 0x00400000; // 4 (See V49.2 spec Section 9.8.3 for the next 5)
       static const int32_t CONTROLLER_ID_mask         = 0x00800000; // 1
       static const int32_t CONTROLLEE_UUID_mask       = 0x01000000; // 4
       static const int32_t CONTROLLEE_ID_mask         = 0x02000000; // 1
-      static const int32_t CITED_MESSAGE_ID_mask      = 0x04000000; // 1 (more info in Section 9.8.4 too)
-      static const int32_t CHILDREN_SID_mask          = 0x08000000; // 1 (Section 9.8.2 for the next 4)
+      static const int32_t CITED_MESSAGE_ID_mask      = 0x04000000; // 1 (more info in See V49.2 spec Section 9.8.4 too)
+      static const int32_t CHILDREN_SID_mask          = 0x08000000; // 1 (See V49.2 spec Section 9.8.2 for the next 4)
       static const int32_t PARENTS_SID_mask           = 0x10000000; // 1
       static const int32_t SIBLINGS_SID_mask          = 0x20000000; // 1
       static const int32_t CITED_SID_mask             = 0x40000000; // 1
-      static const int32_t BIND_mask                  = 0x80000000; // 1 (Section 9.8.1)
+      static const int32_t BIND_mask                  = 0x80000000; // 1 (See V49.2 spec Section 9.8.1)
       
       /** define field lengths */
       static const int32_t CTX_4_OCTETS  = BIND_mask | CITED_SID_mask | SIBLINGS_SID_mask | PARENTS_SID_mask | CHILDREN_SID_mask
@@ -474,7 +474,7 @@ namespace vrt {
 
       /** Bitmasks                                                     Field Size (# of 32-bit words) */
       static const int32_t CIF3_RESERVED_0_mask       = 0x00000001; // N/A (0)
-      static const int32_t NETWORK_ID_mask            = 0x00000002; // 1 (Section 9.8.13)
+      static const int32_t NETWORK_ID_mask            = 0x00000002; // 1 (See V49.2 spec Section 9.8.13)
       static const int32_t TROPOSPHERIC_STATE_mask    = 0x00000004; // 1
       static const int32_t SEA_AND_SWELL_STATE_mask   = 0x00000008; // 1
       static const int32_t BAROMETRIC_PRESSURE_mask   = 0x00000010; // 1
@@ -489,12 +489,12 @@ namespace vrt {
       static const int32_t CIF3_RESERVED_13_mask      = 0x00002000; // N/A (0)
       static const int32_t CIF3_RESERVED_14_mask      = 0x00004000; // N/A (0)
       static const int32_t CIF3_RESERVED_15_mask      = 0x00008000; // N/A (0)
-                                                                    // For the next two, see Section 9.7.2
+                                                                    // For the next two, See V49.2 spec Section 9.7.2
       static const int32_t SHELF_LIFE_mask            = 0x00010000; // 1, 2, or 3 (same as packet tstamp based on TSI and TSF)
       static const int32_t AGE_mask                   = 0x00020000; // 1, 2, or 3 (same as packet tstamp based on TSI and TSF)
       static const int32_t CIF3_RESERVED_18_mask      = 0x00040000; // N/A (0)
       static const int32_t CIF3_RESERVED_19_mask      = 0x00080000; // N/A (0)
-      static const int32_t JITTER_mask                = 0x00100000; // 2 (Section 9.7.1 for the next 8)
+      static const int32_t JITTER_mask                = 0x00100000; // 2 (See V49.2 spec Section 9.7.1 for the next 8)
       static const int32_t DWELL_mask                 = 0x00200000; // 2
       static const int32_t DURATION_mask              = 0x00400000; // 2
       static const int32_t PERIOD_mask                = 0x00800000; // 2
@@ -504,8 +504,8 @@ namespace vrt {
       static const int32_t RISE_TIME_mask             = 0x08000000; // 2
       static const int32_t CIF3_RESERVED_28_mask      = 0x10000000; // N/A (0)
       static const int32_t CIF3_RESERVED_29_mask      = 0x20000000; // N/A (0)
-      static const int32_t TIMESTAMP_SKEW_mask        = 0x40000000; // 2 (Section 9.7.3.2)
-      static const int32_t TIMESTAMP_DETAILS_mask     = 0x80000000; // 2 (Section 9.7.3.4)
+      static const int32_t TIMESTAMP_SKEW_mask        = 0x40000000; // 2 (See V49.2 spec Section 9.7.3.2)
+      static const int32_t TIMESTAMP_DETAILS_mask     = 0x80000000; // 2 (See V49.2 spec Section 9.7.3.4)
 
       /** define field lengths */
       static const int32_t CTX_4_OCTETS = AIR_TEMP_mask | SEA_GROUND_TEMP_mask | HUMIDITY_mask | BAROMETRIC_PRESSURE_mask
@@ -546,8 +546,8 @@ namespace vrt {
       static const int32_t CIF7_RESERVED_16_mask      = 0x00010000; // N/A (0)
       static const int32_t CIF7_RESERVED_17_mask      = 0x00020000; // N/A (0)
       static const int32_t CIF7_RESERVED_18_mask      = 0x00040000; // N/A (0)
-      static const int32_t BELIEF_mask                = 0x00080000; // 1 (see Section 9.12 rules)
-      static const int32_t PROBABILITY_mask           = 0x00100000; // 1 (see Section 9.12 rules)
+      static const int32_t BELIEF_mask                = 0x00080000; // 1 (See V49.2 spec Section 9.12 rules)
+      static const int32_t PROBABILITY_mask           = 0x00100000; // 1 (See V49.2 spec Section 9.12 rules)
       static const int32_t THIRD_DERIVATIVE_mask      = 0x00200000; // same as field it describes
       static const int32_t SECOND_DERIVATIVE_mask     = 0x00400000; // same as field it describes
       static const int32_t FIRST_DERIVATIVE_mask      = 0x00800000; // same as field it describes
@@ -560,7 +560,7 @@ namespace vrt {
       static const int32_t AVERAGE_VALUE_mask         = 0x40000000; // same as field it describes
       static const int32_t CURRENT_VALUE_mask         = 0x80000000; // same as field it describes
 
-      /** Attribute sizes (Section 9.12) */
+      /** Attribute sizes (See V49.2 spec Section 9.12) */
       static const int32_t CTX_4_OCTETS    = PROBABILITY_mask | BELIEF_mask; // These are 4 bytes regardless of field
       /** These essentially apply a multiplier to the size of the original field for each attr included */
       static const int32_t CTX_SAME_OCTETS = CURRENT_VALUE_mask | AVERAGE_VALUE_mask | MEDIAN_VALUE_mask 
@@ -1299,6 +1299,18 @@ namespace vrt {
     protected: virtual void setX (int8_t cifNum, int32_t bit, int64_t val) = 0;
     protected: virtual void setX (IndicatorFieldEnum_t field, int64_t val) {
       setX(getCIFNumber(field), getCIFBitMask(field), val);
+    }
+
+    /** Unpacks a 128-bit UUID from the payload at the indicated position. */
+    protected: virtual UUID getUUID (int8_t cifNum, int32_t bit) const = 0;
+    protected: virtual UUID getUUID (IndicatorFieldEnum_t field) const {
+      return getUUID(getCIFNumber(field), getCIFBitMask(field));
+    }
+
+    /** Packs a 128-bit UUID from the payload at the indicated position. */
+    protected: virtual void setUUID (int8_t cifNum, int32_t bit, const UUID &val) = 0;
+    protected: virtual void setUUID (IndicatorFieldEnum_t field, const UUID &val) {
+      setUUID(getCIFNumber(field), getCIFBitMask(field), val);
     }
 
     /** Sets a block of data. */
@@ -2145,16 +2157,837 @@ namespace vrt {
     // TODO - remember to check if CIF is enabled for all other CIFs
 
     /* XXX START OF CIF1 FUNCTIONS XXX */
+
+    /** Gets Buffer Size, Level, and Status (See V49.2 spec Section 9.10.7)
+     *  Bits 63-32 | Buffer Sz | Size in bytes (assume 32-bit integer)
+     *  Bits 31-16 | Reserved  | Fixed value of 0x0
+     *  Bits 15-8  | Level     | Indicates buffer utilization: empty <=> 0x0; full <=> (either 0x80 if one-hot, or 0xFF; user-defined)
+     *  Bits 7-0   | Status    | Used to indicate buffer underrun/overrun/etc.; user-defined
+     *  @return The Buffer Status (null if not specified)
+     */
+    public: inline int64_t getBufferStatus () const {
+      int64_t bits = getX(BUFFER_SZ);
+      return (isNull(bits))? INT64_NULL : (bits & __INT64_C(0xFFFFFFFF0000FFFF));
+    }
+
+    /** Sets Buffer Size, Level, and Status (See V49.2 spec Section 9.10.7)
+     *  Bits 63-32 | Buffer Sz | Size in bytes (assume 32-bit integer)
+     *  Bits 31-16 | Reserved  | Fixed value of 0x0
+     *  Bits 15-8  | Level     | Indicates buffer utilization: empty <=> 0x0; full <=> (either 0x80 if one-hot, or 0xFF; user-defined)
+     *  Bits 7-0   | Status    | Used to indicate buffer underrun/overrun/etc.; user-defined
+     *  @param val The Buffer Status (null if not specified)
+     */
+    public: inline void setBufferStatus (int64_t val) {
+      if (!isNull(val) && ((val & ~__INT64_C(0xFFFFFFFF0000FFFF)) != 0)) {
+        throw VRTException("Invalid Buffer Status field");
+      }
+      setX(BUFFER_SZ,val);
+    }
+
+    /** Gets Build Version Information (See V49.2 spec Section 9.10.4)
+     *  bits 31-25 | Year     | Year compiled; Values map linearly such that 0 => year 2000, up to 127 => year 2127
+     *  bits 24-16 | Day      | Day of year compiled; Valid values are 1..366, where 1 => Jan 1 (? 366 is for leap year/seconds?)
+     *  bits 15-10 | Revision | Used to distinguish between versions made on the same day, allowing up to 64 revisions per day
+     *  bits 9-0   | User Def | User defined info associated with the build
+     *  @return The Build Version code (null if not specified)
+     */
+    public: inline int32_t getBuildVersion () const {
+      return getL(VER_BLD_CODE);
+    }
+
+    /** Sets Build Version Information (See V49.2 spec Section 9.10.4)
+     *  bits 31-25 | Year     | Year compiled; Values map linearly such that 0 => year 2000, up to 127 => year 2127
+     *  bits 24-16 | Day      | Day of year compiled; Valid values are 1..366, where 1 => Jan 1 (? 366 is for leap year/seconds?)
+     *  bits 15-10 | Revision | Used to distinguish between versions made on the same day, allowing up to 64 revisions per day
+     *  bits 9-0   | User Def | User defined info associated with the build
+     *  @return The Build Version code (null if not specified)
+     */
+    public: inline void setBuildVersion (int32_t val) {
+      setL(VER_BLD_CODE,val);
+    }
+
+    /** Gets V49 Standard and Spec Compliance Number (See V49.2 spec Section 9.10.3)
+     *  0x00000001 => V49.0
+     *  0x00000002 => V49.1
+     *  0x00000003 => V49A (which implies V49.0 and V49.1)
+     *  0x00000004 => V49.2
+     *  @return The V49 spec version (null if not specified)
+     */
+    public: inline int32_t getV49SpecVersion () const {
+      return getL(V49_COMPL);
+    }
+
+    /** Sets V49 Standard and Spec Compliance Number (See V49.2 spec Section 9.10.3)
+     *  0x00000001 => V49.0
+     *  0x00000002 => V49.1
+     *  0x00000003 => V49A (which implies V49.0 and V49.1)
+     *  0x00000004 => V49.2
+     *  @param val The V49 spec version (null if not specified)
+     */
+    public: inline void setV49SpecVersion (int32_t val) {
+      setL(V49_COMPL,val);
+    }
+
+    /** Gets Health Status (See V49.2 spec Section 9.10.2)
+     *  uses lower 16 bits of 32 bit word
+     *  values are user defined and mapped to a defined health state
+     *  @return The Health Status value (null if not specified)
+     */
+    public: inline int16_t getHealthStatus () const {
+      int16_t bits = getI(HEALTH_STATUS, 2);
+      return (isNull(bits))? INT16_NULL : bits;
+    }
+
+    /** Sets Health Status (See V49.2 spec Section 9.10.2)
+     *  uses lower 16 bits of 32 bit word
+     *  values are user defined and mapped to a defined health state
+     *  @param val The Health Status value (null if not specified)
+     */
+    public: inline void setHealthStatus (int16_t val) {
+      setI(HEALTH_STATUS, 2, val);
+    }
+
+    /** Gets Discrete IO 64-bit Field (See V49.2 spec Section 9.11)
+     *  All bits are user-defined
+     *  @return The Discrete IO 64-bit field (null if not specified)
+     */
+    public: inline int64_t getDiscreteIO64 () const {
+      int64_t bits = getX(DISCRETE_IO64);
+      return (isNull(bits))? INT64_NULL : bits;
+    }
+
+    /** Sets Discrete IO 64-bit Field (See V49.2 spec Section 9.11)
+     *  All bits are user-defined
+     *  @param val The Discrete IO 64-bit field (null if not specified)
+     */
+    public: inline void setDiscreteIO64 (int64_t val) {
+      setX(DISCRETE_IO64,val);
+    }
+
+    /** Gets Discrete IO 32-bit Field (See V49.2 spec Section 9.11)
+     *  All bits are user-defined
+     *  @return The Discrete IO 32-bit field (null if not specified)
+     */
+    public: inline int32_t getDiscreteIO32 () const {
+      return getL(DISCRETE_IO32);
+    }
+
+    /** Sets Discrete IO 32-bit Field (See V49.2 spec Section 9.11)
+     *  All bits are user-defined
+     *  @param val The Discrete IO 32-bit field (null if not specified)
+     */
+    public: inline void setDiscreteIO32 (int32_t val) {
+      setL(DISCRETE_IO32,val);
+    }
+
     // TODO
-    /* XXX START OF CIF1 FUNCTIONS XXX */
+    // INDEX_LIST_mask            = 0x00000080; // variable (See V49.2 spec Section 9.3.2)
+    // SECTOR_SCN_STP_mask        = 0x00000200; // variable (See V49.2 spec Section 9.6.2)
+    // SPECTRUM_mask              = 0x00000400; // 14 (See V49.2 spec Section 9.6.1)
+    // CIFS_ARRAY_mask            = 0x00000800; // variable (See V49.2 spec Section 9.13.1)
+
+    /** Gets the Auxiliary Bandwidth of the signal in Hz.
+     *  (See V49.2 spec Section 9.5.16)
+     *  @return The aux bandwidth (null if not specified).
+     */
+    public: inline double getAuxBandwidth () const {
+      int64_t bits = getX(AUX_BANDWIDTH);
+      return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
+    }
+
+    /** Sets the Auxiliary Bandwidth of the signal in Hz.
+     *  (See V49.2 spec Section 9.5.16)
+     *  @param val The aux bandwidth (null if not specified).
+     */
+    public: inline void setAuxBandwidth (double val) {
+      int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
+      setX(AUX_BANDWIDTH,bits);
+    }
+
+    /** Gets the Stage 1 Auxiliary Gain of the device in dB.
+     *  This is a second front-end gain control/metadata field for control and
+     *  reporting on anciliary hardware or processing in a single chain
+     *  described by a single Stream ID.
+     *  In cases where a separate Stage 1 and Stage 2 gain is not necessary,
+     *  this holds the total aux gain of the system and Stage 2 Auxiliary Gain
+     *  is set to zero.
+     *  (See V49.2 spec Section 9.5.15)
+     *  @return The stage 1 aux gain (null if not specified).
+     */
+    public: inline float getAuxGain1 () const {
+      int16_t bits = getI(AUX_GAIN,2);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
+
+    /** Gets the Stage 2 Auxiliary Gain of the device in dB.
+     *  This is a second back-end gain control/metadata field for control and
+     *  reporting on anciliary hardware or processing in a single chain
+     *  described by a single Stream ID.
+     *  In cases where a separate Stage 1 and Stage 2 gain is not necessary,
+     *  Stage 1 Auxiliary Gain holds the total aux gain of the system and this
+     *  is set to zero.
+     *  (See V49.2 spec Section 9.5.15)
+     *  @return The stage 2 aux gain (null if not specified).
+     */
+    public: inline float getAuxGain2 () const {
+      int16_t bits = getI(AUX_GAIN,0);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
+
+    /** Gets the Total Auxiliary Gain of the device in dB. The total aux gain is
+     *  the sum of {@link #getAuxGain1()} and {@link #getAuxGain2()}.
+     *  (See V49.2 spec Section 9.5.15)
+     *  @return The total aux gain (null if not specified).
+     */
+    public: inline float getAuxGain () const {
+      float gain1 = getAuxGain1();
+      float gain2 = getAuxGain2();
+      return (isNull(gain1))? FLOAT_NAN : gain1+gain2;
+    }
+
+    /** Sets the Stage 1 Auxiliary Gain of the device in dB.
+     *  This is a second front-end gain control/metadata field for control and
+     *  reporting on anciliary hardware or processing in a single chain
+     *  described by a single Stream ID.
+     *  In cases where a separate Stage 1 and Stage 2 gain is not necessary,
+     *  this holds the total aux gain of the system and Stage 2 Auxiliary Gain
+     *  is set to zero. <i>If no Stage 2 Auxiliary Gain has been specified, it
+     *  will be set to 0 following the call to this method.</i>
+     *  (See V49.2 spec Section 9.5.15)
+     *  @param val The stage 1 aux gain (null if not specified).
+     */
+    public: inline void setAuxGain1 (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(AUX_GAIN,2,bits);
+    }
+
+    /** Sets the Stage 2 Auxiliary Gain of the device in dB.
+     *  This is a second back-end gain control/metadata field for control and
+     *  reporting on anciliary hardware or processing in a single chain
+     *  described by a single Stream ID.
+     *  In cases where a separate Stage 1 and Stage 2 gain is not necessary,
+     *  Stage 1 Auxiliary Gain holds the total aux gain of the system and this
+     *  is set to zero. <i>If no Stage 1 Auxiliary Gain has been specified, it
+     *  will be set to 0 following the call to this method.</i>
+     *  (See V49.2 spec Section 9.5.15)
+     *  @param val The stage 2 aux gain (null if not specified).
+     */
+    public: inline void setAuxGain2 (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(AUX_GAIN,0,bits);
+    }
+
+    /** Sets the Total Auxiliary Gain of the device in dB. This is effectively the same as
+     *  <tt>setAuxGain(val,0)</tt> except that <tt>setAuxGain(null)</tt> will mark both aux gain values
+     *  as unspecified. <i>(Note that it is not possible to specify one of the aux gain values and
+     *  leave the other as unspecified.)</i>
+     *  (See V49.2 spec Section 9.5.15)
+     *  @param val The total aux gain (null if not specified).
+     */
+    public: inline void setAuxGain (float val) {
+      if (isNull(val)) setI(AUX_GAIN,0,INT16_NULL); // clears gain field(s)
+      else             setAuxGain(val,0.0f);       // sets gain field(s)
+    }
+
+    /** Sets the Total Auxiliary Gain of the device in dB.
+     *  (See V49.2 spec Section 9.5.15)
+     *  @param gain1 The stage 1 aux gain.
+     *  @param gain2 The stage 2 aux gain.
+     */
+    public: inline void setAuxGain (float gain1, float gain2) {
+      setAuxGain1(gain1);
+      setAuxGain2(gain2);
+    }
+
+    /** Gets the Auxiliary Frequency of the signal in Hz.
+     *  (See V49.2 spec Section 9.5.14)
+     *  @return The aux frequency (null if not specified).
+     */
+    public: inline double getAuxFrequency () const {
+      int64_t bits = getX(AUX_FREQUENCY);
+      return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
+    }
+
+    /** Sets the Auxiliary Frequency of the signal in Hz.
+     *  (See V49.2 spec Section 9.5.14)
+     *  @param val The aux frequency (null if not specified).
+     */
+    public: inline void setAuxFrequency (double val) {
+      int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
+      setX(AUX_FREQUENCY,bits);
+    }
+
+    // XXX SNR and Noise Figure share a 32-bit word. Setting either to null will set both to null.
+    //     The same is true for gain1 and gain2 (as well as aux gain1,2)
+    //     and 2nd,3rd order intercept points
+
+    /** Gets the Signal-to-Noise Ratio, expressed in decibels.
+     *  (See V49.2 spec Section 9.5.7)
+     *  @return The SNR (null if not specified).
+     */
+    public: inline float getSNR () const {
+      int16_t bits = getI(SNR_NOISE,0);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
+
+    /** Gets the Noise Figure of the receiver, expressed in decibels.
+     *  The Noise Figure of a receiver is a measure of the reduction in the SNR
+     *  between the input of the receiver (the antenna) to the output of the RF
+     *  processing chain.
+     *  (See V49.2 spec Section 9.5.7)
+     *  @return The Noise Figure (null if not specified).
+     */
+    public: inline float getNoiseFigure () const {
+      int16_t bits = getI(SNR_NOISE,2);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
+
+    /** Sets the Signal-to-Noise Ratio, expressed in decibels.
+     *  <i>If no Noise Figure has been specified, it will be set to 0 following
+     *  the call to this method.</i>
+     *  <i>If set to null, both SNR and Noise Figure will be set to null.</i>
+     *  (See V49.2 spec Section 9.5.7)
+     *  @param val The SNR (null if not specified).
+     */
+    public: inline void setSNR (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(SNR_NOISE,0,bits);
+    }
+
+    /** Sets the Noise Figure of the receiver, expressed in decibels.
+     *  The Noise Figure of a receiver is a measure of the reduction in the SNR
+     *  between the input of the receiver (the antenna) to the output of the RF
+     *  processing chain.
+     *  <i>If no SNR has been specified, it will be set to 0 following the call
+     *  to this method.</i>
+     *  <i>If set to null, both SNR and Noise Figure will be set to null.</i>
+     *  (See V49.2 spec Section 9.5.7)
+     *  @param val The Noise Figure (null if not specified).
+     */
+    public: inline void setNoiseFigure (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(SNR_NOISE,2,bits);
+    }
+
+    /** Gets the Second-order Input Intercept Point (IIP2).
+     *  (See V49.2 spec Section 9.5.6)
+     *  @return The IIP2 (null if not specified).
+     */
+    public: inline float getSecondOrderInputInterceptPoint () const {
+      int16_t bits = getI(ICPT_PTS_2_3,0);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
+
+    /** Gets the Third-order Input Intercept Point (IIP3).
+     *  (See V49.2 spec Section 9.5.6)
+     *  @return The IIP3 (null if not specified).
+     */
+    public: inline float getThirdOrderInputInterceptPoint () const {
+      int16_t bits = getI(ICPT_PTS_2_3,2);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
+
+    /** Sets the Second-order Input Intercept Point (IIP2).
+     *  <i>If no IIP3 has been specified, it will be set to 0 following the call
+     *  to this method.</i>
+     *  <i>If set to null, both IIP2 and IIP3 will be set to null.</i>
+     *  (See V49.2 spec Section 9.5.6)
+     *  @param val The IIP2 (null if not specified).
+     */
+    public: inline void setSecondOrderInterceptPoint (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(ICPT_PTS_2_3,0,bits);
+    }
+
+    /** Sets the Third-order Input Intercept Point (IIP3).
+     *  <i>If no IIP2 has been specified, it will be set to 0 following the call
+     *  to this method.</i>
+     *  <i>If set to null, both IIP2 and IIP3 will be set to null.</i>
+     *  (See V49.2 spec Section 9.5.6)
+     *  @param val The IIP3 (null if not specified).
+     */
+    public: inline void setThirdOrderInterceptPoint (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(ICPT_PTS_2_3,2,bits);
+    }
+
+    /** Gets 1-dB Compression Point.
+     *  (See V49.2 spec Section 9.5.2)
+     *  @return The 1-dB Compression Point (null if not specified).
+     */
+    public: inline float getOneDecibelCompressionPoint () const {
+      int16_t bits = getI(COMPRESS_PT,2);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
+
+    /** Sets the 1-dB Compression Point.
+     *  (See V49.2 spec Section 9.5.2)
+     *  @param val The 1-dB Compression Point (null if not specified).
+     */
+    public: inline void setOneDecibelCompressionPoint  (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(COMPRESS_PT,2,bits);
+    }
+
+    /** Gets the Stage 1 Threshold.
+     *  In cases where Stage 1 and Stage 2 thresholds are not necessary, this
+     *  holds the single threshold value and Stage 2 Threshold is set to zero.
+     *  (See V49.2 spec Section 9.5.13)
+     *  @return The stage 1 threshold (null if not specified).
+     */
+    public: inline float getThreshold1 () const {
+      int16_t bits = getI(THRESHOLD,2);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
+
+    /** Gets the Stage 2 Threshold.
+     *  In cases where Stage 1 and Stage 2 thresholds are not necessary, this
+     *  shall be set to zero and Stage 1 Threshold holds the single threshold
+     *  value.
+     *  (See V49.2 spec Section 9.5.13)
+     *  @return The stage 2 threshold (null if not specified).
+     */
+    public: inline float getThreshold2 () const {
+      int16_t bits = getI(THRESHOLD,0);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
+
+    /** Sets the Stage 1 Threshold.
+     *  In cases where Stage 1 and Stage 2 thresholds are not necessary, this
+     *  holds the single threshold value and Stage 2 Threshold is set to zero.
+     *  <i>If no Stage 2 Threshold has been specified, it will be set to zero
+     *  following the call to this method.</i>
+     *  (See V49.2 spec Section 9.5.13)
+     *  @param val The stage 1 threshold (null if not specified).
+     */
+    public: inline void setThreshold1 (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(THRESHOLD,2,bits);
+    }
+
+    /** Sets the Stage 2 Threshold.
+     *  In cases where Stage 1 and Stage 2 thresholds are not necessary, this
+     *  shall be set to zero and Stage 1 Threshold holds the single threshold
+     *  value.
+     *  <i>If no Stage 1 Threshold has been specified, it will be set to zero
+     *  following the call to this method.</i>
+     *  (See V49.2 spec Section 9.5.13)
+     *  @param val The stage 2 threshold (null if not specified).
+     */
+    public: inline void setThreshold2 (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(THRESHOLD,0,bits);
+    }
+
+    /** Sets the Stage 1 Threshold. This is effectively the same as
+     *  <tt>setThreshold(val,0)</tt> except that <tt>setThreshold(null)</tt>
+     *  will mark both threshold values as unspecified.
+     *  <i>(Note that it is not possible to specify one of the threshold values and
+     *  leave the other as unspecified.)</i>
+     *  (See V49.2 spec Section 9.5.13)
+     *  @param val The total threshold (null if not specified).
+     */
+    public: inline void setThreshold (float val) {
+      if (isNull(val)) setI(THRESHOLD,0,INT16_NULL); // clears threshold field(s)
+      else             setThreshold(val,0.0f);       // sets threshold field(s)
+    }
+
+    /** Sets the Stage 1 and Stage 2 Threshold subfields.
+     *  (See V49.2 spec Section 9.5.13)
+     *  @param threshold1 The stage 1 threshold.
+     *  @param threshold2 The stage 2 threshold.
+     */
+    public: inline void setThreshold (float threshold1, float threshold2) {
+      setThreshold1(threshold1);
+      setThreshold2(threshold2);
+    }
+
+    /** Gets the Energy per Bit to Noise Density ratio (Eb/N0).
+     *  Valid range is from -256dB to +255.984375dB (= 0x7FFE), with the maximum
+     *  positive value (0x7FFF) designating the "Eb/N0 not used" case.
+     *  (See V49.2 spec Section 9.5.17)
+     *  @return The Eb/N0 (null if not specified).
+     */
+    public: inline float getEbN0 () const {
+      int16_t bits = getI(EB_NO_BER,0);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
+
+    /** Gets the Bit Error Rate (BER).
+     *  Valid range is from -256dB to +255.984375dB (= 0x7FFE), with the maximum
+     *  positive value (0x7FFF) designating the "BER not used" case.
+     *  (See V49.2 spec Section 9.5.17)
+     *  @return The BER (null if not specified).
+     */
+    public: inline float getBitErrorRate () const {
+      int16_t bits = getI(EB_NO_BER,2);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
+
+    /** Sets the Energy per Bit to Noise Density ratio (Eb/N0).
+     *  Valid range is from -256dB to +255.984375dB (= 0x7FFE), with the maximum
+     *  positive value (0x7FFF) designating the "Eb/N0 not used" case.
+     *  <i>If no BER has been specified, it will be set to zero following the
+     *  call to this method.</i>
+     *  <i>If set to null, both Eb/N0 and BER will be set to null.</i>
+     *  (See V49.2 spec Section 9.5.17)
+     *  @param val The Eb/N0 (null if not specified).
+     */
+    public: inline void setEbN0 (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(EB_NO_BER,0,bits);
+    }
+
+    /** Sets the Bit Error Rate (BER).
+     *  Valid range is from -256dB to +255.984375dB (= 0x7FFE), with the maximum
+     *  positive value (0x7FFF) designating the "BER not used" case.
+     *  <i>If no Eb/N0 has been specified, it will be set to zero following the
+     *  call to this method.</i>
+     *  <i>If set to null, both Eb/N0 and BER will be set to null.</i>
+     *  (See V49.2 spec Section 9.5.17)
+     *  @param val The BER (null if not specified).
+     */
+    public: inline void setBitErrorRate (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(EB_NO_BER,2,bits);
+    }
+
+    /** Gets Range.
+     *  (See V49.2 spec Section 9.4.10)
+     *  @return The range (null if not specified)
+     */
+    public: inline double getRange () const {
+      int32_t bits = getL(RANGE);
+      return (bits == 0x7FFFFFFF)? DOUBLE_NAN : toDouble32(5, bits);
+    }
+
+    /** Sets Range.
+     *  (See V49.2 spec Section 9.4.10)
+     *  @param val The range (null if not specified)
+     */
+    public: inline void setRange (double val) {
+      int32_t bits = (isNull(val))? 0x7FFFFFFF : fromDouble32(5, val);
+      setL(RANGE,bits);
+    }
+
+    /** Gets the Beamwidth in degrees. Valid range is from 0 to 360 degrees.
+     *  (See V49.2 spec Section 9.4.2)
+     *  @return The Beamwidth (null if not specified).
+     */
+    public: inline float getBeamwidth () const {
+      int16_t bits = getI(BEAMWIDTH,2);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
+
+    /** Sets the Beamwidth in degrees. Valid range is from 0 to 360 degrees.
+     *  (See V49.2 spec Section 9.4.2)
+     *  @param val The Beamwidth (null if not specified).
+     */
+    public: inline void setBeamwidth (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(BEAMWIDTH,2,bits);
+    }
+
+    // TODO
+    // PNT_ANGL_2D_ST_mask        = 0x10000000; // variable (See V49.2 spec Section 9.4.1)
+    
+    /** Gets the Elevation Angle subfield of the Single-word 2D Pointing Angle.
+     *  (See V49.2 spec Section 9.4.1)
+     *  @return The Elevation Angle (null if not specified).
+     */
+    public: inline float get2DPointingAngleElevation () const {
+      int16_t bits = getI(PNT_ANGL_2D_SI,0);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
+
+    /** Gets the Azimuthal Angle subfield of the Single-word 2D Pointing Angle.
+     *  (See V49.2 spec Section 9.4.1)
+     *  @return The Azimuthal Angle (null if not specified).
+     */
+    public: inline float get2DPointingAngleAzimuth () const {
+      int16_t bits = getI(PNT_ANGL_2D_SI,2);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
+
+    /** Sets the Elevation Angle subfield of the Single-word 2D Pointing Angle.
+     *  <i>If no Azimuthal Angle has been specified, it will be set to zero
+     *  following the call to this method.</i>
+     *  <i>If set to null, both Elevation and Azimuthal Angles will be set to 
+     *  null.</i>
+     *  (See V49.2 spec Section 9.4.1)
+     *  @param val The Elevation Angle (null if not specified).
+     */
+    public: inline void set2DPointingAngleElevation (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(PNT_ANGL_2D_SI,0,bits);
+    }
+
+    /** Sets the Azimuthal Angle subfield of the Single-word 2D Pointing Angle.
+     *  <i>If no Elevation Angle has been specified, it will be set to zero 
+     *  following the call to this method.</i>
+     *  <i>If set to null, both Elevation and Azimuthal Angles will be set to 
+     *  null.</i>
+     *  (See V49.2 spec Section 9.4.1)
+     *  @param val The Azimuthal Angle (null if not specified).
+     */
+    public: inline void set2DPointingAngleAzimuth (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(PNT_ANGL_2D_SI,2,bits);
+    }
+
+    /** Gets the Polarization Tilt Angle in units of Radians.
+     *  (See V49.2 spec Section 9.4.8)
+     *  @return The Tilt Angle (null if not specified).
+     */
+    public: inline float getPolarizationTiltAngle () const {
+      int16_t bits = getI(POLARIZATION,0);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(13,bits);
+    }
+
+    /** Gets the Polarization Ellipticity Angle in units of Radians.
+     *  (See V49.2 spec Section 9.4.8)
+     *  @return The Ellipticity Angle (null if not specified).
+     */
+    public: inline float getPolarizationEllipticityAngle () const {
+      int16_t bits = getI(POLARIZATION,2);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(13,bits);
+    }
+
+    /** Sets the Polarization Tilt Angle in units of Radians.
+     *  <i>If no Ellipticity Angle has been specified, it will be set to zero
+     *  following the call to this method.</i>
+     *  <i>If set to null, both Tilt and Ellipticity Angles will be set to 
+     *  null.</i>
+     *  (See V49.2 spec Section 9.4.8)
+     *  @param val The Tilt Angle (null if not specified).
+     */
+    public: inline void setPolarizationTiltAngle (float val) {
+      int16_t bits = VRTMath::fromFloat16(13,val);
+      setI(POLARIZATION,0,bits);
+    }
+
+    /** Sets the Polarization Ellipticity Angle in units of Radians.
+     *  <i>If no Tilt Angle has been specified, it will be set to zero 
+     *  following the call to this method.</i>
+     *  <i>If set to null, both Tilt and Ellipticity Angles will be set to 
+     *  null.</i>
+     *  (See V49.2 spec Section 9.4.8)
+     *  @param val The Ellipticity Angle (null if not specified).
+     */
+    public: inline void setPolarizationEllipticityAngle (float val) {
+      int16_t bits = VRTMath::fromFloat16(13,val);
+      setI(POLARIZATION,2,bits);
+    }
+
+    /** Gets the Phase Offset.
+     *  Phase Offset is measured from the Reference Point to the Described
+     *  Signal. The unit of measure for the reference level is the angle
+     *  measure in units of radians. This is sometimes called Phase Difference.
+     *  (See V49.2 spec Section 9.5.8)
+     *  @return The Phase Offset (null if not specified).
+     */
+    public: inline float getPhaseOffset () const {
+      int16_t bits = getI(PHASE,2);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    }
+
+    /** Sets the Phase Offset.
+     *  Phase Offset is measured from the Reference Point to the Described
+     *  Signal. The unit of measure for the reference level is the angle
+     *  measure in units of radians. This is sometimes called Phase Difference.
+     *  (See V49.2 spec Section 9.5.8)
+     *  @param val The Phase Offset (null if not specified).
+     */
+    public: inline void setPhaseOffset (float val) {
+      int16_t bits = VRTMath::fromFloat16(7,val);
+      setI(PHASE,2,bits);
+    }
+
+
+    /* XXX END OF CIF1 FUNCTIONS XXX */
 
     /* XXX START OF CIF2 FUNCTIONS XXX */
-    // TODO
+    
+    /** Gets Spatial Reference Type.
+     *  Spatial Reference Type uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.11 for Spatial Reference Type
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @return The Spatial Reference Type (null if not specified)
+     */
+    public: inline int16_t getSpatialReferenceType () const {
+      int16_t bits = getI(SPATIAL_REF_TYPE, 2);
+      return (isNull(bits))? INT16_NULL : bits;
+    }
+
+    /** Sets Spatial Reference Type.
+     *  Spatial Reference Type uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.11 for Spatial Reference Type
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param val The Spatial Reference Type (null if not specified)
+     */
+    public: inline void setSpatialReferenceType (int16_t val) {
+      setI(SPATIAL_REF_TYPE, 2, val);
+    }
+
+    /** Gets Spatial Scan Type.
+     *  Spatial Scan Type uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.11 for Spatial Scan Type
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @return The Spatial Scan Type (null if not specified)
+     */
+    public: inline int16_t getSpatialScanType () const {
+      int16_t bits = getI(SPATIAL_SCAN_TYPE, 2);
+      return (isNull(bits))? INT16_NULL : bits;
+    }
+
+    /** Sets Spatial Scan Type.
+     *  Spatial Scan Type uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.11 for Spatial Scan Type
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param val The Spatial Scan Type (null if not specified)
+     */
+    public: inline void setSpatialScanType (int16_t val) {
+      setI(SPATIAL_SCAN_TYPE, 2, val);
+    }
+
+    /** Gets RF Footprint Range.
+     *  RF Footprint Range is used to portray antenna geographical footprint on
+     *  Earth via a Generic32 bit Identifier field linked to a KML in a Data
+     *  Extension Packet.
+     *  See V49.2 spec Section 9.8.12 for RF Footprint Range
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @return The RF Footprint Range (null if not specified)
+     */
+    public: inline int32_t getRFFootprintRange () const {
+      return getL(RF_FOOTPRINT_RANGE);
+    }
+
+    /** Sets RF Footprint Range.
+     *  RF Footprint Range is used to portray antenna geographical footprint on
+     *  Earth via a Generic32 bit Identifier field linked to a KML in a Data
+     *  Extension Packet.
+     *  See V49.2 spec Section 9.8.12 for RF Footprint Range
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param val The RF Footprint Range (null if not specified)
+     */
+    public: inline void setRFFootprintRange (int32_t val) {
+      setL(RF_FOOTPRINT_RANGE, val);
+    }
+
+    /** Gets RF Footprint.
+     *  RF Footprint is used to portray antenna geographical footprint on
+     *  Earth via a Generic32 bit Identifier field linked to a KML Class Code
+     *  in a Data Extension Packet.
+     *  See V49.2 spec Section 9.8.12 for RF Footprint
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @return The RF Footprint (null if not specified)
+     */
+    public: inline int32_t getRFFootprint() const {
+      return getL(RF_FOOTPRINT);
+    }
+
+    /** Sets RF Footprint.
+     *  RF Footprint is used to portray antenna geographical footprint on
+     *  Earth via a Generic32 bit Identifier field linked to a KML Class Code
+     *  in a Data Extension Packet.
+     *  See V49.2 spec Section 9.8.12 for RF Footprint
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param val The RF Footprint (null if not specified)
+     */
+    public: inline void setRFFootprint(int32_t val) {
+      setL(RF_FOOTPRINT, val);
+    }
+
+    /** Gets Communication Priority ID
+     *  Communication Priority ID is used to set a priority level to the
+     *  information to be conveyed over a communication channel.
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.10.5 for Communication Priority ID
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @return The Communication Priority ID (null if not specified)
+     */
+    public: inline int32_t getCommunicationPriorityID () const {
+      return getL(COMM_PRIORITY_ID);
+    }
+
+    /** Sets Communication Priority ID
+     *  Communication Priority ID is used to set a priority level to the
+     *  information to be conveyed over a communication channel.
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.10.5 for Communication Priority ID
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param val The Communication Priority ID (null if not specified)
+     */
+    public: inline void setCommunicationPriorityID (int32_t val) {
+      setL(COMM_PRIORITY_ID, val);
+    }
+
+    /** Gets Function Priority ID
+     *  Function Priority ID enables a prioritization schema to be expressed
+     *  for using V49.2 Command Packets, such as in receiver, exciter, DSP and
+     *  other device.
+     *  Function Priority ID uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.10.4 for Function Priority ID
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @return The Function Priority ID (null if not specified)
+     */
+    public: inline int16_t getFunctionPriorityID () const {
+      int16_t bits = getI(FUNCT_PRIORITY_ID, 2);
+      return (isNull(bits))? INT16_NULL : bits;
+    }
+
+    /** Sets Function Priority ID
+     *  Function Priority ID enables a prioritization schema to be expressed
+     *  for using V49.2 Command Packets, such as in receiver, exciter, DSP and
+     *  other device.
+     *  Function Priority ID uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.10.4 for Function Priority ID
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param val The Function Priority ID (null if not specified)
+     */
+    public: inline void setFunctionPriorityID (int16_t val) {
+      setI(FUNCT_PRIORITY_ID, 2, val);
+    }
+
+    /** Gets Event ID
+     *  Used to enumerate the different events that impact the interpretation of
+     *  information or operations. Enumerated events can represent simple or
+     *  complex relationships such as signal crossing threshold or signal
+     *  crossing threshold while aperture pointing at a specific location.
+     *  Event ID uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.10.3 for Event ID
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @return The Event ID (null if not specified)
+     */
+    public: inline int16_t getEventID () const {
+      int16_t bits = getI(EVENT_ID, 2);
+      return (isNull(bits))? INT16_NULL : bits;
+    }
+
+    /** Sets Event ID
+     *  Used to enumerate the different events that impact the interpretation of
+     *  information or operations. Enumerated events can represent simple or
+     *  complex relationships such as signal crossing threshold or signal
+     *  crossing threshold while aperture pointing at a specific location.
+     *  Event ID uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.10.3 for Event ID
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param val The Event ID (null if not specified)
+     */
+    public: inline void setEventID (int16_t val) {
+      setI(EVENT_ID, 2, val);
+    }
 
     /** Gets Mode ID
+     *  Used to enumerate the different modes or states a node associated of the
+     *  SID it is bonded to. For example, an enumeration of the field may convey
+     *  Start, Stop, Reset, Pause, Restart, Load, Wait for Event, Zeroize
+     *  information.
      *  Mode ID uses the Generic16 bit Identifier field
-     *  See Section 9.8.10.2 for Mode ID
-     *  See Section 9.8 for Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.10.2 for Mode ID
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @return The Mode ID (null if not specified)
      */
     public: inline int16_t getModeID () const {
@@ -2163,24 +2996,654 @@ namespace vrt {
     }
 
     /** Sets Mode ID
+     *  Used to enumerate the different modes or states a node associated of the
+     *  SID it is bonded to. For example, an enumeration of the field may convey
+     *  Start, Stop, Reset, Pause, Restart, Load, Wait for Event, Zeroize
+     *  information.
      *  Mode ID uses the Generic16 bit Identifier field
-     *  See Section 9.8.10.2 for Mode ID
-     *  See Section 9.8 for Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.10.2 for Mode ID
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @param val The Mode ID (null if not specified)
      */
     public: inline void setModeID (int16_t val) {
       setI(MODE_ID, 2, val);
     }
 
-    /* XXX START OF CIF2 FUNCTIONS XXX */
+    /** Gets Function ID
+     *  Used to enumerate different analog, digital and other processes
+     *  performed by SID it is associated with. For example, an enumeration of
+     *  the field values can convey if it is an antenna, RF receiver, ADC,
+     *  channelizer, DDC, DUC, DAC, RF upconverter or other attribute.
+     *  Function ID uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.10.1 for Function ID
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @return The Function ID (null if not specified)
+     */
+    public: inline int16_t getFunctionID () const {
+      int16_t bits = getI(FUNCTION_ID, 2);
+      return (isNull(bits))? INT16_NULL : bits;
+    }
+
+    /** Sets Function ID
+     *  Used to enumerate different analog, digital and other processes
+     *  performed by SID it is associated with. For example, an enumeration of
+     *  the field values can convey if it is an antenna, RF receiver, ADC,
+     *  channelizer, DDC, DUC, DAC, RF upconverter or other attribute.
+     *  Function ID uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.10.1 for Function ID
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param val The Function ID (null if not specified)
+     */
+    public: inline void setFunctionID (int16_t val) {
+      setI(FUNCTION_ID, 2, val);
+    }
+
+    /** Gets Modulation Type
+     *  Conveys more detailed modulation attributes that can be used to uniquely
+     *  identify a waveform association to an EMS device and/or object.
+     *  Modulation Type uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.9 for Modulation Type
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @return The Modulation Type (null if not specified)
+     */
+    public: inline int16_t getModulationType () const {
+      int16_t bits = getI(MODULATION_TYPE, 2);
+      return (isNull(bits))? INT16_NULL : bits;
+    }
+
+    /** Sets Modulation Type
+     *  Conveys more detailed modulation attributes that can be used to uniquely
+     *  identify a waveform association to an EMS device and/or object.
+     *  Modulation Type uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.9 for Modulation Type
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param val The Modulation Type (null if not specified)
+     */
+    public: inline void setModulationType (int16_t val) {
+      setI(MODULATION_TYPE, 2, val);
+    }
+
+    /** Gets Modulation Class
+     *  Conveys the general type of waveform used to generate a signal such as
+     *  pulsed radar, pulsed linear FM radar, CW FM radar, n-ary QAM, n-ary PSK,
+     *  LTE.
+     *  Modulation Class uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.9 for Modulation Class
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @return The Modulation Class (null if not specified)
+     */
+    public: inline int16_t getModulationClass () const {
+      int16_t bits = getI(MODULATION_CLASS, 2);
+      return (isNull(bits))? INT16_NULL : bits;
+    }
+
+    /** Sets Modulation Class
+     *  Conveys the general type of waveform used to generate a signal such as
+     *  pulsed radar, pulsed linear FM radar, CW FM radar, n-ary QAM, n-ary PSK,
+     *  LTE.
+     *  Modulation Class uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.9 for Modulation Class
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param val The Modulation Class (null if not specified)
+     */
+    public: inline void setModulationClass (int16_t val) {
+      setI(MODULATION_CLASS, 2, val);
+    }
+
+    /** Gets EMS Device Instance
+     *  Unique identifier for the specific device emitting the RF signal
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.9 for EMS Device Instance
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @return The EMS Device Instance (null if not specified)
+     */
+    public: inline int32_t getEmsDeviceInstance () const {
+      return getL(EMS_DEVICE_INSTANCE);
+    }
+
+    /** Sets EMS Device Instance
+     *  Unique identifier for the specific device emitting the RF signal
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.9 for EMS Device Instance
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param val The EMS Device Instance (null if not specified)
+     */
+    public: inline void setEmsDeviceInstance (int32_t val) {
+      setL(EMS_DEVICE_INSTANCE, val);
+    }
+
+    /** Gets EMS Device Type
+     *  Identifies the specific type of EMS device such as a WSR-88D (weather
+     *  radar), EASAT Primary Surveillanec radar (air traffic control), Motorola
+     *  MOTOTRBO radio (business radio) or Verizon LTE.
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.9 for EMS Device Type
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @return The EMS Device Type (null if not specified)
+     */
+    public: inline int32_t getEmsDeviceType () const {
+      return getL(EMS_DEVICE_TYPE);
+    }
+
+    /** Sets EMS Device Type
+     *  Identifies the specific type of EMS device such as a WSR-88D (weather
+     *  radar), EASAT Primary Surveillanec radar (air traffic control), Motorola
+     *  MOTOTRBO radio (business radio) or Verizon LTE.
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.9 for EMS Device Type
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param val The EMS Device Type (null if not specified)
+     */
+    public: inline void setEmsDeviceType (int32_t val) {
+      setL(EMS_DEVICE_TYPE, val);
+    }
+
+    // TODO - could provide additional helper functions for EMS Device Class
+
+    /** Gets EMS Device Class
+     *  Conveys the general type of sensor used to generate the signal such as
+     *  radar, communications, beacon. The enumeration may also represent sub-
+     *  classes such as search radar, navigation radar, broadcast commercial FM
+     *  station, SATCOM, cellular, public safety radio or military radio.
+     *  EMS Device Class uses the Generic16 bit Identifier field
+     *  Bits 15..14: General organization relationship 
+     *    {00: Coalition, 01: Known, 10: Unknown, 11: Reserved}
+     *  Bit 13: Set if device is exciter
+     *  Bit 12: Set if device is receiver
+     *  Bits 11..0: enumeration of general type of EMS device
+     *  See V49.2 spec Section 9.8.9 for EMS Device Class
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @return The EMS Device Class (null if not specified)
+     */
+    public: inline int16_t getEmsDeviceClass () const {
+      int16_t bits = getI(EMS_DEVICE_CLASS, 2);
+      return (isNull(bits))? INT16_NULL : bits;
+    }
+
+    /** Sets EMS Device Class
+     *  Conveys the general type of sensor used to generate the signal such as
+     *  radar, communications, beacon. The enumeration may also represent sub-
+     *  classes such as search radar, navigation radar, broadcast commercial FM
+     *  station, SATCOM, cellular, public safety radio or military radio.
+     *  EMS Device Class uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.9 for EMS Device Class
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param val The EMS Device Class (null if not specified)
+     */
+    public: inline void setEmsDeviceClass (int16_t val) {
+      setI(EMS_DEVICE_CLASS, 2, val);
+    }
+
+    /** Gets Platform Display
+     *  Used to link to a graphical display item
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.8 for Platform Display
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @return The Platform Display (null if not specified)
+     */
+    public: inline int32_t getPlatformDisplay () const {
+      return getL(PLATFORM_DISPLAY);
+    }
+
+    /** Sets Platform Display
+     *  Used to link to a graphical display item
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.8 for Platform Display
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param val The Platform Display (null if not specified)
+     */
+    public: inline void setPlatformDisplay (int32_t val) {
+      setL(PLATFORM_DISPLAY, val);
+    }
+
+
+    /** Gets Platform Instance
+     *  Used to link to specific objects such as the United Airlines Flight
+     *  7301, Mount Shasta, or Empire State Building
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.8 for Platform Instance
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @return The Platform Instance (null if not specified)
+     */
+    public: inline int32_t getPlatformInstance () const {
+      return getL(PLATFORM_INSTANCE);
+    }
+
+    /** Sets Platform Instance
+     *  Used to link to specific objects such as the United Airlines Flight
+     *  7301, Mount Shasta, or Empire State Building
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.8 for Platform Instance
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param val The Platform Instance (null if not specified)
+     */
+    public: inline void setPlatformInstance (int32_t val) {
+      setL(PLATFORM_INSTANCE, val);
+    }
+
+    /** Gets Platform Class
+     *  Platform ID is used to link to a generic class of the object such as
+     *  ship, commercial airliner, mountain or building
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.8 for Platform Class
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @return The Platform Class (null if not specified)
+     */
+    public: inline int32_t getPlatformClass () const {
+      return getL(PLATFORM_CLASS);
+    }
+
+    /** Sets Platform Class
+     *  Platform ID is used to link to a generic class of the object such as
+     *  ship, commercial airliner, mountain or building
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.8 for Platform Class
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param val The Platform Class (null if not specified)
+     */
+    public: inline void setPlatformClass (int32_t val) {
+      setL(PLATFORM_CLASS, val);
+    }
+
+    /** Gets Operator ID
+     *  Provides linkage to operator enumerations
+     *  Operator ID uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.7 for Operator ID
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @return The Operator ID (null if not specified)
+     */
+    public: inline int16_t getOperator () const {
+      int16_t bits = getI(OPERATOR, 2);
+      return (isNull(bits))? INT16_NULL : bits;
+    }
+
+    /** Sets Operator ID
+     *  Provides linkage to operator enumerations
+     *  Operator ID uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.7 for Operator ID
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param val The Operator ID (null if not specified)
+     */
+    public: inline void setOperator (int16_t val) {
+      setI(OPERATOR, 2, val);
+    }
+
+    // TODO - could provide additional helper functions for Country Code
+
+    /** Gets Country Code
+     *  The ISO 3166 Numeric code or user-defined code for a country.
+     *  Bit 15: Set if user-defined country/entity code
+     *  Bits 14..12: Reserved
+     *  Bits 11..0: ISO 3166 or user-defined country/entity code
+     *  Country Code uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.7 for Country Code
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @return The Country Code (null if not specified)
+     */
+    public: inline int16_t getCountryCode () const {
+      int16_t bits = getI(COUNTRY_CODE, 2);
+      return (isNull(bits))? INT16_NULL : bits;
+    }
+
+    /** Sets Country Code
+     *  The ISO 3166 Numeric code or user-defined code for a country.
+     *  Bit 15: Set if user-defined country/entity code
+     *  Bits 14..12: Reserved
+     *  Bits 11..0: ISO 3166 or user-defined country/entity code
+     *  Country Code uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.8.7 for Country Code
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param val The Country Code (null if not specified)
+     */
+    public: inline void setCountryCode (int16_t val) {
+      setI(COUNTRY_CODE, 2, val);
+    }
+
+    /** Gets Track ID
+     *  A dynamic number that is generated during operations used to indicate
+     *  that information from a specrum observation or a set of spectrum
+     *  observations over time is associated.
+     *  Track ID uses the Generic32 bit Identifier field
+     *  See V49.2 spec Section 9.8.6 for Track ID
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @return The Track ID (null if not specified)
+     */
+    public: inline int32_t getTrackID () const {
+      return getL(TRACK_ID);
+    }
+
+    /** Sets Track ID
+     *  A dynamic number that is generated during operations used to indicate
+     *  that information from a specrum observation or a set of spectrum
+     *  observations over time is associated.
+     *  Track ID uses the Generic32 bit Identifier field
+     *  See V49.2 spec Section 9.8.6 for Track ID
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param val The Track ID (null if not specified)
+     */
+    public: inline void setTrackID (int32_t val) {
+      setL(TRACK_ID, val);
+    }
+
+    /** Gets Information Source
+     *  A tag to represent different types of information sources.
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.5 for Information Source
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @return The Information Source (null if not specified)
+     */
+    public: inline int32_t getInformationSource () const {
+      return getL(INFORMATION_SOURCE);
+    }
+
+    /** Sets Information Source
+     *  A tag to represent different types of information sources.
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.5 for Information Source
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param val The Information Source (null if not specified)
+     */
+    public: inline void setInformationSource (int32_t val) {
+      setL(INFORMATION_SOURCE, val);
+    }
+
+    /** Gets Controller UUID Indicator Field
+     *  See V49.2 spec Section 9.8.3 for Controller UUID
+     *  @return The Controller UUID (null if not specified)
+     */
+    public: inline UUID getControllerUUIDField () const {
+      return getUUID(CONTROLLER_UUID);
+    }
+
+    /** Sets Controller UUID Indicator Field
+     *  See V49.2 spec Section 9.8.3 for Controller UUID
+     *  @param val The Controller UUID (null if not specified)
+     */
+    public: inline void setControllerUUIDField (const UUID &val) {
+      setUUID(CONTROLLER_UUID, val);
+    }
+
+    /** Gets Controller ID Indicator Field
+     *  See V49.2 spec Section 9.8.3 for Controller ID
+     *  @return The Controller ID (null if not specified)
+     */
+    public: inline int32_t getControllerIDField () const {
+      return getL(CONTROLLER_ID);
+    }
+
+    /** Sets Controller ID Indicator Field
+     *  See V49.2 spec Section 9.8.3 for Controller ID
+     *  @param val The Controller ID (null if not specified)
+     */
+    public: inline void setControllerIDField (int32_t val) {
+      setL(CONTROLLER_ID, val);
+    }
+
+    /** Gets Controllee UUID Indicator Field
+     *  See V49.2 spec Section 9.8.3 for Controllee UUID
+     *  @return The Controllee UUID (null if not specified)
+     */
+    public: inline UUID getControlleeUUIDField () const {
+      return getUUID(CONTROLLEE_UUID);
+    }
+
+    /** Sets Controllee UUID Indicator Field
+     *  See V49.2 spec Section 9.8.3 for Controllee UUID
+     *  @param val The Controllee UUID (null if not specified)
+     */
+    public: inline void setControlleeUUIDField (const UUID &val) {
+      setUUID(CONTROLLEE_UUID, val);
+    }
+
+    /** Gets Controllee ID Indicator Field
+     *  See V49.2 spec Section 9.8.3 for Controllee ID
+     *  @return The Controllee ID (null if not specified)
+     */
+    public: inline int32_t getControlleeIDField () const {
+      return getL(CONTROLLEE_ID);
+    }
+
+    /** Sets Controllee ID Indicator Field
+     *  See V49.2 spec Section 9.8.3 for Controllee ID
+     *  @param val The Controllee ID (null if not specified)
+     */
+    public: inline void setControlleeIDField (int32_t val) {
+      setL(CONTROLLEE_ID, val);
+    }
+
+    /** Gets Cited Message ID
+     *  Used to relay, repeat or recall the information that was conveyed in a
+     *  packet with the same Message ID for a Cited SID.
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.4 for Cited Message ID
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @return The Cited Message ID (null if not specified)
+     */
+    public: inline int32_t getCitedMessageID () const {
+      return getL(CITED_MESSAGE_ID);
+    }
+
+    /** Sets Cited Message ID
+     *  Used to relay, repeat or recall the information that was conveyed in a
+     *  packet with the same Message ID for a Cited SID.
+     *  The V49.2 spec does not specify, but it is assumed that the Generic32
+     *  bit Identifier field is used for this field. XXX
+     *  See V49.2 spec Section 9.8.4 for Cited Message ID
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param val The Cited Message ID (null if not specified)
+     */
+    public: inline void setCitedMessageID (int32_t val) {
+      setL(CITED_MESSAGE_ID, val);
+    }
+
+    /** Gets Children SID
+     *  See V49.2 spec Section 9.8.2 for Children SID
+     *  @return The Children SID (null if not specified)
+     */
+    public: inline int32_t getChildrenSID () const {
+      return getL(CHILDREN_SID);
+    }
+    /** Gets Children SID as a string
+     *  See V49.2 spec Section 9.8.2 for Children SID
+     *  @return The Children SID (null if not specified)
+     */
+    public: inline string getChildrenSIDString () const {
+      int32_t streamID = getL(CHILDREN_SID);
+      return (isNull(streamID))? string("") : Utilities::format("%d", streamID);
+    }
+
+    /** Sets Children SID
+     *  See V49.2 spec Section 9.8.2 for Children SID
+     *  @param val The Children SID (null if not specified)
+     */
+    public: inline void setChildrenSID (int32_t val) {
+      setL(CHILDREN_SID, val);
+    }
+    /** Sets Children SID from a string
+     *  See V49.2 spec Section 9.8.2 for Children SID
+     *  @param val The Children SID (null if not specified)
+     */
+    public: inline void setChildrenSIDString (string val) {
+      if (val.size() == 0)
+        setChildrenSID(INT32_NULL);
+      else
+        setChildrenSID(atoi(val.c_str()));
+    }
+
+    /** Gets Parents SID
+     *  See V49.2 spec Section 9.8.2 for Parents SID
+     *  @return The Parents SID (null if not specified)
+     */
+    public: inline int32_t getParentsSID () const {
+      return getL(PARENTS_SID);
+    }
+    /** Gets Parents SID as a string
+     *  See V49.2 spec Section 9.8.2 for Parents SID
+     *  @return The Parents SID (null if not specified)
+     */
+    public: inline string getParentsSIDString () const {
+      int32_t streamID = getL(PARENTS_SID);
+      return (isNull(streamID))? string("") : Utilities::format("%d", streamID);
+    }
+
+    /** Sets Parents SID
+     *  See V49.2 spec Section 9.8.2 for Parents SID
+     *  @param val The Parents SID (null if not specified)
+     */
+    public: inline void setParentsSID (int32_t val) {
+      setL(PARENTS_SID, val);
+    }
+    /** Sets Parents SID from a string
+     *  See V49.2 spec Section 9.8.2 for Parents SID
+     *  @param val The Parents SID (null if not specified)
+     */
+    public: inline void setParentsSIDString (string val) {
+      if (val.size() == 0)
+        setParentsSID(INT32_NULL);
+      else
+        setParentsSID(atoi(val.c_str()));
+    }
+
+    /** Gets Siblings SID
+     *  See V49.2 spec Section 9.8.2 for Siblings SID
+     *  @return The Siblings SID (null if not specified)
+     */
+    public: inline int32_t getSiblingsSID () const {
+      return getL(SIBLINGS_SID);
+    }
+    /** Gets Siblings SID as a string
+     *  See V49.2 spec Section 9.8.2 for Siblings SID
+     *  @return The Siblings SID (null if not specified)
+     */
+    public: inline string getSiblingsSIDString () const {
+      int32_t streamID = getL(SIBLINGS_SID);
+      return (isNull(streamID))? string("") : Utilities::format("%d", streamID);
+    }
+
+    /** Sets Siblings SID
+     *  See V49.2 spec Section 9.8.2 for Siblings SID
+     *  @param val The Siblings SID (null if not specified)
+     */
+    public: inline void setSiblingsSID (int32_t val) {
+      setL(SIBLINGS_SID, val);
+    }
+    /** Sets Siblings SID from a string
+     *  See V49.2 spec Section 9.8.2 for Siblings SID
+     *  @param val The Siblings SID (null if not specified)
+     */
+    public: inline void setSiblingsSIDString (string val) {
+      if (val.size() == 0)
+        setSiblingsSID(INT32_NULL);
+      else
+        setSiblingsSID(atoi(val.c_str()));
+    }
+
+    /** Gets Cited SID
+     *  See V49.2 spec Section 9.8.2 for Cited SID
+     *  @return The Cited SID (null if not specified)
+     */
+    public: inline int32_t getCitedSID () const {
+      return getL(CITED_SID);
+    }
+    /** Gets Cited SID as a string
+     *  See V49.2 spec Section 9.8.2 for Cited SID
+     *  @return The Cited SID (null if not specified)
+     */
+    public: inline string getCitedSIDString () const {
+      int32_t streamID = getL(CITED_SID);
+      return (isNull(streamID))? string("") : Utilities::format("%d", streamID);
+    }
+
+    /** Sets Cited SID
+     *  See V49.2 spec Section 9.8.2 for Cited SID
+     *  @param val The Cited SID (null if not specified)
+     */
+    public: inline void setCitedSID (int32_t val) {
+      setL(CITED_SID, val);
+    }
+    /** Sets Cited SID from a string
+     *  See V49.2 spec Section 9.8.2 for Cited SID
+     *  @param val The Cited SID (null if not specified)
+     */
+    public: inline void setCitedSIDString (string val) {
+      if (val.size() == 0)
+        setCitedSID(INT32_NULL);
+      else
+        setCitedSID(atoi(val.c_str()));
+    }
+
+    // TODO - could provide additional helper functions for Country Code
+
+    /** Gets Bind Indicator Field
+     *  See V49.2 spec Section 9.8.1 for Bind Indicator Field
+     *  @return The Bind field (null if not specified)
+     */
+    public: inline int32_t getBindField () const {
+      return getL(BIND);
+    }
+
+    /** Sets Bind Indicator Field
+     *  See V49.2 spec Section 9.8.1 for Bind Indicator Field
+     *  @param val The Bind field (null if not specified)
+     */
+    public: inline void setBindField (int32_t val) {
+      setL(BIND, val);
+    }
+    /* XXX END OF CIF2 FUNCTIONS XXX */
 
     /* XXX START OF CIF3 FUNCTIONS XXX */
     // TODO
-    /* XXX START OF CIF3 FUNCTIONS XXX */
+    // NETWORK_ID_mask            = 0x00000002; // 1 (See V49.2 spec Section 9.8.13)
+    // TROPOSPHERIC_STATE_mask    = 0x00000004; // 1 (See V49.2 spec Section 9.9.1)
+    // SEA_AND_SWELL_STATE_mask   = 0x00000008; // 1 (See V49.2 spec Section 9.9.1)
+    // BAROMETRIC_PRESSURE_mask   = 0x00000010; // 1 (See V49.2 spec Section 9.9.2)
+    // HUMIDITY_mask              = 0x00000020; // 1 (See V49.2 spec Section 9.9.2)
+    // SEA_GROUND_TEMP_mask       = 0x00000040; // 1 (See V49.2 spec Section 9.9.2)
+    // AIR_TEMP_mask              = 0x00000080; // 1 (See V49.2 spec Section 9.9.2)
+                                                // For the next two, See V49.2 spec Section 9.7.2
+    // SHELF_LIFE_mask            = 0x00010000; // 1, 2, or 3 (same as packet tstamp based on TSI and TSF)
+    // AGE_mask                   = 0x00020000; // 1, 2, or 3 (same as packet tstamp based on TSI and TSF)
+    // JITTER_mask                = 0x00100000; // 2 (See V49.2 spec Section 9.7.1 for the next 8)
+    // DWELL_mask                 = 0x00200000; // 2
+    // DURATION_mask              = 0x00400000; // 2
+    // PERIOD_mask                = 0x00800000; // 2
+    // PULSE_WIDTH_mask           = 0x01000000; // 2
+    // OFFSET_TIME_mask           = 0x02000000; // 2
+    // FALL_TIME_mask             = 0x04000000; // 2
+    // RISE_TIME_mask             = 0x08000000; // 2
+    // TIMESTAMP_SKEW_mask        = 0x40000000; // 2 (See V49.2 spec Section 9.7.3.2)
+    // TIMESTAMP_DETAILS_mask     = 0x80000000; // 2 (See V49.2 spec Section 9.7.3.4)
+    /* XXX END OF CIF3 FUNCTIONS XXX */
 
     /* XXX START OF CIF7 FUNCTIONS XXX */
     // TODO
-    /* XXX START OF CIF7 FUNCTIONS XXX */
+    // BELIEF_mask                = 0x00080000; // 1 (See V49.2 spec Section 9.12 rules)
+    // PROBABILITY_mask           = 0x00100000; // 1 (See V49.2 spec Section 9.12 rules)
+    // THIRD_DERIVATIVE_mask      = 0x00200000; // same as field it describes
+    // SECOND_DERIVATIVE_mask     = 0x00400000; // same as field it describes
+    // FIRST_DERIVATIVE_mask      = 0x00800000; // same as field it describes
+    // ACCURACY_mask              = 0x01000000; // same as field it describes
+    // PRECISION_mask             = 0x02000000; // same as field it describes
+    // MIN_VALUE_mask             = 0x04000000; // same as field it describes
+    // MAX_VALUE_mask             = 0x08000000; // same as field it describes
+    // STANDARD_DEVIATION_mask    = 0x10000000; // same as field it describes
+    // MEDIAN_VALUE_mask          = 0x20000000; // same as field it describes
+    // AVERAGE_VALUE_mask         = 0x40000000; // same as field it describes
+    // CURRENT_VALUE_mask         = 0x80000000; // same as field it describes
+    /* XXX END OF CIF7 FUNCTIONS XXX */
 
 
   }; /* class IndicatorFieldProvider */

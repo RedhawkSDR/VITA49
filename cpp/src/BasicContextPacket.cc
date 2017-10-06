@@ -437,6 +437,24 @@ void BasicContextPacket::setX (int8_t cifNum, int32_t bit, int64_t val) {
   }
 }
 
+UUID BasicContextPacket::getUUID (int8_t cifNum, int32_t bit) const {
+  int32_t off = getOffset(cifNum, bit);
+  if (off < 0) return UUID(); // return NULL UUID
+  return VRTMath::unpackUUID(bbuf, off+getPrologueLength());
+}
+void BasicContextPacket::setUUID (int8_t cifNum, int32_t bit, const UUID &val) {
+  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
+  int32_t off = getOffset(cifNum, bit);
+  bool present = !isNull(val);
+
+  setContextIndicatorFieldBit(cifNum, bit, present);
+  off = shiftPayload(off, 16, present);
+
+  if (!isNull(val)) {
+    VRTMath::packUUID(bbuf, off+getPrologueLength(), val);
+  }
+}
+
 int32_t BasicContextPacket::getFieldLen (int8_t cifNum, int32_t field) const {
   // TODO - do CIF7 settings affect calculation of field length?
   //      - i.e. does field length include all attributes for the field?
