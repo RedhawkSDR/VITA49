@@ -46,7 +46,7 @@ void Record::setByteLength (int32_t len, int32_t off) {
     buf.resize(len, 0);
   }
   else if ((size_t)len < buf.size()) {
-    int32_t delta = (int32_t)(len - buf.size());
+    int32_t delta = (int32_t)(buf.size() - len);
     buf.erase(buf.begin()+off, buf.begin()+off+delta);
   }
   else {

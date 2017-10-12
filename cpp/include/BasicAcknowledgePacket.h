@@ -391,6 +391,14 @@ namespace vrt {
       UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(val);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports setL.");
     }
+    protected: virtual TimeStamp getTimeStampField (int8_t cifNum, int32_t bit) const {
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit);
+      throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
+    }
+    protected: virtual void setTimeStampField (int8_t cifNum, int32_t bit, const TimeStamp &val){
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(val);
+      throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports setL.");
+    }
     protected: virtual void setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen) {
       UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(val); UNUSED_VARIABLE(oldLen);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports setL.");
@@ -407,6 +415,21 @@ namespace vrt {
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
     public: virtual ContextAssocLists getContextAssocLists () const {
+      throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
+    }
+    public: virtual IndexFieldList getIndexList () const {
+      throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
+    }
+    public: virtual ArrayOfRecords getSectorScanStep () const {
+      throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
+    }
+    public: virtual ArrayOfRecords getCIFsArray () const {
+      throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
+    }
+    public: virtual ArrayOfRecords get2DPointingAngleStructured () const {
+      throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
+    }
+    public: virtual SpectrumField getSpectrumField () const {
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
     protected: virtual boolNull getStateEventBit (int32_t enable, int32_t indicator) const {

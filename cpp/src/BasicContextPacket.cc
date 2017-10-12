@@ -455,6 +455,62 @@ void BasicContextPacket::setUUID (int8_t cifNum, int32_t bit, const UUID &val) {
   }
 }
 
+TimeStamp BasicContextPacket::getTimeStampField (int8_t cifNum, int32_t bit) const {
+  int32_t off = getOffset(cifNum, bit);
+  if (off < 0) return TimeStamp(); // return NULL TimeStamp (int/frac modes both set to None)
+
+  IntegerMode    tsiMode = (IntegerMode   )((bbuf[1] >> 6) & 0x3);
+  FractionalMode tsfMode = (FractionalMode)((bbuf[1] >> 4) & 0x3);
+  if (tsiMode == IntegerMode_None && tsfMode == FractionalMode_None)
+    return TimeStamp(); // return NULL TimeStamp (int/frac modes both set to None)
+
+  uint32_t tsi     = 0;
+  uint64_t tsf     = 0;
+  if (tsiMode != IntegerMode_None) {
+    tsi = VRTMath::unpackUInt(bbuf, off+getPrologueLength());
+    off += 4;
+  }
+  if (tsfMode != FractionalMode_None) {
+    tsf = VRTMath::unpackULong(bbuf, off+getPrologueLength());
+  }
+  return TimeStamp(tsiMode, tsfMode, tsi, tsf, DOUBLE_NAN);
+}
+void BasicContextPacket::setTimeStampField (int8_t cifNum, int32_t bit, const TimeStamp &val) {
+  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
+
+  // Get packet timestamp info from TSI/TSF
+  IntegerMode    tsiModePkt = (IntegerMode   )((bbuf[1] >> 6) & 0x3);
+  FractionalMode tsfModePkt = (FractionalMode)((bbuf[1] >> 4) & 0x3);
+  if (tsiModePkt == IntegerMode_None && tsfModePkt == FractionalMode_None)
+    throw VRTException("Can not set TimeStamp field on VRTPacket without a TimeStamp.");
+
+  // Get timestamp info from new value
+  IntegerMode    tsiModeVal = val.getIntegerMode();
+  FractionalMode tsfModeVal = val.getFractionalMode();
+  if (tsiModePkt != tsiModeVal || tsfModePkt != tsfModeVal)
+    throw VRTException("Can not set TimeStamp field to format not consistent with VRTPacket TimeStamp format.");
+
+  int32_t len = 0;
+  if (tsiModeVal != IntegerMode_None) len+=4;
+  if (tsfModeVal != FractionalMode_None) len+=8;
+
+  int32_t off = getOffset(cifNum, bit);
+  bool present = !isNull(val);
+
+  setContextIndicatorFieldBit(cifNum, bit, present);
+  off = shiftPayload(off, len, present);
+
+  if (!isNull(val)) {
+    if (tsiModeVal != IntegerMode_None) {
+      VRTMath::packUInt(bbuf, off+getPrologueLength(), val.getTimeStampInteger());
+      off += 4;
+    }
+    if (tsfModeVal != FractionalMode_None) {
+      VRTMath::packULong(bbuf, off+getPrologueLength(), val.getTimeStampFractional());
+    }
+  }
+}
+
 int32_t BasicContextPacket::getFieldLen (int8_t cifNum, int32_t field) const {
   // TODO - do CIF7 settings affect calculation of field length?
   //      - i.e. does field length include all attributes for the field?
@@ -484,12 +540,11 @@ int32_t BasicContextPacket::getFieldLen (int8_t cifNum, int32_t field) const {
     if ((field & protected_CIF1::CTX_4_OCTETS ) != 0) return 4;
     if ((field & protected_CIF1::CTX_8_OCTETS ) != 0) return 8;
     if ((field & protected_CIF1::CTX_56_OCTETS ) != 0) return 56;
-    // others (variable) :
-    //                     PNT_ANGL_2D_ST_mask TODO variable (Section 9.4.1)
-    //                     CIFS_ARRAY_mask TODO variable (Section 9.13.1)
-    //                     SECTOR_SCN_STP_mask TODO variable (Section 9.6.2)
-    //                     INDEX_LIST_mask TODO variable (Section 9.3.2)
-
+    if ((field & protected_CIF1::CTX_ARR_OF_RECS ) != 0) {
+      int32_t prologlen = getPrologueLength();
+      int off = getOffset(cifNum, field);
+      return VRTMath::unpackInt(bbuf, prologlen+off)*4;
+    }
     break;
   case 2:
     if ((field & protected_CIF2::CTX_4_OCTETS ) != 0) return 4;
@@ -662,10 +717,13 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int8_t cifNum, int32
     m = cif1 & mask1 & 0xE0000000;
     int32_t off1 = (bitCount(m & protected_CIF1::CTX_4_OCTETS) * (cif7Add + (4*cif7Mult) ));
 
-    // PNT_ANGL_2D_ST length is variable so we handle it separately if applicable.
+    // PNT_ANGL_2D_ST length is Array-of-Records format, which has variable size
+    // so we handle it separately if applicable. Note that off+off1 is the offset
+    // up to point to the start of the PNT_ANGL_2D_ST field.
     if (field1 < protected_CIF1::PNT_ANGL_2D_ST_mask) {
       if ((cif1 & protected_CIF1::PNT_ANGL_2D_ST_mask) != 0) {
-        // TODO - determine size of field and add to off1= w/ cif7Add and cif7Mult applied
+        // TODO - when and where does cif7Mult apply? perhaps not all field sizes are affected.    
+        off1 += (VRTMath::unpackInt(bbuf, prologlen+off+off1)*4)*cif7Mult + cif7Add;
       }
 
       // Only count fields not yet counted (i.e. after PNT_ANGL_2D_ST) and before
@@ -675,32 +733,35 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int8_t cifNum, int32
       off1 += (bitCount(m & (protected_CIF1::CTX_4_OCTETS)) * (cif7Add + (4*cif7Mult) ))
             + (bitCount(m & (protected_CIF1::CTX_8_OCTETS)) * (cif7Add + (8*cif7Mult) ));
 
-      // CIFS_ARRAY is also variable length, since it comes after PNT_ANGL_2D_ST
-      // we nest it here so the check can be skipped.
+      // CIFS_ARRAY is also Array-of-Records format, and since it comes after
+      // PNT_ANGL_2D_ST, we nest it here so the check can be skipped.
       if (field1 < protected_CIF1::CIFS_ARRAY_mask) {
-        if ((cif0 & protected_CIF1::CIFS_ARRAY_mask) != 0) {
-          // TODO - determine size of field and add to off1= w/ cif7Add and cif7Mult applied
+        if ((cif1 & protected_CIF1::CIFS_ARRAY_mask) != 0) {
+          // TODO - when and where does cif7Mult apply? perhaps not all field sizes are affected.    
+          off1 += (VRTMath::unpackInt(bbuf, prologlen+off+off1)*4)*cif7Mult + cif7Add;
         }
 
         // Only count SPECTRUM since it is the only field between the previous
         // and next variable length fields. SPECTRUM is 56-octets.
         if ((cif1 & mask1 & protected_CIF1::SPECTRUM_mask) != 0) off1 += (cif7Add + (56*cif7Mult));
 
-        // SECTOR_SCN_STP is also variable length, since it comes after CIFS_ARRAY
-        // we nest it here so the check can be skipped.
+        // SECTOR_SCN_STP is also Array-of-Records format, and since it comes after
+        // CIFS_ARRAY, we nest it here so the check can be skipped.
         if (field < protected_CIF1::SECTOR_SCN_STP_mask) {
           if ((cif1 & protected_CIF1::SECTOR_SCN_STP_mask) != 0) {
-            // TODO - determine size of field and add to off1= w/ cif7Add and cif7Mult applied
+            // TODO - when and where does cif7Mult apply? perhaps not all field sizes are affected.    
+            off1 += (VRTMath::unpackInt(bbuf, prologlen+off+off1)*4)*cif7Mult + cif7Add;
           }
 
           // Only field between the previous and next variable length fields is reserved (i.e. 0).
           // Nothing to add here for CIF1_RESERVED_8.
 
-          // INDEX_LIST is also variable length, since it comes after SECTOR_SCN_STP
-          // we nest it here so the check can be skipped.
+          // INDEX_LIST is also Array-of-Records format, and since it comes after
+          // SECTOR_SCN_STP, we nest it here so the check can be skipped.
           if (field < protected_CIF1::INDEX_LIST_mask) {
             if ((cif1 & protected_CIF1::INDEX_LIST_mask) != 0) {
-              // TODO - determine size of field and add to off1= w/ cif7Add and cif7Mult applied
+              // TODO - when and where does cif7Mult apply? perhaps not all field sizes are affected.    
+              off1 += (VRTMath::unpackInt(bbuf, prologlen+off+off1)*4)*cif7Mult + cif7Add;
             }
           }
           

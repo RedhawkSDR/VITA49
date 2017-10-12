@@ -26,6 +26,12 @@ using namespace vrt;
 using namespace IndicatorFields;
 
 
+SpectrumField::SpectrumField             ()                             : Record(56) { }
+SpectrumField::SpectrumField             (const SpectrumField       &r) : Record(r) { }
+ArrayOfRecords::ArrayOfRecords           ()                             : Record(12) { }
+ArrayOfRecords::ArrayOfRecords           (const ArrayOfRecords      &r) : Record(r) { }
+IndexFieldList::IndexFieldList           ()                             : Record(8) { }
+IndexFieldList::IndexFieldList           (const IndexFieldList      &r) : Record(r) { }
 ContextAssocLists::ContextAssocLists     ()                             : Record(8) { }
 ContextAssocLists::ContextAssocLists     (const ContextAssocLists   &r) : Record(r) { }
 AbstractGeolocation::AbstractGeolocation (size_t n)                     : Record(n) { }
@@ -206,7 +212,7 @@ string Ephemeris::toString () const {
 }
 
 int32_t Ephemeris::getFieldCount () const {
-  return AbstractGeolocation::getFieldCount() + 18;
+  return AbstractGeolocation::getFieldCount() + 9;
 }
 
 string Ephemeris::getFieldName (int32_t id) const {
@@ -518,3 +524,418 @@ void ContextAssocLists::setField (int32_t id, const Value* val) {
     Record::setField(id,val); return;
   }
 }
+
+// IndexFieldList
+string IndexFieldList::toString () const {
+  ostringstream str;
+  str << Record::toString();
+  int8_t bpe = getIndexEntrySize();
+  int32_t cnt = getIndexEntriesCount();
+  if (bpe == 0 || cnt == 0)
+    return str.str();
+  int32_t off = getIndexEntriesByteOffset();
+
+  str << "IndexFieldList=[" << std::hex << std::setw(bpe*2) << std::setfill('0');
+  for (int32_t i = 0; i < cnt; i++) {
+    if (i > 0) str << ", ";
+    switch (bpe) {
+      case 1: str << unpackByte(off+i); break;
+      case 2: str << unpackShort(off+i*2); break;
+      case 4: str << unpackInt(off+i*4); break;
+      default: break;
+    }
+  }
+  str << "]";
+  return str.str();
+}
+
+void IndexFieldList::updateByteLength () {
+  int32_t len = getTotalFieldSize()*4;
+  setByteLength(len);            // Do this first to zero buffer if len==0
+  if (len < 8) setByteLength(8); // But make sure we maintain at least 8 bytes
+}
+
+void IndexFieldList::setIndexEntriesCount (int32_t val) {
+  // set num entries
+  int8_t bpe = getIndexEntrySize(); // preserve entry size
+  packInt(4, val & 0xFFFFF);
+  packByte(4, bpe);
+  // set total size
+  int32_t list_words = (int32_t)((bpe*(val&0xFFFFF)+3)/4); 
+  packInt(0, 2+list_words);
+  updateByteLength();
+}
+
+void IndexFieldList::setIndexEntrySize (int8_t val) {
+  // set entry size
+  packByte(4, val&0x7);
+  // set total size
+  int32_t list_words = (int32_t)((getIndexEntriesCount()*(val&0x7)+3)/4); 
+  packInt(0, 2+list_words);
+  updateByteLength();
+}
+
+vector<int32_t> IndexFieldList::getIndexEntries () const {
+  vector<int32_t> val(getIndexEntriesCount());
+  int8_t bpe = getIndexEntrySize();
+  for (size_t i=0, j=getIndexEntriesByteOffset(); i < val.size(); i++,j+=bpe) {
+    switch (bpe) {
+      case 1: val[i] = (int32_t) unpackByte(j);
+      case 2: val[i] = (int32_t) unpackShort(j);
+      case 4: val[i] = (int32_t) unpackInt(j);
+      default: break;
+    }
+  }
+  return val;
+}
+
+void IndexFieldList::setIndexEntries (const vector<int32_t> &val, int8_t bpe) {
+  if (bpe!=0) setIndexEntrySize(bpe);
+  else bpe = getIndexEntrySize();
+  if (bpe==4) return setIndexEntries(val);
+  setIndexEntriesCount(val.size());
+  for (size_t i=0, j=getIndexEntriesByteOffset(); i < val.size(); i++,j+=bpe) {
+    switch (bpe) {
+      case 1: packByte (j, (int8_t)  val[i]);
+      case 2: packShort(j, (int16_t) val[i]);
+      //case 4: packInt  (j, (int32_t) val[i]);
+      default: break;
+    }
+  }
+}
+
+void IndexFieldList::setIndexEntries (const vector<int32_t> &val) {
+  setIndexEntrySize(4);
+  setIndexEntriesCount(val.size());
+  memcpy(&buf[8], &val[0], val.size()*4);
+  //for (size_t i=0, j=getIndexEntriesByteOffset(); i < val.size(); i++,j+=4) {
+  //  packInt(j, val[i]);
+  //}
+}
+
+void IndexFieldList::setIndexEntries (const vector<int16_t> &val) {
+  setIndexEntrySize(2);
+  setIndexEntriesCount(val.size());
+  memcpy(&buf[8], &val[0], val.size()*2);
+  //for (size_t i=0, j=getIndexEntriesByteOffset(); i < val.size(); i++,j+=2) {
+  //  packShort(j, val[i]);
+  //}
+}
+
+void IndexFieldList::setIndexEntries (const vector<int8_t> &val) {
+  setIndexEntrySize(1);
+  setIndexEntriesCount(val.size());
+  memcpy(&buf[8], &val[0], val.size());
+  //for (size_t i=0, j=getIndexEntriesByteOffset(); i < val.size(); i++,j+=1) {
+  //  packByte(j, val[i]);
+  //}
+}
+
+int32_t IndexFieldList::getFieldCount () const {
+  return Record::getFieldCount() + 1;
+}
+
+string IndexFieldList::getFieldName (int32_t id) const {
+  if ((id - Record::getFieldCount()) == 0)
+    return "IndexEntries";
+  else
+    return Record::getFieldName(id);
+}
+
+ValueType IndexFieldList::getFieldType (int32_t id) const {
+  if ((id - Record::getFieldCount()) == 0)
+    return (ValueType)-ValueType_Int32;
+  else
+    return Record::getFieldType(id);
+}
+
+Value* IndexFieldList::getField (int32_t id) const {
+  if ((id - Record::getFieldCount()) == 0)
+    return new Value(new vector<int32_t>(getIndexEntries()), true);
+  else
+    return Record::getField(id);
+}
+
+void IndexFieldList::setField (int32_t id, const Value* val) {
+  if ((id - Record::getFieldCount()) == 0) {
+    vector<int32_t> vec(val->size());
+    for (size_t i = 0; i < val->size(); i++) {
+      Value *v = val->at(i);
+      vec[i] = *v;
+      delete v;
+    }
+    setIndexEntries(vec); return;
+  }
+  else {
+    Record::setField(id,val); return;
+  }
+}
+
+// ArrayOfRecords
+string ArrayOfRecords::toString () const {
+  ostringstream str;
+  str << Record::toString();
+  str << "BitMappedIndicator=" << std::hex << std::setw(8) << std::setfill('0')
+      << getBitMappedIndicator();
+
+  str << " ArrayOfRecords=[";
+  std::vector<Record> recs(getRecords());
+  for (size_t i = 0; i < recs.size(); i++) {
+    if (i > 0) str << ", ";
+    str << recs[i].toString();
+  }
+  str << "]";
+  return str.str();
+}
+
+void ArrayOfRecords::updateByteLength (int32_t off) {
+  int32_t totalSize = 3 + getHeaderSize() + getRecordSize()*getRecordCount();
+  setByteLength(totalSize*4, off);
+}
+
+void ArrayOfRecords::setRecordSize (int32_t val) {
+  // set record size, preserving header size and record count
+  int32_t hdr1 = unpackInt(4) & 0xFF000FFF; // clear previous rec size
+  hdr1 |= (val<<12) & 0x00FFF000;   // update with new rec size
+  packInt(4, val);
+  // set total size
+  packInt(0, 3+getHeaderSize()+(val&0xFFF)*getRecordCount());
+  updateByteLength();
+}
+
+void ArrayOfRecords::setRecordCount (int32_t val, int32_t off) {
+  // set record count, preserving header size and record size
+  int32_t hdr1 = unpackInt(4) & 0xFFFFF000; // clear previous rec count
+  hdr1 |= (val) & 0x00000FFF;               // update with new rec count
+  packInt(4, val);
+  // set total size
+  packInt(0, 3+getHeaderSize()+getRecordSize()*(val&0xFFF));
+  updateByteLength(off);
+}
+
+void ArrayOfRecords::setApplicationSpecificHeader (const vector<char> &val) {
+  setApplicationSpecificHeader(&val[0], val.size());
+}
+
+void ArrayOfRecords::setApplicationSpecificHeader (const char* val, size_t bytes) {
+  if (bytes > 255*4)
+    throw VRTException("Application Specific Header size exceeded limit of 255 32-bit words.");
+  packByte(4, (int8_t) ((bytes+3)/4) & 0xFF); // header size in full 32-bit words
+  updateByteLength(12); // insert before records, or erase from existing app-spec header
+  if (val!=NULL) memcpy(&buf[12], val, bytes);
+}
+
+vector<Record> ArrayOfRecords::getRecords (int32_t idx, int32_t num) const {
+  const int32_t numRecs = getRecordCount();
+  if (idx < 0 || idx >= numRecs || num == 0)
+    return vector<Record>();
+  if (num < 0 || idx+num > numRecs)
+    num = numRecs-idx;
+  int32_t bpe = getRecordSize()*4; // bytes per record entry
+  vector<Record> val(num, Record(bpe));
+  for (size_t i=0, j=getRecordEntriesByteOffset()+idx*bpe; i < val.size(); i++,j+=bpe) {
+    VRTMath::unpackRecord(buf, j, val[i]);
+    //val[i].writeBytes(&buf[j]); // the previous call does exactly this...
+  }
+  return val;
+}
+
+void ArrayOfRecords::getRecord (int32_t idx, Record &rec) const {
+  if (idx < 0 || idx >= getRecordCount()) {
+    //rec.setByteLength(0); // can't do this b/c protected method
+    rec = Record(0);
+  } else {
+    int32_t bpe = getRecordSize()*4; // bytes per record entry
+    //rec.setByteLength(bpe); // can't do this b/c protected method
+    rec = Record(bpe);
+    VRTMath::unpackRecord(buf, getRecordEntriesByteOffset()+idx*bpe, rec);
+  }
+}
+
+void ArrayOfRecords::setRecords (const vector<Record> &val) {
+  if (val.size() == 0) {
+    setRecordCount(0);
+    setRecordSize(0);
+  } else {
+    int32_t wpe = (val[0].getByteLength()+3)/4; // number of full 32-bit words
+    setRecordSize(wpe);
+    setRecordCount(val.size());
+    for (size_t i=0, j=getRecordEntriesByteOffset(); i < val.size(); i++,j+=wpe*4) {
+      VRTMath::packRecord(buf, j, val[i]);
+    }
+  }
+}
+
+int32_t ArrayOfRecords::addRecords (const vector<Record> &val, int32_t idx) {
+  if (val.size() == 0) return 0;
+  if (idx < 0 || idx >= getRecordCount()) idx = getRecordCount();
+  int32_t wpe = (val[0].getByteLength()+3)/4; // number of full 32-bit words
+  if (getRecordCount() == 0) {
+    setRecordSize(wpe);
+    setRecordCount(val.size());
+  } else if (wpe != getRecordSize()) { // can't add records of different size
+    return 0;
+  } else { // add space for records at proper byte offset based on idx
+    setRecordCount(getRecordCount()+val.size(), getRecordEntriesByteOffset()+idx*wpe*4);
+  }
+  for (size_t i=0, j=getRecordEntriesByteOffset()+idx*wpe*4; i < val.size(); i++,j+=wpe*4) {
+    // recalc wpe for each Record to ensure they do not change
+    if (wpe != (int32_t) (val[i].getByteLength()+3)/4) {
+      setRecordCount(getRecordCount()+i, j); // remove unnecessary space for invalid records
+      return i;
+    }
+    VRTMath::packRecord(buf, j, val[i]);
+  }
+  return val.size();
+}
+
+bool ArrayOfRecords::addRecord (const Record &val, int32_t idx) {
+  if (isNull(val)) return true; // or false? Adding null is considered successful
+  if (idx < 0 || idx >= getRecordCount()) idx = getRecordCount();
+  int32_t wpe = (val.getByteLength()+3)/4; // number of full 32-bit words
+  if (getRecordCount() == 0) {
+    setRecordSize(wpe);
+    setRecordCount(1);
+  } else if (wpe != getRecordSize()) { // can't add a record of different size
+    return false;
+  } else { // add space for record at proper byte offset based on idx
+    setRecordCount(getRecordCount()+1, getRecordEntriesByteOffset()+idx*wpe*4);
+  }
+  VRTMath::packRecord(buf, getRecordEntriesByteOffset()+idx*wpe*4, val);
+  return true;
+}
+
+int32_t ArrayOfRecords::getFieldCount () const {
+  return Record::getFieldCount() + 1;
+}
+
+string ArrayOfRecords::getFieldName (int32_t id) const {
+  switch (id - Record::getFieldCount()) {
+    case  0: return "BitMappedIndicator";
+    default: return Record::getFieldName(id);
+  }
+}
+
+ValueType ArrayOfRecords::getFieldType (int32_t id) const {
+  switch (id - Record::getFieldCount()) {
+    case  0: return (ValueType)ValueType_Int32;
+    default: return Record::getFieldType(id);
+  }
+}
+
+Value* ArrayOfRecords::getField (int32_t id) const {
+  switch (id - Record::getFieldCount()) {
+    case  0:
+      return new Value(getBitMappedIndicator());
+    default: return Record::getField(id);
+  }
+}
+
+void ArrayOfRecords::setField (int32_t id, const Value* val) {
+  switch (id - Record::getFieldCount()) {
+    case  0:
+      setBitMappedIndicator(val->as<int32_t>()); return;
+    default: Record::setField(id,val); return;
+  }
+}
+
+// SpectrumField
+string SpectrumField::toString () const {
+  ostringstream str;
+  str << Record::toString();
+  Utilities::append(str,  "SpectrumType=",       getSpectrumType());
+  Utilities::append(str, " AveragingType=",      getAveragingType());
+  Utilities::append(str, " WindowTime=",         getWindowTime());
+  Utilities::append(str, " WindowType=",         getWindowType());
+  Utilities::append(str, " NumTransformPoints=", getNumTransformPoints());
+  Utilities::append(str, " NumWindowPoints=",    getNumWindowPoints());
+  Utilities::append(str, " Resolution=",         getResolution());
+  Utilities::append(str, " Span=",               getSpan());
+  Utilities::append(str, " NumAverages=",        getNumAverages());
+  Utilities::append(str, " WeightingFactor=",    getWeightingFactor());
+  Utilities::append(str, " SpectrumF1Index=",    getSpectrumF1Index());
+  Utilities::append(str, " SpectrumF2Index=",    getSpectrumF2Index());
+  Utilities::append(str, " WindowTimeDelta=",    getWindowTimeDelta());
+  return str.str();
+}
+
+int32_t SpectrumField::getFieldCount () const {
+  return Record::getFieldCount() + 13;
+}
+
+string SpectrumField::getFieldName (int32_t id) const {
+  switch (id - Record::getFieldCount()) {
+    case  0: return "SpectrumType";
+    case  1: return "AveragingType";
+    case  2: return "WindowTime";
+    case  3: return "WindowType";
+    case  4: return "NumTransformPoints";
+    case  5: return "NumWindowPoints";
+    case  6: return "Resolution";
+    case  7: return "Span";
+    case  8: return "NumAverages";
+    case  9: return "WeightingFactor";
+    case 10: return "SpectrumF1Index";
+    case 11: return "SpectrumF2Index";
+    case 12: return "WindowTimeDelta";
+    default: return Record::getFieldName(id);
+  }
+}
+
+ValueType SpectrumField::getFieldType (int32_t id) const {
+  switch (id - Record::getFieldCount()) {
+    case  0: return ValueType_Int8;
+    case  1: return ValueType_Int8;
+    case  2: return ValueType_Int8;
+    case  3: return ValueType_Int8;
+    case  4: return ValueType_Int32;
+    case  5: return ValueType_Int32;
+    case  6: return ValueType_Double;
+    case  7: return ValueType_Double;
+    case  8: return ValueType_Int32;
+    case  9: return ValueType_Int32;
+    case 10: return ValueType_Int32;
+    case 11: return ValueType_Int32;
+    case 12: return ValueType_Double;
+    default: return Record::getFieldType(id);
+  }
+}
+
+Value* SpectrumField::getField (int32_t id) const {
+  switch (id - Record::getFieldCount()) {
+    case  0: return new Value(getSpectrumType());
+    case  1: return new Value(getAveragingType());
+    case  2: return new Value(getWindowTime());
+    case  3: return new Value(getWindowType());
+    case  4: return new Value(getNumTransformPoints());
+    case  5: return new Value(getNumWindowPoints());
+    case  6: return new Value(getResolution());
+    case  7: return new Value(getSpan());
+    case  8: return new Value(getNumAverages());
+    case  9: return new Value(getWeightingFactor());
+    case 10: return new Value(getSpectrumF1Index());
+    case 11: return new Value(getSpectrumF2Index());
+    case 12: return new Value(getWindowTimeDelta());
+    default: return Record::getField(id);
+  }
+}
+
+void SpectrumField::setField (int32_t id, const Value* val) {
+  switch (id - Record::getFieldCount()) {
+    case  0: setSpectrumType(       val->as<int8_t>());  return;
+    case  1: setAveragingType(      val->as<int8_t>());  return;
+    case  2: setWindowTime(         val->as<int8_t>());  return;
+    case  3: setWindowType(         val->as<int8_t>());  return;
+    case  4: setNumTransformPoints( val->as<int32_t>()); return;
+    case  5: setNumWindowPoints(    val->as<int32_t>()); return;
+    case  6: setResolution(         val->as<double>());  return;
+    case  7: setSpan(               val->as<double>());  return;
+    case  8: setNumAverages(        val->as<int32_t>()); return;
+    case  9: setWeightingFactor(    val->as<int32_t>()); return;
+    case 10: setSpectrumF1Index(    val->as<int32_t>()); return;
+    case 11: setSpectrumF2Index(    val->as<int32_t>()); return;
+    case 12: setWindowTimeDelta(    val->as<double>());  return;
+    default: Record::setField(id,val); return;
+  }
+}
+

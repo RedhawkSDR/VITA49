@@ -26,6 +26,7 @@
 #include "VRTConfig.h"
 #include "VRTMath.h"
 #include <map>
+#include <iomanip>
 #if NOT_USING_JNI
 # include "MetadataBlock.h"
 # include "Utilities.h"
@@ -407,12 +408,7 @@ namespace vrt {
                                         | V49_COMPL_mask | VER_BLD_CODE_mask;
       static const int32_t CTX_8_OCTETS = AUX_FREQUENCY_mask | AUX_BANDWIDTH_mask | DISCRETE_IO64_mask | BUFFER_SZ_mask;
       static const int32_t CTX_56_OCTETS = SPECTRUM_mask;
-      // others (variable) :
-      //                     PNT_ANGL_2D_ST_mask TODO
-      //                     CIFS_ARRAY_mask TODO
-      //                     SECTOR_SCN_STP_mask TODO
-      //                     INDEX_LIST_mask TODO
-      //         Note TODO : These also matter for others that come after
+      static const int32_t CTX_ARR_OF_RECS = PNT_ANGL_2D_ST_mask | CIFS_ARRAY_mask | SECTOR_SCN_STP_mask | INDEX_LIST_mask;
 
     } END_NAMESPACE // protected_CIF1 namespace
 
@@ -582,6 +578,9 @@ namespace vrt {
   class Ephemeris;            // declared below
   class ContextAssocLists;    // declared below
   class GeoSentences;         // declared below
+  class IndexFieldList;       // declared below
+  class ArrayOfRecords;       // declared below
+  class SpectrumField;        // declared below
 
   /** Represents a GPS or INS geolocation fix. <i>The fact that {@link GeoSentences}
    *  does not extend this class is not accidental.</i>
@@ -1171,7 +1170,299 @@ namespace vrt {
     public: virtual void      setField      (int32_t id, const Value* val);
   };
 
+  /** Specifies a Index Field List. */
+  class IndexFieldList : public Record {
+    /** Creates a new instance. */
+    public: IndexFieldList ();
 
+    /** Basic copy constructor. */
+    public: IndexFieldList (const IndexFieldList &r);
+
+    public: virtual string toString () const;
+
+    public: inline virtual void writeBytes (const void *buffer) {
+      // Write Counts
+      setByteLength(8);
+      Record::writeBytes(buffer);
+
+      // Size as appropriate
+      updateByteLength();
+
+      // Write Data
+      Record::writeBytes(buffer);
+    }
+
+    /** Updates the byte length. */
+    private: void updateByteLength ();
+
+    private: inline int32_t getIndexEntriesByteOffset () const { return 8; }
+
+    /** Gets the total size of Index List Field in number of 32-bit words. */
+    public: inline int32_t getTotalFieldSize () const { return unpackInt(0); }
+
+    /** Gets the number of Index Entries. */
+    public: inline int32_t getIndexEntriesCount () const { return unpackInt(4) & 0xFFFFF; }
+
+    /** Gets the size of each Index Entry in number of Bytes. */
+    public: inline int8_t getIndexEntrySize () const { return unpackByte(4); }
+
+    /** Sets the number of Index Entries. */
+    public: void setIndexEntriesCount (int32_t val);
+
+    /** Sets the size of each Index Entry in number of Bytes. */
+    public: void setIndexEntrySize (int8_t val);
+
+    /** Gets a copy of the Index Field List.
+     *  @return A copy of the Index Field list (returns an arry of length 0 if there are no entries).
+     */
+    public: vector<int32_t> getIndexEntries () const;
+
+    /** Sets the Index Field List.
+     *  @param val The Index Field List (an arry of length 0 if there are no entries).
+     *  @param bpe The number of bytes to use per element; 0 to use current setting.
+     */
+    public: void setIndexEntries (const vector<int32_t> &val, int8_t bpe);
+    public: void setIndexEntries (const vector<int32_t> &val);
+    public: void setIndexEntries (const vector<int16_t> &val);
+    public: void setIndexEntries (const vector<int8_t> &val);
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // Implement HasFields
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    public: virtual int32_t   getFieldCount () const;
+    public: virtual string    getFieldName  (int32_t id) const;
+    public: virtual ValueType getFieldType  (int32_t id) const;
+    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));
+    public: virtual void      setField      (int32_t id, const Value* val);
+  };
+
+  /** Specifies an Array of Records. */
+  class ArrayOfRecords : public Record {
+    /** Creates a new instance. */
+    public: ArrayOfRecords ();
+
+    /** Basic copy constructor. */
+    public: ArrayOfRecords (const ArrayOfRecords &r);
+
+    public: virtual string toString () const;
+
+    public: inline virtual void writeBytes (const void *buffer) {
+      // Write Counts
+      setByteLength(12);
+      Record::writeBytes(buffer);
+
+      // Size as appropriate
+      updateByteLength();
+
+      // Write Data
+      Record::writeBytes(buffer);
+    }
+
+    /** Updates the byte length. */
+    private: void updateByteLength (int32_t off=-1);
+
+    /** Gets the total size of Array Of Records in number of 32-bit words. */
+    public: inline int32_t getTotalFieldSize () const { return unpackInt(0); }
+
+    /** Gets the size of the optional Application-Specific Header in number of 32-bit words. */
+    public: inline int32_t getHeaderSize () const { return ((int32_t) unpackByte(4)) & 0xFF; }
+
+    /** Gets the size of each Record in number of 32-bit words. */
+    public: inline int32_t getRecordSize () const { return (unpackInt(4)>>12) & 0xFFF; }
+
+    /** Sets the size of each Record in number of 32-bit words. */
+    public: void setRecordSize (int32_t val);
+
+    /** Gets the number of Records. */
+    public: inline int32_t getRecordCount () const { return unpackInt(4) & 0xFFF; }
+
+    /** Sets the number of Records. */
+    public: void setRecordCount (int32_t val, int32_t off=-1);
+
+    /** Gets the Bit-mapped indicator for optional record subfields. */
+    public: inline int32_t getBitMappedIndicator () const { return unpackInt(8); }
+
+    /** Sets the Bit-mapped indicator for optional record subfields. */
+    public: inline void setBitMappedIndicator (int32_t val) { packInt(8, val); }
+
+    
+    /** Gets a copy of the Application-Specific Header as a byte buffer.
+     *  @return A copy of the Application-Specific Header (returns an arry of length 0 if none).
+     */
+    public: inline vector<char> getApplicationSpecificHeader () const { return unpackBytes(12, getHeaderSize()*4); }
+
+    /** Sets the Application-Specific Header
+     *  @param val The Application-Specific Header (an arry of length 0 if none).
+     *  @throws VRTException if size of Application-Specific header exceeds 255 32-bit words
+     */
+    public: void setApplicationSpecificHeader (const vector<char> &val);
+
+    /** Sets the Application-Specific Header
+     *  If val pointer is null, Application-Specific Header is only resized to
+     *  the number of bytes specified.
+     *  @param val The Application-Specific Header (an arry of length 0 if none).
+     *  @param bytes The size of Application-Specific Header in bytes.
+     *  @throws VRTException if size of Application-Specific header exceeds 255 32-bit words
+     *  @throws VRTException if size of Application-Specific header is negative
+     */
+    public: void setApplicationSpecificHeader (const char* val, size_t bytes);
+
+    /** Gets the byte offset of the first record.
+     *  Note: If 0 records, value will be equal to getTotalFieldSize().
+     *  @return Byte offset of first record.
+     */
+    private: inline int32_t getRecordEntriesByteOffset () const { return 12+4*getHeaderSize(); }
+
+    /** Gets a copy of the Array of Records.
+     *  @param idx Index of first record to get. Invalid indicies result in
+     *  empty vector returned.
+     *  @param num Number of records to get. Invalid number (i.e. negative or
+     *  too high) result in max available from index specified.
+     *  @return A copy of the Array of Records (returns an arry of length 0 if there are no entries).
+     */
+    public: vector<Record> getRecords (int32_t idx=0, int32_t num=-1) const;
+
+    /** Gets a copy of a single Record.
+     *  @param idx Index of record to get.
+     *  @param rec Record to be populated with results. Will be resized if
+     *  necessary. Set to Null Record if there are no entries or index is
+     *  invalid.
+     */
+    public: void getRecord (int32_t idx, Record &rec) const;
+
+    /** Sets the Array of Records.
+     *  @param val The Array of Records (an arry of length 0 if there are no entries).
+     */
+    public: void setRecords (const vector<Record> &val);
+
+    /** Adds Record(s) to the Array of Records.
+     *  All Records must be the same size. Function returns upon encountering
+     *  a Record of differing size.
+     *  @param val The Array of Records to add.
+     *  @param idx The index to insert the new Records. Records are added to the
+     *  end for invalid indices.
+     *  @return The number of Records inserted. Number may be less than total
+     *  attempted if a Record of different size is encountered.
+     */
+    public: int32_t addRecords (const vector<Record> &val, int32_t idx=-1);
+
+    /** Adds Record(s) to the Array of Records.
+     *  @param val The Array of Records to add.
+     *  @param idx The index to insert the new Records.
+     *  @return True if successfully inserted Record; False otherwise.
+     */
+    public: bool addRecord (const Record &val, int32_t idx=-1);
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // Implement HasFields
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    public: virtual int32_t   getFieldCount () const;
+    public: virtual string    getFieldName  (int32_t id) const;
+    public: virtual ValueType getFieldType  (int32_t id) const;
+    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));
+    public: virtual void      setField      (int32_t id, const Value* val);
+  };
+
+  /** Specifies a Spectrum Field. */
+  class SpectrumField : public Record {
+    /** Creates a new instance. */
+    public: SpectrumField ();
+
+    /** Basic copy constructor. */
+    public: SpectrumField (const SpectrumField &r);
+
+    public: virtual string toString () const;
+
+    /** SpectrumType: word 0, bits 7..0 **/
+    public: virtual int8_t getSpectrumType () const { return unpackByte(3); }
+    public: virtual void setSpectrumType (int8_t val) { packByte(3, val); }
+
+    /** AveragingType: word 0, bits 15..8 **/
+    public: virtual int8_t getAveragingType () const { return unpackByte(2); }
+    public: virtual void setAveragingType (int8_t val) { packByte(2, val); }
+
+    /** WindowTime: word 0, bits 19..16 **/
+    public: virtual int8_t getWindowTime () const { return (unpackByte(1) & 0xF); }
+    public: virtual void setWindowTime (int8_t val) { packByte(1, val & 0xF); }
+
+    //reserved: word 0, bits 31..20
+
+    /** WindowType: word 1, bits 7..0 **/
+    public: virtual int8_t getWindowType () const { return unpackByte(7); }
+    public: virtual void setWindowType (int8_t val) { packByte(7, val); }
+
+    // reserved: word 1, bits 31..8
+
+    // NumTransformPoints: word 2, bits 31..0
+    public: virtual int32_t getNumTransformPoints () const { return unpackInt(8); }
+    public: virtual void setNumTransformPoints (int32_t val) { packInt(8, val); }
+
+    /** NumWindowPoints: word 3 **/
+    public: virtual int32_t getNumWindowPoints () const { return unpackInt(12); }
+    public: virtual void setNumWindowPoints (int32_t val) { packInt(12, val); }
+
+    /** Resolution: words 4-5
+     *  64-bit floating-point w/ radix point to the right of bit 20
+     */
+    public: virtual double getResolution () const {
+      int64_t bits = unpackLong(16);
+      return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
+    }
+    public: virtual void setResolution (double val) {
+      int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
+      packLong(16, bits);
+    }
+
+    /** Span: words 6-7
+     *  64-bit floating-point w/ radix point to the right of bit 20
+     */
+    public: virtual double getSpan () const {
+      int64_t bits = unpackLong(24);
+      return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
+    }
+    public: virtual void setSpan (double val) {
+      int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
+      packLong(24, bits);
+    }
+
+    /** NumAverages: word 8 **/
+    public: virtual int32_t getNumAverages () const { return unpackInt(32); }
+    public: virtual void setNumAverages (int32_t val) { packInt(32, val); }
+
+    /** WeightingFactor: word 9 **/
+    public: virtual int32_t getWeightingFactor () const { return unpackInt(36); }
+    public: virtual void setWeightingFactor (int32_t val) { packInt(36, val); }
+
+    /** SpectrumF1Index: word 10 **/
+    public: virtual int32_t getSpectrumF1Index () const { return unpackInt(40); }
+    public: virtual void setSpectrumF1Index (int32_t val) { packInt(40, val); }
+
+    /** SpectrumF2Index: word 11 **/
+    public: virtual int32_t getSpectrumF2Index () const { return unpackInt(44); }
+    public: virtual void setSpectrumF2Index (int32_t val) { packInt(44, val); }
+
+    /** WindowTimeDelta: words 12-13
+     *  64-bit floating-point w/ radix point to the right of bit 12
+     */
+    public: virtual double getWindowTimeDelta () const {
+      int64_t bits = unpackLong(48);
+      return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(12,bits);
+    }
+    public: virtual void setWindowTimeDelta (double val) {
+      int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(12,val);
+      packLong(48, bits);
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    // Implement HasFields
+    //////////////////////////////////////////////////////////////////////////////////////////////////
+    public: virtual int32_t   getFieldCount () const;
+    public: virtual string    getFieldName  (int32_t id) const;
+    public: virtual ValueType getFieldType  (int32_t id) const;
+    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));
+    public: virtual void      setField      (int32_t id, const Value* val);
+  };
 
   /** XXX Interface for working with Context/Command Indicator Fields (CIFs) XXX
    *
@@ -1311,6 +1602,18 @@ namespace vrt {
     protected: virtual void setUUID (int8_t cifNum, int32_t bit, const UUID &val) = 0;
     protected: virtual void setUUID (IndicatorFieldEnum_t field, const UUID &val) {
       setUUID(getCIFNumber(field), getCIFBitMask(field), val);
+    }
+
+    /** Unpacks a TimeStamp from the payload at the indicated position. */
+    protected: virtual TimeStamp getTimeStampField (int8_t cifNum, int32_t bit) const = 0;
+    protected: virtual TimeStamp getTimeStampField (IndicatorFieldEnum_t field) const {
+      return getTimeStampField(getCIFNumber(field), getCIFBitMask(field));
+    }
+
+    /** Packs a TimeStamp from the payload at the indicated position. */
+    protected: virtual void setTimeStampField (int8_t cifNum, int32_t bit, const TimeStamp &val) = 0;
+    protected: virtual void setTimeStampField (IndicatorFieldEnum_t field, const TimeStamp &val) {
+      setTimeStampField(getCIFNumber(field), getCIFBitMask(field), val);
     }
 
     /** Sets a block of data. */
@@ -2154,8 +2457,6 @@ namespace vrt {
 
     /* XXX END OF CIF0 FUNCTIONS XXX */
 
-    // TODO - remember to check if CIF is enabled for all other CIFs
-
     /* XXX START OF CIF1 FUNCTIONS XXX */
 
     /** Gets Buffer Size, Level, and Status (See V49.2 spec Section 9.10.7)
@@ -2280,11 +2581,74 @@ namespace vrt {
       setL(DISCRETE_IO32,val);
     }
 
-    // TODO
-    // INDEX_LIST_mask            = 0x00000080; // variable (See V49.2 spec Section 9.3.2)
-    // SECTOR_SCN_STP_mask        = 0x00000200; // variable (See V49.2 spec Section 9.6.2)
-    // SPECTRUM_mask              = 0x00000400; // 14 (See V49.2 spec Section 9.6.1)
-    // CIFS_ARRAY_mask            = 0x00000800; // variable (See V49.2 spec Section 9.13.1)
+    /** Gets the Index Field List. 
+     *  IndexFieldList type
+     *  (See V49.2 spec Section 9.3.2)
+     *  @return The Index Field List (null if not specified). <i>Note that changes to the
+     *          returned object do not alter the packet.</i>
+     */
+    public: virtual IndexFieldList getIndexList () const = 0;
+
+    /** Sets the Index Field List.
+     *  IndexFieldList type
+     *  (See V49.2 spec Section 9.3.2)
+     *  @param val The Index Field List (null if not specified).
+     */
+    public: inline void setIndexList (const IndexFieldList &val) {
+      setRecord(INDEX_LIST, val, getIndexList());
+    }
+
+    /** Gets the Sector Scan/Step Field. 
+     *  Array-of-Records type
+     *  (See V49.2 spec Section 9.6.2)
+     *  @return The Sector Scan/Step Array-of-Records (null if not specified).
+     *  <i>Note that changes to the returned object do not alter the packet.</i>
+     */
+    public: virtual ArrayOfRecords getSectorScanStep () const = 0;
+
+    /** Sets the Sector Scan/Step Field.
+     *  Array-of-Records type
+     *  (See V49.2 spec Section 9.6.2)
+     *  @param val The Sector Scan/Step Array-of-Records (null if not specified).
+     */
+    public: inline void setSectorScanStep (const ArrayOfRecords &val) {
+      setRecord(SECTOR_SCN_STP, val, getSectorScanStep());
+    }
+
+    /** Gets the CIFs Array 
+     *  Array-of-Records type
+     *  (See V49.2 spec Section 9.13.1)
+     *  @return The CIFs Array as an Array-of-Records (null if not specified).
+     *  <i>Note that changes to the returned object do not alter the packet.</i>
+     */
+    public: virtual ArrayOfRecords getCIFsArray () const = 0;
+
+    /** Sets the CIFs Array
+     *  Array-of-Records type
+     *  (See V49.2 spec Section 9.13.1)
+     *  @param val The CIFs Array as an Array-of-Records (null if not specified).
+     */
+    public: inline void setCIFsArray (const ArrayOfRecords &val) {
+      setRecord(CIFS_ARRAY, val, getCIFsArray());
+    }
+
+    /** Gets the Spectrum Field 
+     *  SpectrumField type
+     *  (See V49.2 spec Section 9.6.1)
+     *  @return The Spectrum Field (null if not specified).
+     *  <i>Note that changes to the returned object do not alter the packet.</i>
+     */
+    public: virtual SpectrumField getSpectrumField () const = 0;
+
+    /** Sets the Spectrum Field
+     *  SpectrumField type
+     *  (See V49.2 spec Section 9.6.1)
+     *  @param val The Spectrum Field (null if not specified).
+     */
+    public: inline void setSpectrumField (const SpectrumField &val) {
+      setRecord(SPECTRUM, val, getSpectrumField());
+    }
+
 
     /** Gets the Auxiliary Bandwidth of the signal in Hz.
      *  (See V49.2 spec Section 9.5.16)
@@ -2688,9 +3052,23 @@ namespace vrt {
       setI(BEAMWIDTH,2,bits);
     }
 
-    // TODO
-    // PNT_ANGL_2D_ST_mask        = 0x10000000; // variable (See V49.2 spec Section 9.4.1)
-    
+    /** Gets the 2D Pointing Angle (Structured)
+     *  See V49.2 spec Section 9.4.1.
+     *  Array-of-Records format
+     *  @return 2D Pointing Angle as an Array-of-Records (null if not specified).
+     *  <i>Note that changes to the returned object do not alter the packet.</i>
+     */
+    public: virtual ArrayOfRecords get2DPointingAngleStructured () const = 0;
+
+    /** Gets the 2D Pointing Angle (Structured)
+     *  See V49.2 spec Section 9.4.1.
+     *  Array-of-Records format
+     *  @param val The 2D Pointing Angle as an Array-of-Records (null if not specified).
+     */
+    public: inline void set2DPointingAngleStructured (const ArrayOfRecords &val) {
+      setRecord(PNT_ANGL_2D_ST, val, get2DPointingAngleStructured());
+    }
+
     /** Gets the Elevation Angle subfield of the Single-word 2D Pointing Angle.
      *  (See V49.2 spec Section 9.4.1)
      *  @return The Elevation Angle (null if not specified).
@@ -3605,27 +3983,579 @@ namespace vrt {
     /* XXX END OF CIF2 FUNCTIONS XXX */
 
     /* XXX START OF CIF3 FUNCTIONS XXX */
-    // TODO
-    // NETWORK_ID_mask            = 0x00000002; // 1 (See V49.2 spec Section 9.8.13)
-    // TROPOSPHERIC_STATE_mask    = 0x00000004; // 1 (See V49.2 spec Section 9.9.1)
-    // SEA_AND_SWELL_STATE_mask   = 0x00000008; // 1 (See V49.2 spec Section 9.9.1)
-    // BAROMETRIC_PRESSURE_mask   = 0x00000010; // 1 (See V49.2 spec Section 9.9.2)
-    // HUMIDITY_mask              = 0x00000020; // 1 (See V49.2 spec Section 9.9.2)
-    // SEA_GROUND_TEMP_mask       = 0x00000040; // 1 (See V49.2 spec Section 9.9.2)
-    // AIR_TEMP_mask              = 0x00000080; // 1 (See V49.2 spec Section 9.9.2)
-                                                // For the next two, See V49.2 spec Section 9.7.2
-    // SHELF_LIFE_mask            = 0x00010000; // 1, 2, or 3 (same as packet tstamp based on TSI and TSF)
-    // AGE_mask                   = 0x00020000; // 1, 2, or 3 (same as packet tstamp based on TSI and TSF)
-    // JITTER_mask                = 0x00100000; // 2 (See V49.2 spec Section 9.7.1 for the next 8)
-    // DWELL_mask                 = 0x00200000; // 2
-    // DURATION_mask              = 0x00400000; // 2
-    // PERIOD_mask                = 0x00800000; // 2
-    // PULSE_WIDTH_mask           = 0x01000000; // 2
-    // OFFSET_TIME_mask           = 0x02000000; // 2
-    // FALL_TIME_mask             = 0x04000000; // 2
-    // RISE_TIME_mask             = 0x08000000; // 2
-    // TIMESTAMP_SKEW_mask        = 0x40000000; // 2 (See V49.2 spec Section 9.7.3.2)
-    // TIMESTAMP_DETAILS_mask     = 0x80000000; // 2 (See V49.2 spec Section 9.7.3.4)
+    /** Gets Network ID
+     *  Used to associate information to be on the same network.
+     *  Network ID uses the Generic32 bit Identifier field
+     *  See V49.2 spec Section 9.8.13 for Network ID
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @return The Network ID (null if not specified)
+     */
+    public: inline int32_t getNetworkID () const {
+      return getL(NETWORK_ID);
+    }
+
+    /** Sets Network ID
+     *  Used to associate information to be on the same network.
+     *  Network ID uses the Generic32 bit Identifier field
+     *  See V49.2 spec Section 9.8.13 for Network ID
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param val The Network ID (null if not specified)
+     */
+    public: inline void setNetworkID (int32_t val) {
+      setL(NETWORK_ID, val);
+    }
+
+    /** Gets Tropospheric State
+     *  Used to enumerate the state of the troposphere.
+     *  Tropospheric State uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.1.1 for Tropospheric State
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @return The Tropospheric State (null if not specified)
+     */
+    public: inline int16_t getTroposphericState () const {
+      int16_t bits = getI(TROPOSPHERIC_STATE, 2);
+      return (isNull(bits))? INT16_NULL : bits;
+    }
+
+    /** Sets Tropospheric State
+     *  Used to enumerate the state of the troposphere.
+     *  Tropospheric State uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.9.1 for Tropospheric State
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param val The Tropospheric State (null if not specified)
+     */
+    public: inline void setTroposphericState (int16_t val) {
+      setI(TROPOSPHERIC_STATE, 2, val);
+    }
+
+    /** Gets Sea and Swell State
+     *  Sea and Swell States use the Douglas sea and swell scale as officially
+     *  defined by the United Kingdom MetOffice in "Fact Sheet No. 6". Sea and
+     *  Swell States are each a number between 0 and 9.
+     *  Bits 31..16: Reserved (property of all Generic16 bit Identifier fields)
+     *  Bits 15..10: User Defined
+     *  Bits 9..5: Swell State
+     *  Bits 4..0: Sea State
+     *  Sea and Swell State uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.9.1 for Sea and Swell State
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @return The Sea and Swell State (null if not specified)
+     */
+    public: inline int16_t getSeaAndSwellState () const {
+      int16_t bits = getI(SEA_AND_SWELL_STATE, 2);
+      return (isNull(bits))? INT16_NULL : bits;
+    }
+
+    /** Sets Sea and Swell State
+     *  Sea and Swell States use the Douglas sea and swell scale as officially
+     *  defined by the United Kingdom MetOffice in "Fact Sheet No. 6". Sea and
+     *  Swell States are each a number between 0 and 9.
+     *  Bits 31..16: Reserved (property of all Generic16 bit Identifier fields)
+     *  Bits 15..10: User Defined
+     *  Bits 9..5: Swell State
+     *  Bits 4..0: Sea State
+     *  Sea and Swell State uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.9.1 for Sea and Swell State
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param val The Sea and Swell State (null if not specified)
+     *  @throws VRTException if parameter contains invalid sea or swell values
+     */
+    public: inline void setSeaAndSwellState (int16_t val) {
+      if (!isNull(val)) {
+        int8_t sea = val&0x1F;
+        int8_t swell = (val>>5)&0x1F;
+        if (sea < 0 || swell < 0 || sea > 9 || swell > 9)
+          throw VRTException("Sea and Swell must both be between 0 and 9.");
+      }
+      setI(SEA_AND_SWELL_STATE, 2, val);
+    }
+
+    /** Sets Sea and Swell State
+     *  Sea and Swell States use the Douglas sea and swell scale as officially
+     *  defined by the United Kingdom MetOffice in "Fact Sheet No. 6". Sea and
+     *  Swell States are each a number between 0 and 9.
+     *  Bits 31..16: Reserved (property of all Generic16 bit Identifier fields)
+     *  Bits 15..10: User Defined
+     *  Bits 9..5: Swell State
+     *  Bits 4..0: Sea State
+     *  Sea and Swell State uses the Generic16 bit Identifier field
+     *  See V49.2 spec Section 9.9.1 for Sea and Swell State
+     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param sea The Sea State [0 to 9], not null
+     *  @param swell The Swell State [0  to 9], not null
+     *  @throws VRTException if either parameter is invalid, including null
+     */
+    public: inline void setSeaAndSwellState (int8_t sea, int8_t swell) {
+      if (isNull(sea) || isNull(swell))
+        throw VRTException("Sea and Swell must both not be null to use this method.");
+      if (sea < 0 || swell < 0 || sea > 9 || swell > 9)
+        throw VRTException("Sea and Swell must both be between 0 and 9.");
+      int16_t val = (swell<<5) & sea;
+      setI(SEA_AND_SWELL_STATE, 2, val);
+    }
+
+    /** Gets Barometric Pressure
+     *  Atmospheric pressure measured in the units of Pascal.
+     *  Bits 31..17: Reserved; 0x0
+     *  Bits 16..0: 0x1FFFF=131071 Pascals; 0x00001=1/131071 Pascals
+     *  See V49.2 spec Section 9.9.2 for Barometric Pressure
+     *  @return The Barometric Pressure (null if not specified)
+     */
+    public: inline int32_t getBarometricPressure () const {
+      return getL(BAROMETRIC_PRESSURE);
+    }
+
+    /** Sets Barometric Pressure
+     *  Atmospheric pressure measured in the units of Pascal.
+     *  Bits 31..17: Reserved; 0x0
+     *  Bits 16..0: 0x1FFFF=131071 Pascals; 0x00001=1/131071 Pascals
+     *  See V49.2 spec Section 9.9.2 for Barometric Pressure
+     *  @param val The Barometric Pressure (null if not specified)
+     */
+    public: inline void setBarometricPressure (int32_t val) {
+      if (!isNull(val))
+        val = val&0x1FFFF;
+      setL(BAROMETRIC_PRESSURE, val);
+    }
+
+    /** Gets Humidity
+     *  Percent humidity.
+     *  Bits 31..16: Reserved; 0x0
+     *  Bits 15..0: Percent humidity. 0xFFFF=100%; 0x0001=(1/65535)*100%
+     *  See V49.2 spec Section 9.9.2 for Humidity
+     *  @return The Humidity (null if not specified)
+     */
+    public: inline int32_t getHumidity () const {
+      return getL(HUMIDITY);
+    }
+
+    /** Sets Humidity
+     *  Percent humidity.
+     *  Bits 31..16: Reserved; 0x0
+     *  Bits 15..0: Percent humidity. 0xFFFF=100%; 0x0001=(1/65535)*100%
+     *  See V49.2 spec Section 9.9.2 for Humidity
+     *  @param val The Humidity (null if not specified)
+     */
+    public: inline void setHumidity (int32_t val) {
+      if (!isNull(val))
+        val = val&0xFFFF;
+      setL(HUMIDITY, val);
+    }
+
+    /** Gets the Sea/Ground Temperature.
+     *  Sea or ground temperature in degrees Celcius. The valid range of values
+     *  is from -273.15 to +511.984375 degrees Celcius.
+     *  Bits 31..16: Reserved; 0x0
+     *  Bits 15..0: 16-bit floating point value with radix point to the right of
+     *  bit 6.
+     *  See V49.2 spec Section 9.9.2 for Sea/Ground Temperature
+     *  @return The Sea/Ground Temperature (null if not specified).
+     */
+    public: inline float getSeaGroundTemperature () const {
+      int16_t bits = getI(SEA_GROUND_TEMP,2);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(6,bits);
+    }
+
+    /** Sets the Sea/Ground Temperature.
+     *  Sea or ground temperature in degrees Celcius. The valid range of values
+     *  is from -273.15 to +511.984375 degrees Celcius.
+     *  Bits 31..16: Reserved; 0x0
+     *  Bits 15..0: 16-bit floating point value with radix point to the right of
+     *  bit 6.
+     *  See V49.2 spec Section 9.9.2 for Sea/Ground Temperature
+     *  @param val The Sea/Ground Temperature (null if not specified).
+     */
+    public: inline void setSeaGroundTemperature (float val) {
+      int16_t bits = VRTMath::fromFloat16(6,val);
+      setI(SEA_GROUND_TEMP,2,bits);
+    }
+
+    /** Gets the Air Temperature.
+     *  Air temperature in degrees Celcius. The valid range of values is from
+     *  -273.15 to +511.984375 degrees Celcius.
+     *  Bits 31..16: Reserved; 0x0
+     *  Bits 15..0: 16-bit floating point value with radix point to the right of
+     *  bit 6.
+     *  See V49.2 spec Section 9.9.2 for Air Temperature
+     *  @return The Air Temperature (null if not specified).
+     */
+    public: inline float getAirTemperature () const {
+      int16_t bits = getI(AIR_TEMP,2);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(6,bits);
+    }
+
+    /** Sets the Air Temperature.
+     *  Air temperature in degrees Celcius. The valid range of values is from
+     *  -273.15 to +511.984375 degrees Celcius.
+     *  Bits 31..16: Reserved; 0x0
+     *  Bits 15..0: 16-bit floating point value with radix point to the right of
+     *  bit 6.
+     *  See V49.2 spec Section 9.9.2 for Air Temperature
+     *  @param val The Air Temperature (null if not specified).
+     */
+    public: inline void setAirTemperature (float val) {
+      int16_t bits = VRTMath::fromFloat16(6,val);
+      setI(AIR_TEMP,2,bits);
+    }
+
+    /** Gets Shelf Life
+     *  The Shelf Life value and format depends on the packet timestamp format
+     *  indicated by TSI and TSF fields of the Packet Prologue.
+     *  See V49.2 spec Section 9.7.2 for Shelf Life
+     *  @return The Shelf Life (null if not specified)
+     */
+    public: inline TimeStamp getShelfLife () const {
+      return getTimeStampField(SHELF_LIFE);
+    }
+
+    /** Sets Shelf Life
+     *  The Shelf Life value and format depends on the packet timestamp format
+     *  indicated by TSI and TSF fields of the Packet Prologue.
+     *  See V49.2 spec Section 9.7.2 for Shelf Life
+     *  @param val The Shelf Life (null if not specified)
+     */
+    public: inline void setShelfLife (const TimeStamp &val) {
+      setTimeStampField(SHELF_LIFE, val);
+    }
+
+    /** Gets Age
+     *  The Age value and format depends on the packet timestamp format
+     *  indicated by TSI and TSF fields of the Packet Prologue.
+     *  See V49.2 spec Section 9.7.2 for Age
+     *  @return The Age (null if not specified)
+     */
+    public: inline TimeStamp getAge () const {
+      return getTimeStampField(AGE);
+    }
+
+    /** Sets Age
+     *  The Age value and format depends on the packet timestamp format
+     *  indicated by TSI and TSF fields of the Packet Prologue.
+     *  See V49.2 spec Section 9.7.2 for Age
+     *  @param val The Age (null if not specified)
+     */
+    public: inline void setAge (const TimeStamp &val) {
+      setTimeStampField(AGE, val);
+    }
+
+    /** Gets Jitter
+     *  Jitter expresses the uncertainty of the timing attribute. The Jitter
+     *  range is +/- the value expressed in the Jitter field.
+     *  Jitter uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Jitter
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @return The Jitter (null if not specified)
+     */
+    public: inline int64_t getJitter () const {
+      int64_t bits = getX(JITTER);
+      return (isNull(bits))? INT64_NULL : bits;
+    }
+
+    /** Sets Jitter
+     *  Jitter expresses the uncertainty of the timing attribute. The Jitter
+     *  range is +/- the value expressed in the Jitter field.
+     *  Jitter uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Jitter
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param val The Jitter (null if not specified)
+     */
+    public: inline void setJitter (int64_t val) {
+      setX(JITTER,val);
+    }
+
+    /** Gets Dwell
+     *  Dwell expresses the length of time that a signal existed (Context
+     *  Packets) or should exist (Command Packets).
+     *  Dwell uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Dwell
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @return The Dwell (null if not specified)
+     */
+    public: inline int64_t getDwell () const {
+      int64_t bits = getX(DWELL);
+      return (isNull(bits))? INT64_NULL : bits;
+    }
+
+    /** Sets Dwell
+     *  Dwell expresses the length of time that a signal existed (Context
+     *  Packets) or should exist (Command Packets).
+     *  Dwell uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Dwell
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param val The Dwell (null if not specified)
+     */
+    public: inline void setDwell (int64_t val) {
+      setX(DWELL,val);
+    }
+
+    /** Gets Duration
+     *  Duration expresses the length of time that a pattern in a signal existed
+     *  (Context Packets) or should exist (Command Packets).
+     *  Duration uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Duration
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @return The Duration (null if not specified)
+     */
+    public: inline int64_t getDuration () const {
+      int64_t bits = getX(DURATION);
+      return (isNull(bits))? INT64_NULL : bits;
+    }
+
+    /** Sets Duration
+     *  Duration expresses the length of time that a pattern in a signal existed
+     *  (Context Packets) or should exist (Command Packets).
+     *  Duration uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Duration
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param val The Duration (null if not specified)
+     */
+    public: inline void setDuration (int64_t val) {
+      setX(DURATION,val);
+    }
+
+    /** Gets Period
+     *  Period expresses the time between cyclical phenomena of a signal.
+     *  Period uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Period
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @return The Period (null if not specified)
+     */
+    public: inline int64_t getPeriod () const {
+      int64_t bits = getX(PERIOD);
+      return (isNull(bits))? INT64_NULL : bits;
+    }
+
+    /** Sets Period
+     *  Period expresses the time between cyclical phenomena of a signal.
+     *  Period uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Period
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param val The Period (null if not specified)
+     */
+    public: inline void setPeriod (int64_t val) {
+      setX(PERIOD,val);
+    }
+
+    /** Gets Pulse Width
+     *  Pulse Width measures the delta time between two timing edges of a
+     *  signal. It measures the time between the rising edge and falling edge of
+     *  a signal or vice versa.
+     *  Pulse Width uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Pulse Width
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @return The Pulse Width (null if not specified)
+     */
+    public: inline int64_t getPulseWidth () const {
+      int64_t bits = getX(PULSE_WIDTH);
+      return (isNull(bits))? INT64_NULL : bits;
+    }
+
+    /** Sets Pulse Width
+     *  Pulse Width measures the delta time between two timing edges of a
+     *  signal. It measures the time between the rising edge and falling edge of
+     *  a signal or vice versa.
+     *  Pulse Width uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Pulse Width
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param val The Pulse Width (null if not specified)
+     */
+    public: inline void setPulseWidth (int64_t val) {
+      setX(PULSE_WIDTH,val);
+    }
+
+    /** Gets Offset Time
+     *  Offset Time is used to measure latency between the timestamp in the V49
+     *  Packet Prologue and the timing edge when the information in the Context
+     *  Packet or Command Packet became valid.
+     *  Offset Time uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Offset Time
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @return The Offset Time (null if not specified)
+     */
+    public: inline int64_t getOffsetTime () const {
+      int64_t bits = getX(OFFSET_TIME);
+      return (isNull(bits))? INT64_NULL : bits;
+    }
+
+    /** Sets Offset Time
+     *  Offset Time is used to measure latency between the timestamp in the V49
+     *  Packet Prologue and the timing edge when the information in the Context
+     *  Packet or Command Packet became valid.
+     *  Offset Time uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Offset Time
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param val The Offset Time (null if not specified)
+     */
+    public: inline void setOffsetTime (int64_t val) {
+      setX(OFFSET_TIME,val);
+    }
+
+    /** Gets Fall Time
+     *  Fall Time is the delta time from 90% of maximum deviation to 10% of
+     *  maximum deviation. Deviation is referenced to the noise floor of the
+     *  signal.
+     *  Fall Time uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Fall Time
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @return The Fall Time (null if not specified)
+     */
+    public: inline int64_t getFallTime () const {
+      int64_t bits = getX(FALL_TIME);
+      return (isNull(bits))? INT64_NULL : bits;
+    }
+
+    /** Sets Fall Time
+     *  Fall Time is the delta time from 90% of maximum deviation to 10% of
+     *  maximum deviation. Deviation is referenced to the noise floor of the
+     *  signal.
+     *  Fall Time uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Fall Time
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param val The Fall Time (null if not specified)
+     */
+    public: inline void setFallTime (int64_t val) {
+      setX(FALL_TIME,val);
+    }
+
+    /** Gets Rise Time
+     *  Rise Time is the delta time from 10% of maximum deviation to 90% of
+     *  maximum deviation. Deviation is referenced to the noise floor of the
+     *  signal.
+     *  Rise Time uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Rise Time
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @return The Rise Time (null if not specified)
+     */
+    public: inline int64_t getRiseTime () const {
+      int64_t bits = getX(RISE_TIME);
+      return (isNull(bits))? INT64_NULL : bits;
+    }
+
+    /** Sets Rise Time
+     *  Rise Time is the delta time from 10% of maximum deviation to 90% of
+     *  maximum deviation. Deviation is referenced to the noise floor of the
+     *  signal.
+     *  Rise Time uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.1 for Rise Time
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param val The Rise Time (null if not specified)
+     */
+    public: inline void setRiseTime (int64_t val) {
+      setX(RISE_TIME,val);
+    }
+
+    /** Gets Timestamp Skew
+     *  Timestamp Skew conveys a time offset between channels in a system or
+     *  between systems in a distributed system-of-systems architecture.
+     *  Timestamp Skew uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.3.2 for Timestamp Skew
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @return The Timestamp Skew (null if not specified)
+     */
+    public: inline int64_t getTimestampSkew () const {
+      int64_t bits = getX(TIMESTAMP_SKEW);
+      return (isNull(bits))? INT64_NULL : bits;
+    }
+
+    /** Sets Timestamp Skew
+     *  Timestamp Skew conveys a time offset between channels in a system or
+     *  between systems in a distributed system-of-systems architecture.
+     *  Timestamp Skew uses the 64-bit Fractional Time format where the least
+     *  significant bit represents 1 femtosecond (10e-15 seconds).
+     *  See V49.2 spec Section 9.7.3.2 for Timestamp Skew
+     *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param val The Timestamp Skew (null if not specified)
+     */
+    public: inline void setTimestampSkew (int64_t val) {
+      setX(TIMESTAMP_SKEW,val);
+    }
+
+    // TODO - Could provide additional helpers for Timestamp Details field
+
+    /** Gets Timestamp Details
+     *  Timestamp Details describes the timestamps used in the Context Stream
+     *  and the paired Data Stream (if present).
+     *  First Word:
+     *    Bits 31..24: User Defined
+     *    Bits 23..19: Reserved; 0x0
+     *    Bit      18: (G) Globally applicable?
+     *    Bits 17..16: (TSE Code) Type of Timestamp Epoch provided
+     *    Bits 15..14: (LSH Code) Indicates the means by which leap seconds are
+     *                 handled in the packet timestamps
+     *    Bits 13..12: (LSP Code) Indicates the number of seconds in the current
+     *                 day denoted by the packet timestamps
+     *    Bits  11..9: (Time Source) Indicates time reference source being used
+     *    Bit       8: (E) If 0, Current POSIX Time Offset is undefined. If 1,
+     *                 Current POSIX Time Offset conveys the difference in
+     *                 seconds between UTC time and POSIX time, as a signed
+     *                 twos-complement number, and it represents the total leap
+     *                 seconds count.
+     *    Bits   7..0: (Current POSIX Time Offset) See Bit 8 (E)
+     *  Second Word:
+     *    Bits  31..0: (Timestamp Epoch) Unsigned integer value specifying the
+     *                 number of whole seconds, in the epoch denoted by the TSE
+     *                 Code, describing the start of the epoch used for
+     *                 timestamps in all packets to which the Timestamp Details
+     *                 field applies. When the TSE Code is set to Unspecified,
+     *                 the value in the Timestamp Epoch field has no meaning.
+     *  See V49.2 spec Section 9.7.3.4 for Timestamp Details
+     *  @return The Timestamp Details (null if not specified)
+     */
+    public: inline int64_t getTimestampDetails () const {
+      int64_t bits = getX(TIMESTAMP_DETAILS);
+      return (isNull(bits))? INT64_NULL : bits;
+    }
+
+    /** Sets Timestamp Details
+     *  Timestamp Details describes the timestamps used in the Context Stream
+     *  and the paired Data Stream (if present).
+     *  First Word:
+     *    Bits 31..24: User Defined
+     *    Bits 23..19: Reserved; 0x0
+     *    Bit      18: (G) Globally applicable?
+     *    Bits 17..16: (TSE Code) Type of Timestamp Epoch provided
+     *    Bits 15..14: (LSH Code) Indicates the means by which leap seconds are
+     *                 handled in the packet timestamps
+     *    Bits 13..12: (LSP Code) Indicates the number of seconds in the current
+     *                 day denoted by the packet timestamps
+     *    Bits  11..9: (Time Source) Indicates time reference source being used
+     *    Bit       8: (E) If 0, Current POSIX Time Offset is undefined. If 1,
+     *                 Current POSIX Time Offset conveys the difference in
+     *                 seconds between UTC time and POSIX time, as a signed
+     *                 twos-complement number, and it represents the total leap
+     *                 seconds count.
+     *    Bits   7..0: (Current POSIX Time Offset) See Bit 8 (E)
+     *  Second Word:
+     *    Bits  31..0: (Timestamp Epoch) Unsigned integer value specifying the
+     *                 number of whole seconds, in the epoch denoted by the TSE
+     *                 Code, describing the start of the epoch used for
+     *                 timestamps in all packets to which the Timestamp Details
+     *                 field applies. When the TSE Code is set to Unspecified,
+     *                 the value in the Timestamp Epoch field has no meaning.
+     *  See V49.2 spec Section 9.7.3.4 for Timestamp Details
+     *  @param val The Timestamp Details (null if not specified)
+     */
+    public: inline void setTimestampDetails (int64_t val) {
+      setX(TIMESTAMP_DETAILS,val);
+    }
+
     /* XXX END OF CIF3 FUNCTIONS XXX */
 
     /* XXX START OF CIF7 FUNCTIONS XXX */

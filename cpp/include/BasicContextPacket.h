@@ -291,6 +291,12 @@ namespace vrt {
     /** Packs a 128-bit UUID from the payload at the indicated position. */
     protected: virtual void setUUID (int8_t cifNum, int32_t bit, const UUID &val);
 
+    /** Unpacks a TimeStamp from the payload at the indicated position. */
+    protected: virtual TimeStamp getTimeStampField (int8_t cifNum, int32_t bit) const;
+
+    /** Packs a TimeStamp from the payload at the indicated position. */
+    protected: virtual void setTimeStampField (int8_t cifNum, int32_t bit, const TimeStamp &val);
+
     /** Gets a block of data. */
     protected: virtual void setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen);
 
@@ -405,6 +411,68 @@ namespace vrt {
       //int32_t           off = IndicatorFieldProvider::getOffset(CONTEXT_ASOC);
       int32_t           off = getOffset(0, protected_CIF0::CONTEXT_ASOC_mask);
       ContextAssocLists val;
+      if (off >= 0) unpackPayloadRecord(off,val);
+      return val;
+    }
+
+    /** Gets the Index Field List.
+     *  @return The Index Field List (null if not specified). <i>Note that changes to the
+     *          returned object do not alter the packet.</i>
+     */
+    public: inline IndexFieldList getIndexList () const {
+      //int32_t           off = IndicatorFieldProvider::getOffset(INDEX_LIST);
+      int32_t           off = getOffset(0, protected_CIF1::INDEX_LIST_mask);
+      IndexFieldList val;
+      if (off >= 0) unpackPayloadRecord(off,val);
+      return val;
+    }
+
+    /** Gets the Sector Scan/Step Field. 
+     *  @return The Sector Scan/Step Array-of-Records (null if not specified).
+     *  <i>Note that changes to the returned object do not alter the packet.</i>
+     */
+    public: virtual ArrayOfRecords getSectorScanStep () const {
+      //int32_t           off = IndicatorFieldProvider::getOffset(SECTOR_SCN_STP);
+      int32_t           off = getOffset(0, protected_CIF1::SECTOR_SCN_STP_mask);
+      ArrayOfRecords val;
+      if (off >= 0) unpackPayloadRecord(off,val);
+      return val;
+    }
+
+    /** Gets the CIFs Array
+     *  @return The CIFs Array as an Array-of-Records (null if not specified).
+     *  <i>Note that changes to the returned object do not alter the packet.</i>
+     */
+    public: virtual ArrayOfRecords getCIFsArray () const {
+      //int32_t           off = IndicatorFieldProvider::getOffset(CIFS_ARRAY);
+      int32_t           off = getOffset(0, protected_CIF1::CIFS_ARRAY_mask);
+      ArrayOfRecords val;
+      if (off >= 0) unpackPayloadRecord(off,val);
+      return val;
+    }
+
+    /** Gets the Spectrum Field 
+     *  SpectrumField type
+     *  (See V49.2 spec Section 9.6.1)
+     *  @return The Spectrum Field (null if not specified).
+     *  <i>Note that changes to the returned object do not alter the packet.</i>
+     */
+    public: virtual SpectrumField getSpectrumField () const {
+      //int32_t           off = IndicatorFieldProvider::getOffset(SPECTRUM);
+      int32_t           off = getOffset(0, protected_CIF1::SPECTRUM_mask);
+      SpectrumField val;
+      if (off >= 0) unpackPayloadRecord(off,val);
+      return val;
+    }
+
+    /** Gets the 2D Pointing Angle (Structured)
+     *  @return 2D Pointing Angle as an Array-of-Records (null if not specified).
+     *  <i>Note that changes to the returned object do not alter the packet.</i>
+     */
+    public: virtual ArrayOfRecords get2DPointingAngleStructured () const {
+      //int32_t           off = IndicatorFieldProvider::getOffset(PNT_ANGL_2D_ST);
+      int32_t           off = getOffset(0, protected_CIF1::PNT_ANGL_2D_ST_mask);
+      ArrayOfRecords val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
     }
