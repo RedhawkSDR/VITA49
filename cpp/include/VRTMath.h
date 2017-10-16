@@ -72,7 +72,7 @@
 // so we omit the include file there and just use the definitions appearing below.
 // Note that it is possible these are missing under BSD too, but this is untested.
 # include <byteswap.h>
-#endif
+#else
 
 #ifndef __bswap_16
 inline uint16_t __bswap_16 (uint16_t val) {
@@ -129,6 +129,7 @@ inline double __bswap_64 (double val) {
   return *((double*)&v);
 }
 # endif
+#endif
 #endif
 
 // Avoid warnings caused by the __bswap_XX(..) functions being unsigned-only on some platforms
