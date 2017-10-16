@@ -180,7 +180,7 @@ int16_t VRTMath::_toHalfInternal (float val) {
   // The algorithm used here is based on the code provided in [2], with
   // modifications to address the problem in the algorithm provided in [2]
   // where some NaN values mapped to Inf.
-  int32_t floatBits = *((int32_t*)(void*)&val);
+  int32_t floatBits = safecastT1ToT2<float,int32_t>(val);
   int32_t index     = (floatBits>>23) & 0x1FF;
   int32_t halfBits  = FLOAT16_BASE_TABLE[index]
                     | ((floatBits&0x007FFFFF) >> FLOAT16_SHIFT_TABLE[index])
@@ -197,7 +197,7 @@ float VRTMath::_fromHalfInternal (int16_t bits) {
   int32_t index     = halfBits >> 10;
   int32_t floatBits = FLOAT16_MAN_TABLE[FLOAT16_OFF_TABLE[index]+(halfBits&0x3FF)]
                     + FLOAT16_EXP_TABLE[index];
-  return *((float*)(void*)&floatBits);
+  return safecastT1ToT2<int32_t,float>(floatBits);
 }
 
 /** <b>Internal Use Only:</b> Converts to VRTFloat. */

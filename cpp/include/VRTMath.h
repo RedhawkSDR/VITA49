@@ -289,6 +289,35 @@ namespace vrt {
    */
   namespace VRTMath {
 
+    /** Used to perform compile-time type check as follows:
+     *    requirement<sizeof(int32_t)==sizeof(float), int32_t>::type ret;
+     *  which passes, where as the following will fail at compile time:
+     *    requirement<sizeof(int32_t)==sizeof(double), int32_t>::type ret;
+     *  Use where the first argument is false results in a compilation error
+     *  reporting invalid use of incomplete type.
+     */
+    template <bool, typename T>
+    struct type_requirement;
+
+    template <typename T>
+    struct type_requirement<true, T>
+    {
+      typedef T type;
+    };
+
+    /** Converts an from one type to another type of same size using memcpy.
+     *  templateparam T1 From-type
+     *  templateparam T2 To-type
+     *  @param val Value to convert from (should have type T1)
+     *  @return Value as type T2
+     */
+    template <typename T1, typename T2>
+    T2 safecastT1ToT2 (T1 val) {
+      typename type_requirement<sizeof(T1)==sizeof(T2), T2>::type ret;
+      memcpy(&ret, &val, sizeof(ret));
+      return ret;
+    };
+
     /** Converts an IEEE-764 double into the corresponding 64-bits contained
      *  in a 64-bit integer. <br>
      *  <br>
@@ -297,7 +326,7 @@ namespace vrt {
      *  implementation is entirely different.
      */
     inline int64_t doubleToRawLongBits (double val) {
-      return *((int64_t*)(void*)&val);
+      return safecastT1ToT2<double,int64_t>(val);
     }
 
     /** Converts an IEEE-764 float into the corresponding 32-bits contained
@@ -308,7 +337,7 @@ namespace vrt {
      *  implementation is entirely different.
      */
     inline int32_t floatToRawIntBits (float val) {
-      return *((int32_t*)(void*)&val);
+      return safecastT1ToT2<float,int32_t>(val);
     }
 
     /** Converts the 64-bits corresponding to an IEEE-764 double, as contained
@@ -319,7 +348,7 @@ namespace vrt {
      *  implementation is entirely different.
      */
     inline double longBitsToDouble (int64_t bits) {
-      return *((double*)(void*)&bits);
+      return safecastT1ToT2<int64_t,double>(bits);
     }
 
     /** Converts the 32-bits corresponding to an IEEE-764 float, as contained
@@ -330,7 +359,7 @@ namespace vrt {
      *  implementation is entirely different.
      */
     inline float intBitsToFloat (int32_t bits) {
-      return *((float*)(void*)&bits);
+      return safecastT1ToT2<int32_t,float>(bits);
     }
 
     // We have checked and the compiler (GCC 4.4.5 with -O3), when in-lining any
