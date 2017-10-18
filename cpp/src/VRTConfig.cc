@@ -28,21 +28,18 @@
 #include "VRTConfig.h"
 #include "stdlib.h"     // required for getenv(..) on GCC4.4/libc6 2.11.1
 
+#define _libraryVersion "0.9.0";
+
 using namespace std;
 using namespace vrt;
 
 static bool                     _initDone             = false;
-static string                   _libraryVersion       = "0.9.0";
 static int32_t                  _testDelay            = 0;
-static string                   _testDevice           = "";
-static string                   _testFirstMCast       = "";
 static int32_t                  _testFirstPort        = 0;
 static bool                     _testQuick            = true;
-static string                   _testServer           = "";
 static int32_t                  _testServerTimeout    = 0;
 static bool                     _strict               = false;
 static bool                     _preferIPv6Addresses  = false;
-static string                   _leapSecondsFile      = "";
 static bool                     _noradLeapSecCounted  = true;
 static VRTConfig::VITAVersion   _vrtVersion           = VRTConfig::VITAVersion_V49;
 static void                    *_packetFactory        = NULL;
@@ -100,16 +97,11 @@ void VRTConfig::libraryInit () {
 
   _initDone            = true;
   _testDelay           = atoi(testDelay.c_str());;
-  _testDevice          = getProperty("VRT_TEST_DEVICE",      "");
-  _testFirstMCast      = getProperty("VRT_TEST_FIRST_MCAST", "");
   _testFirstPort       = atoi(firstPort.c_str());
   _testQuick           = Utilities::toBooleanValue(getProperty("VRT_TEST_QUICK","true"));
-  _testServer          = getProperty("VRT_TEST_SERVER", "");
   _testServerTimeout   = atoi(serverTimeout.c_str());;
   _strict              = Utilities::toBooleanValue(getProperty("VRT_STRICT","false"));
   _preferIPv6Addresses = Utilities::toBooleanValue(getProperty("VRT_PREFER_IPV6_ADDRESSES","false"));
-  _leapSecondsFile     = (vrthome == "")? getProperty("VRT_LEAP_SECONDS", "")
-                                        : getProperty("VRT_LEAP_SECONDS", vrthome+"/cpp_lib/tai-utc.dat");
   _noradLeapSecCounted = Utilities::toBooleanValue(getProperty("VRT_NORAD_LS_COUNTED","true"));
   _packetFactory       = NULL;
 
@@ -151,7 +143,6 @@ void VRTConfig::libraryInit () {
 }
 
 string VRTConfig::getLibraryVersion () {
-  if (!_initDone) libraryInit();
   return _libraryVersion;
 }
 
@@ -166,11 +157,19 @@ int32_t VRTConfig::getTestDelay () {
 }
 
 string VRTConfig::getTestDevice () {
+  static string _testDevice = getProperty("VRT_TEST_DEVICE", "");
+  if (_testDevice=="") {
+    _testDevice = getProperty("VRT_TEST_DEVICE", "");
+  }
   if (!_initDone) libraryInit();
   return _testDevice;
 }
 
 string VRTConfig::getTestFirstMCast () {
+  static string _testFirstMCast = getProperty("VRT_TEST_FIRST_MCAST", "");
+  if (_testFirstMCast=="") {
+    _testFirstMCast = getProperty("VRT_TEST_FIRST_MCAST", "");
+  }
   if (!_initDone) libraryInit();
   return _testFirstMCast;
 }
@@ -186,6 +185,10 @@ bool VRTConfig::getTestQuick () {
 }
 
 string VRTConfig::getTestServer () {
+  static string _testServer = getProperty("VRT_TEST_SERVER", "");
+  if (_testServer=="") {
+    _testServer = getProperty("VRT_TEST_SERVER", "");
+  }
   if (!_initDone) libraryInit();
   return _testServer;
 }
@@ -206,6 +209,12 @@ bool VRTConfig::getPreferIPv6Addresses () {
 }
 
 string VRTConfig::getLeapSecondsFile () {
+  static string _leapSecondsFile = "";
+  if (_leapSecondsFile=="") {
+    string vrthome = getProperty("VRTHOME", "");
+    _leapSecondsFile = (vrthome == "")? getProperty("VRT_LEAP_SECONDS", "")
+                                      : getProperty("VRT_LEAP_SECONDS", vrthome+"/cpp_lib/tai-utc.dat");
+  }
   if (!_initDone) libraryInit();
   return _leapSecondsFile;
 }
