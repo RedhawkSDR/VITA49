@@ -1,0 +1,213 @@
+<html>
+  <head>
+    <title>A.1. Standard Data Packet</title>
+    <style>
+      body { font-family:  serif, 'Times New Roman', 'Times', serif;
+             font-size:    10pt;  font-style: normal;
+             background-color: #FFFFFF; color:#000000; width:        600pt; }
+      
+      h1 { font-size:16pt; font-weight:bold; text-align:center; font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 8pt 8pt 8pt 8pt; }
+      
+      h2 { font-size:14pt; font-weight:bold; text-align:left; font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      h3 { font-size:12pt; font-weight:bold; text-align:left; font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      h4 { font-size:12pt; font-weight:bold; text-align:left;   font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      h5 { font-size:12pt; font-weight:bold; text-align:left;   font-style: italic;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      pre    { font-family:  monospace, 'Courier New', 'Courier', monospace;
+               font-size:    10pt;
+               font-weight:  bold;
+               text-align:   left;
+               border-style: outset; border-width: 0pt;
+               margin: 5pt 5pt 5pt 5pt; padding: 5pt 5pt 5pt 5pt; }
+      
+      pre.led{ font-size:6pt; font-weight:bold; }
+      
+      code   { font-family:  monospace, 'Courier New', 'Courier', monospace;
+               font-size:    10pt;
+               font-weight:  bold;
+               text-align:   left; }
+      
+      ol { margin: 0pt 20pt 5pt 20pt; padding: 0pt 20pt 5pt 20pt; }
+      ul { margin: 0pt 20pt 5pt 20pt; padding: 0pt 20pt 5pt 20pt; }
+      
+      li { margin-top: 10pt; }
+      
+      table       { margin-left:  20pt; margin-right: 20pt;
+                    font-size:    10pt; font-style: normal;
+                    width:        560pt;
+                    border-style: outset; border-width: 1pt;
+                    empty-cells:  show; }
+      
+      table.nested{ margin-left:  0pt;  margin-right: 0pt;
+                    font-size:    10pt; font-style: normal;
+                    width:        100%;
+                    border-style: none;
+                    empty-cells:  show; }
+      
+      td          { border-style: inset; border-width: 1pt;
+                    text-align:left; vertical-align: text-top;
+                    background-color: #FFFFFF; color:#000000; }
+      th          { border-style: inset; border-width: 1pt;
+                    text-align:left; vertical-align: text-top;
+                    background-color: #888888; color:#000000; }
+      
+      th.title   { background-color: #FFFF66; text-align:center; }
+      th.section { background-color: #9999FF; text-align:center; }
+      th.col     {                            text-align:center; }
+    </style>
+  </head>
+  <body>
+    <h1>A.1. Standard Data Packet</h1>
+
+        The "standard data packet" defines a specific set of Class Identifiers
+        that can be used with IF Data and Extension Data packets. Rather than
+        enumerate all possible Class Identifiers that can be used, an algorithmic
+        approach is taken to assign them (this algorithm should be apparent from
+        the diagrams shown below). All of the Class Identifiers will be in the
+        range of <tt>FF-FF-FA:0000.0000</tt> to <tt>FF-FF-FA:00FF.FFFF</tt>.<br><br>
+
+        Note that although much of the information in the algorithm derives from
+        information contained in the paired IF Context packet (especially the
+        Data Packet Payload Field), this is not intended to be a substitute for
+        the proper use of the fields in the paired IF Context packet.<br><br>
+
+        The <tt>StandardDataPacket</tt> shall only be used with data packets that
+        meet all of the following criteria (see VRT section 7.1.5.18):
+        <ul>
+          <li>Contain "Real" or "Complex, Cartesian" values;</li>
+          <li>Contain 4-/8-/16-/32-/64-bit Signed Fixed Point,
+              1-/4-/8-/16-/32-/64-bit Unsigned Fixed Point, 32-bit IEEE-754
+              Single-Precision Floating-Point, or 64-bit IEEE-754 Double-Precision
+              Floating-Point values;</li>
+          <li>Have an Event-Tag Size of zero;</li>
+          <li>Have an Channel-Tag Size of zero;</li>
+          <li>Have an Item Packing Field Size equal to the Data Item Size; and</li>
+          <li>Have a Repeat Count of 1.</li>
+        </ul>
+        <pre>
++--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+|31|30|29|28|27|26|25|24|23|22|21|20|19|18|17|16|15|14|13|12|11|10| 9| 8| 7| 6| 5| 4| 3| 2| 1| 0|
++--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+|        Reserved       |                         FF-FF-FA                                      |
++-----------------------+-----+-----+-----------+-----------------------------------------------+
+| 0  0  0  0  0  0  0  0| Res | R/C | Data Type |               Vector Size                     |
++-----------------------+-----+-----+-----------+-----------------------------------------------+
+                <b>Organization of the StandardDataPacket Class Identifier</b>
+        </pre><br><br>
+
+        <pre>
++--------+-------------------------------------------+-----------+
+|  Bit   |               Field                       |Field Width|
+|Position|            Description                    |  (bits)   |
++--------+-------------------------------------------+-----------+
+| 24..31 | Fixed Value (binary 0000 0000)            |     8     |
++--------+-------------------------------------------+-----------+
+| 22..23 | Reserved    (binary 00)                   |     2     |
++--------+-------------------------------------------+-----------+
+| 20..21 | Real/Complex Indicator:                   |     1     |
+|        |     00 = Real                             |           |
+|        |     01 = Complex, Cartesian               |           |
+|        |     10 = <i>Reserved</i>                         |           |
+|        |     11 = <i>Reserved</i>                         |           |
+|        |   <i>(This mirrors VRT Rule 7.1.5.18-3.)</i>     |           |
++--------+-------------------------------------------+-----------+
+| 16..19 | Data Type:                                |     4     |
+|        |   0000 = <i>Reserved</i>                         |           |
+|        |   0001 =  4-bit Signed Fixed Point        |           |
+|        |   0010 =  8-bit Signed Fixed Point        |           |
+|        |   0011 = 16-bit Signed Fixed Point        |           |
+|        |   0100 = 32-bit Signed Fixed Point        |           |
+|        |   0101 = 64-bit Signed Fixed Point        |           |
+|        |   0110 = 32-bit IEEE-754 Single-Precision |           |
+|        |   0111 = 64-bit IEEE-754 Double-Precision |           |
+|        |   1000 =  1-bit Unsigned Fixed Point      |           |
+|        |   1001 =  4-bit Unsigned Fixed Point      |           |
+|        |   1010 =  8-bit Unsigned Fixed Point      |           |
+|        |   1011 = 16-bit Unsigned Fixed Point      |           |
+|        |   1100 = 32-bit Unsigned Fixed Point      |           |
+|        |   1101 = 64-bit Unsigned Fixed Point      |           |
+|        |   1110 = <i>Reserved</i>                         |           |
+|        |   1111 = <i>Reserved</i>                         |           |
++--------+-------------------------------------------+-----------+
+|  0..15 | Vector Size:                              |    16     |
+|        |    An unsigned number that is one less    |           |
+|        |    than the actual Vector size. <i>(This     |           |
+|        |    mirrors VRT Rule 7.1.5.18-11.)</i>         |           |
++--------+-------------------------------------------+-----------+
+<b>Location of Parameter Fields in the Second Class Identifier Word</b>
+        </pre>
+      
+<br>
+<br>
+<h2>See Also:</h2>
+<ul>
+  <li><a href='../java_doc/nxm/vrt/lib/StandardDataPacket.html'>StandardDataPacket.java</a></li>
+  <li><a href='../cpp_doc/html/classvrt_1_1StandardDataPacket.html'>StandardDataPacket.h</a></li>
+</ul>
+<center>
+  <table border='1'>
+    <tr><th colspan='3' class='title'>Extension Data Packet Class Options Table   </th></tr>
+    <tr>
+      <th>
+        Class Name
+      </th>
+      <td colspan='2'>
+        <tt style='font-size:large'><b>StandardDataPacket</b></tt>
+      </td>
+    </tr>
+    <tr>
+      <th>
+        Class Code
+      </th>
+      <td colspan='2'>
+        <tt style='font-size:large'><b>FF-FF-FA:0000.0000</b></tt>
+      </td>
+    </tr>
+    <tr><th colspan='3' class='section'>         Packet Header                                      </th></tr>
+    <tr><th class='col'>Parameter</th><th class='col'>Allowed Options</th><th class='col'>Comments</th></tr>
+    <tr><th>Packet Type                 </th><td>Extension Data</td><td>&nbsp;   </td></tr>
+    <tr><th>Stream Identifier           </th><td>Not Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Class Identifier            </th><td>Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Integer-seconds    Timestamp</th><td>UTC (or GPS)</td><td>&nbsp;   </td></tr>
+    <tr><th>Fractional-seconds Timestamp</th><td>Real-time</td><td>&nbsp;   </td></tr>
+    <tr><th>Timestamp Precision         </th><td>As specified in TimestampAccuracyPacket</td><td>&nbsp;</td></tr>
+    <tr><th colspan='3' class='section'>       Packet Payload                                     </th></tr>
+    <tr><th class='col'>Parameter</th><th class='col'>Allowed Options</th><th class='col'>Comments</th></tr>
+    <tr><th>Packing Method              </th><td rowspan='10'>As specified in the paired IF Context packet.</td><td>&nbsp;   </td></tr>
+    <tr><th>Item Packing Field Size     </th>                                        <td>&nbsp;   </td></tr>
+    <tr><th>Data Item Size              </th>                                        <td>&nbsp;   </td></tr>
+    <tr><th>Event-Tag Sizeer            </th>                                        <td>&nbsp;   </td></tr>
+    <tr><th>Channel-Tag Size            </th>                                        <td>&nbsp;   </td></tr>
+    <tr><th>Vector Size                 </th>                                        <td>&nbsp;   </td></tr>
+    <tr><th>Real/Complex Type           </th>                                        <td>&nbsp;   </td></tr>
+    <tr><th>Data Item Format            </th>                                        <td>&nbsp;   </td></tr>
+    <tr><th>Sample-Repeating / Channel Repeating</th>                                <td>&nbsp;   </td></tr>
+    <tr><th>Repeat Count                </th>                                        <td>&nbsp;   </td></tr>
+    <tr><th colspan='3' class='section'>       Packet Trailer                                     </th></tr>
+    <tr><td colspan='3'><center>             Trailer is Optional                       </center></td></tr>
+    <tr><th class='col'>Parameter</th><th class='col'>Allowed Options</th><th class='col'>Comments</th></tr>
+    <tr><th>Calibrated Time    Indicator</th><td>Sometimes Used</td><td></td></tr>
+    <tr><th>Valid Data         Indicator</th><td>Sometimes Used</td><td></td></tr>
+    <tr><th>Reference Lock     Indicator</th><td>Sometimes Used</td><td></td></tr>
+    <tr><th>AGC/MGC            Indicator</th><td>Sometimes Used</td><td></td></tr>
+    <tr><th>Detected Signal    Indicator</th><td>Sometimes Used</td><td></td></tr>
+    <tr><th>Spectral-Inversion Indicator</th><td>Sometimes Used</td><td></td></tr>
+    <tr><th>Over-Range         Indicator</th><td>Sometimes Used</td><td></td></tr>
+    <tr><th>Sample Loss        Indicator</th><td>Sometimes Used</td><td></td></tr>
+    <tr><th>User Defined Indicator #11</th><td>Sometimes Used</td><td></td></tr>
+    <tr><th>User Defined Indicator #10</th><td>Sometimes Used</td><td></td></tr>
+    <tr><th>User Defined Indicator #9 </th><td>Sometimes Used</td><td></td></tr>
+    <tr><th>User Defined Indicator #8 </th><td>Sometimes Used</td><td></td></tr>
+    <tr><th>Associated Context Packet Count</th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+  </table>
+</center>
+  </body>
+</html>

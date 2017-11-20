@@ -1,0 +1,524 @@
+<html>
+  <head>
+    <title>A.7. ECEF Ephemeris</title>
+    <style>
+      body { font-family:  serif, 'Times New Roman', 'Times', serif;
+             font-size:    10pt;  font-style: normal;
+             background-color: #FFFFFF; color:#000000; width:        600pt; }
+      
+      h1 { font-size:16pt; font-weight:bold; text-align:center; font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 8pt 8pt 8pt 8pt; }
+      
+      h2 { font-size:14pt; font-weight:bold; text-align:left; font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      h3 { font-size:12pt; font-weight:bold; text-align:left; font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      h4 { font-size:12pt; font-weight:bold; text-align:left;   font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      h5 { font-size:12pt; font-weight:bold; text-align:left;   font-style: italic;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      pre    { font-family:  monospace, 'Courier New', 'Courier', monospace;
+               font-size:    10pt;
+               font-weight:  bold;
+               text-align:   left;
+               border-style: outset; border-width: 0pt;
+               margin: 5pt 5pt 5pt 5pt; padding: 5pt 5pt 5pt 5pt; }
+      
+      pre.led{ font-size:6pt; font-weight:bold; }
+      
+      code   { font-family:  monospace, 'Courier New', 'Courier', monospace;
+               font-size:    10pt;
+               font-weight:  bold;
+               text-align:   left; }
+      
+      ol { margin: 0pt 20pt 5pt 20pt; padding: 0pt 20pt 5pt 20pt; }
+      ul { margin: 0pt 20pt 5pt 20pt; padding: 0pt 20pt 5pt 20pt; }
+      
+      li { margin-top: 10pt; }
+      
+      table       { margin-left:  20pt; margin-right: 20pt;
+                    font-size:    10pt; font-style: normal;
+                    width:        560pt;
+                    border-style: outset; border-width: 1pt;
+                    empty-cells:  show; }
+      
+      table.nested{ margin-left:  0pt;  margin-right: 0pt;
+                    font-size:    10pt; font-style: normal;
+                    width:        100%;
+                    border-style: none;
+                    empty-cells:  show; }
+      
+      td          { border-style: inset; border-width: 1pt;
+                    text-align:left; vertical-align: text-top;
+                    background-color: #FFFFFF; color:#000000; }
+      th          { border-style: inset; border-width: 1pt;
+                    text-align:left; vertical-align: text-top;
+                    background-color: #888888; color:#000000; }
+      
+      th.title   { background-color: #FFFF66; text-align:center; }
+      th.section { background-color: #9999FF; text-align:center; }
+      th.col     {                            text-align:center; }
+    </style>
+  </head>
+  <body>
+    <h1>A.7. ECEF Ephemeris</h1>
+
+        Describes the position of a vehicle in ECEF (ECR) coordinates. This
+        augments the standard IF Context packet which includes basic ephemeris
+        information for a single point in time, but lacks the ability to convey
+        a description of the actual and anticipated movements of a vehicle. A
+        good example would be that of a ballistic projectile that lacks a GPS
+        or INS system, but has an extremely predictable path of travel.<br><br>
+
+        The ECEF and Attitude <b>shall</b> be defined using the same coordinate
+        system described in VITA 49.0 rules 7.1.5.21-1 and 7.1.5.21-2.<br><br>
+
+        If the associated IF Context packet includes ECEF ephemeris values, they
+        <b>shall</b> be consistent with the values provided here (excepting rounding
+        errors). Note that "consistent" differs from "equal" in that the fixes in
+        the IF Context packet <b>may</b> be sampled at a different time interval
+        resulting in values that are "consistent" but "unequal". Also note that
+        the ECEF values <b>may</b> differ significantly from the GPS and/or INS
+        values that are (optionally) included in the IF Context packet in cases
+        where there are measurement inconsistencies between the devices used.<br><br>
+
+        The enumerated Fix Type enumeration provides extra detail to processing
+        systems that assign different "accuracy tolerances" based on the fix
+        type. All fix types less than zero indicates a predicted/estimated value
+        is given, fix types greater than zero indicates an actual/measured value
+        is given. If both Predicted and Actual values are included, the Fix
+        Types <b>shall</b> report all points as Predicted or <b>shall not</b>
+        specify the Fix Type.<br><br>
+
+        The Fix Time field specifies the time of the first fix. Where multiple
+        fix points are provided the Fix Delta gives the delta between each pair
+        of fixes (e.g. between points(7) and points(8)), all points must be
+        evenly spaced. A fix at the current time will have the fix time match
+        that of the packet; though it need not be the first point listed.<br><br>
+
+        This approach allows for old fixes to be re-sent as necessary and allows
+        use of predicted values for interpolation. In the case of orbiting
+        spacecraft, future positions of vehicles can be predicted with some
+        accuracy so the inclusion of points in the past and future allows
+        consumers to interpolate the positions at any arbitrary time.<br><br>
+
+        Stationary objects are identified by velocity and acceleration values of
+        zero (but a non-zero fix type for both) and will typically have 1+ past
+        and 1+ future points specified (with the same values). Any interpolation
+        algorithms should always resolve to the stationary position.
+      
+<br>
+<br>
+<h2>See Also:</h2>
+<ul>
+  <li><a href='../java_doc/nxm/vrt/libm/EphemerisPacket.html'>EphemerisPacket.java</a></li>
+  <li><a href='../cpp_doc/html/classvrt_1_1EphemerisPacket.html'>EphemerisPacket.h</a></li>
+</ul>
+<center>
+  <table border='1'>
+    <tr><th colspan='3' class='title'>Extension Context Packet Class Options Table   </th></tr>
+    <tr>
+      <th>
+        Class Name
+      </th>
+      <td colspan='2'>
+        <tt style='font-size:large'><b>EphemerisPacket</b></tt>
+      </td>
+    </tr>
+    <tr>
+      <th>
+        Class Code
+      </th>
+      <td colspan='2'>
+        <tt style='font-size:large'><b>FF-FF-FA:2011.ECEF</b></tt>
+      </td>
+    </tr>
+    <tr><th colspan='3' class='section'>         Packet Header                                      </th></tr>
+    <tr><th class='col'>Parameter</th><th class='col'>Allowed Options</th><th class='col'>Comments</th></tr>
+    <tr><th>Packet Type                 </th><td>Extension Context</td><td>&nbsp;   </td></tr>
+    <tr><th>Stream Identifier           </th><td>Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Class Identifier            </th><td>Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Integer-seconds    Timestamp</th><td>UTC (or GPS)</td><td>&nbsp;   </td></tr>
+    <tr><th>Fractional-seconds Timestamp</th><td>Real-time</td><td>&nbsp;   </td></tr>
+    <tr><th>Timestamp Precision         </th><td>As specified in TimestampAccuracyPacket</td><td>&nbsp;</td></tr>
+    <tr><th colspan='3'  class='section'>          Packet Payload                                 </th></tr>
+    <tr><td colspan='3'><center>        Total Payload Length = 56+ bytes             </center></td></tr>
+    <tr>
+      <td colspan='3'>
+        <table class='nested'>
+          <tr>
+            <th class='col'>Offset</th>
+            <th class='col'>Type</th>
+            <th class='col'>Name</th>
+            <th class='col'>Units</th>
+            <th class='col'>Range</th>
+            <th class='col'>Description</th>
+          </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>0</tt></td>
+          <td style='text-align:center;'><tt>ascii[32]</tt></td>
+          <td style='text-align:center;'><b>ProducedBy</b></td>
+          <td style='text-align:center;'></td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >Ephemeris produced by</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>32</tt></td>
+          <td style='text-align:center;'><tt>/FixType/</tt></td>
+          <td style='text-align:center;'><b>PosFixType</b></td>
+          <td style='text-align:center;'></td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >The position fix type</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>33</tt></td>
+          <td style='text-align:center;'><tt>/FixType/</tt></td>
+          <td style='text-align:center;'><b>VelFixType</b></td>
+          <td style='text-align:center;'></td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >The velocity fix type</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>34</tt></td>
+          <td style='text-align:center;'><tt>/FixType/</tt></td>
+          <td style='text-align:center;'><b>AccFixType</b></td>
+          <td style='text-align:center;'></td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >The acceleration fix type</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>35</tt></td>
+          <td style='text-align:center;'><tt>/FixType/</tt></td>
+          <td style='text-align:center;'><b>AttFixType</b></td>
+          <td style='text-align:center;'></td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >The attitude fix type</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>36</tt></td>
+          <td style='text-align:center;'><tt>gpsTime</tt></td>
+          <td style='text-align:center;'><b>FixTime</b></td>
+          <td style='text-align:center;'>sec</td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >Time stamp of the first point</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>48</tt></td>
+          <td style='text-align:center;'><tt>long</tt></td>
+          <td style='text-align:center;'><b>FixDelta</b></td>
+          <td style='text-align:center;'>ps</td>
+          <td style='text-align:center;'><tt>[0,86401e12]</tt></td>
+          <td style='text-align:left;'  >Time delta between each set of points (seconds + picoseconds) max is one day (0 if only one point)</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>56</tt></td>
+          <td style='text-align:center;'><tt>/Point/[*]</tt></td>
+          <td style='text-align:center;'><b>Points</b></td>
+          <td style='text-align:center;'></td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >ECEF fix points (1+)</td>
+        </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</center>
+<br>
+<h2>Enumeration Definitions</h2>
+<center>
+  <table>
+    <tr>
+      <th class='title' colspan='3'>Fix Type Enumerated Values</th>
+    </tr>
+    <tr>
+      <th>Name</th>
+      <td colspan='2'>FixType</td>
+    </tr>
+    <tr>
+      <th>Type</th>
+      <td colspan='2'>byte</td>
+    </tr>
+    <tr>
+      <th>Description</th>
+      <td colspan='2'></td>
+    </tr>
+    <tr>
+      <th class='section' colspan='3'>Enumeration Values</th>
+    </tr>
+    <tr>
+      <th class='col'>Value</th>
+      <th class='col'>Name(s)</th>
+      <th class='col'>Description</th>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>-19</tt></td>
+      <td style='text-align:center;'><tt>PREDICTED_EPHEMERIS_9</tt></td>
+      <td style='text-align:left;'  >    Predicted Ephemeris (9+ days before)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>-18</tt></td>
+      <td style='text-align:center;'><tt>PREDICTED_EPHEMERIS_8</tt></td>
+      <td style='text-align:left;'  >    Predicted Ephemeris (8 days before)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>-17</tt></td>
+      <td style='text-align:center;'><tt>PREDICTED_EPHEMERIS_7</tt></td>
+      <td style='text-align:left;'  >    Predicted Ephemeris (7 days before)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>-16</tt></td>
+      <td style='text-align:center;'><tt>PREDICTED_EPHEMERIS_6</tt></td>
+      <td style='text-align:left;'  >    Predicted Ephemeris (6 days before)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>-15</tt></td>
+      <td style='text-align:center;'><tt>PREDICTED_EPHEMERIS_5</tt></td>
+      <td style='text-align:left;'  >    Predicted Ephemeris (5 days before)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>-14</tt></td>
+      <td style='text-align:center;'><tt>PREDICTED_EPHEMERIS_4</tt></td>
+      <td style='text-align:left;'  >    Predicted Ephemeris (4 days before)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>-13</tt></td>
+      <td style='text-align:center;'><tt>PREDICTED_EPHEMERIS_3</tt></td>
+      <td style='text-align:left;'  >    Predicted Ephemeris (3 days before)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>-12</tt></td>
+      <td style='text-align:center;'><tt>PREDICTED_EPHEMERIS_2</tt></td>
+      <td style='text-align:left;'  >    Predicted Ephemeris (2 days before)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>-11</tt></td>
+      <td style='text-align:center;'><tt>PREDICTED_EPHEMERIS_1</tt></td>
+      <td style='text-align:left;'  >    Predicted Ephemeris (1 days before)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>-10</tt></td>
+      <td style='text-align:center;'><tt>PREDICTED_EPHEMERIS</tt></td>
+      <td style='text-align:left;'  >    Predicted Ephemeris     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>-3</tt></td>
+      <td style='text-align:center;'><tt>PREDICTED_INS</tt></td>
+      <td style='text-align:left;'  >    Predicted INS (Inertial Navigation System)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>-2</tt></td>
+      <td style='text-align:center;'><tt>PREDICTED_GPS</tt></td>
+      <td style='text-align:left;'  >    Predicted GPS     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>-1</tt></td>
+      <td style='text-align:center;'><tt>PREDICTED</tt></td>
+      <td style='text-align:left;'  >    Predicted     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>0</tt></td>
+      <td style='text-align:center;'><tt>null</tt></td>
+      <td style='text-align:left;'  >    Value not specified     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>1</tt></td>
+      <td style='text-align:center;'><tt>ACTUAL</tt></td>
+      <td style='text-align:left;'  >    Actual     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>2</tt></td>
+      <td style='text-align:center;'><tt>ACTUAL_GPS</tt></td>
+      <td style='text-align:left;'  >    Actual GPS     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>3</tt></td>
+      <td style='text-align:center;'><tt>ACTUAL_INS</tt></td>
+      <td style='text-align:left;'  >    Actual INS (Inertial Navigation System)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>10</tt></td>
+      <td style='text-align:center;'><tt>ACTUAL_EPHEMERIS</tt></td>
+      <td style='text-align:left;'  >    Actual Ephemeris     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>11</tt></td>
+      <td style='text-align:center;'><tt>ACTUAL_EPHEMERIS_1</tt></td>
+      <td style='text-align:left;'  >    Actual Ephemeris (1 days after)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>12</tt></td>
+      <td style='text-align:center;'><tt>ACTUAL_EPHEMERIS_2</tt></td>
+      <td style='text-align:left;'  >    Actual Ephemeris (2 days after)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>13</tt></td>
+      <td style='text-align:center;'><tt>ACTUAL_EPHEMERIS_3</tt></td>
+      <td style='text-align:left;'  >    Actual Ephemeris (3 days after)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>14</tt></td>
+      <td style='text-align:center;'><tt>ACTUAL_EPHEMERIS_4</tt></td>
+      <td style='text-align:left;'  >    Actual Ephemeris (4 days after)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>15</tt></td>
+      <td style='text-align:center;'><tt>ACTUAL_EPHEMERIS_5</tt></td>
+      <td style='text-align:left;'  >    Actual Ephemeris (5 days after)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>16</tt></td>
+      <td style='text-align:center;'><tt>ACTUAL_EPHEMERIS_6</tt></td>
+      <td style='text-align:left;'  >    Actual Ephemeris (6 days after)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>17</tt></td>
+      <td style='text-align:center;'><tt>ACTUAL_EPHEMERIS_7</tt></td>
+      <td style='text-align:left;'  >    Actual Ephemeris (7 days after)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>18</tt></td>
+      <td style='text-align:center;'><tt>ACTUAL_EPHEMERIS_8</tt></td>
+      <td style='text-align:left;'  >    Actual Ephemeris (8 days after)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>19</tt></td>
+      <td style='text-align:center;'><tt>ACTUAL_EPHEMERIS_9</tt></td>
+      <td style='text-align:left;'  >    Actual Ephemeris (9+ days after)     </td>
+    </tr>
+  </table>
+</center>
+<br>
+<br>
+<h2>Record Definitions</h2>
+<center>
+  <table>
+    <tr>
+      <th class='title' colspan='6'>Point Definition</th>
+    </tr>
+    <tr>
+      <th colspan='2'>Name</th>
+      <td colspan='4'>Point</td>
+    </tr>
+    <tr>
+      <th colspan='2'>Description</th>
+      <td colspan='4'></td>
+    </tr>
+    <tr>
+      <th class='section' colspan='6'>Record Fields</th>
+    </tr>
+    <tr>
+      <td class='section' colspan='6'><center>Total Payload Length = 72 bytes</center></td>
+    </tr>
+    <tr>
+      <th class='col'>Offset</th>
+      <th class='col'>Type</th>
+      <th class='col'>Name</th>
+      <th class='col'>Units</th>
+      <th class='col'>Range</th>
+      <th class='col'>Description</th>
+    </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>0</tt></td>
+          <td style='text-align:center;'><tt>double</tt></td>
+          <td style='text-align:center;'><b>PositionX</b></td>
+          <td style='text-align:center;'>m</td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >ECEF position X</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>8</tt></td>
+          <td style='text-align:center;'><tt>double</tt></td>
+          <td style='text-align:center;'><b>PositionY</b></td>
+          <td style='text-align:center;'>m</td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >ECEF position Y</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>16</tt></td>
+          <td style='text-align:center;'><tt>double</tt></td>
+          <td style='text-align:center;'><b>PositionZ</b></td>
+          <td style='text-align:center;'>m</td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >ECEF position Z</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>24</tt></td>
+          <td style='text-align:center;'><tt>double</tt></td>
+          <td style='text-align:center;'><b>VelocityX</b></td>
+          <td style='text-align:center;'>m/s</td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >ECEF velocity X</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>32</tt></td>
+          <td style='text-align:center;'><tt>double</tt></td>
+          <td style='text-align:center;'><b>VelocityY</b></td>
+          <td style='text-align:center;'>m/s</td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >ECEF velocity Y</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>40</tt></td>
+          <td style='text-align:center;'><tt>double</tt></td>
+          <td style='text-align:center;'><b>VelocityZ</b></td>
+          <td style='text-align:center;'>m/s</td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >ECEF velocity Z</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>48</tt></td>
+          <td style='text-align:center;'><tt>float</tt></td>
+          <td style='text-align:center;'><b>AccelerationX</b></td>
+          <td style='text-align:center;'>m/s^2</td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >ECEF acceleration X</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>52</tt></td>
+          <td style='text-align:center;'><tt>float</tt></td>
+          <td style='text-align:center;'><b>AccelerationY</b></td>
+          <td style='text-align:center;'>m/s^2</td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >ECEF acceleration Y</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>56</tt></td>
+          <td style='text-align:center;'><tt>float</tt></td>
+          <td style='text-align:center;'><b>AccelerationZ</b></td>
+          <td style='text-align:center;'>m/s^2</td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >ECEF acceleration Z</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>60</tt></td>
+          <td style='text-align:center;'><tt>float</tt></td>
+          <td style='text-align:center;'><b>AttitudeAlpha</b></td>
+          <td style='text-align:center;'>deg</td>
+          <td style='text-align:center;'><tt>[0,360)</tt></td>
+          <td style='text-align:left;'  >Attitude Alpha</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>64</tt></td>
+          <td style='text-align:center;'><tt>float</tt></td>
+          <td style='text-align:center;'><b>AttitudeBeta</b></td>
+          <td style='text-align:center;'>deg</td>
+          <td style='text-align:center;'><tt>[0,360)</tt></td>
+          <td style='text-align:left;'  >Attitude Beta</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>68</tt></td>
+          <td style='text-align:center;'><tt>float</tt></td>
+          <td style='text-align:center;'><b>AttitudePhi</b></td>
+          <td style='text-align:center;'>deg</td>
+          <td style='text-align:center;'><tt>[0,360)</tt></td>
+          <td style='text-align:left;'  >Attitude Phi</td>
+        </tr>
+  </table>
+</center>
+<br>
+  </body>
+</html>

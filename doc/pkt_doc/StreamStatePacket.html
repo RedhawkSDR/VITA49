@@ -1,0 +1,443 @@
+<html>
+  <head>
+    <title>A.5. Stream State Packet</title>
+    <style>
+      body { font-family:  serif, 'Times New Roman', 'Times', serif;
+             font-size:    10pt;  font-style: normal;
+             background-color: #FFFFFF; color:#000000; width:        600pt; }
+      
+      h1 { font-size:16pt; font-weight:bold; text-align:center; font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 8pt 8pt 8pt 8pt; }
+      
+      h2 { font-size:14pt; font-weight:bold; text-align:left; font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      h3 { font-size:12pt; font-weight:bold; text-align:left; font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      h4 { font-size:12pt; font-weight:bold; text-align:left;   font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      h5 { font-size:12pt; font-weight:bold; text-align:left;   font-style: italic;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      pre    { font-family:  monospace, 'Courier New', 'Courier', monospace;
+               font-size:    10pt;
+               font-weight:  bold;
+               text-align:   left;
+               border-style: outset; border-width: 0pt;
+               margin: 5pt 5pt 5pt 5pt; padding: 5pt 5pt 5pt 5pt; }
+      
+      pre.led{ font-size:6pt; font-weight:bold; }
+      
+      code   { font-family:  monospace, 'Courier New', 'Courier', monospace;
+               font-size:    10pt;
+               font-weight:  bold;
+               text-align:   left; }
+      
+      ol { margin: 0pt 20pt 5pt 20pt; padding: 0pt 20pt 5pt 20pt; }
+      ul { margin: 0pt 20pt 5pt 20pt; padding: 0pt 20pt 5pt 20pt; }
+      
+      li { margin-top: 10pt; }
+      
+      table       { margin-left:  20pt; margin-right: 20pt;
+                    font-size:    10pt; font-style: normal;
+                    width:        560pt;
+                    border-style: outset; border-width: 1pt;
+                    empty-cells:  show; }
+      
+      table.nested{ margin-left:  0pt;  margin-right: 0pt;
+                    font-size:    10pt; font-style: normal;
+                    width:        100%;
+                    border-style: none;
+                    empty-cells:  show; }
+      
+      td          { border-style: inset; border-width: 1pt;
+                    text-align:left; vertical-align: text-top;
+                    background-color: #FFFFFF; color:#000000; }
+      th          { border-style: inset; border-width: 1pt;
+                    text-align:left; vertical-align: text-top;
+                    background-color: #888888; color:#000000; }
+      
+      th.title   { background-color: #FFFF66; text-align:center; }
+      th.section { background-color: #9999FF; text-align:center; }
+      th.col     {                            text-align:center; }
+    </style>
+  </head>
+  <body>
+    <h1>A.5. Stream State Packet</h1>
+
+        The "stream state packet" provides describes the overall state of the
+        system at the given reference point and provides receivers with greater
+        insight into the current activity state of the packet's emitter.<br><br>
+
+        The "state" of a system refers to its position in the state diagram of
+        the emitter. The states are based on the following generalized state
+        diagram, though individual systems <b>may</b> omit stages and/or
+        <b>may</b> differ slightly:<br><br>
+
+        <pre>
+                                                      +---------+
+                                                      | PAUSING |
+                                                      +---------+
+                                                         ^   |
+                                                         |   V
++---------+     +--------------+     +----------+     +---------+     +----------+     +---------+
+| BOOTING | --&gt; | INITIALIZING | --&gt; | STARTING | --&gt; | RUNNING | --&gt; | STOPPING | --&gt; | EXITING |
++---------+     +--------------+     +----------+     +---------+     +----------+     +---------+
+                                                         ^   |
+                                                         |   |
+                                   +------------+        |   |        +----------+
+                                   | RESTARTING | -------+   +------&gt; | BREAKING |
+                                   +------------+                     +----------+
+                                         ^                                  |
+                                         +----------------------------------+<br><br>
+
+
+                                                                  +----------+     +-------------+
+                                                         (*) ---&gt; | ABORTING | --&gt; | TERMINATING |
+                                                                  +----------+     +-------------+
+        </pre><br><br>
+
+        The states are as follows:
+        <ul>
+          <li><b>BOOTING</b>      - System is booting up, but not yet ready for
+                                    initialization, <i>(this state is generally
+                                    "implied" and rarely visible outside of log
+                                    file messages)</i>;</li>
+          <li><b>INITIALIZING</b> - System is initializing;</li>
+          <li><b>STARTING</b>     - System has been initialized, and is preparing
+                                    to run;</li>
+          <li><b>RUNNING</b>      - System is running, this included situations
+                                    where the system is waiting for input;</li>
+          <li><b>STOPPING</b>     - System is done processing (e.g. in response
+                                    to user input or the result of not having
+                                    any more data to process) and is stopping;</li>
+          <li><b>EXITING</b>      - System has completed operation and is exiting
+                                    normally <i>(this state is generally "implied"
+                                    and rarely visible outside of log file
+                                    messages)</i>;</li>
+          <li><b>PAUSING</b>      - System is pausing, this is generally in
+                                    response to user input, such as pausing
+                                    playback of a recorded signal;</li>
+          <li><b>BREAKING</b>     - System is breaking out of the current running
+                                    state on its way to a restart;</li>
+          <li><b>RESTARTING</b>   - System is restarting;</li>
+          <li><b>ABORTING</b>     - An error event has taking place or an "abort"
+                                    signal has been sent to the system, and the
+                                    system is now aborting normal operation <i>(this
+                                    state can follow any other state and might not
+                                    be visible outside of log file messages)</i>;
+                                    and</li>
+          <li><b>TERMINATING</b>  - System has aborted operation and is terminating
+                                    abnormally <i>(this state is generally "implied"
+                                    and rarely visible outside of log file
+                                    messages)</i>.</li>
+        </ul><br><br>
+
+        Some systems <b>may</b> split the <b>RUNNING</b> state into three separate
+        states:
+        <ul>
+          <li><b>IDENTIFYING</b>  - System is running and is currently identifying
+                                    the input format;</li>
+          <li><b>CONFIGURING</b>
+               or <b>LOCKING</b>  - System is running, has identified the input
+                                    format and is configuring itself for processing;
+                                    and</li>
+          <li><b>PROCESSING</b>   - System is running, has identified the input
+                                    format, has been configured and is processing
+                                    the input.</li>
+        </ul><br><br>
+
+        The typical example of where the <b>IDENTIFYING</b>, <b>LOCKING</b>, and
+        <b>PROCESSING</b> states are used is within a demodulator where the
+        <b>IDENTIFYING</b> state implies that the demodulator is detecting the
+        modulation type; <b>LOCKING</b> implies that the demodulator is trying
+        to lock up to the signal; and <b>PROCESSING</b> means that the demodulator
+        is locked to the identified signal and is demodulating it. If the demodulator
+        looses lock, it can return to either the <b>IDENTIFYING</b> (it wants to
+        re-check the modulation type) or the <b>LOCKING</b> state.<br><br>
+
+        The "status" of a system refers to the "health" of the system's processing
+        ability at three key points (input, internal, output) and an aggregate
+        status indicator. The "health" is essentially a "traffic light" color
+        coding that mimics the status lights on traditional radio equipment. The
+        <b>BLUE</b> state is an addition that may be used to differentiate normal
+        (<b>GREEN</b>) operation, where output is being produced, from that where
+        there is no output being produced (e.g. a radio that is receiving and
+        processing a signal, but there is no "user data" to output since the
+        decoded signal consists only of "idle" indicators).
+      
+<br>
+<br>
+<h2>See Also:</h2>
+<ul>
+  <li><a href='../java_doc/nxm/vrt/libm/StreamStatePacket.html'>StreamStatePacket.java</a></li>
+  <li><a href='../cpp_doc/html/classvrt_1_1StreamStatePacket.html'>StreamStatePacket.h</a></li>
+</ul>
+<center>
+  <table border='1'>
+    <tr><th colspan='3' class='title'>Extension Context Packet Class Options Table   </th></tr>
+    <tr>
+      <th>
+        Class Name
+      </th>
+      <td colspan='2'>
+        <tt style='font-size:large'><b>StreamStatePacket</b></tt>
+      </td>
+    </tr>
+    <tr>
+      <th>
+        Class Code
+      </th>
+      <td colspan='2'>
+        <tt style='font-size:large'><b>FF-FF-FA:2011.0005</b></tt>
+      </td>
+    </tr>
+    <tr><th colspan='3' class='section'>         Packet Header                                      </th></tr>
+    <tr><th class='col'>Parameter</th><th class='col'>Allowed Options</th><th class='col'>Comments</th></tr>
+    <tr><th>Packet Type                 </th><td>Extension Context</td><td>&nbsp;   </td></tr>
+    <tr><th>Stream Identifier           </th><td>Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Class Identifier            </th><td>Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Integer-seconds    Timestamp</th><td>UTC (or GPS)</td><td>&nbsp;   </td></tr>
+    <tr><th>Fractional-seconds Timestamp</th><td>Real-time</td><td>&nbsp;   </td></tr>
+    <tr><th>Timestamp Precision         </th><td>As specified in TimestampAccuracyPacket</td><td>&nbsp;</td></tr>
+    <tr><th colspan='3'  class='section'>          Packet Payload                                 </th></tr>
+    <tr><td colspan='3'><center>        Total Payload Length = 8+ bytes             </center></td></tr>
+    <tr>
+      <td colspan='3'>
+        <table class='nested'>
+          <tr>
+            <th class='col'>Offset</th>
+            <th class='col'>Type</th>
+            <th class='col'>Name</th>
+            <th class='col'>Units</th>
+            <th class='col'>Range</th>
+            <th class='col'>Description</th>
+          </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>0</tt></td>
+          <td style='text-align:center;'><tt>/SystemState/</tt></td>
+          <td style='text-align:center;'><b>SystemState</b></td>
+          <td style='text-align:center;'></td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >The system state</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>1</tt></td>
+          <td style='text-align:center;'><tt>byte[3]</tt></td>
+          <td style='text-align:center;'><i>     reserved      </i></td>
+          <td style='text-align:center;'>                          </td>
+          <td style='text-align:center;'><tt>                 </tt></td>
+          <td style='text-align:left;'  ><i>Reserved for future use, must be zero.</i></td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>4</tt></td>
+          <td style='text-align:center;'><tt>/SystemStatus/</tt></td>
+          <td style='text-align:center;'><b>AggregateSystemStatus</b></td>
+          <td style='text-align:center;'></td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >The aggregate system status</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>5</tt></td>
+          <td style='text-align:center;'><tt>/SystemStatus/</tt></td>
+          <td style='text-align:center;'><b>InputStatus</b></td>
+          <td style='text-align:center;'></td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >The status of the input</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>6</tt></td>
+          <td style='text-align:center;'><tt>/SystemStatus/</tt></td>
+          <td style='text-align:center;'><b>InternalStatus</b></td>
+          <td style='text-align:center;'></td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >The status of the system's internals</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>7</tt></td>
+          <td style='text-align:center;'><tt>/SystemStatus/</tt></td>
+          <td style='text-align:center;'><b>OutputStatus</b></td>
+          <td style='text-align:center;'></td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >The status of the output</td>
+        </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>8</tt></td>
+          <td style='text-align:center;'><tt>utf8[*]</tt></td>
+          <td style='text-align:center;'><b>Message</b></td>
+          <td style='text-align:center;'></td>
+          <td style='text-align:center;'><tt></tt></td>
+          <td style='text-align:left;'  >Any messages to better explain the processing state and/or status</td>
+        </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</center>
+<br>
+<h2>Enumeration Definitions</h2>
+<center>
+  <table>
+    <tr>
+      <th class='title' colspan='3'>System State Enumerated Values</th>
+    </tr>
+    <tr>
+      <th>Name</th>
+      <td colspan='2'>SystemState</td>
+    </tr>
+    <tr>
+      <th>Type</th>
+      <td colspan='2'>byte</td>
+    </tr>
+    <tr>
+      <th>Description</th>
+      <td colspan='2'></td>
+    </tr>
+    <tr>
+      <th class='section' colspan='3'>Enumeration Values</th>
+    </tr>
+    <tr>
+      <th class='col'>Value</th>
+      <th class='col'>Name(s)</th>
+      <th class='col'>Description</th>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>0</tt></td>
+      <td style='text-align:center;'><tt>null</tt></td>
+      <td style='text-align:left;'  >    Value not specified     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>1</tt></td>
+      <td style='text-align:center;'><tt>BOOTING</tt></td>
+      <td style='text-align:left;'  >    System is booting up, but not yet ready for initialization     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>2</tt></td>
+      <td style='text-align:center;'><tt>INITIALIZING</tt></td>
+      <td style='text-align:left;'  >    System is initializing     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>3</tt></td>
+      <td style='text-align:center;'><tt>STARTING</tt></td>
+      <td style='text-align:left;'  >    System has been initialized, and is preparing to run     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>4</tt></td>
+      <td style='text-align:center;'><tt>RUNNING</tt></td>
+      <td style='text-align:left;'  >    System is running     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>5</tt></td>
+      <td style='text-align:center;'><tt>STOPPING</tt></td>
+      <td style='text-align:left;'  >    System is done processing     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>6</tt></td>
+      <td style='text-align:center;'><tt>EXITING</tt></td>
+      <td style='text-align:left;'  >    System has completed operation and is exiting normally     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>7</tt></td>
+      <td style='text-align:center;'><tt>PAUSING</tt></td>
+      <td style='text-align:left;'  >    System is pausing     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>8</tt></td>
+      <td style='text-align:center;'><tt>BREAKING</tt></td>
+      <td style='text-align:left;'  >    System is breaking out of the current running state on its way to a restart     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>9</tt></td>
+      <td style='text-align:center;'><tt>RESTARTING</tt></td>
+      <td style='text-align:left;'  >    System is restarting     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>10</tt></td>
+      <td style='text-align:center;'><tt>ABORTING</tt></td>
+      <td style='text-align:left;'  >    An error event has taking place and the system is now aborting     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>11</tt></td>
+      <td style='text-align:center;'><tt>TERMINATING</tt></td>
+      <td style='text-align:left;'  >    System has aborted operation and is terminating abnormally     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>12</tt></td>
+      <td style='text-align:center;'><tt>IDENTIFYING</tt></td>
+      <td style='text-align:left;'  >    System is running and is currently identifying the input format     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>13</tt></td>
+      <td style='text-align:center;'><tt>CONFIGURING<br><i>(LOCKING)</i></tt></td>
+      <td style='text-align:left;'  >    System is running and is configuring itsself for processing     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>14</tt></td>
+      <td style='text-align:center;'><tt>PROCESSING</tt></td>
+      <td style='text-align:left;'  >    System is running and is processing the input     </td>
+    </tr>
+  </table>
+</center>
+<br>
+<center>
+  <table>
+    <tr>
+      <th class='title' colspan='3'>System Status Enumerated Values</th>
+    </tr>
+    <tr>
+      <th>Name</th>
+      <td colspan='2'>SystemStatus</td>
+    </tr>
+    <tr>
+      <th>Type</th>
+      <td colspan='2'>byte</td>
+    </tr>
+    <tr>
+      <th>Description</th>
+      <td colspan='2'></td>
+    </tr>
+    <tr>
+      <th class='section' colspan='3'>Enumeration Values</th>
+    </tr>
+    <tr>
+      <th class='col'>Value</th>
+      <th class='col'>Name(s)</th>
+      <th class='col'>Description</th>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>0</tt></td>
+      <td style='text-align:center;'><tt>null</tt></td>
+      <td style='text-align:left;'  >    Value not specified     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>1</tt></td>
+      <td style='text-align:center;'><tt>RED</tt></td>
+      <td style='text-align:left;'  >    One of more errors, functionality greatly restricted (or non-functional)     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>2</tt></td>
+      <td style='text-align:center;'><tt>YELLOW<br><i>(AMBER)</i></tt></td>
+      <td style='text-align:left;'  >    One or more warnings, functionality may be limited     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>3</tt></td>
+      <td style='text-align:center;'><tt>GREEN</tt></td>
+      <td style='text-align:left;'  >    Everything is good, functioning normally     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>4</tt></td>
+      <td style='text-align:center;'><tt>BLUE</tt></td>
+      <td style='text-align:left;'  >    Everything is good, but nothing to do     </td>
+    </tr>
+    <tr>
+      <td style='text-align:right;' ><tt>5</tt></td>
+      <td style='text-align:center;'><tt>GRAY<br><i>(GREY)</i></tt></td>
+      <td style='text-align:left;'  >    Not applicable or turned off     </td>
+    </tr>
+  </table>
+</center>
+<br>
+  </body>
+</html>

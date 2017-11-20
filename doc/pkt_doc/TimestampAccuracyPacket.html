@@ -1,0 +1,178 @@
+<html>
+  <head>
+    <title>A.4. Timestamp Accuracy Packet</title>
+    <style>
+      body { font-family:  serif, 'Times New Roman', 'Times', serif;
+             font-size:    10pt;  font-style: normal;
+             background-color: #FFFFFF; color:#000000; width:        600pt; }
+      
+      h1 { font-size:16pt; font-weight:bold; text-align:center; font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 8pt 8pt 8pt 8pt; }
+      
+      h2 { font-size:14pt; font-weight:bold; text-align:left; font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      h3 { font-size:12pt; font-weight:bold; text-align:left; font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      h4 { font-size:12pt; font-weight:bold; text-align:left;   font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      h5 { font-size:12pt; font-weight:bold; text-align:left;   font-style: italic;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      pre    { font-family:  monospace, 'Courier New', 'Courier', monospace;
+               font-size:    10pt;
+               font-weight:  bold;
+               text-align:   left;
+               border-style: outset; border-width: 0pt;
+               margin: 5pt 5pt 5pt 5pt; padding: 5pt 5pt 5pt 5pt; }
+      
+      pre.led{ font-size:6pt; font-weight:bold; }
+      
+      code   { font-family:  monospace, 'Courier New', 'Courier', monospace;
+               font-size:    10pt;
+               font-weight:  bold;
+               text-align:   left; }
+      
+      ol { margin: 0pt 20pt 5pt 20pt; padding: 0pt 20pt 5pt 20pt; }
+      ul { margin: 0pt 20pt 5pt 20pt; padding: 0pt 20pt 5pt 20pt; }
+      
+      li { margin-top: 10pt; }
+      
+      table       { margin-left:  20pt; margin-right: 20pt;
+                    font-size:    10pt; font-style: normal;
+                    width:        560pt;
+                    border-style: outset; border-width: 1pt;
+                    empty-cells:  show; }
+      
+      table.nested{ margin-left:  0pt;  margin-right: 0pt;
+                    font-size:    10pt; font-style: normal;
+                    width:        100%;
+                    border-style: none;
+                    empty-cells:  show; }
+      
+      td          { border-style: inset; border-width: 1pt;
+                    text-align:left; vertical-align: text-top;
+                    background-color: #FFFFFF; color:#000000; }
+      th          { border-style: inset; border-width: 1pt;
+                    text-align:left; vertical-align: text-top;
+                    background-color: #888888; color:#000000; }
+      
+      th.title   { background-color: #FFFF66; text-align:center; }
+      th.section { background-color: #9999FF; text-align:center; }
+      th.col     {                            text-align:center; }
+    </style>
+  </head>
+  <body>
+    <h1>A.4. Timestamp Accuracy Packet</h1>
+
+        The "timestamp accuracy packet" provides details about the accuracy of
+        the timing source. Use of this packet is required for all cases where
+        the Calibrated Time Indicator is enabled and set to one by Rule 6.1.7-1
+        of "VITA 49 Spectrum Survey Profile".<br><br>
+
+        For the purpose of this packet definition, "timestamp accuracy" is defined
+        to be the maximal distance (measured in picoseconds) between any two
+        consecutive "time tics" (a "time tic" is a point in time that is marked
+        by a stable time reference). In other words the "timestamp accuracy" it is
+        equal to twice the maximum error.<br><br>
+
+        If the time source is more accurate than 1 picosecond, the accuracy
+        <b>shall</b> be reported as 1 picosecond if the time values will be
+        rounded to the nearest 1 picosecond before insertion into the
+        Fractional-Seconds Timestamp field and <b>shall</b> be 2 picoseconds if
+        the value is truncated (mathematical floor operation).<br><br>
+
+        Note that this reports the "accuracy" not "precision" of the timestamp.
+        In all cases the precision is 1 picosecond as required by the Real-Time
+        mode of the Fractional-Seconds Timestamp field in the packet header.
+        The Fractional-Seconds Timestamp field <b>may</b> include time value
+        that is (or appears to be) more precise than the accuracy value implies.<br><br>
+
+        The <tt>TimestampAccuracy</tt> <b>shall not</b> be more than 1e12 picoseconds
+        (1 second). If the accuracy of the time stamp is less than 1 second, the
+        Calibrated Time Indicator shall not be set to one. It is worth noting
+        that although a 1 second accuracy value is permissible, any value greater
+        than 1 microsecond is generally considered "poor" (a 1 microsecond value
+        can be obtained by using a 1 pulse-per-second time source and a 10 MHz
+        reference).<br><br>
+
+        If <u>all</u> packets in the Information Stream do not enable the
+        Calibrated Time Indicator or otherwise set it to zero, the
+        <tt>TimestampAccuracy</tt> value <b>may</b> contain any value between 1
+        and 1e12 (inclusive). <i>(A typical use case for this is to set the
+        <tt>TimestampAccuracy</tt> value based on the specifications/requirements
+        of the timing source and to then set the Calibrated Time Indicator to
+        zero if those specifications/requirements are not being met.)</i><br><br>
+
+        The <tt>TimestampAccuracy</tt> <b>may</b> be any integer between 1 and
+        1e12 (inclusive) and is not limited to multiples of 10 or 2.<br><br>
+
+        In any Information Stream, there shall not be more than one stream of
+        Timestamp Accuracy Packets. The stream with the Timestamp Accuracy Packets
+        shall be considered a System Context stream applicable to all packets
+        within the Information Stream.
+      
+<br>
+<br>
+<h2>See Also:</h2>
+<ul>
+  <li><a href='../java_doc/nxm/vrt/libm/TimestampAccuracyPacket.html'>TimestampAccuracyPacket.java</a></li>
+  <li><a href='../cpp_doc/html/classvrt_1_1TimestampAccuracyPacket.html'>TimestampAccuracyPacket.h</a></li>
+</ul>
+<center>
+  <table border='1'>
+    <tr><th colspan='3' class='title'>Extension Context Packet Class Options Table   </th></tr>
+    <tr>
+      <th>
+        Class Name
+      </th>
+      <td colspan='2'>
+        <tt style='font-size:large'><b>TimestampAccuracyPacket</b></tt>
+      </td>
+    </tr>
+    <tr>
+      <th>
+        Class Code
+      </th>
+      <td colspan='2'>
+        <tt style='font-size:large'><b>FF-FF-FA:2011.0004</b></tt>
+      </td>
+    </tr>
+    <tr><th colspan='3' class='section'>         Packet Header                                      </th></tr>
+    <tr><th class='col'>Parameter</th><th class='col'>Allowed Options</th><th class='col'>Comments</th></tr>
+    <tr><th>Packet Type                 </th><td>Extension Context</td><td>&nbsp;   </td></tr>
+    <tr><th>Stream Identifier           </th><td>Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Class Identifier            </th><td>Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Integer-seconds    Timestamp</th><td>UTC (or GPS)</td><td>&nbsp;   </td></tr>
+    <tr><th>Fractional-seconds Timestamp</th><td>Real-time</td><td>&nbsp;   </td></tr>
+    <tr><th>Timestamp Precision         </th><td>As specified in TimestampAccuracyPacket</td><td>&nbsp;</td></tr>
+    <tr><th colspan='3'  class='section'>          Packet Payload                                 </th></tr>
+    <tr><td colspan='3'><center>        Total Payload Length = 8 bytes             </center></td></tr>
+    <tr>
+      <td colspan='3'>
+        <table class='nested'>
+          <tr>
+            <th class='col'>Offset</th>
+            <th class='col'>Type</th>
+            <th class='col'>Name</th>
+            <th class='col'>Units</th>
+            <th class='col'>Range</th>
+            <th class='col'>Description</th>
+          </tr>
+        <tr>
+          <td style='text-align:right;' ><tt>0</tt></td>
+          <td style='text-align:center;'><tt>long</tt></td>
+          <td style='text-align:center;'><b>TimestampAccuracy</b></td>
+          <td style='text-align:center;'>picoseconds</td>
+          <td style='text-align:center;'><tt>[1,1e12]</tt></td>
+          <td style='text-align:left;'  >The timestamp accuracy in picoseconds.</td>
+        </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</center>
+  </body>
+</html>

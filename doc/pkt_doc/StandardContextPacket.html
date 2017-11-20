@@ -1,0 +1,146 @@
+<html>
+  <head>
+    <title>A.3. Standard Context Packet</title>
+    <style>
+      body { font-family:  serif, 'Times New Roman', 'Times', serif;
+             font-size:    10pt;  font-style: normal;
+             background-color: #FFFFFF; color:#000000; width:        600pt; }
+      
+      h1 { font-size:16pt; font-weight:bold; text-align:center; font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 8pt 8pt 8pt 8pt; }
+      
+      h2 { font-size:14pt; font-weight:bold; text-align:left; font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      h3 { font-size:12pt; font-weight:bold; text-align:left; font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      h4 { font-size:12pt; font-weight:bold; text-align:left;   font-style: normal;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      h5 { font-size:12pt; font-weight:bold; text-align:left;   font-style: italic;
+           margin: 0pt 0pt 0pt 0pt; padding: 0pt 0pt 0pt 0pt; }
+      
+      pre    { font-family:  monospace, 'Courier New', 'Courier', monospace;
+               font-size:    10pt;
+               font-weight:  bold;
+               text-align:   left;
+               border-style: outset; border-width: 0pt;
+               margin: 5pt 5pt 5pt 5pt; padding: 5pt 5pt 5pt 5pt; }
+      
+      pre.led{ font-size:6pt; font-weight:bold; }
+      
+      code   { font-family:  monospace, 'Courier New', 'Courier', monospace;
+               font-size:    10pt;
+               font-weight:  bold;
+               text-align:   left; }
+      
+      ol { margin: 0pt 20pt 5pt 20pt; padding: 0pt 20pt 5pt 20pt; }
+      ul { margin: 0pt 20pt 5pt 20pt; padding: 0pt 20pt 5pt 20pt; }
+      
+      li { margin-top: 10pt; }
+      
+      table       { margin-left:  20pt; margin-right: 20pt;
+                    font-size:    10pt; font-style: normal;
+                    width:        560pt;
+                    border-style: outset; border-width: 1pt;
+                    empty-cells:  show; }
+      
+      table.nested{ margin-left:  0pt;  margin-right: 0pt;
+                    font-size:    10pt; font-style: normal;
+                    width:        100%;
+                    border-style: none;
+                    empty-cells:  show; }
+      
+      td          { border-style: inset; border-width: 1pt;
+                    text-align:left; vertical-align: text-top;
+                    background-color: #FFFFFF; color:#000000; }
+      th          { border-style: inset; border-width: 1pt;
+                    text-align:left; vertical-align: text-top;
+                    background-color: #888888; color:#000000; }
+      
+      th.title   { background-color: #FFFF66; text-align:center; }
+      th.section { background-color: #9999FF; text-align:center; }
+      th.col     {                            text-align:center; }
+    </style>
+  </head>
+  <body>
+    <h1>A.3. Standard Context Packet</h1>
+
+        The "standard context packet" is simply an IF Context packet that can be
+        used in any generic IF Context Stream that conforms to the ""VITA 49
+        Spectrum Survey Profile"".
+      
+<br>
+<br>
+<h2>See Also:</h2>
+<ul>
+  <li><a href='../java_doc/nxm/vrt/libm/StandardContextPacket.html'>StandardContextPacket.java</a></li>
+  <li><a href='../cpp_doc/html/classvrt_1_1StandardContextPacket.html'>StandardContextPacket.h</a></li>
+</ul>
+<center>
+  <table border='1'>
+    <tr><th colspan='3' class='title'>IF Context Packet Class Options Table   </th></tr>
+    <tr>
+      <th>
+        Class Name
+      </th>
+      <td colspan='2'>
+        <tt style='font-size:large'><b>StandardContextPacket</b></tt>
+      </td>
+    </tr>
+    <tr>
+      <th>
+        Class Code
+      </th>
+      <td colspan='2'>
+        <tt style='font-size:large'><b>FF-FF-FA:2011.0003</b></tt>
+      </td>
+    </tr>
+    <tr><th colspan='3' class='section'>         Packet Header                                      </th></tr>
+    <tr><th class='col'>Parameter</th><th class='col'>Allowed Options</th><th class='col'>Comments</th></tr>
+    <tr><th>Packet Type                 </th><td>IF Context</td><td>&nbsp;   </td></tr>
+    <tr><th>Stream Identifier           </th><td>Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Class Identifier            </th><td>Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Integer-seconds    Timestamp</th><td>UTC (or GPS)</td><td>&nbsp;   </td></tr>
+    <tr><th>Fractional-seconds Timestamp</th><td>Real-time</td><td>&nbsp;   </td></tr>
+    <tr><th>Timestamp Precision         </th><td>As specified in TimestampAccuracyPacket</td><td>&nbsp;</td></tr>
+    <tr><th colspan='3' class='section'>       Context Fields                                     </th></tr>
+    <tr><th class='col'>Parameter</th><th class='col'>Allowed Options</th><th class='col'>Comments</th></tr>
+    <tr><th>Context Field Change Indicator   </th><td>Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Reference Point Identifier       </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Bandwidth                        </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>IF Reference Frequency           </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>RF Reference Frequency           </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>RF Frequency Offset              </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>IF Band Offset                   </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Reference Level                  </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Gain                             </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Over-Range Count                 </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Sample Rate                      </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Timestamp Adjustment             </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Timestamp Calibration Time       </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Temperature                      </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Device Identifier                </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>State and Event Indicators       </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>--Calibrated Time  Indicator     </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>--Valid Data       Indicator     </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>--Reference Lock   Indicator     </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>--AGC/MGC          Indicator     </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>--Detected Signal  Indicator     </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>--Over-Range       Indicator     </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>--Sample Loss      Indicator     </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>--User Defined Bits              </th><td>Sometimes Used</td><td>Reserved for future use, set to zero.</td></tr>
+    <tr><th>Data Packet Payload Format       </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Formatted GPS Geolocation        </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>ECEF Ephemeris                   </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Relative Ephemeris               </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Ephemeris Reference Identifier   </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>GPS ASCII                        </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Context Association List         </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>ECEF Ephemeris Adjunct           </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+    <tr><th>Relative Ephemeris Adjunct       </th><td>Sometimes Used</td><td>&nbsp;   </td></tr>
+  </table>
+</center>
+  </body>
+</html>
