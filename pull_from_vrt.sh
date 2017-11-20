@@ -50,8 +50,10 @@ if [ ! -d "${vrt_path}/cpp_src/vrt/libm" ]; then
   exit 1
 fi
 
-cp -v ${vrt_path}/cpp_src/vrt/lib/*.h cpp/include/
-cp -v ${vrt_path}/cpp_src/vrt/lib/*.cc cpp/src/
-cp -v ${vrt_path}/cpp_src/vrt/libm/*.h cpp/include/
-cp -v ${vrt_path}/cpp_src/vrt/libm/*.cc cpp/src/
+cp -v  ${vrt_path}/cpp_src/vrt/lib/*.h cpp/include/
+cp -v  ${vrt_path}/cpp_src/vrt/lib/*.cc cpp/src/
+cp -v  ${vrt_path}/cpp_src/vrt/libm/*.h cpp/include/
+cp -v  ${vrt_path}/cpp_src/vrt/libm/*.cc cpp/src/
+cp -vr ${vrt_path}/cpp_doc/html doc/doxygen_html
+cp -vr ${vrt_path}/pkt_doc doc/
 
