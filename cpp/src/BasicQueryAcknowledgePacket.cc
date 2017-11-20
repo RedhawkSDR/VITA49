@@ -76,6 +76,7 @@ static inline vector<char> BasicQueryAcknowledgePacket_createDefaultPacket () {
   buf[3]  = 0x12; // Packet size = 18 (full header, full psp, +1 for CIF0)
   buf[28] = 0xF0; // Has 128-bit ControlleeID and 128-bit ControllerID
   buf[29] = 0x10; // AckS/Query
+  buf[68] = 0x80; // ChangeIndicator bit set (default true for AckS Packets)
   return buf;
 }
 

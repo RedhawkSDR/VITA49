@@ -1204,7 +1204,7 @@ namespace vrt {
     public: inline int32_t getIndexEntriesCount () const { return unpackInt(4) & 0xFFFFF; }
 
     /** Gets the size of each Index Entry in number of Bytes. */
-    public: inline int8_t getIndexEntrySize () const { return unpackByte(4); }
+    public: inline int8_t getIndexEntrySize () const { return (unpackByte(4)>>4)&0x7; }
 
     /** Sets the number of Index Entries. */
     public: void setIndexEntriesCount (int32_t val);
@@ -1442,16 +1442,22 @@ namespace vrt {
     public: virtual int32_t getSpectrumF2Index () const { return unpackInt(44); }
     public: virtual void setSpectrumF2Index (int32_t val) { packInt(44, val); }
 
-    /** WindowTimeDelta: words 12-13
-     *  64-bit floating-point w/ radix point to the right of bit 12
+    /** WindowTimeDelta(int): word 12
+     *  32-bit integer
      */
-    public: virtual double getWindowTimeDelta () const {
-      int64_t bits = unpackLong(48);
-      return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(12,bits);
+    public: virtual int32_t getWindowTimeDeltaInt () const { return unpackInt(48); }
+    public: virtual void setWindowTimeDeltaInt (int32_t val) { packInt(48, val); }
+
+    /** WindowTimeDelta(float): word 13
+     *  32-bit floating-point w/ radix point to the right of bit 12
+     */
+    public: virtual double getWindowTimeDeltaFloat () const {
+      int32_t bits = unpackInt(52);
+      return (bits == 0x7FFFFFFF)? DOUBLE_NAN : VRTMath::toDouble32(12, bits);
     }
-    public: virtual void setWindowTimeDelta (double val) {
-      int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(12,val);
-      packLong(48, bits);
+    public: virtual void setWindowTimeDeltaFloat (double val) {
+      int32_t bits = (isNull(val))? 0x7FFFFFFF : VRTMath::fromDouble32(12, val);
+      packInt(52, bits);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2814,8 +2820,12 @@ namespace vrt {
      *  @param val The SNR (null if not specified).
      */
     public: inline void setSNR (float val) {
-      int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(SNR_NOISE,0,bits);
+      if (isNull(val)) {
+        setL(SNR_NOISE, INT32_NULL);
+      } else {
+        int16_t bits = VRTMath::fromFloat16(7,val);
+        setI(SNR_NOISE,0,bits);
+      }
     }
 
     /** Sets the Noise Figure of the receiver, expressed in decibels.
@@ -2829,8 +2839,12 @@ namespace vrt {
      *  @param val The Noise Figure (null if not specified).
      */
     public: inline void setNoiseFigure (float val) {
-      int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(SNR_NOISE,2,bits);
+      if (isNull(val)) {
+        setL(SNR_NOISE, INT32_NULL);
+      } else {
+        int16_t bits = VRTMath::fromFloat16(7,val);
+        setI(SNR_NOISE,2,bits);
+      }
     }
 
     /** Gets the Second-order Input Intercept Point (IIP2).
@@ -2858,9 +2872,13 @@ namespace vrt {
      *  (See V49.2 spec Section 9.5.6)
      *  @param val The IIP2 (null if not specified).
      */
-    public: inline void setSecondOrderInterceptPoint (float val) {
-      int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(ICPT_PTS_2_3,0,bits);
+    public: inline void setSecondOrderInputInterceptPoint (float val) {
+      if (isNull(val)) {
+        setL(ICPT_PTS_2_3, INT32_NULL);
+      } else {
+        int16_t bits = VRTMath::fromFloat16(7,val);
+        setI(ICPT_PTS_2_3,0,bits);
+      }
     }
 
     /** Sets the Third-order Input Intercept Point (IIP3).
@@ -2870,9 +2888,13 @@ namespace vrt {
      *  (See V49.2 spec Section 9.5.6)
      *  @param val The IIP3 (null if not specified).
      */
-    public: inline void setThirdOrderInterceptPoint (float val) {
-      int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(ICPT_PTS_2_3,2,bits);
+    public: inline void setThirdOrderInputInterceptPoint (float val) {
+      if (isNull(val)) {
+        setL(ICPT_PTS_2_3, INT32_NULL);
+      } else {
+        int16_t bits = VRTMath::fromFloat16(7,val);
+        setI(ICPT_PTS_2_3,2,bits);
+      }
     }
 
     /** Gets 1-dB Compression Point.
@@ -2889,8 +2911,12 @@ namespace vrt {
      *  @param val The 1-dB Compression Point (null if not specified).
      */
     public: inline void setOneDecibelCompressionPoint  (float val) {
-      int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(COMPRESS_PT,2,bits);
+      if (isNull(val)) {
+        setL(COMPRESS_PT, INT32_NULL);
+      } else {
+        int16_t bits = VRTMath::fromFloat16(7,val);
+        setI(COMPRESS_PT,2,bits);
+      }
     }
 
     /** Gets the Stage 1 Threshold.
@@ -2998,8 +3024,12 @@ namespace vrt {
      *  @param val The Eb/N0 (null if not specified).
      */
     public: inline void setEbN0 (float val) {
-      int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(EB_NO_BER,0,bits);
+      if (isNull(val)) {
+        setL(EB_NO_BER, INT32_NULL);
+      } else {
+        int16_t bits = VRTMath::fromFloat16(7,val);
+        setI(EB_NO_BER,0,bits);
+      }
     }
 
     /** Sets the Bit Error Rate (BER).
@@ -3012,8 +3042,12 @@ namespace vrt {
      *  @param val The BER (null if not specified).
      */
     public: inline void setBitErrorRate (float val) {
-      int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(EB_NO_BER,2,bits);
+      if (isNull(val)) {
+        setL(EB_NO_BER, INT32_NULL);
+      } else {
+        int16_t bits = VRTMath::fromFloat16(7,val);
+        setI(EB_NO_BER,2,bits);
+      }
     }
 
     /** Gets Range.
@@ -3022,7 +3056,9 @@ namespace vrt {
      */
     public: inline double getRange () const {
       int32_t bits = getL(RANGE);
-      return (bits == 0x7FFFFFFF)? DOUBLE_NAN : toDouble32(5, bits);
+      // XXX if bits==INT32_NULL, could be valid value or could be indicating Range is not set
+      if (isNull(bits) && getOffset(RANGE) < 0) return DOUBLE_NAN;
+      return (bits == 0x7FFFFFFF)? DOUBLE_NAN : toDouble32(6, bits);
     }
 
     /** Sets Range.
@@ -3030,7 +3066,7 @@ namespace vrt {
      *  @param val The range (null if not specified)
      */
     public: inline void setRange (double val) {
-      int32_t bits = (isNull(val))? 0x7FFFFFFF : fromDouble32(5, val);
+      int32_t bits = (isNull(val))? 0x7FFFFFFF : fromDouble32(6, val);
       setL(RANGE,bits);
     }
 
@@ -3048,21 +3084,71 @@ namespace vrt {
      *  @param val The Beamwidth (null if not specified).
      */
     public: inline void setBeamwidth (float val) {
-      int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(BEAMWIDTH,2,bits);
+      if (isNull(val)) {
+        setL(BEAMWIDTH, INT32_NULL);
+      } else {
+        int16_t bits = VRTMath::fromFloat16(7,val);
+        setI(BEAMWIDTH,2,bits);
+      }
     }
 
     /** Gets the 2D Pointing Angle (Structured)
      *  See V49.2 spec Section 9.4.1.
      *  Array-of-Records format
+     *  HeaderSize is either 0 or 1
+     *    - Note: docs say 3 or 4, but that's inconsistent with definition of ArrayOfRecords, so ignoring that guidance
+     *            3 or 4 must include the required 3 words of every ArrayOfRecords, which is incorrect.
+     *    - depends on whether optional App-Specific Header is included, which is a 32-bit word if so
+     *    - optional App-Specific Header is a *Global* Index/Ref/Beam subfield
+     *  NumWords/Record is either 1 or 2
+     *    - depends on whether optional Index/Ref/Beam subfield is included in each record
+     *  Bitmapped CIF subfield only uses bits 31 and 30
+     *    - Bit 31: Set when each record includes the optional Index/Ref/Beam subfield
+     *    - Bit 30: Always set; Indicates presence of 2D Pointing Angle subfield in each record, which is required
+     *  App-Specific header is optional 32-bit word
+     *    - as mentioned above, this is a *Global* Index/Ref/Beam subfield
+     *  Each Record is at most 2 words
+     *    - First 32-bit word is optional, and is the Index/Ref/Beam subfield
+     *    - Second 32-bit word is required, and is the 2D Pointing Angle subfield
+     *  Index/Ref/Beam subfield
+     *    - Bits 31..16: Record Index (optional; 0 when global or unused in records)
+     *    - Bits 15..4: Reserved
+     *    - Bits 3..2: Reference (00 not specified; 01 ECEF; 10 Platform centered; 11 Array centered)
+     *    - Bits 1..0: Beam (00 not specified; 01 Beam or signal direction; 10 Null; 11 reserved)
+     *  2D Pointing Angle subfield
+     *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
+     *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
      *  @return 2D Pointing Angle as an Array-of-Records (null if not specified).
      *  <i>Note that changes to the returned object do not alter the packet.</i>
      */
     public: virtual ArrayOfRecords get2DPointingAngleStructured () const = 0;
 
-    /** Gets the 2D Pointing Angle (Structured)
+    /** Sets the 2D Pointing Angle (Structured)
      *  See V49.2 spec Section 9.4.1.
      *  Array-of-Records format
+     *  HeaderSize is either 0 or 1
+     *    - Note: docs say 3 or 4, but that's inconsistent with definition of ArrayOfRecords, so ignoring that guidance
+     *            3 or 4 must include the required 3 words of every ArrayOfRecords, which is incorrect.
+     *    - depends on whether optional App-Specific Header is included, which is a 32-bit word if so
+     *    - optional App-Specific Header is a *Global* Index/Ref/Beam subfield
+     *  NumWords/Record is either 1 or 2
+     *    - depends on whether optional Index/Ref/Beam subfield is included in each record
+     *  Bitmapped CIF subfield only uses bits 31 and 30
+     *    - Bit 31: Set when each record includes the optional Index/Ref/Beam subfield
+     *    - Bit 30: Always set; Indicates presence of 2D Pointing Angle subfield in each record, which is required
+     *  App-Specific header is optional 32-bit word
+     *    - as mentioned above, this is a *Global* Index/Ref/Beam subfield
+     *  Each Record is at most 2 words
+     *    - First 32-bit word is optional, and is the Index/Ref/Beam subfield
+     *    - Second 32-bit word is required, and is the 2D Pointing Angle subfield
+     *  Index/Ref/Beam subfield
+     *    - Bits 31..16: Record Index (optional; 0 when global or unused in records)
+     *    - Bits 15..4: Reserved
+     *    - Bits 3..2: Reference (00 not specified; 01 ECEF; 10 Platform centered; 11 Array centered)
+     *    - Bits 1..0: Beam (00 not specified; 01 Beam or signal direction; 10 Null; 11 reserved)
+     *  2D Pointing Angle subfield
+     *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
+     *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
      *  @param val The 2D Pointing Angle as an Array-of-Records (null if not specified).
      */
     public: inline void set2DPointingAngleStructured (const ArrayOfRecords &val) {
@@ -3071,6 +3157,8 @@ namespace vrt {
 
     /** Gets the Elevation Angle subfield of the Single-word 2D Pointing Angle.
      *  (See V49.2 spec Section 9.4.1)
+     *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
+     *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
      *  @return The Elevation Angle (null if not specified).
      */
     public: inline float get2DPointingAngleElevation () const {
@@ -3080,11 +3168,15 @@ namespace vrt {
 
     /** Gets the Azimuthal Angle subfield of the Single-word 2D Pointing Angle.
      *  (See V49.2 spec Section 9.4.1)
+     *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
+     *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
      *  @return The Azimuthal Angle (null if not specified).
      */
     public: inline float get2DPointingAngleAzimuth () const {
       int16_t bits = getI(PNT_ANGL_2D_SI,2);
-      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+      if (isNull(bits)) return FLOAT_NAN;
+      float val = VRTMath::toFloat16(7,bits);
+      return (val < 0)? 512.0+val : val;
     }
 
     /** Sets the Elevation Angle subfield of the Single-word 2D Pointing Angle.
@@ -3093,11 +3185,17 @@ namespace vrt {
      *  <i>If set to null, both Elevation and Azimuthal Angles will be set to 
      *  null.</i>
      *  (See V49.2 spec Section 9.4.1)
+     *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
+     *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
      *  @param val The Elevation Angle (null if not specified).
      */
     public: inline void set2DPointingAngleElevation (float val) {
-      int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(PNT_ANGL_2D_SI,0,bits);
+      if (isNull(val)) {
+        setL(PNT_ANGL_2D_SI, INT32_NULL);
+      } else {
+        int16_t bits = VRTMath::fromFloat16(7,val);
+        setI(PNT_ANGL_2D_SI,0,bits);
+      }
     }
 
     /** Sets the Azimuthal Angle subfield of the Single-word 2D Pointing Angle.
@@ -3106,11 +3204,18 @@ namespace vrt {
      *  <i>If set to null, both Elevation and Azimuthal Angles will be set to 
      *  null.</i>
      *  (See V49.2 spec Section 9.4.1)
+     *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
+     *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
      *  @param val The Azimuthal Angle (null if not specified).
      */
     public: inline void set2DPointingAngleAzimuth (float val) {
-      int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(PNT_ANGL_2D_SI,2,bits);
+      if (isNull(val)) {
+        setL(PNT_ANGL_2D_SI, INT32_NULL);
+      } else {
+        if (val > 255.984375) val = val-512;
+        int16_t bits = VRTMath::fromFloat16(7,val);
+        setI(PNT_ANGL_2D_SI,2,bits);
+      }
     }
 
     /** Gets the Polarization Tilt Angle in units of Radians.
@@ -3140,8 +3245,12 @@ namespace vrt {
      *  @param val The Tilt Angle (null if not specified).
      */
     public: inline void setPolarizationTiltAngle (float val) {
-      int16_t bits = VRTMath::fromFloat16(13,val);
-      setI(POLARIZATION,0,bits);
+      if (isNull(val)) {
+        setL(POLARIZATION, INT32_NULL);
+      } else {
+        int16_t bits = VRTMath::fromFloat16(13,val);
+        setI(POLARIZATION,0,bits);
+      }
     }
 
     /** Sets the Polarization Ellipticity Angle in units of Radians.
@@ -3153,8 +3262,12 @@ namespace vrt {
      *  @param val The Ellipticity Angle (null if not specified).
      */
     public: inline void setPolarizationEllipticityAngle (float val) {
-      int16_t bits = VRTMath::fromFloat16(13,val);
-      setI(POLARIZATION,2,bits);
+      if (isNull(val)) {
+        setL(POLARIZATION, INT32_NULL);
+      } else {
+        int16_t bits = VRTMath::fromFloat16(13,val);
+        setI(POLARIZATION,2,bits);
+      }
     }
 
     /** Gets the Phase Offset.
@@ -3177,8 +3290,12 @@ namespace vrt {
      *  @param val The Phase Offset (null if not specified).
      */
     public: inline void setPhaseOffset (float val) {
-      int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(PHASE,2,bits);
+      if (isNull(val)) {
+        setL(PHASE, INT32_NULL);
+      } else {
+        int16_t bits = VRTMath::fromFloat16(7,val);
+        setI(PHASE,2,bits);
+      }
     }
 
 
@@ -4070,6 +4187,8 @@ namespace vrt {
       setI(SEA_AND_SWELL_STATE, 2, val);
     }
 
+    // XXX could add set/getSeaState, set/getSwellState, set/getSeaAndSwellStateUserDefinedBits
+
     /** Sets Sea and Swell State
      *  Sea and Swell States use the Douglas sea and swell scale as officially
      *  defined by the United Kingdom MetOffice in "Fact Sheet No. 6". Sea and
@@ -4090,7 +4209,7 @@ namespace vrt {
         throw VRTException("Sea and Swell must both not be null to use this method.");
       if (sea < 0 || swell < 0 || sea > 9 || swell > 9)
         throw VRTException("Sea and Swell must both be between 0 and 9.");
-      int16_t val = (swell<<5) & sea;
+      int16_t val = (swell<<5) | sea;
       setI(SEA_AND_SWELL_STATE, 2, val);
     }
 
@@ -4166,7 +4285,7 @@ namespace vrt {
      *  @param val The Sea/Ground Temperature (null if not specified).
      */
     public: inline void setSeaGroundTemperature (float val) {
-      int16_t bits = VRTMath::fromFloat16(6,val);
+      int16_t bits = (isNull(val))? INT16_NULL : VRTMath::fromFloat16(6,val);
       setI(SEA_GROUND_TEMP,2,bits);
     }
 
@@ -4194,7 +4313,7 @@ namespace vrt {
      *  @param val The Air Temperature (null if not specified).
      */
     public: inline void setAirTemperature (float val) {
-      int16_t bits = VRTMath::fromFloat16(6,val);
+      int16_t bits = (isNull(val))? INT16_NULL : VRTMath::fromFloat16(6,val);
       setI(AIR_TEMP,2,bits);
     }
 
@@ -4553,6 +4672,8 @@ namespace vrt {
      *  @param val The Timestamp Details (null if not specified)
      */
     public: inline void setTimestampDetails (int64_t val) {
+      if (!isNull(val))
+        val = val&0xFF07FFFFFFFFFFFF; // force reserved bits to 0
       setX(TIMESTAMP_DETAILS,val);
     }
 

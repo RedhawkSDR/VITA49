@@ -149,9 +149,9 @@ namespace vrt {
     // as is appropriate for BasicCommandPacket.
     // IndicatorFieldProvider also provides this method, but returns value of Change Indicator
     // as is appropriate for BasicContextPacket.
-    // BasicControlPackets should default to BasicCommandPacket's implementation; ensure that here.
+    // BasicControlPackets should default to BasicContextPacket's implementation; ensure that here.
     public: virtual bool isChangePacket () const {
-      return BasicCommandPacket::isChangePacket(); // could just return true instead
+      return BasicContextPacket::isChangePacket();
     }
 
     // override prologue-related functions now that we have a PSP

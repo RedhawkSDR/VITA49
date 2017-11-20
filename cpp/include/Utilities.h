@@ -24,6 +24,7 @@
 
 #include "VRTObject.h"
 #include <stdarg.h>
+#include <iomanip>
 
 using namespace std;
 namespace vrt {
@@ -296,6 +297,20 @@ namespace vrt {
         if (vec[i] >  val) return -i-1;
       }
       return -vec.size();
+    }
+
+    /** Dumps hex representation of bytes
+     *  @param ptr Pointer to start of memory (i.e. buffer) to be dumped
+     *  @param len Number of bytes to dump
+     */
+    inline void dumpBytes (const void *ptr, int32_t len) {
+      std::cout<<"Dump:"<<std::endl;
+      const unsigned char *buf  = (const unsigned char*)ptr;
+      for(int32_t i=0; i < len; ++i) {
+        std::cout<<std::hex<<std::setw(2)<<std::setfill('0')<<(int)(buf[i]);
+        if (i%4 == 3) std::cout<<std::endl;
+        else if (i%2 == 1) std::cout<<" ";
+      }
     }
   } END_NAMESPACE
 } END_NAMESPACE

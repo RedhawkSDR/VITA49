@@ -559,7 +559,7 @@ void IndexFieldList::setIndexEntriesCount (int32_t val) {
   // set num entries
   int8_t bpe = getIndexEntrySize(); // preserve entry size
   packInt(4, val & 0xFFFFF);
-  packByte(4, bpe);
+  packByte(4, (bpe<<4)&0x70);
   // set total size
   int32_t list_words = (int32_t)((bpe*(val&0xFFFFF)+3)/4); 
   packInt(0, 2+list_words);
@@ -568,7 +568,7 @@ void IndexFieldList::setIndexEntriesCount (int32_t val) {
 
 void IndexFieldList::setIndexEntrySize (int8_t val) {
   // set entry size
-  packByte(4, val&0x7);
+  packByte(4, (val<<4)&0x70);
   // set total size
   int32_t list_words = (int32_t)((getIndexEntriesCount()*(val&0x7)+3)/4); 
   packInt(0, 2+list_words);
@@ -580,9 +580,9 @@ vector<int32_t> IndexFieldList::getIndexEntries () const {
   int8_t bpe = getIndexEntrySize();
   for (size_t i=0, j=getIndexEntriesByteOffset(); i < val.size(); i++,j+=bpe) {
     switch (bpe) {
-      case 1: val[i] = (int32_t) unpackByte(j);
-      case 2: val[i] = (int32_t) unpackShort(j);
-      case 4: val[i] = (int32_t) unpackInt(j);
+      case 1: val[i] = (int32_t) unpackByte(j); break;
+      case 2: val[i] = (int32_t) unpackShort(j); break;
+      case 4: val[i] = (int32_t) unpackInt(j); break;
       default: break;
     }
   }
@@ -596,9 +596,9 @@ void IndexFieldList::setIndexEntries (const vector<int32_t> &val, int8_t bpe) {
   setIndexEntriesCount(val.size());
   for (size_t i=0, j=getIndexEntriesByteOffset(); i < val.size(); i++,j+=bpe) {
     switch (bpe) {
-      case 1: packByte (j, (int8_t)  val[i]);
-      case 2: packShort(j, (int16_t) val[i]);
-      //case 4: packInt  (j, (int32_t) val[i]);
+      case 1: packByte (j, (int8_t)  val[i]); break;
+      case 2: packShort(j, (int16_t) val[i]); break;
+      //case 4: packInt  (j, (int32_t) val[i]); break;
       default: break;
     }
   }
@@ -678,8 +678,8 @@ string ArrayOfRecords::toString () const {
   str << "BitMappedIndicator=" << std::hex << std::setw(8) << std::setfill('0')
       << getBitMappedIndicator();
 
-  str << " ArrayOfRecords=[";
   std::vector<Record> recs(getRecords());
+  str << " ArrayOfRecords(" << recs.size() << ")=[";
   for (size_t i = 0; i < recs.size(); i++) {
     if (i > 0) str << ", ";
     str << recs[i].toString();
@@ -696,8 +696,8 @@ void ArrayOfRecords::updateByteLength (int32_t off) {
 void ArrayOfRecords::setRecordSize (int32_t val) {
   // set record size, preserving header size and record count
   int32_t hdr1 = unpackInt(4) & 0xFF000FFF; // clear previous rec size
-  hdr1 |= (val<<12) & 0x00FFF000;   // update with new rec size
-  packInt(4, val);
+  hdr1 |= ((val<<12) & 0x00FFF000);         // update with new rec size
+  packInt(4, hdr1);
   // set total size
   packInt(0, 3+getHeaderSize()+(val&0xFFF)*getRecordCount());
   updateByteLength();
@@ -706,8 +706,8 @@ void ArrayOfRecords::setRecordSize (int32_t val) {
 void ArrayOfRecords::setRecordCount (int32_t val, int32_t off) {
   // set record count, preserving header size and record size
   int32_t hdr1 = unpackInt(4) & 0xFFFFF000; // clear previous rec count
-  hdr1 |= (val) & 0x00000FFF;               // update with new rec count
-  packInt(4, val);
+  hdr1 |= ((val) & 0x00000FFF);             // update with new rec count
+  packInt(4, hdr1);
   // set total size
   packInt(0, 3+getHeaderSize()+getRecordSize()*(val&0xFFF));
   updateByteLength(off);
@@ -855,12 +855,13 @@ string SpectrumField::toString () const {
   Utilities::append(str, " WeightingFactor=",    getWeightingFactor());
   Utilities::append(str, " SpectrumF1Index=",    getSpectrumF1Index());
   Utilities::append(str, " SpectrumF2Index=",    getSpectrumF2Index());
-  Utilities::append(str, " WindowTimeDelta=",    getWindowTimeDelta());
+  Utilities::append(str, " WindowTimeDeltaInt=", getWindowTimeDeltaInt());
+  Utilities::append(str, " WindowTimeDeltaFloat=", getWindowTimeDeltaFloat());
   return str.str();
 }
 
 int32_t SpectrumField::getFieldCount () const {
-  return Record::getFieldCount() + 13;
+  return Record::getFieldCount() + 14;
 }
 
 string SpectrumField::getFieldName (int32_t id) const {
@@ -877,7 +878,8 @@ string SpectrumField::getFieldName (int32_t id) const {
     case  9: return "WeightingFactor";
     case 10: return "SpectrumF1Index";
     case 11: return "SpectrumF2Index";
-    case 12: return "WindowTimeDelta";
+    case 12: return "WindowTimeDeltaInt";
+    case 13: return "WindowTimeDeltaFloat";
     default: return Record::getFieldName(id);
   }
 }
@@ -915,7 +917,8 @@ Value* SpectrumField::getField (int32_t id) const {
     case  9: return new Value(getWeightingFactor());
     case 10: return new Value(getSpectrumF1Index());
     case 11: return new Value(getSpectrumF2Index());
-    case 12: return new Value(getWindowTimeDelta());
+    case 12: return new Value(getWindowTimeDeltaInt());
+    case 13: return new Value(getWindowTimeDeltaFloat());
     default: return Record::getField(id);
   }
 }
@@ -934,7 +937,8 @@ void SpectrumField::setField (int32_t id, const Value* val) {
     case  9: setWeightingFactor(    val->as<int32_t>()); return;
     case 10: setSpectrumF1Index(    val->as<int32_t>()); return;
     case 11: setSpectrumF2Index(    val->as<int32_t>()); return;
-    case 12: setWindowTimeDelta(    val->as<double>());  return;
+    case 12: setWindowTimeDeltaInt( val->as<int32_t>());  return;
+    case 13: setWindowTimeDeltaFloat( val->as<double>());  return;
     default: Record::setField(id,val); return;
   }
 }

@@ -481,18 +481,19 @@ void BasicContextPacket::setTimeStampField (int8_t cifNum, int32_t bit, const Ti
   // Get packet timestamp info from TSI/TSF
   IntegerMode    tsiModePkt = (IntegerMode   )((bbuf[1] >> 6) & 0x3);
   FractionalMode tsfModePkt = (FractionalMode)((bbuf[1] >> 4) & 0x3);
-  if (tsiModePkt == IntegerMode_None && tsfModePkt == FractionalMode_None)
-    throw VRTException("Can not set TimeStamp field on VRTPacket without a TimeStamp.");
+  if (tsiModePkt == IntegerMode_None && tsfModePkt == FractionalMode_None) {
+    if (!isNull(val))
+      throw VRTException("Can not set TimeStamp field on VRTPacket without a TimeStamp.");
+    return; // nothing to do
+  }
 
   // Get timestamp info from new value
-  IntegerMode    tsiModeVal = val.getIntegerMode();
-  FractionalMode tsfModeVal = val.getFractionalMode();
-  if (tsiModePkt != tsiModeVal || tsfModePkt != tsfModeVal)
+  if (!isNull(val) && (tsiModePkt != val.getIntegerMode() || tsfModePkt != val.getFractionalMode()))
     throw VRTException("Can not set TimeStamp field to format not consistent with VRTPacket TimeStamp format.");
 
   int32_t len = 0;
-  if (tsiModeVal != IntegerMode_None) len+=4;
-  if (tsfModeVal != FractionalMode_None) len+=8;
+  if (tsiModePkt != IntegerMode_None) len+=4;
+  if (tsfModePkt != FractionalMode_None) len+=8;
 
   int32_t off = getOffset(cifNum, bit);
   bool present = !isNull(val);
@@ -501,11 +502,11 @@ void BasicContextPacket::setTimeStampField (int8_t cifNum, int32_t bit, const Ti
   off = shiftPayload(off, len, present);
 
   if (!isNull(val)) {
-    if (tsiModeVal != IntegerMode_None) {
+    if (tsiModePkt != IntegerMode_None) {
       VRTMath::packUInt(bbuf, off+getPrologueLength(), val.getTimeStampInteger());
       off += 4;
     }
-    if (tsfModeVal != FractionalMode_None) {
+    if (tsfModePkt != FractionalMode_None) {
       VRTMath::packULong(bbuf, off+getPrologueLength(), val.getTimeStampFractional());
     }
   }

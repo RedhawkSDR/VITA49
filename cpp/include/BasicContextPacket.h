@@ -421,7 +421,7 @@ namespace vrt {
      */
     public: inline IndexFieldList getIndexList () const {
       //int32_t           off = IndicatorFieldProvider::getOffset(INDEX_LIST);
-      int32_t           off = getOffset(0, protected_CIF1::INDEX_LIST_mask);
+      int32_t           off = getOffset(1, protected_CIF1::INDEX_LIST_mask);
       IndexFieldList val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
@@ -433,7 +433,7 @@ namespace vrt {
      */
     public: virtual ArrayOfRecords getSectorScanStep () const {
       //int32_t           off = IndicatorFieldProvider::getOffset(SECTOR_SCN_STP);
-      int32_t           off = getOffset(0, protected_CIF1::SECTOR_SCN_STP_mask);
+      int32_t           off = getOffset(1, protected_CIF1::SECTOR_SCN_STP_mask);
       ArrayOfRecords val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
@@ -445,7 +445,7 @@ namespace vrt {
      */
     public: virtual ArrayOfRecords getCIFsArray () const {
       //int32_t           off = IndicatorFieldProvider::getOffset(CIFS_ARRAY);
-      int32_t           off = getOffset(0, protected_CIF1::CIFS_ARRAY_mask);
+      int32_t           off = getOffset(1, protected_CIF1::CIFS_ARRAY_mask);
       ArrayOfRecords val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
@@ -459,7 +459,7 @@ namespace vrt {
      */
     public: virtual SpectrumField getSpectrumField () const {
       //int32_t           off = IndicatorFieldProvider::getOffset(SPECTRUM);
-      int32_t           off = getOffset(0, protected_CIF1::SPECTRUM_mask);
+      int32_t           off = getOffset(1, protected_CIF1::SPECTRUM_mask);
       SpectrumField val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
@@ -471,7 +471,7 @@ namespace vrt {
      */
     public: virtual ArrayOfRecords get2DPointingAngleStructured () const {
       //int32_t           off = IndicatorFieldProvider::getOffset(PNT_ANGL_2D_ST);
-      int32_t           off = getOffset(0, protected_CIF1::PNT_ANGL_2D_ST_mask);
+      int32_t           off = getOffset(1, protected_CIF1::PNT_ANGL_2D_ST_mask);
       ArrayOfRecords val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
