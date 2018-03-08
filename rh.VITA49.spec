@@ -30,7 +30,7 @@
 
 Name:           rh.VITA49
 Version:        4.0.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        REDHAWK shared library %{name}
 
 Group:          REDHAWK/Shared Libraries

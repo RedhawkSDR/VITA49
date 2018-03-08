@@ -180,11 +180,42 @@ bool BasicContextPacket::resetForResend (const TimeStamp &t) {
   return true;
 }
 
+// TODO update setters to all use a common function like below:
+/*int32_t setGenericField(int8_t cifNum, int32_t bit, int32_t xoff, bool present, int32_t cif7bit) {
+  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
+  int32_t cif7off = 0;
+  int32_t fieldLen = getFieldLen(cifNum,bit);
+  if (cif7bit != 0) {
+    if (!present) throw VRTException("CIF7 attribute must be removed globally for all fields");
+    cif7off = getCIF7Offset(cif7bit, fieldLen); // This will throw exception if cif7 not enabled, which is appropriate
+    if (cif7off < 0) throw VRTException("CIF7 attribute must be enabled prior to assigning value");
+    int32_t cif7length = getFieldLen(7,cif7bit, fieldLen);
+    cif7off -= cif7length; // adjust to be offset to start of attribute, not end.
+  // Note: If setting value w/o specifying cif7bit, the value will be set as the first attribute
+  //       The alternative is to error check:
+  //} else if (!isNull(val) && isCIF7Enable()) throw VRTException("CIF7 attribute must be specified when CIF7 is enabled");
+  }
+
+  int32_t poff = getOffset(cifNum, bit); // offset to beginning of [parent] field
+  //bool present = !isNull(val);
+
+  // are we adding or removing? then we have to do some extra work
+  if (present != (poff>0)) {
+    int32_t totalSize = getTotalFieldSize(fieldLen);
+    setContextIndicatorFieldBit(cifNum, bit, present);
+    poff = shiftPayload(poff, totalSize, present);
+  }
+
+  //if (present) {
+  //  bbuf[poff+cif7off+xoff+getPrologueLength()] = val;
+  //}
+  return present? poff+cif7off+xoff+getPrologueLength() : -1;
+}*/
+
 // This is the State and Event Indicator, which has the same format as the Trailer for Data/ExtData packets
 // The trailer function is leveraged to eliminate duplicate code.
-boolNull BasicContextPacket::getStateEventBit (int32_t enable, int32_t indicator) const {
-  //int32_t off = IndicatorFieldProvider::getOffset(STATE_EVENT);
-  int32_t off = getOffset(0, protected_CIF0::STATE_EVENT_mask);
+boolNull BasicContextPacket::getStateEventBit (int32_t enable, int32_t indicator, int32_t cif7bit) const { // TODO CIF7 (done)
+  int32_t off = getOffset(0, protected_CIF0::STATE_EVENT_mask, cif7bit);
   if (off < 0) return _NULL;
   // Note: offset passed to BasicVRTPacket is from start of bbuf
   return BasicVRTPacket::getStateEventBit(bbuf, off+getPrologueLength(), enable, indicator);
@@ -192,42 +223,68 @@ boolNull BasicContextPacket::getStateEventBit (int32_t enable, int32_t indicator
 
 // This is the State and Event Indicator, which has the same format as the Trailer for Data/ExtData packets
 // The trailer function is leveraged to eliminate duplicate code.
-void BasicContextPacket::setStateEventBit (int32_t enable, int32_t indicator, boolNull value) {
+void BasicContextPacket::setStateEventBit (int32_t enable, int32_t indicator, boolNull value, int32_t cif7bit) { // TODO CIF7 (done)
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  //int32_t off = IndicatorFieldProvider::getOffset(STATE_EVENT);
-  int32_t off = getOffset(0, protected_CIF0::STATE_EVENT_mask);
-  if (off < 0) {
+  int32_t cif7off = 0;
+  int32_t fieldLen = 4; // STATE_EVENT is 4 bytes
+  if (cif7bit != 0) {
+    cif7off = getCIF7Offset(cif7bit, fieldLen); // This will throw exception if cif7 not enabled, which is appropriate
+    if (cif7off < 0) throw VRTException("CIF7 attribute must be enabled prior to assigning value");
+    int32_t cif7length = 4; // all CIF7 attributes for STATE_EVENT are 4 bytes
+    cif7off -= cif7length; // adjust to be offset to start of attribute, not end.
+  // Note: If setting value w/o specifying cif7bit, the value will be set as the first attribute
+  //       The alternative is to error check:
+  //} else if (!isNull(val) && isCIF7Enable()) throw VRTException("CIF7 attribute must be specified when CIF7 is enabled");
+  }
+
+  int32_t poff = getOffset(0, protected_CIF0::STATE_EVENT_mask); // offset to beginning of [parent] field
+  if (poff < 0) {
     if (value == _NULL) return; // no State and Event Indicator, no need to set to null
-    setContextIndicatorFieldBit(STATE_EVENT, true);
-    off = shiftPayload(off, 4, true);
+    int32_t totalSize = getTotalFieldSize(fieldLen);
+    setContextIndicatorFieldBit(0, protected_CIF0::STATE_EVENT_mask, true);
+    poff = shiftPayload(poff, totalSize, true);
   }
   // Note: offset passed to BasicVRTPacket is from start of bbuf
-  BasicVRTPacket::setStateEventBit(bbuf, off+getPrologueLength(), enable, indicator, value);
+  BasicVRTPacket::setStateEventBit(bbuf, poff+cif7off+getPrologueLength(), enable, indicator, value);
 }
 
-void BasicContextPacket::setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen) {
+void BasicContextPacket::setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen, int32_t cif7bit) { // TODO CIF7 (done)
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  int32_t off = getOffset(cifNum, bit);
-
-  if ((val == NULL) && (off < 0)) return; // not present, no change
-
+  int32_t cif7off = 0;
   int32_t newLen = (val == NULL)? 0 : val->getByteLength();
-  if ((off >= 0) && (val != NULL) && (oldLen == newLen)) {
+  if (cif7bit != 0) {
+    if (val==NULL) throw VRTException("CIF7 attribute must be removed globally for all fields");
+    cif7off = getCIF7Offset(cif7bit, newLen); // This will throw exception if cif7 not enabled, which is appropriate
+    if (cif7off < 0) throw VRTException("CIF7 attribute must be enabled prior to assigning value");
+    int32_t cif7length = getFieldLen(7,cif7bit, newLen);
+    cif7off -= cif7length; // adjust to be offset to start of attribute, not end.
+  // Note: If setting value w/o specifying cif7bit, the value will be set as the first attribute
+  //       The alternative is to error check:
+  //} else if (!isNull(val) && isCIF7Enable()) throw VRTException("CIF7 attribute must be specified when CIF7 is enabled");
+  }
+
+  int32_t poff = getOffset(cifNum, bit); // offset to beginning of [parent] field
+
+  if ((val == NULL) && (poff < 0)) return; // not present, no change
+
+  if ((poff >= 0) && (val != NULL) && (oldLen == newLen)) {
     // present, no change in size
-    packPayloadRecord(off, *val);
+    packPayloadRecord(poff+cif7off, *val);
   }
   else {
-    if (off >= 0) {
+    if (poff >= 0) {
       // remove the old one
+      int32_t oldTotalSize = getTotalFieldSize(oldLen);
       setContextIndicatorFieldBit(cifNum, bit, false);
-      shiftPayload(off, oldLen, false);
-      off = -off;
+      shiftPayload(poff, oldTotalSize, false);
+      poff = -poff;
     }
 
     if (val != NULL) {
+      int32_t newTotalSize = getTotalFieldSize(newLen);
       setContextIndicatorFieldBit(cifNum, bit, true);
-      off = shiftPayload(off, newLen, true);
-      packPayloadRecord(off, *val);
+      poff = shiftPayload(poff, newTotalSize, true);
+      packPayloadRecord(poff+cif7off, *val);
     }
   }
 }
@@ -307,6 +364,7 @@ void BasicContextPacket::setContextIndicatorField7Bit (int32_t bit, bool set, bo
 }
 
 void BasicContextPacket::addCIF1 (bool add, bool occurrence) {
+  // TODO - either need to ensure CIF is 0 already, or also remove each set CIF bit and associated fields
   UNUSED_VARIABLE(occurrence);
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   if (isCIF1Enable() == add) return; // Nothing to do
@@ -319,6 +377,7 @@ void BasicContextPacket::addCIF1 (bool add, bool occurrence) {
 }
 
 void BasicContextPacket::addCIF2 (bool add, bool occurrence) {
+  // TODO - either need to ensure CIF is 0 already, or also remove each set CIF bit and associated fields
   UNUSED_VARIABLE(occurrence);
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   if (isCIF2Enable() == add) return; // Nothing to do
@@ -332,6 +391,7 @@ void BasicContextPacket::addCIF2 (bool add, bool occurrence) {
 }
 
 void BasicContextPacket::addCIF3 (bool add, bool occurrence) {
+  // TODO - either need to ensure CIF is 0 already, or also remove each set CIF bit and associated fields
   UNUSED_VARIABLE(occurrence);
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   if (isCIF3Enable() == add) return; // Nothing to do
@@ -346,118 +406,288 @@ void BasicContextPacket::addCIF3 (bool add, bool occurrence) {
 }
 
 void BasicContextPacket::addCIF7 (bool add, bool occurrence) {
+  // TODO - either need to ensure CIF is 0 already, or also remove each set CIF bit and associated fields
   UNUSED_VARIABLE(occurrence);
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   if (isCIF7Enable() == add) return; // Nothing to do
 
   setContextIndicatorField0Bit(protected_CIF0::CIF7_ENABLE_mask, add);
 
+  // calculate offset for CIF7 and determine if CURRENT_VALUE bit of CIF7 needs to be set
+  int32_t prologlen = getPrologueLength();
+  // the following are N/A for CIF7
+  int32_t cif0_mask = ~(protected_CIF0::CIF1_ENABLE_mask | protected_CIF0::CIF2_ENABLE_mask
+                      | protected_CIF0::CIF3_ENABLE_mask | protected_CIF0::CIF7_ENABLE_mask
+                      | protected_CIF0::CHANGE_IND_mask);
+  int32_t cif_bits = VRTMath::unpackInt(bbuf, prologlen) & cif0_mask;
   int32_t off = 4; // CIF0
-  if (isCIF1Enable()) off+=4;
-  if (isCIF2Enable()) off+=4;
-  if (isCIF3Enable()) off+=4;
+  if (isCIF1Enable()) {
+    cif_bits |= VRTMath::unpackInt(bbuf, prologlen+off);
+    off+=4;
+  }
+  if (isCIF2Enable()) {
+    cif_bits |= VRTMath::unpackInt(bbuf, prologlen+off);
+    off+=4;
+  }
+  if (isCIF3Enable()) {
+    cif_bits |= VRTMath::unpackInt(bbuf, prologlen+off);
+    off+=4;
+  }
   if (add) off = -off; // negative if doesn't exist
   off = shiftPayload(off, 4, add);
+
+  if (add && (cif_bits!=0)) { // at least one CIF bit is set
+    //setContextIndicatorField7Bit(protected_CIF7::CURRENT_VALUE_mask, true);
+    VRTMath::packInt(bbuf, prologlen+off, protected_CIF7::CURRENT_VALUE_mask);
+    // no shifting required because the values must already be there in this case
+  }
 }
 
+void BasicContextPacket::setCIF7Bit (int32_t cif7bit, bool set, bool occurrence) {
+  UNUSED_VARIABLE(occurrence);
+  boolNull present = getCIF7Bit(cif7bit);
+  if ((present!=_TRUE) && !set) return; // nothing to do
+  if ((present==_TRUE) && set) return; // nothing to do
+  if (present==_NULL) { // need to add CIF7 enable
+    addCIF7(true);
+  }
+  
+  // for set=true, set bit first, then adjust from top to bottom, left to right
+  int8_t  cif_start = 0;  // start at CIF0
+  int8_t  cif_stop  = 4;  // stop after CIF3
+  int8_t  cif_inc   = 1;  // increment cifNum by 1 each iteration
+  int32_t bit_start = 31; // start at the msb (31)
+  int32_t bit_stop  = -1; // stop after the lsb (0)
+  int32_t bit_inc   = -1; // decrement bit number by 1 each  iteration
+  if (!set) { // for set=false, adjust from bottom to top, right to left first, then unset bit
+    cif_start = 3;  // start at CIF3
+    cif_stop  = -1; // stop after CIF0
+    cif_inc   = -1; // decrement cifNum by 1 each iteration
+    bit_start = 0;  // start at the lsb (0)
+    bit_stop  = 32; // stop after the msb (31)
+    bit_inc   = 1;  // increment bit number by 1 each iteration
+    // and do not un-set the CIF7 enable bit until after adjusting the payload
+  } else {
+    // set the CIF7 enable bit prior to adjusting the payload
+    setContextIndicatorField7Bit(cif7bit, set); // set bit
+  }
 
-int8_t BasicContextPacket::getB (int8_t cifNum, int32_t bit, int32_t xoff) const {
-  int32_t off = getOffset(cifNum, bit);
-  if (off < 0) return INT8_NULL;
+  // ignore CIF0 bits that are not affected by CIF7
+  // for each set bit, shift in (or out) space for cif7 attribute
+  int32_t cif0_mask = ~(protected_CIF0::CIF1_ENABLE_mask | protected_CIF0::CIF2_ENABLE_mask
+                      | protected_CIF0::CIF3_ENABLE_mask | protected_CIF0::CIF7_ENABLE_mask
+                      | protected_CIF0::CHANGE_IND_mask); // = 0x7FFFFF00
+
+  for (int8_t cifNum = cif_start; cifNum != cif_stop; cifNum+=cif_inc) {
+    if (!isCIFEnable(cifNum)) continue;
+    int32_t cif = getContextIndicatorField(cifNum);
+    if (cifNum == 0) cif &= cif0_mask;
+    for (int32_t bit = bit_start; bit!=bit_stop; bit+=bit_inc) {
+      if (((0x1<<bit)&cif) != 0) {
+        // get cif7 field size and offset
+        int32_t fieldLen = getFieldLen(cifNum, (0x1<<bit));
+        int32_t cif7size = getFieldLen(7, cif7bit, fieldLen);
+        int32_t off = getOffset(cifNum, (0x1<<bit)); // this must be positive
+        int32_t cif7off = getCIF7Offset(cif7bit, fieldLen); // if set=true, sign reflects end result, not current reality
+        if (set) cif7off = -cif7off; // flip sign to reflect current reality, not end result
+        if (cif7off < 0) {
+          off = -off; // flip offset because cif7 field is not currently present
+          cif7off += cif7size; // adjust to beginning of cif7 field rather than end
+        } else {
+          cif7off -= cif7size; // adjust to beginning of cif7 field rather than end
+        }
+        // shift in (or out) cif7field size at cif7offset
+        off = shiftPayload(off+cif7off, cif7size, set);
+      }
+    }
+  }
+  if (!set) {
+    setContextIndicatorField7Bit(cif7bit, set); // unset bit
+  }
+}
+
+int8_t BasicContextPacket::getB (int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const { // TODO CIF7 (done)
+  int32_t off = getOffset(cifNum, bit, cif7bit);
+  if (isNull(off) || off < 0) return INT8_NULL;
   return bbuf[off+xoff+getPrologueLength()];
 }
-void BasicContextPacket::setB (int8_t cifNum, int32_t bit, int32_t xoff, int8_t val) {
+void BasicContextPacket::setB (int8_t cifNum, int32_t bit, int32_t xoff, int8_t val, int32_t cif7bit) { // TODO CIF7 (done)
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  int32_t off = getOffset(cifNum, bit);
+  int32_t cif7off = 0;
+  int32_t fieldLen = getFieldLen(cifNum,bit);
+  if (cif7bit != 0) {
+    if (isNull(val)) throw VRTException("CIF7 attribute must be removed globally for all fields");
+    cif7off = getCIF7Offset(cif7bit, fieldLen); // This will throw exception if cif7 not enabled, which is appropriate
+    if (cif7off < 0) throw VRTException("CIF7 attribute must be enabled prior to assigning value");
+    int32_t cif7length = getFieldLen(7,cif7bit, fieldLen);
+    cif7off -= cif7length; // adjust to be offset to start of attribute, not end.
+  // Note: If setting value w/o specifying cif7bit, the value will be set as the first attribute
+  //       The alternative is to error check:
+  //} else if (!isNull(val) && isCIF7Enable()) throw VRTException("CIF7 attribute must be specified when CIF7 is enabled");
+  }
+
+  int32_t poff = getOffset(cifNum, bit); // offset to beginning of [parent] field
   bool present = !isNull(val);
 
-  setContextIndicatorFieldBit(cifNum, bit, present);
-  off = shiftPayload(off, 4, present);
+  // are we adding or removing? then we have to do some extra work
+  if (present != (poff>0)) {
+    int32_t totalSize = getTotalFieldSize(fieldLen);
+    setContextIndicatorFieldBit(cifNum, bit, present);
+    poff = shiftPayload(poff, totalSize, present);
+  }
 
-  if (!isNull(val)) {
-    bbuf[off+xoff+getPrologueLength()] = val;
+  if (present) {
+    bbuf[poff+cif7off+xoff+getPrologueLength()] = val;
   }
 }
-int16_t BasicContextPacket::getI (int8_t cifNum, int32_t bit, int32_t xoff) const {
-  int32_t off = getOffset(cifNum, bit);
-  if (off < 0) return INT16_NULL;
+int16_t BasicContextPacket::getI (int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const { // TODO CIF7 (done)
+  int32_t off = getOffset(cifNum, bit, cif7bit);
+  if (isNull(off) || off < 0) return INT16_NULL;
   return VRTMath::unpackShort(bbuf, off+xoff+getPrologueLength());
 }
-void BasicContextPacket::setI (int8_t cifNum, int32_t bit, int32_t xoff, int16_t val) {
+void BasicContextPacket::setI (int8_t cifNum, int32_t bit, int32_t xoff, int16_t val, int32_t cif7bit) { // TODO CIF7 (done)
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  int32_t off = getOffset(cifNum, bit);
+  int32_t cif7off = 0;
+  int32_t fieldLen = getFieldLen(cifNum,bit);
+  if (cif7bit != 0) {
+    if (isNull(val)) throw VRTException("CIF7 attribute must be removed globally for all fields");
+    cif7off = getCIF7Offset(cif7bit, fieldLen); // This will throw exception if cif7 not enabled, which is appropriate
+    if (cif7off < 0) throw VRTException("CIF7 attribute must be enabled prior to assigning value");
+    int32_t cif7length = getFieldLen(7,cif7bit, fieldLen);
+    cif7off -= cif7length; // adjust to be offset to start of attribute, not end.
+  // Note: If setting value w/o specifying cif7bit, the value will be set as the first attribute
+  //       The alternative is to error check:
+  //} else if (!isNull(val) && isCIF7Enable()) throw VRTException("CIF7 attribute must be specified when CIF7 is enabled");
+  }
+
+  int32_t poff = getOffset(cifNum, bit); // offset to beginning of [parent] field
   bool present = !isNull(val);
 
-  setContextIndicatorFieldBit(cifNum, bit, present);
-  off = shiftPayload(off, 4, present);
+  // are we adding or removing? then we have to do some extra work
+  if (present != (poff>0)) {
+    int32_t totalSize = getTotalFieldSize(fieldLen);
+    setContextIndicatorFieldBit(cifNum, bit, present);
+    poff = shiftPayload(poff, totalSize, present);
+  }
 
-  if (!isNull(val)) {
-    VRTMath::packShort(bbuf, off+xoff+getPrologueLength(), val);
+  if (present) {
+    VRTMath::packShort(bbuf, poff+cif7off+xoff+getPrologueLength(), val);
   }
 }
-int32_t BasicContextPacket::getL24 (int8_t cifNum, int32_t bit, int32_t offset) const {
-  int32_t off = getOffset(cifNum, bit);
-  if (off < 0) return INT32_NULL;
+int32_t BasicContextPacket::getL24 (int8_t cifNum, int32_t bit, int32_t offset, int32_t cif7bit) const { // TODO CIF7 (done)
+  int32_t off = getOffset(cifNum, bit, cif7bit);
+  if (isNull(off) || off < 0) return INT32_NULL;
   int32_t bits = VRTMath::unpackInt(bbuf, off+getPrologueLength());
   bits = (bits & (0xFFFFFF00 >> 8*offset)) >> 8*offset;
   return bits;
 }
-int32_t BasicContextPacket::getL (int8_t cifNum, int32_t bit) const {
-  int32_t off = getOffset(cifNum, bit);
-  if (off < 0) return INT32_NULL;
+int32_t BasicContextPacket::getL (int8_t cifNum, int32_t bit, int32_t cif7bit) const { // TODO CIF7 (done)
+  int32_t off = getOffset(cifNum, bit, cif7bit);
+  if (isNull(off) || off < 0) return INT32_NULL;
   return VRTMath::unpackInt(bbuf, off+getPrologueLength());
 }
-void BasicContextPacket::setL (int8_t cifNum, int32_t bit, int32_t val) {
+void BasicContextPacket::setL (int8_t cifNum, int32_t bit, int32_t val, int32_t cif7bit) { // TODO CIF7 (done)
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  int32_t off = getOffset(cifNum, bit);
+  int32_t cif7off = 0;
+  int32_t fieldLen = getFieldLen(cifNum,bit);
+  if (cif7bit != 0) {
+    if (isNull(val)) throw VRTException("CIF7 attribute must be removed globally for all fields");
+    cif7off = getCIF7Offset(cif7bit, fieldLen); // This will throw exception if cif7 not enabled, which is appropriate
+    if (cif7off < 0) throw VRTException("CIF7 attribute must be enabled prior to assigning value");
+    int32_t cif7length = getFieldLen(7,cif7bit, fieldLen);
+    cif7off -= cif7length; // adjust to be offset to start of attribute, not end.
+  // Note: If setting value w/o specifying cif7bit, the value will be set as the first attribute
+  //       The alternative is to error check:
+  //} else if (!isNull(val) && isCIF7Enable()) throw VRTException("CIF7 attribute must be specified when CIF7 is enabled");
+  }
+
+  int32_t poff = getOffset(cifNum, bit); // offset to beginning of [parent] field
   bool present = !isNull(val);
 
-  setContextIndicatorFieldBit(cifNum, bit, present);
-  off = shiftPayload(off, 4, present);
+  // are we adding or removing? then we have to do some extra work
+  if (present != (poff>0)) {
+    int32_t totalSize = getTotalFieldSize(fieldLen);
+    setContextIndicatorFieldBit(cifNum, bit, present);
+    poff = shiftPayload(poff, totalSize, present);
+  }
 
-  if (!isNull(val)) {
-    VRTMath::packInt(bbuf, off+getPrologueLength(), val);
+  if (present) {
+    VRTMath::packInt(bbuf, poff+cif7off+getPrologueLength(), val);
   }
 }
-int64_t BasicContextPacket::getX (int8_t cifNum, int32_t bit) const {
-  int32_t off = getOffset(cifNum, bit);
-  if (off < 0) return INT64_NULL;
+int64_t BasicContextPacket::getX (int8_t cifNum, int32_t bit, int32_t cif7bit) const { // TODO CIF7 (done)
+  int32_t off = getOffset(cifNum, bit, cif7bit);
+  if (isNull(off) || off < 0) return INT64_NULL;
   return VRTMath::unpackLong(bbuf, off+getPrologueLength());
 }
-void BasicContextPacket::setX (int8_t cifNum, int32_t bit, int64_t val) {
+void BasicContextPacket::setX (int8_t cifNum, int32_t bit, int64_t val, int32_t cif7bit) { // TODO CIF7 (done)
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  int32_t off = getOffset(cifNum, bit);
+  int32_t cif7off = 0;
+  int32_t fieldLen = getFieldLen(cifNum,bit);
+  if (cif7bit != 0) {
+    if (isNull(val)) throw VRTException("CIF7 attribute must be removed globally for all fields");
+    cif7off = getCIF7Offset(cif7bit, fieldLen); // This will throw exception if cif7 not enabled, which is appropriate
+    if (cif7off < 0) throw VRTException("CIF7 attribute must be enabled prior to assigning value");
+    int32_t cif7length = getFieldLen(7,cif7bit, fieldLen);
+    cif7off -= cif7length; // adjust to be offset to start of attribute, not end.
+  // Note: If setting value w/o specifying cif7bit, the value will be set as the first attribute
+  //       The alternative is to error check:
+  //} else if (!isNull(val) && isCIF7Enable()) throw VRTException("CIF7 attribute must be specified when CIF7 is enabled");
+  }
+
+  int32_t poff = getOffset(cifNum, bit); // offset to beginning of [parent] field
   bool present = !isNull(val);
 
-  setContextIndicatorFieldBit(cifNum, bit, present);
-  off = shiftPayload(off, 8, present);
+  // are we adding or removing? then we have to do some extra work
+  if (present != (poff>0)) {
+    int32_t totalSize = getTotalFieldSize(fieldLen);
+    setContextIndicatorFieldBit(cifNum, bit, present);
+    poff = shiftPayload(poff, totalSize, present);
+  }
 
-  if (!isNull(val)) {
-    VRTMath::packLong(bbuf, off+getPrologueLength(), val);
+  if (present) {
+    VRTMath::packLong(bbuf, poff+cif7off+getPrologueLength(), val);
   }
 }
 
-UUID BasicContextPacket::getUUID (int8_t cifNum, int32_t bit) const {
-  int32_t off = getOffset(cifNum, bit);
-  if (off < 0) return UUID(); // return NULL UUID
+UUID BasicContextPacket::getUUID (int8_t cifNum, int32_t bit, int32_t cif7bit) const { // TODO CIF7 (done)
+  int32_t off = getOffset(cifNum, bit, cif7bit);
+  if (isNull(off) || off < 0) return UUID(); // return NULL UUID
   return VRTMath::unpackUUID(bbuf, off+getPrologueLength());
 }
-void BasicContextPacket::setUUID (int8_t cifNum, int32_t bit, const UUID &val) {
+void BasicContextPacket::setUUID (int8_t cifNum, int32_t bit, const UUID &val, int32_t cif7bit) { // TODO CIF7 (done)
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  int32_t off = getOffset(cifNum, bit);
+  int32_t cif7off = 0;
+  int32_t fieldLen = getFieldLen(cifNum,bit);
+  if (cif7bit != 0) {
+    if (isNull(val)) throw VRTException("CIF7 attribute must be removed globally for all fields");
+    cif7off = getCIF7Offset(cif7bit, fieldLen); // This will throw exception if cif7 not enabled, which is appropriate
+    if (cif7off < 0) throw VRTException("CIF7 attribute must be enabled prior to assigning value");
+    int32_t cif7length = getFieldLen(7,cif7bit, fieldLen);
+    cif7off -= cif7length; // adjust to be offset to start of attribute, not end.
+  // Note: If setting value w/o specifying cif7bit, the value will be set as the first attribute
+  //       The alternative is to error check:
+  //} else if (!isNull(val) && isCIF7Enable()) throw VRTException("CIF7 attribute must be specified when CIF7 is enabled");
+  }
+
+  int32_t poff = getOffset(cifNum, bit);
   bool present = !isNull(val);
 
-  setContextIndicatorFieldBit(cifNum, bit, present);
-  off = shiftPayload(off, 16, present);
+  // are we adding or removing? then we have to do some extra work
+  if (present != (poff>0)) {
+    int32_t totalSize = getTotalFieldSize(fieldLen);
+    setContextIndicatorFieldBit(cifNum, bit, present);
+    poff = shiftPayload(poff, totalSize, present);
+  }
 
-  if (!isNull(val)) {
-    VRTMath::packUUID(bbuf, off+getPrologueLength(), val);
+  if (present) {
+    VRTMath::packUUID(bbuf, poff+cif7off+getPrologueLength(), val);
   }
 }
 
-TimeStamp BasicContextPacket::getTimeStampField (int8_t cifNum, int32_t bit) const {
-  int32_t off = getOffset(cifNum, bit);
-  if (off < 0) return TimeStamp(); // return NULL TimeStamp (int/frac modes both set to None)
+TimeStamp BasicContextPacket::getTimeStampField (int8_t cifNum, int32_t bit, int32_t cif7bit) const { // TODO CIF7 (done)
+  int32_t off = getOffset(cifNum, bit, cif7bit);
+  if (isNull(off) || off < 0) return TimeStamp(); // return NULL TimeStamp (int/frac modes both set to None)
 
   IntegerMode    tsiMode = (IntegerMode   )((bbuf[1] >> 6) & 0x3);
   FractionalMode tsfMode = (FractionalMode)((bbuf[1] >> 4) & 0x3);
@@ -475,7 +705,7 @@ TimeStamp BasicContextPacket::getTimeStampField (int8_t cifNum, int32_t bit) con
   }
   return TimeStamp(tsiMode, tsfMode, tsi, tsf, DOUBLE_NAN);
 }
-void BasicContextPacket::setTimeStampField (int8_t cifNum, int32_t bit, const TimeStamp &val) {
+void BasicContextPacket::setTimeStampField (int8_t cifNum, int32_t bit, const TimeStamp &val, int32_t cif7bit) { // TODO CIF7 (done)
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
 
   // Get packet timestamp info from TSI/TSF
@@ -495,26 +725,65 @@ void BasicContextPacket::setTimeStampField (int8_t cifNum, int32_t bit, const Ti
   if (tsiModePkt != IntegerMode_None) len+=4;
   if (tsfModePkt != FractionalMode_None) len+=8;
 
-  int32_t off = getOffset(cifNum, bit);
+  int32_t cif7off = 0;
+  if (cif7bit != 0) {
+    if (isNull(val)) throw VRTException("CIF7 attribute must be removed globally for all fields");
+    cif7off = getCIF7Offset(cif7bit, len); // This will throw exception if cif7 not enabled, which is appropriate
+    if (cif7off < 0) throw VRTException("CIF7 attribute must be enabled prior to assigning value");
+    int32_t cif7length = getFieldLen(7,cif7bit, len);
+    cif7off -= cif7length; // adjust to be offset to start of attribute, not end.
+  // Note: If setting value w/o specifying cif7bit, the value will be set as the first attribute
+  //       The alternative is to error check:
+  //} else if (!isNull(val) && isCIF7Enable()) throw VRTException("CIF7 attribute must be specified when CIF7 is enabled");
+  }
+
+  int32_t poff = getOffset(cifNum, bit);
   bool present = !isNull(val);
 
-  setContextIndicatorFieldBit(cifNum, bit, present);
-  off = shiftPayload(off, len, present);
+  // are we adding or removing? then we have to do some extra work
+  if (present != (poff>0)) {
+    int32_t totalSize = getTotalFieldSize(len);
+    setContextIndicatorFieldBit(cifNum, bit, present);
+    poff = shiftPayload(poff, totalSize, present);
+  }
 
-  if (!isNull(val)) {
+  if (present) {
     if (tsiModePkt != IntegerMode_None) {
-      VRTMath::packUInt(bbuf, off+getPrologueLength(), val.getTimeStampInteger());
-      off += 4;
+      VRTMath::packUInt(bbuf, poff+cif7off+getPrologueLength(), val.getTimeStampInteger());
+      poff += 4;
     }
     if (tsfModePkt != FractionalMode_None) {
-      VRTMath::packULong(bbuf, off+getPrologueLength(), val.getTimeStampFractional());
+      VRTMath::packULong(bbuf, poff+cif7off+getPrologueLength(), val.getTimeStampFractional());
     }
   }
 }
 
-int32_t BasicContextPacket::getFieldLen (int8_t cifNum, int32_t field) const {
-  // TODO - do CIF7 settings affect calculation of field length?
-  //      - i.e. does field length include all attributes for the field?
+void BasicContextPacket::setDataPayloadFormat (const PayloadFormat &val, IndicatorFieldEnum_t cif7field) {
+  int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+  if (isNull(val)) {
+    setX(0, protected_CIF0::DATA_FORMAT_mask, INT64_NULL, cif7bit);
+  } else if (isNull(val.getBits())) {
+    // XXX - special case: setX will interpret the request as a removal of the field (NULL)
+    // First, let setX do the heavy lifting with a non-NULL value
+    setX(0, protected_CIF0::DATA_FORMAT_mask, val.getBits()+1, cif7bit);
+    // now assign the correct value
+    int32_t off = getOffset(0, protected_CIF0::DATA_FORMAT_mask, cif7bit);
+    VRTMath::packLong(bbuf, off+getPrologueLength(), val.getBits());
+  } else {
+    setX(0, protected_CIF0::DATA_FORMAT_mask, val.getBits(), cif7bit);
+  }
+}
+
+int32_t BasicContextPacket::getTotalFieldSize (int32_t fieldLen, bool occurrence) const {
+  UNUSED_VARIABLE(occurrence);
+  if (!isCIF7Enable()) return fieldLen;
+  int32_t cif7 = getContextIndicatorField7();
+  int32_t sz = (bitCount(cif7 & protected_CIF7::CTX_4_OCTETS    ) * 4       )
+             + (bitCount(cif7 & protected_CIF7::CTX_SAME_OCTETS ) * fieldLen);
+  return sz;
+}
+
+int32_t BasicContextPacket::getFieldLen (int8_t cifNum, int32_t field, int32_t parent) const { // TODO CIF7 (done)
   switch(cifNum) {
   case 0:
     if ((field & protected_CIF0::CTX_4_OCTETS ) != 0) return  4;
@@ -524,11 +793,13 @@ int32_t BasicContextPacket::getFieldLen (int8_t cifNum, int32_t field) const {
     if (field == protected_CIF0::GPS_ASCII_mask) {
       int32_t prologlen = getPrologueLength();
       int off = getOffset(cifNum, field);
+      if (off<0) return -1;
       return VRTMath::unpackInt(bbuf, prologlen+4+off)*4+8;
     }
     if (field == protected_CIF0::CONTEXT_ASOC_mask) {
       int32_t prologlen = getPrologueLength();
       int off = getOffset(cifNum, field);
+      if (off<0) return -1;
       int32_t source = VRTMath::unpackShort(bbuf, prologlen+0+off) & 0x01FF;
       int32_t system = VRTMath::unpackShort(bbuf, prologlen+2+off) & 0x01FF;
       int32_t vector = VRTMath::unpackShort(bbuf, prologlen+4+off) & 0xFFFF;
@@ -544,6 +815,7 @@ int32_t BasicContextPacket::getFieldLen (int8_t cifNum, int32_t field) const {
     if ((field & protected_CIF1::CTX_ARR_OF_RECS ) != 0) {
       int32_t prologlen = getPrologueLength();
       int off = getOffset(cifNum, field);
+      if (off<0) return -1;
       return VRTMath::unpackInt(bbuf, prologlen+off)*4;
     }
     break;
@@ -553,7 +825,7 @@ int32_t BasicContextPacket::getFieldLen (int8_t cifNum, int32_t field) const {
     break;
   case 3:
     if ((field & protected_CIF3::CTX_4_OCTETS ) != 0) return 4;
-    if ((field & protected_CIF3::CTX_8_OCTETS ) != 0) return 4;
+    if ((field & protected_CIF3::CTX_8_OCTETS ) != 0) return 8;
     if ((field & protected_CIF3::CTX_TSTAMP_OCTETS ) != 0) {
       // BasicVRTPacket doesn't provide us any help, so do it manually
       //      - for TSI and TSF, 0x00 = no timestamp (+0 octets)
@@ -568,8 +840,8 @@ int32_t BasicContextPacket::getFieldLen (int8_t cifNum, int32_t field) const {
     }
     break;
   case 7:
-    // TODO - return 0? or -1? (will return -1 for change bit in CIF0, these are similar, but maybe that's wrong... -1 means variable, -2 means not found, so maybe 0 is more appropriate)
-    break;
+    if ((field & protected_CIF7::CTX_4_OCTETS    ) != 0) return 4;
+    if ((field & protected_CIF7::CTX_SAME_OCTETS ) != 0) return parent;
   default:
     throw VRTException("Invalid Context Indicator Field number.");
   } // switch
@@ -589,13 +861,22 @@ string BasicContextPacket::getPacketValid (bool strict, int32_t length) const {
   return "";
 }
 
-int32_t BasicContextPacket::getCif7Offset (int32_t attr, int32_t len) const {
+int32_t BasicContextPacket::getCIF7Offset (int32_t attr, int32_t len, bool occurrence) const { // TODO CIF7 (done)
+  UNUSED_VARIABLE(occurrence);
+  if (!isCIF7Enable()) throw VRTException("CIF7 is not enabled.");
   int32_t cif7 = getContextIndicatorField7();
-  if (isNull(cif7)) {
-    throw VRTException("CIF7 is not enabled.");
-  }
-  int32_t mask = ~(attr ^ (attr - 1));
-  int32_t m    = cif7 & mask;
+  //if (isNull(cif7)) {
+    // 0x80000000 is INT32_NULL, which is also CURRENT_VALUE_mask
+    //throw VRTException("CIF7 is not enabled.");
+  //}
+  //int32_t mask = ~(attr ^ (attr - 1));
+  // This offset needs to be calculated differently from other CIFs because an
+  // offset of 0 is permitted, and we can't return -0 to indicate not present.
+  // Instead, we return offet+length of the field. This is essentially the
+  // offset to the end of the field instead of the beginning.
+  // A value of 0 is now only possible if the attr is 0 (i.e. no CIF7 attribute)
+  int32_t mask = ~(attr - 1); // this will include the field of interest in the offset
+  int32_t m    = (cif7 & mask) | attr;
   int32_t off  = (bitCount(m & protected_CIF7::CTX_4_OCTETS    ) * 4  )
                + (bitCount(m & protected_CIF7::CTX_SAME_OCTETS ) * len);
   return ((cif7 & attr) != 0)? off: -off;  // -off if not present

@@ -128,7 +128,7 @@
 <a name="l00157"></a>00157 
 <a name="l00158"></a>00158 
 <a name="l00159"></a>00159   <span class="comment">// See VRTMath.c for function code</span>
-<a name="l00160"></a>00160   <span class="keyword">namespace </span>VRTMath {
+<a name="l00160"></a><a class="code" href="namespacevrt_1_1VRTMath.html">00160</a>   <span class="keyword">namespace </span>VRTMath {
 <a name="l00166"></a><a class="code" href="namespacevrt_1_1VRTMath.html#ac0fff2b83255a420f25e0784bd366f9f">00166</a>     <span class="keyword">inline</span> <span class="keywordtype">void</span> <a class="code" href="namespacevrt_1_1VRTMath.html#ac0fff2b83255a420f25e0784bd366f9f" title="Pack a 16-byte IPv6 address into a buffer.">packInetAddr</a> (<span class="keywordtype">void</span> *ptr, int32_t off, <span class="keyword">const</span> <a class="code" href="classvrt_1_1InetAddress.html" title="An IPv4 or IPv6 Internet address.">InetAddress</a> &amp;val) {
 <a name="l00167"></a>00167       <span class="keywordtype">char</span> *buf = (<span class="keywordtype">char</span>*)ptr;
 <a name="l00168"></a>00168       memcpy(&amp;buf[off], &amp;val.<a class="code" href="classvrt_1_1InetAddress.html#a04bd06c629932e534548463cdc5e5ab6" title="Gets this address as an IPv6 address.">toIPv6</a>().s6_addr[0], 16);
@@ -149,7 +149,7 @@
 <a name="l00198"></a>00198 } END_NAMESPACE
 <a name="l00199"></a>00199 <span class="preprocessor">#endif </span><span class="comment">/* _InetAddress_h */</span>
 </pre></div></div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 20 Nov 2017 for VRT by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 7 Mar 2018 for VRT by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

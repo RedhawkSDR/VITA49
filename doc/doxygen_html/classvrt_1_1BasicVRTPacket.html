@@ -1002,7 +1002,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Reads the packet content as a vector. </p>
 
-<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l00975">getPacketVector()</a>.</p>
+<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l00888">getPacketVector()</a>.</p>
 
 </div>
 </div>
@@ -1075,9 +1075,9 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 <p>The length of the header will be a value <b>up to</b> <a class="el" href="classvrt_1_1BasicVRTPacket.html#ace1fce903f77599d549f3ae7943a1b9e">MAX_PACKET_LENGTH</a> (see <a class="el" href="classvrt_1_1BasicVRTPacket.html#ace1fce903f77599d549f3ae7943a1b9e">MAX_PACKET_LENGTH</a> for explanation as to why actual packet lengths used are usually a lot less than this number). The packet length will always be a multiple of 4-bytes. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The total length of the packet in bytes. </dd></dl>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>.</p>
 
-<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l00724">getPayloadLength()</a>.</p>
+<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l00637">getPayloadLength()</a>.</p>
 
 </div>
 </div>
@@ -1098,7 +1098,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p><b>Experimental, use with care:</b> Gets a pointer to the packet content. </p>
 
-<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l00984">getPacketPointer_type()</a>.</p>
+<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l00897">getPacketPointer_type()</a>.</p>
 
 </div>
 </div>
@@ -1141,7 +1141,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Gets the packet type. </p>
 
-<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l00446">hasStreamIdentifier()</a>.</p>
+<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l00359">hasStreamIdentifier()</a>.</p>
 
 </div>
 </div>
@@ -1211,7 +1211,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>Empty string ("") if it is valid, a description of the error otherwise. </dd></dl>
 
-<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l00554">isPacketValid()</a>.</p>
+<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l00467">isPacketValid()</a>.</p>
 
 </div>
 </div>
@@ -1303,9 +1303,9 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
   </pre><p> The payload length will always be a multiple of 4-bytes. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The length of the payload in bytes. </dd></dl>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00708">getPacketLength()</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="classvrt_1_1BasicVRTPacket.html#ae0b07bf5ad5721cbc4f4d769de18376b">getTrailerLength()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00621">getPacketLength()</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="classvrt_1_1BasicVRTPacket.html#ae0b07bf5ad5721cbc4f4d769de18376b">getTrailerLength()</a>.</p>
 
-<p>Referenced by <a class="el" href="BasicDataPacket_8h_source.html#l00677">vrt::BasicDataPacket::getData()</a>, <a class="el" href="ReferencePointPacket_8h_source.html#l00129">vrt::ReferencePointPacket::getDescription()</a>, <a class="el" href="StreamStatePacket_8h_source.html#l00312">vrt::StreamStatePacket::getMessage()</a>, <a class="el" href="EphemerisPacket_8h_source.html#l00551">vrt::EphemerisPacket::getPointCount()</a>, and <a class="el" href="BasicDataPacket_8h_source.html#l01191">vrt::BasicDataPacket::setData()</a>.</p>
+<p>Referenced by <a class="el" href="BasicDataPacket_8h_source.html#l00678">vrt::BasicDataPacket::getData()</a>, <a class="el" href="ReferencePointPacket_8h_source.html#l00129">vrt::ReferencePointPacket::getDescription()</a>, <a class="el" href="StreamStatePacket_8h_source.html#l00312">vrt::StreamStatePacket::getMessage()</a>, <a class="el" href="EphemerisPacket_8h_source.html#l00551">vrt::EphemerisPacket::getPointCount()</a>, and <a class="el" href="BasicDataPacket_8h_source.html#l01192">vrt::BasicDataPacket::setData()</a>.</p>
 
 </div>
 </div>
@@ -1372,7 +1372,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Reimplemented in <a class="el" href="classvrt_1_1BasicCommandPacket.html#a2bd7b5952c6fdee424fe8faad91f82e1">vrt::BasicCommandPacket</a>, and <a class="el" href="classvrt_1_1BasicControlPacket.html#a442228f7a5b94844edf913e8b409868d">vrt::BasicControlPacket</a>.</p>
 
-<p>Referenced by <a class="el" href="BasicContextPacket_8h_source.html#l00304">vrt::BasicContextPacket::getContextIndicatorField0()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00882">vrt::BasicDataPacket::getDataByte()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00722">vrt::BasicDataPacket::getDataDouble()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00754">vrt::BasicDataPacket::getDataFloat()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00818">vrt::BasicDataPacket::getDataInt()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00786">vrt::BasicDataPacket::getDataLong()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00850">vrt::BasicDataPacket::getDataShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00724">getPayloadLength()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01094">packPayloadAscii()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01077">packPayloadBoolean()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01075">packPayloadBoolNull()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01063">packPayloadByte()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01083">packPayloadBytes()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01073">packPayloadDouble()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01071">packPayloadFloat()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01089">packPayloadInetAddr()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01067">packPayloadInt()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01069">packPayloadLong()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01081">packPayloadMetadata()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01079">packPayloadRecord()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01065">packPayloadShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01087">packPayloadTimeStamp()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01107">packPayloadUTF8()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01091">packPayloadUUID()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01364">vrt::BasicDataPacket::setDataByte()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01229">vrt::BasicDataPacket::setDataDouble()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01256">vrt::BasicDataPacket::setDataFloat()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01310">vrt::BasicDataPacket::setDataInt()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01283">vrt::BasicDataPacket::setDataLong()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01337">vrt::BasicDataPacket::setDataShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01151">unpackPayloadAscii()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01147">unpackPayloadBoolean()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01145">unpackPayloadBoolNull()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01133">unpackPayloadByte()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01157">unpackPayloadBytes()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01143">unpackPayloadDouble()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01141">unpackPayloadFloat()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01163">unpackPayloadInetAddr()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01137">unpackPayloadInt()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01139">unpackPayloadLong()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01155">unpackPayloadMetadata()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01149">unpackPayloadRecord()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01135">unpackPayloadShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01161">unpackPayloadTimeStamp()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01153">unpackPayloadUTF8()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01165">unpackPayloadUUID()</a>.</p>
+<p>Referenced by <a class="el" href="BasicContextPacket_8h_source.html#l00317">vrt::BasicContextPacket::getContextIndicatorField0()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00883">vrt::BasicDataPacket::getDataByte()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00723">vrt::BasicDataPacket::getDataDouble()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00755">vrt::BasicDataPacket::getDataFloat()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00819">vrt::BasicDataPacket::getDataInt()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00787">vrt::BasicDataPacket::getDataLong()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00851">vrt::BasicDataPacket::getDataShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00637">getPayloadLength()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01007">packPayloadAscii()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00990">packPayloadBoolean()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00988">packPayloadBoolNull()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00976">packPayloadByte()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00996">packPayloadBytes()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00986">packPayloadDouble()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00984">packPayloadFloat()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01002">packPayloadInetAddr()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00980">packPayloadInt()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00982">packPayloadLong()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00994">packPayloadMetadata()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00992">packPayloadRecord()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00978">packPayloadShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01000">packPayloadTimeStamp()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01020">packPayloadUTF8()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01004">packPayloadUUID()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01365">vrt::BasicDataPacket::setDataByte()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01230">vrt::BasicDataPacket::setDataDouble()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01257">vrt::BasicDataPacket::setDataFloat()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01311">vrt::BasicDataPacket::setDataInt()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01284">vrt::BasicDataPacket::setDataLong()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01338">vrt::BasicDataPacket::setDataShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01064">unpackPayloadAscii()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01060">unpackPayloadBoolean()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01058">unpackPayloadBoolNull()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01046">unpackPayloadByte()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01070">unpackPayloadBytes()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01056">unpackPayloadDouble()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01054">unpackPayloadFloat()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01076">unpackPayloadInetAddr()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01050">unpackPayloadInt()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01052">unpackPayloadLong()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01068">unpackPayloadMetadata()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01062">unpackPayloadRecord()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01048">unpackPayloadShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01074">unpackPayloadTimeStamp()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01066">unpackPayloadUTF8()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01078">unpackPayloadUUID()</a>.</p>
 
 </div>
 </div>
@@ -1576,7 +1576,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 <p>Gets the time stamp of the packet. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The time stamp of the packet (never null). </dd></dl>
 
-<p>Referenced by <a class="el" href="BasicContextPacket_8h_source.html#l00210">vrt::BasicContextPacket::getAdjustedTimeStamp()</a>.</p>
+<p>Referenced by <a class="el" href="BasicContextPacket_8h_source.html#l00211">vrt::BasicContextPacket::getAdjustedTimeStamp()</a>.</p>
 
 </div>
 </div>
@@ -1599,7 +1599,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 <p>Note that the presence of the trailer is an all-or-nothing, so this method return either <a class="el" href="classvrt_1_1BasicVRTPacket.html#a74f683b39777f1e9289d6e3d7fe55dde">MAX_TRAILER_LENGTH</a> or <code>0</code>. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The length of the trailer in bytes. </dd></dl>
 
-<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l00724">getPayloadLength()</a>.</p>
+<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l00637">getPayloadLength()</a>.</p>
 
 </div>
 </div>
@@ -1839,7 +1839,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Reimplemented from <a class="el" href="classvrt_1_1VRTObject.html#ad5fc53758bf19350e251f4cd84670e2c">vrt::VRTObject</a>.</p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>.</p>
 
 </div>
 </div>
@@ -1869,7 +1869,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if it is valid, false otherwise. </dd></dl>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00575">getPacketValid()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00488">getPacketValid()</a>.</p>
 
 </div>
 </div>
@@ -1892,7 +1892,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 <p>This checks the overall structure of the packet (i.e. length is correct, reserved bits set to 0, etc.). It does not check the content of the packet or the validity of the data in the packet (the state and event indicators are provided for that purpose). </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>true if it is valid, false otherwise. </dd></dl>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00575">getPacketValid()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00488">getPacketValid()</a>.</p>
 
 </div>
 </div>
@@ -2012,7 +2012,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs an ASCII string into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, <a class="el" href="namespacevrt_1_1VRTMath.html#a3c7d32193d1beb4a21fcbee46e7878b4">vrt::VRTMath::packAscii()</a>, and <a class="el" href="classvrt_1_1BasicVRTPacket.html#aa624a0ad7411af7dc8fdd173f0f80ffc">setPayloadLength()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, <a class="el" href="namespacevrt_1_1VRTMath.html#a3c7d32193d1beb4a21fcbee46e7878b4">vrt::VRTMath::packAscii()</a>, and <a class="el" href="classvrt_1_1BasicVRTPacket.html#aa624a0ad7411af7dc8fdd173f0f80ffc">setPayloadLength()</a>.</p>
 
 <p>Referenced by <a class="el" href="ReferencePointPacket_8h_source.html#l00121">vrt::ReferencePointPacket::setName()</a>, and <a class="el" href="EphemerisPacket_8h_source.html#l00438">vrt::EphemerisPacket::setProducedBy()</a>.</p>
 
@@ -2045,7 +2045,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a boolean value into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01470">vrt::VRTMath::packBoolean()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01470">vrt::VRTMath::packBoolean()</a>.</p>
 
 </div>
 </div>
@@ -2076,7 +2076,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a <code>boolNull</code> value into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01442">vrt::VRTMath::packBoolNull()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01442">vrt::VRTMath::packBoolNull()</a>.</p>
 
 </div>
 </div>
@@ -2107,7 +2107,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs an 8-bit integer into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01163">vrt::VRTMath::packByte()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01163">vrt::VRTMath::packByte()</a>.</p>
 
 <p>Referenced by <a class="el" href="EphemerisPacket_8h_source.html#l00480">vrt::EphemerisPacket::setAccFixType()</a>, <a class="el" href="StreamStatePacket_8h_source.html#l00262">vrt::StreamStatePacket::setAggregateSystemStatus()</a>, <a class="el" href="EphemerisPacket_8h_source.html#l00494">vrt::EphemerisPacket::setAttFixType()</a>, <a class="el" href="StreamStatePacket_8h_source.html#l00276">vrt::StreamStatePacket::setInputStatus()</a>, <a class="el" href="StreamStatePacket_8h_source.html#l00290">vrt::StreamStatePacket::setInternalStatus()</a>, <a class="el" href="StreamStatePacket_8h_source.html#l00304">vrt::StreamStatePacket::setOutputStatus()</a>, <a class="el" href="EphemerisPacket_8h_source.html#l00452">vrt::EphemerisPacket::setPosFixType()</a>, <a class="el" href="StreamStatePacket_8h_source.html#l00248">vrt::StreamStatePacket::setSystemState()</a>, and <a class="el" href="EphemerisPacket_8h_source.html#l00466">vrt::EphemerisPacket::setVelFixType()</a>.</p>
 
@@ -2146,7 +2146,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a block of bytes into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01636">vrt::VRTMath::packBytes()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01636">vrt::VRTMath::packBytes()</a>.</p>
 
 </div>
 </div>
@@ -2183,7 +2183,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a block of bytes into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01636">vrt::VRTMath::packBytes()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01636">vrt::VRTMath::packBytes()</a>.</p>
 
 </div>
 </div>
@@ -2214,7 +2214,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a 64-bit floating-point value into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01408">vrt::VRTMath::packDouble()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01408">vrt::VRTMath::packDouble()</a>.</p>
 
 </div>
 </div>
@@ -2245,7 +2245,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a 32-bit floating-point value into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01381">vrt::VRTMath::packFloat()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01381">vrt::VRTMath::packFloat()</a>.</p>
 
 </div>
 </div>
@@ -2276,7 +2276,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a <a class="el" href="classvrt_1_1InetAddress.html">InetAddress</a> into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="InetAddress_8h_source.html#l00166">vrt::VRTMath::packInetAddr()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="InetAddress_8h_source.html#l00166">vrt::VRTMath::packInetAddr()</a>.</p>
 
 </div>
 </div>
@@ -2307,7 +2307,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a 32-bit integer into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01235">vrt::VRTMath::packInt()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01235">vrt::VRTMath::packInt()</a>.</p>
 
 <p>Referenced by <a class="el" href="ReferencePointPacket_8h_source.html#l00101">vrt::ReferencePointPacket::setRefPointID()</a>.</p>
 
@@ -2340,7 +2340,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a 64-bit integer into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01256">vrt::VRTMath::packLong()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01256">vrt::VRTMath::packLong()</a>.</p>
 
 <p>Referenced by <a class="el" href="EphemerisPacket_8h_source.html#l00528">vrt::EphemerisPacket::setFixDelta()</a>, and <a class="el" href="TimestampAccuracyPacket_8h_source.html#l00147">vrt::TimestampAccuracyPacket::setTimestampAccuracy()</a>.</p>
 
@@ -2379,7 +2379,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a metadata block into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#a2caf91200db7580abace6c9c51c43374">vrt::VRTMath::packMetadata()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#a2caf91200db7580abace6c9c51c43374">vrt::VRTMath::packMetadata()</a>.</p>
 
 </div>
 </div>
@@ -2410,7 +2410,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a record value into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#aaee853c53dbbfaab48ebfeff8d412b70">vrt::VRTMath::packRecord()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#aaee853c53dbbfaab48ebfeff8d412b70">vrt::VRTMath::packRecord()</a>.</p>
 
 </div>
 </div>
@@ -2441,7 +2441,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a 16-bit integer into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01183">vrt::VRTMath::packShort()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01183">vrt::VRTMath::packShort()</a>.</p>
 
 </div>
 </div>
@@ -2478,7 +2478,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a <a class="el" href="classvrt_1_1TimeStamp.html">TimeStamp</a> into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="TimeStamp_8h_source.html#l01146">vrt::VRTMath::packTimeStamp()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="TimeStamp_8h_source.html#l01146">vrt::VRTMath::packTimeStamp()</a>.</p>
 
 <p>Referenced by <a class="el" href="EphemerisPacket_8h_source.html#l00510">vrt::EphemerisPacket::setFixTime()</a>.</p>
 
@@ -2517,7 +2517,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a UTF-8 string into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, <a class="el" href="namespacevrt_1_1VRTMath.html#a6d45e3bdc1dd1bc8153a07bc072f8c5a">vrt::VRTMath::packUTF8()</a>, and <a class="el" href="classvrt_1_1BasicVRTPacket.html#aa624a0ad7411af7dc8fdd173f0f80ffc">setPayloadLength()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, <a class="el" href="namespacevrt_1_1VRTMath.html#a6d45e3bdc1dd1bc8153a07bc072f8c5a">vrt::VRTMath::packUTF8()</a>, and <a class="el" href="classvrt_1_1BasicVRTPacket.html#aa624a0ad7411af7dc8fdd173f0f80ffc">setPayloadLength()</a>.</p>
 
 </div>
 </div>
@@ -2554,7 +2554,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a UTF-8 string into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, <a class="el" href="namespacevrt_1_1VRTMath.html#a6d45e3bdc1dd1bc8153a07bc072f8c5a">vrt::VRTMath::packUTF8()</a>, and <a class="el" href="classvrt_1_1BasicVRTPacket.html#aa624a0ad7411af7dc8fdd173f0f80ffc">setPayloadLength()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, <a class="el" href="namespacevrt_1_1VRTMath.html#a6d45e3bdc1dd1bc8153a07bc072f8c5a">vrt::VRTMath::packUTF8()</a>, and <a class="el" href="classvrt_1_1BasicVRTPacket.html#aa624a0ad7411af7dc8fdd173f0f80ffc">setPayloadLength()</a>.</p>
 
 <p>Referenced by <a class="el" href="ReferencePointPacket_8h_source.html#l00137">vrt::ReferencePointPacket::setDescription()</a>, and <a class="el" href="StreamStatePacket_8h_source.html#l00320">vrt::StreamStatePacket::setMessage()</a>.</p>
 
@@ -2587,7 +2587,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packs a <a class="el" href="classvrt_1_1UUID.html">UUID</a> into the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="UUID_8h_source.html#l00138">vrt::VRTMath::packUUID()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="UUID_8h_source.html#l00138">vrt::VRTMath::packUUID()</a>.</p>
 
 </div>
 </div>
@@ -3313,7 +3313,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
   </dd>
 </dl>
 
-<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l01094">packPayloadAscii()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01107">packPayloadUTF8()</a>, <a class="el" href="ReferencePointPacket_8h_source.html#l00137">vrt::ReferencePointPacket::setDescription()</a>, <a class="el" href="StreamStatePacket_8h_source.html#l00320">vrt::StreamStatePacket::setMessage()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01030">setPayload()</a>.</p>
+<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l01007">packPayloadAscii()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01020">packPayloadUTF8()</a>, <a class="el" href="ReferencePointPacket_8h_source.html#l00137">vrt::ReferencePointPacket::setDescription()</a>, <a class="el" href="StreamStatePacket_8h_source.html#l00320">vrt::StreamStatePacket::setMessage()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l00943">setPayload()</a>.</p>
 
 </div>
 </div>
@@ -3746,7 +3746,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p><b>Internal Use Only:</b> Does a buffer swap. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l00245">readOnly</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l00158">readOnly</a>.</p>
 
 </div>
 </div>
@@ -3768,7 +3768,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p><b>Internal Use Only:</b> Does a buffer swap. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l00245">readOnly</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l00158">readOnly</a>.</p>
 
 </div>
 </div>
@@ -3921,7 +3921,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks an ASCII string from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#a8a61c533c98f77c4943a309bb1de9256">vrt::VRTMath::unpackAscii()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#a8a61c533c98f77c4943a309bb1de9256">vrt::VRTMath::unpackAscii()</a>.</p>
 
 <p>Referenced by <a class="el" href="ReferencePointPacket_8h_source.html#l00109">vrt::ReferencePointPacket::getName()</a>, and <a class="el" href="EphemerisPacket_8h_source.html#l00426">vrt::EphemerisPacket::getProducedBy()</a>.</p>
 
@@ -3945,7 +3945,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks a boolean value from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#a5af1b4911b0d0103fa04ee5cca5d8c92">vrt::VRTMath::unpackBoolean()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#a5af1b4911b0d0103fa04ee5cca5d8c92">vrt::VRTMath::unpackBoolean()</a>.</p>
 
 </div>
 </div>
@@ -3967,7 +3967,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks a <code>boolNull</code> value from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#ad724d3ff607ef08f13338e3f70cbdd88">vrt::VRTMath::unpackBoolNull()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#ad724d3ff607ef08f13338e3f70cbdd88">vrt::VRTMath::unpackBoolNull()</a>.</p>
 
 </div>
 </div>
@@ -3989,7 +3989,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks an 8-bit integer from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l00747">vrt::VRTMath::unpackByte()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l00747">vrt::VRTMath::unpackByte()</a>.</p>
 
 <p>Referenced by <a class="el" href="EphemerisPacket_8h_source.html#l00473">vrt::EphemerisPacket::getAccFixType()</a>, <a class="el" href="StreamStatePacket_8h_source.html#l00255">vrt::StreamStatePacket::getAggregateSystemStatus()</a>, <a class="el" href="EphemerisPacket_8h_source.html#l00487">vrt::EphemerisPacket::getAttFixType()</a>, <a class="el" href="StreamStatePacket_8h_source.html#l00269">vrt::StreamStatePacket::getInputStatus()</a>, <a class="el" href="StreamStatePacket_8h_source.html#l00283">vrt::StreamStatePacket::getInternalStatus()</a>, <a class="el" href="StreamStatePacket_8h_source.html#l00297">vrt::StreamStatePacket::getOutputStatus()</a>, <a class="el" href="EphemerisPacket_8h_source.html#l00445">vrt::EphemerisPacket::getPosFixType()</a>, <a class="el" href="StreamStatePacket_8h_source.html#l00241">vrt::StreamStatePacket::getSystemState()</a>, and <a class="el" href="EphemerisPacket_8h_source.html#l00459">vrt::EphemerisPacket::getVelFixType()</a>.</p>
 
@@ -4028,7 +4028,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks a block of bytes from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01133">vrt::VRTMath::unpackBytes()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01133">vrt::VRTMath::unpackBytes()</a>.</p>
 
 </div>
 </div>
@@ -4059,7 +4059,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks a block of bytes from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01133">vrt::VRTMath::unpackBytes()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l01133">vrt::VRTMath::unpackBytes()</a>.</p>
 
 </div>
 </div>
@@ -4081,7 +4081,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks a 64-bit floating-point value from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l00990">vrt::VRTMath::unpackDouble()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l00990">vrt::VRTMath::unpackDouble()</a>.</p>
 
 </div>
 </div>
@@ -4103,7 +4103,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks a 32-bit floating-point value from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l00962">vrt::VRTMath::unpackFloat()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l00962">vrt::VRTMath::unpackFloat()</a>.</p>
 
 </div>
 </div>
@@ -4125,7 +4125,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks a <a class="el" href="classvrt_1_1InetAddress.html">InetAddress</a> from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="InetAddress_8h_source.html#l00185">vrt::VRTMath::unpackInetAddr()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="InetAddress_8h_source.html#l00185">vrt::VRTMath::unpackInetAddr()</a>.</p>
 
 </div>
 </div>
@@ -4147,7 +4147,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks a 32-bit integer from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l00813">vrt::VRTMath::unpackInt()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l00813">vrt::VRTMath::unpackInt()</a>.</p>
 
 <p>Referenced by <a class="el" href="ReferencePointPacket_8h_source.html#l00094">vrt::ReferencePointPacket::getRefPointID()</a>.</p>
 
@@ -4171,7 +4171,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks a 64-bit integer from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l00835">vrt::VRTMath::unpackLong()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l00835">vrt::VRTMath::unpackLong()</a>.</p>
 
 <p>Referenced by <a class="el" href="EphemerisPacket_8h_source.html#l00519">vrt::EphemerisPacket::getFixDelta()</a>, and <a class="el" href="TimestampAccuracyPacket_8h_source.html#l00138">vrt::TimestampAccuracyPacket::getTimestampAccuracy()</a>.</p>
 
@@ -4204,7 +4204,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks a metadata block from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#a6cc65757d0e95057485375a6907703be">vrt::VRTMath::unpackMetadata()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#a6cc65757d0e95057485375a6907703be">vrt::VRTMath::unpackMetadata()</a>.</p>
 
 </div>
 </div>
@@ -4235,9 +4235,9 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks a record from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#a381a914b6e2172aa2715869569074ef5">vrt::VRTMath::unpackRecord()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#a381a914b6e2172aa2715869569074ef5">vrt::VRTMath::unpackRecord()</a>.</p>
 
-<p>Referenced by <a class="el" href="BasicContextPacket_8h_source.html#l00472">vrt::BasicContextPacket::get2DPointingAngleStructured()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00446">vrt::BasicContextPacket::getCIFsArray()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00410">vrt::BasicContextPacket::getContextAssocLists()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00382">vrt::BasicContextPacket::getEphemeris()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00374">vrt::BasicContextPacket::getGeolocation()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00397">vrt::BasicContextPacket::getGeoSentences()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00422">vrt::BasicContextPacket::getIndexList()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00434">vrt::BasicContextPacket::getSectorScanStep()</a>, and <a class="el" href="BasicContextPacket_8h_source.html#l00460">vrt::BasicContextPacket::getSpectrumField()</a>.</p>
+<p>Referenced by <a class="el" href="BasicContextPacket_8h_source.html#l00494">vrt::BasicContextPacket::get2DPointingAngleStructured()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00466">vrt::BasicContextPacket::getCIFsArray()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00427">vrt::BasicContextPacket::getContextAssocLists()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00397">vrt::BasicContextPacket::getEphemeris()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00389">vrt::BasicContextPacket::getGeolocation()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00413">vrt::BasicContextPacket::getGeoSentences()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00440">vrt::BasicContextPacket::getIndexList()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00453">vrt::BasicContextPacket::getSectorScanStep()</a>, and <a class="el" href="BasicContextPacket_8h_source.html#l00481">vrt::BasicContextPacket::getSpectrumField()</a>.</p>
 
 </div>
 </div>
@@ -4259,7 +4259,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks a 16-bit integer from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l00767">vrt::VRTMath::unpackShort()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="VRTMath_8h_source.html#l00767">vrt::VRTMath::unpackShort()</a>.</p>
 
 </div>
 </div>
@@ -4290,7 +4290,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks a <a class="el" href="classvrt_1_1TimeStamp.html">TimeStamp</a> from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="TimeStamp_8h_source.html#l01180">vrt::VRTMath::unpackTimeStamp()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="TimeStamp_8h_source.html#l01180">vrt::VRTMath::unpackTimeStamp()</a>.</p>
 
 <p>Referenced by <a class="el" href="EphemerisPacket_8h_source.html#l00502">vrt::EphemerisPacket::getFixTime()</a>.</p>
 
@@ -4323,7 +4323,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks a UTF-8 string from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#a887aa55d34bfb4e224a7766e897796d4">vrt::VRTMath::unpackUTF8()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="namespacevrt_1_1VRTMath.html#a887aa55d34bfb4e224a7766e897796d4">vrt::VRTMath::unpackUTF8()</a>.</p>
 
 <p>Referenced by <a class="el" href="ReferencePointPacket_8h_source.html#l00129">vrt::ReferencePointPacket::getDescription()</a>, and <a class="el" href="StreamStatePacket_8h_source.html#l00312">vrt::StreamStatePacket::getMessage()</a>.</p>
 
@@ -4347,7 +4347,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Unpacks a <a class="el" href="classvrt_1_1UUID.html">UUID</a> from the payload of the packet. </p>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00241">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="UUID_8h_source.html#l00157">vrt::VRTMath::unpackUUID()</a>.</p>
+<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l00154">bbuf</a>, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">getPrologueLength()</a>, and <a class="el" href="UUID_8h_source.html#l00157">vrt::VRTMath::unpackUUID()</a>.</p>
 
 </div>
 </div>
@@ -4398,7 +4398,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
   </dd>
 </dl>
 
-<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l01030">setPayload()</a>.</p>
+<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l00943">setPayload()</a>.</p>
 
 </div>
 </div>
@@ -4416,7 +4416,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Packet buffer (always includes the header). </p>
 
-<p>Referenced by <a class="el" href="BasicContextPacket_8h_source.html#l00304">vrt::BasicContextPacket::getContextIndicatorField0()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00882">vrt::BasicDataPacket::getDataByte()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00722">vrt::BasicDataPacket::getDataDouble()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00754">vrt::BasicDataPacket::getDataFloat()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00818">vrt::BasicDataPacket::getDataInt()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00786">vrt::BasicDataPacket::getDataLong()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00850">vrt::BasicDataPacket::getDataShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00708">getPacketLength()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00306">isNullValue()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01094">packPayloadAscii()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01077">packPayloadBoolean()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01075">packPayloadBoolNull()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01063">packPayloadByte()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01083">packPayloadBytes()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01073">packPayloadDouble()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01071">packPayloadFloat()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01089">packPayloadInetAddr()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01067">packPayloadInt()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01069">packPayloadLong()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01081">packPayloadMetadata()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01079">packPayloadRecord()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01065">packPayloadShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01087">packPayloadTimeStamp()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01107">packPayloadUTF8()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01091">packPayloadUUID()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01364">vrt::BasicDataPacket::setDataByte()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01229">vrt::BasicDataPacket::setDataDouble()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01256">vrt::BasicDataPacket::setDataFloat()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01310">vrt::BasicDataPacket::setDataInt()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01283">vrt::BasicDataPacket::setDataLong()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01337">vrt::BasicDataPacket::setDataShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01049">swap()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01151">unpackPayloadAscii()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01147">unpackPayloadBoolean()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01145">unpackPayloadBoolNull()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01133">unpackPayloadByte()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01157">unpackPayloadBytes()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01143">unpackPayloadDouble()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01141">unpackPayloadFloat()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01163">unpackPayloadInetAddr()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01137">unpackPayloadInt()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01139">unpackPayloadLong()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01155">unpackPayloadMetadata()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01149">unpackPayloadRecord()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01135">unpackPayloadShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01161">unpackPayloadTimeStamp()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01153">unpackPayloadUTF8()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01165">unpackPayloadUUID()</a>.</p>
+<p>Referenced by <a class="el" href="BasicContextPacket_8h_source.html#l00317">vrt::BasicContextPacket::getContextIndicatorField0()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00883">vrt::BasicDataPacket::getDataByte()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00723">vrt::BasicDataPacket::getDataDouble()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00755">vrt::BasicDataPacket::getDataFloat()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00819">vrt::BasicDataPacket::getDataInt()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00787">vrt::BasicDataPacket::getDataLong()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l00851">vrt::BasicDataPacket::getDataShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00621">getPacketLength()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00219">isNullValue()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01007">packPayloadAscii()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00990">packPayloadBoolean()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00988">packPayloadBoolNull()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00976">packPayloadByte()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00996">packPayloadBytes()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00986">packPayloadDouble()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00984">packPayloadFloat()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01002">packPayloadInetAddr()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00980">packPayloadInt()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00982">packPayloadLong()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00994">packPayloadMetadata()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00992">packPayloadRecord()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00978">packPayloadShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01000">packPayloadTimeStamp()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01020">packPayloadUTF8()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01004">packPayloadUUID()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01365">vrt::BasicDataPacket::setDataByte()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01230">vrt::BasicDataPacket::setDataDouble()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01257">vrt::BasicDataPacket::setDataFloat()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01311">vrt::BasicDataPacket::setDataInt()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01284">vrt::BasicDataPacket::setDataLong()</a>, <a class="el" href="BasicDataPacket_8h_source.html#l01338">vrt::BasicDataPacket::setDataShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l00962">swap()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01064">unpackPayloadAscii()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01060">unpackPayloadBoolean()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01058">unpackPayloadBoolNull()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01046">unpackPayloadByte()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01070">unpackPayloadBytes()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01056">unpackPayloadDouble()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01054">unpackPayloadFloat()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01076">unpackPayloadInetAddr()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01050">unpackPayloadInt()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01052">unpackPayloadLong()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01068">unpackPayloadMetadata()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01062">unpackPayloadRecord()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01048">unpackPayloadShort()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01074">unpackPayloadTimeStamp()</a>, <a class="el" href="BasicVRTPacket_8h_source.html#l01066">unpackPayloadUTF8()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01078">unpackPayloadUUID()</a>.</p>
 
 </div>
 </div>
@@ -4563,7 +4563,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 
 <p>Is this instance read-only? </p>
 
-<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l01049">swap()</a>.</p>
+<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l00962">swap()</a>.</p>
 
 </div>
 </div>
@@ -4571,7 +4571,7 @@ class&nbsp;</td><td class="memItemRight" valign="bottom"><b>VRTReader</b></td></
 <li>cpp_src/vrt/lib/<a class="el" href="BasicVRTPacket_8h_source.html">BasicVRTPacket.h</a></li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 20 Nov 2017 for VRT by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 7 Mar 2018 for VRT by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

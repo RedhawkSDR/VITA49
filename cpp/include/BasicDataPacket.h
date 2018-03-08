@@ -22,6 +22,7 @@
 #ifndef _BasicDataPacket_h
 #define _BasicDataPacket_h
 #include "BasicVRTPacket.h"
+#include "PayloadFormat.h"
 #include "PackUnpack.h"
 
 namespace vrt {

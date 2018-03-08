@@ -80,59 +80,63 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>addCIF2</b> (
 virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>addCIF3</b> (bool add=true, bool occurrence=false)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5ed3fec8485fe331ce53007651c8c34f"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::addCIF7" ref="a5ed3fec8485fe331ce53007651c8c34f" args="(bool add=true, bool occurrence=false)" -->
 virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>addCIF7</b> (bool add=true, bool occurrence=false)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a143e9332ac8209fe499ebe9f7d34f1f1">addError</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field, int32_t val)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Adds one or more errors to the error bit field for the specified indicator field.  <a href="#a143e9332ac8209fe499ebe9f7d34f1f1"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a9866d3f0f046d28e75d07a55c919c3c1">addWarning</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field, int32_t val)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Adds one or more warnings to the warning bit field for the specified indicator field.  <a href="#a9866d3f0f046d28e75d07a55c919c3c1"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a835dc46e63cc8a877dd540d15a83e815">get2DPointingAngleStructured</a> () const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the 2D Pointing Angle (Structured) See V49.2 spec Section 9.4.1.  <a href="#a835dc46e63cc8a877dd540d15a83e815"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a76a146ad6f0cbd18e609aaa130bdbb68">getCIFsArray</a> () const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the CIFs Array Array-of-Records type (See V49.2 spec Section 9.13.1).  <a href="#a76a146ad6f0cbd18e609aaa130bdbb68"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1ContextAssocLists.html">ContextAssocLists</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#acf5fa0763a534c60bd94ad32882f7ff1">getContextAssocLists</a> () const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Context Association Lists.  <a href="#acf5fa0763a534c60bd94ad32882f7ff1"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a5cb28959b097a204f94257bbe20144fe">getError</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the error bit field for the specified indicator field.  <a href="#a5cb28959b097a204f94257bbe20144fe"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a7bb22672fbeca96ad14e7a5d451b330f">addError</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field, int32_t val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Adds one or more errors to the error bit field for the specified indicator field.  <a href="#a7bb22672fbeca96ad14e7a5d451b330f"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a5bc244ad9e445b4ba971be9df21500ef">addWarning</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field, int32_t val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Adds one or more warnings to the warning bit field for the specified indicator field.  <a href="#a5bc244ad9e445b4ba971be9df21500ef"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a8bc3365260d10b9a802be5156c363512">get2DPointingAngleStructured</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the 2D Pointing Angle (Structured) See V49.2 spec Section 9.4.1.  <a href="#a8bc3365260d10b9a802be5156c363512"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a76b522014e29a85ead242159cacebaa8">getCIFsArray</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the CIFs Array Array-of-Records type (See V49.2 spec Section 9.13.1).  <a href="#a76b522014e29a85ead242159cacebaa8"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1ContextAssocLists.html">ContextAssocLists</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a5de187a9455d1db445d7ea88419a5a7a">getContextAssocLists</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Context Association Lists.  <a href="#a5de187a9455d1db445d7ea88419a5a7a"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1PayloadFormat.html">PayloadFormat</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aa0c2989915f927c38cdb53c796d3b3f7">getDataPayloadFormat</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Data Packet Payload Format.  <a href="#aa0c2989915f927c38cdb53c796d3b3f7"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a445e54986809b5eb26fb137099a89585">getError</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the error bit field for the specified indicator field.  <a href="#a445e54986809b5eb26fb137099a89585"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structvrt_1_1WarningErrorField.html">WarningErrorField_t</a> &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a0d0ef8353370daa10dd495b69f8ffa8c">getErrors</a> () const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets all errors for all indicator fields.  <a href="#a0d0ef8353370daa10dd495b69f8ffa8c"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="structvrt_1_1FreeFormMessage.html">FreeFormMessage_t</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a17f14fa11b1e9520ffc0ddfe0296a777">getFreeFormMessage</a> () const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets Free-form Warning/Error Message Field.  <a href="#a17f14fa11b1e9520ffc0ddfe0296a777"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1GeoSentences.html">GeoSentences</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a15f71a2d7e9718f2d3bb14ca8db6ef82">getGeoSentences</a> () const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the GPS ASCII "sentences".  <a href="#a15f71a2d7e9718f2d3bb14ca8db6ef82"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1IndexFieldList.html">IndexFieldList</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a8686baeecaae7004cc409676ad4d0166">getIndexList</a> () const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Index Field List.  <a href="#a8686baeecaae7004cc409676ad4d0166"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a1bf486a81a2f682187cd2418afe1651a">getSectorScanStep</a> () const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Sector Scan/Step Field.  <a href="#a1bf486a81a2f682187cd2418afe1651a"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1SpectrumField.html">SpectrumField</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a76d2417ca890b801ca97d0e155366459">getSpectrumField</a> () const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Spectrum Field <a class="el" href="classvrt_1_1SpectrumField.html" title="Specifies a Spectrum Field.">SpectrumField</a> type (See V49.2 spec Section 9.6.1).  <a href="#a76d2417ca890b801ca97d0e155366459"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a9bc4803b4eca12f01c13ebb1726d1504">getWarning</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the warning bit field for the specified indicator field.  <a href="#a9bc4803b4eca12f01c13ebb1726d1504"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1GeoSentences.html">GeoSentences</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aefa543165b8cbee4e3a91773a2d2c24c">getGeoSentences</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the GPS ASCII "sentences".  <a href="#aefa543165b8cbee4e3a91773a2d2c24c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1IndexFieldList.html">IndexFieldList</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aab814c2fe51425be7c8c85646541ac6d">getIndexList</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Index Field List.  <a href="#aab814c2fe51425be7c8c85646541ac6d"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ab41541979f9e93a243dcecba0c6e6437">getSectorScanStep</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Sector Scan/Step Field.  <a href="#ab41541979f9e93a243dcecba0c6e6437"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1SpectrumField.html">SpectrumField</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a5d4be00b5cc30fbe9ac1adc8bbbdec43">getSpectrumField</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Spectrum Field <a class="el" href="classvrt_1_1SpectrumField.html" title="Specifies a Spectrum Field.">SpectrumField</a> type (See V49.2 spec Section 9.6.1).  <a href="#a5d4be00b5cc30fbe9ac1adc8bbbdec43"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aae6497de28153d8e01d46a1e72ae179b">getWarning</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the warning bit field for the specified indicator field.  <a href="#aae6497de28153d8e01d46a1e72ae179b"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="structvrt_1_1WarningErrorField.html">WarningErrorField_t</a> &gt;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ace8d6476f47001e59234987153b1750c">getWarnings</a> () const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets all warnings for all indicator fields.  <a href="#ace8d6476f47001e59234987153b1750c"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ac48022928bc034516c0dd4da28c34309">hasFreeFormMessage</a> () const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Is there a Free-form Warning/Error Message Field.  <a href="#ac48022928bc034516c0dd4da28c34309"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#acbc43edb88d885c0592440dce254143e">removeError</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field, int32_t val)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Removes one or more errors from the error bit field for the specified indicator field.  <a href="#acbc43edb88d885c0592440dce254143e"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a143d557d6ae7ee4a961904442a3d0ea9">removeWarning</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field, int32_t val)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Removes one or more warnings from the warning bit field for the specified indicator field.  <a href="#a143d557d6ae7ee4a961904442a3d0ea9"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a151415619e0432482d51da9d4ba67064">setError</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field, int32_t val)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the error bit field for the specified indicator field.  <a href="#a151415619e0432482d51da9d4ba67064"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a66185e324a061e263a55bd4c05bb0290">removeError</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field, int32_t val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Removes one or more errors from the error bit field for the specified indicator field.  <a href="#a66185e324a061e263a55bd4c05bb0290"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a5cbdba9ef170ca980b3b1b2311e21bd3">removeWarning</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field, int32_t val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Removes one or more warnings from the warning bit field for the specified indicator field.  <a href="#a5cbdba9ef170ca980b3b1b2311e21bd3"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a16b8fcff0cf8c74c72f44afc24a522b7">setDataPayloadFormat</a> (const <a class="el" href="classvrt_1_1PayloadFormat.html">PayloadFormat</a> &amp;val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the Data Packet Payload Format.  <a href="#a16b8fcff0cf8c74c72f44afc24a522b7"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a763afbd430b2ea3d2c70ea4649291a98">setError</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field, int32_t val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the error bit field for the specified indicator field.  <a href="#a763afbd430b2ea3d2c70ea4649291a98"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae245ad6b972e590fe80c833f7b3b9589"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setErrorsGenerated" ref="ae245ad6b972e590fe80c833f7b3b9589" args="(bool set)" -->
 virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setErrorsGenerated</b> (bool set)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a302997b233cb33a81d0a4a7ab4f14f5b">setFreeFormMessage</a> (const <a class="el" href="structvrt_1_1FreeFormMessage.html">FreeFormMessage_t</a> msg)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets Free-form Warning/Error Message Field.  <a href="#a302997b233cb33a81d0a4a7ab4f14f5b"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#abdffe0272305a1f5ffc21aba19381fb4">setPacketType</a> (PacketType t)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><em>Optional functionality:</em> Sets the packet type.  <a href="#abdffe0272305a1f5ffc21aba19381fb4"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aaca92ca1b12dcb11d8670ec7fe3b4ec5">setWarning</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field, int32_t val)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the warning bit field for the specified indicator field.  <a href="#aaca92ca1b12dcb11d8670ec7fe3b4ec5"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a577d3d89688cf365bfafc78ed481b043">setWarning</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field, int32_t val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the warning bit field for the specified indicator field.  <a href="#a577d3d89688cf365bfafc78ed481b043"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a48e6232216c6eaaa869e6abdb7a34da6"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setWarningsGenerated" ref="a48e6232216c6eaaa869e6abdb7a34da6" args="(bool set)" -->
 virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setWarningsGenerated</b> (bool set)</td></tr>
 <tr><td colspan="2"><h2>Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ad41b046ab95368ef6be25993c01a4966">BasicAcknowledgePacket</a> (const <a class="el" href="classvrt_1_1BasicVRTPacket.html">BasicVRTPacket</a> &amp;p, PacketType type, int64_t classID, int32_t minPayloadLength, int32_t maxPayloadLength)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Internal constructor, for use by subclasses.  <a href="#ad41b046ab95368ef6be25993c01a4966"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual int8_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a73f5f6cc0b823d579a61f17fb0d5bed8">getB</a> (int8_t cifNum, int32_t bit, int32_t xoff) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Unpacks a 16-bit integer from the payload at the indicated position.  <a href="#a73f5f6cc0b823d579a61f17fb0d5bed8"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a545d96ddcf991ae42f221645f45e04d4">getCif7Offset</a> (int32_t attr, int32_t len) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the offset of the CIF7 attribute Offset is from the start of a field of size specified.  <a href="#a545d96ddcf991ae42f221645f45e04d4"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual int8_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#afbfed217a4d70964229c4172b57e19a0">getB</a> (int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Unpacks a 16-bit integer from the payload at the indicated position.  <a href="#afbfed217a4d70964229c4172b57e19a0"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ab1375b964cbaeb86433b08a2a2246964">getCIF7Offset</a> (int32_t attr, int32_t len, bool occurrence=0) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the offset of the CIF7 attribute Offset is from the start of a field of size specified.  <a href="#ab1375b964cbaeb86433b08a2a2246964"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0fb9d7bb337c1082c793168cbf0d135e"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getContextIndicatorField0" ref="a0fb9d7bb337c1082c793168cbf0d135e" args="(bool occurrence=0) const " -->
 virtual int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>getContextIndicatorField0</b> (bool occurrence=0) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8fe655ae730e566955e7585c1abb3257"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getContextIndicatorField1" ref="a8fe655ae730e566955e7585c1abb3257" args="(bool occurrence=0) const " -->
@@ -143,42 +147,48 @@ virtual int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>getContext
 virtual int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>getContextIndicatorField3</b> (bool occurrence=0) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a09a3fad720258e964528a5e9983dbbd5"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getContextIndicatorField7" ref="a09a3fad720258e964528a5e9983dbbd5" args="(bool occurrence=0) const " -->
 virtual int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>getContextIndicatorField7</b> (bool occurrence=0) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1Ephemeris.html">Ephemeris</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#adf25738d0f0c600b912cda8ae35d06d4">getEphemeris</a> (int8_t cifNum, int32_t field) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Used for unpacking ephemeris records.  <a href="#adf25738d0f0c600b912cda8ae35d06d4"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1Ephemeris.html">Ephemeris</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a3402b8c7e74665791a4da74de47fd152">getEphemeris</a> (int8_t cifNum, int32_t field, int32_t cif7bit) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Used for unpacking ephemeris records.  <a href="#a3402b8c7e74665791a4da74de47fd152"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a57dae2444c14d1806aa370c3f39b92ba"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getErrorIndicatorField" ref="a57dae2444c14d1806aa370c3f39b92ba" args="(IndicatorFieldEnum_t field) const " -->
 int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>getErrorIndicatorField</b> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a465cf27198c788f23cd656c4dfc6b600"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getErrorIndicatorField" ref="a465cf27198c788f23cd656c4dfc6b600" args="(int8_t wifNum) const " -->
-int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>getErrorIndicatorField</b> (int8_t wifNum) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1530bafbb177e604ec0c6877bad58801"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getErrorIndicatorField" ref="a1530bafbb177e604ec0c6877bad58801" args="(int8_t eifNum) const " -->
+int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>getErrorIndicatorField</b> (int8_t eifNum) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1b96520a9ad84425945ae7d0ddea5060"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getErrorIndicatorFieldBit" ref="a1b96520a9ad84425945ae7d0ddea5060" args="(IndicatorFieldEnum_t field) const " -->
 boolNull&nbsp;</td><td class="memItemRight" valign="bottom"><b>getErrorIndicatorFieldBit</b> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aa9c0abb9cf4435dd02a8077dcd551251">getFieldLen</a> (int8_t cifNum, int32_t field) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the length of the given field when present (-1 if variable, -2 if not found).  <a href="#aa9c0abb9cf4435dd02a8077dcd551251"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1Geolocation.html">Geolocation</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#add86866f33028a048940a7327bca1eff">getGeolocation</a> (int8_t cifNum, int32_t field) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Used for unpacking geolocation records.  <a href="#add86866f33028a048940a7327bca1eff"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual int16_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ab92f5e63940a44cfeb6932c85cf9532d">getI</a> (int8_t cifNum, int32_t bit, int32_t xoff) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Unpacks a 16-bit integer from the payload at the indicated position.  <a href="#ab92f5e63940a44cfeb6932c85cf9532d"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a3b68b3597ce9b6d882d7e1dcf7765738">getL</a> (int8_t cifNum, int32_t bit) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get 32-bits from buffer as a 32-bit integer.  <a href="#a3b68b3597ce9b6d882d7e1dcf7765738"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a169145dd16ae08e8259d03f80165769b">getL24</a> (int8_t cifNum, int32_t bit, int32_t offset) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Unpacks a 32-bit integer from the payload at the indicated position.  <a href="#a169145dd16ae08e8259d03f80165769b"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a074f27c95f68db56c5f2caae51b77196">getFieldLen</a> (int8_t cifNum, int32_t field, int32_t parent=0) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the length of the given field when present (-1 if variable, -2 if not found).  <a href="#a074f27c95f68db56c5f2caae51b77196"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1Geolocation.html">Geolocation</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a5953970c8e70f2e5bdb4155616ece327">getGeolocation</a> (int8_t cifNum, int32_t field, int32_t cif7bit) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Used for unpacking geolocation records.  <a href="#a5953970c8e70f2e5bdb4155616ece327"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual int16_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a3277de3b731f67b67b03ea6e49d9472c">getI</a> (int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Unpacks a 16-bit integer from the payload at the indicated position.  <a href="#a3277de3b731f67b67b03ea6e49d9472c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aba19e34221cdf05e9a60859aa9d4907d">getL</a> (int8_t cifNum, int32_t bit, int32_t cif7bit) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get 32-bits from buffer as a 32-bit integer.  <a href="#aba19e34221cdf05e9a60859aa9d4907d"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ac1374ab0adfa07a010f6eaa9e09a6a42">getL24</a> (int8_t cifNum, int32_t bit, int32_t offset, int32_t cif7bit) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Unpacks a 32-bit integer from the payload at the indicated position.  <a href="#ac1374ab0adfa07a010f6eaa9e09a6a42"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ac13b4efb5337efab0a74466fce06fddd">getOffset</a> (int8_t cifNum, int32_t field) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Prepares a packet for resend resetting any non-persistent values and clearing the context change flags.  <a href="#ac13b4efb5337efab0a74466fce06fddd"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual boolNull&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a76c9b79e364f1800ca468c314625270d">getStateEventBit</a> (int32_t enable, int32_t indicator) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the specified bit from the State and Event Indicator field.  <a href="#a76c9b79e364f1800ca468c314625270d"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1TimeStamp.html">TimeStamp</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aaf1cc96bdeecdec6f385f41671c34378">getTimeStampField</a> (int8_t cifNum, int32_t bit) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Unpacks a <a class="el" href="classvrt_1_1TimeStamp.html" title="An immutable time stamp.">TimeStamp</a> from the payload at the indicated position.  <a href="#aaf1cc96bdeecdec6f385f41671c34378"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1UUID.html">UUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a1402ce2adbe981a62a20b0d394f7421c">getUUID</a> (int8_t cifNum, int32_t bit) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Unpacks a 128-bit <a class="el" href="classvrt_1_1UUID.html" title="A 128-bit universally unique identifier (UUID).">UUID</a> from the payload at the indicated position.  <a href="#a1402ce2adbe981a62a20b0d394f7421c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual boolNull&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#abed798b31c0f6873f6de1f34a24f642d">getStateEventBit</a> (int32_t enable, int32_t indicator, int32_t cif7bit) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the specified bit from the State and Event Indicator field.  <a href="#abed798b31c0f6873f6de1f34a24f642d"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1TimeStamp.html">TimeStamp</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a3b37c1c73c1aa70a3308dce70559f3dd">getTimeStampField</a> (int8_t cifNum, int32_t bit, int32_t cif7bit) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Unpacks a <a class="el" href="classvrt_1_1TimeStamp.html" title="An immutable time stamp.">TimeStamp</a> from the payload at the indicated position.  <a href="#a3b37c1c73c1aa70a3308dce70559f3dd"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a9ce06b83dd12920e81054db38fe98e55">getTotalFieldSize</a> (int32_t fieldLen, bool occurrence=0) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the total size of the field, including all CIF7 attributes.  <a href="#a9ce06b83dd12920e81054db38fe98e55"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1UUID.html">UUID</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ab4c2f89c0e36d87477370237beb2a127">getUUID</a> (int8_t cifNum, int32_t bit, int32_t cif7bit) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Unpacks a 128-bit <a class="el" href="classvrt_1_1UUID.html" title="A 128-bit universally unique identifier (UUID).">UUID</a> from the payload at the indicated position.  <a href="#ab4c2f89c0e36d87477370237beb2a127"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4115fd9230b9781b35e38fa0bcef0015"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getWarningIndicatorField" ref="a4115fd9230b9781b35e38fa0bcef0015" args="(IndicatorFieldEnum_t field) const " -->
 int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>getWarningIndicatorField</b> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1fb06bedaa572d633c50aa7ac8752a47"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getWarningIndicatorField" ref="a1fb06bedaa572d633c50aa7ac8752a47" args="(int8_t wifNum) const " -->
 int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>getWarningIndicatorField</b> (int8_t wifNum) const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a50f161cda1af1ae1f9d9477cadb39ed2"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getWarningIndicatorFieldBit" ref="a50f161cda1af1ae1f9d9477cadb39ed2" args="(IndicatorFieldEnum_t field) const " -->
 boolNull&nbsp;</td><td class="memItemRight" valign="bottom"><b>getWarningIndicatorFieldBit</b> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field) const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual int64_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a1c8a611f338d79a050809b31a17a3ca8">getX</a> (int8_t cifNum, int32_t bit) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Unpacks a 64-bit integer from the payload at the indicated position.  <a href="#a1c8a611f338d79a050809b31a17a3ca8"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a26cc55f08f404f1cbaf031adf401bfe6">setB</a> (int8_t cifNum, int32_t bit, int32_t xoff, int8_t val)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Packs a 16-bit integer from the payload at the indicated position.  <a href="#a26cc55f08f404f1cbaf031adf401bfe6"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual int64_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aa0a032a8a6eeacef74f7886421ca2390">getX</a> (int8_t cifNum, int32_t bit, int32_t cif7bit) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Unpacks a 64-bit integer from the payload at the indicated position.  <a href="#aa0a032a8a6eeacef74f7886421ca2390"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a40a1cc8b1c7376c39888b9773309d2db"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::isCIFEnable" ref="a40a1cc8b1c7376c39888b9773309d2db" args="(int8_t cifNum) const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>isCIFEnable</b> (int8_t cifNum) const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ad4eb9f3612b75751fcc68e0d9d3521ed">setB</a> (int8_t cifNum, int32_t bit, int32_t xoff, int8_t val, int32_t cif7bit)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Packs a 16-bit integer from the payload at the indicated position.  <a href="#ad4eb9f3612b75751fcc68e0d9d3521ed"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1c0a171c4b9d1d225f61e4f9a1e847ea"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setCIF7Bit" ref="a1c0a171c4b9d1d225f61e4f9a1e847ea" args="(int32_t cif7bit, bool set, bool occurrence=false)" -->
+virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setCIF7Bit</b> (int32_t cif7bit, bool set, bool occurrence=false)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ade94bd2dc04cb0146c220085510b8977"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setContextIndicatorField0Bit" ref="ade94bd2dc04cb0146c220085510b8977" args="(int32_t bit, bool set, bool occurrence=0)" -->
 virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextIndicatorField0Bit</b> (int32_t bit, bool set, bool occurrence=0)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af52527f38dddf11701cf473fee70c700"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setContextIndicatorField1Bit" ref="af52527f38dddf11701cf473fee70c700" args="(int32_t bit, bool set, bool occurrence=0)" -->
@@ -189,20 +199,20 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextIndicatorField3Bit</b> (int32_t bit, bool set, bool occurrence=0)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="afa6a794bbc3bcac5c27a53ce944ac31e"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setContextIndicatorField7Bit" ref="afa6a794bbc3bcac5c27a53ce944ac31e" args="(int32_t bit, bool set, bool occurrence=0)" -->
 virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextIndicatorField7Bit</b> (int32_t bit, bool set, bool occurrence=0)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a011f950019169b3bba9d40d459ab5faf">setI</a> (int8_t cifNum, int32_t bit, int32_t xoff, int16_t val)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Packs a 16-bit integer from the payload at the indicated position.  <a href="#a011f950019169b3bba9d40d459ab5faf"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aae5b7a1dbd7435f8d84bc5f566dd10b8">setL</a> (int8_t cifNum, int32_t bit, int32_t val)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set 32-bits of buffer from a 32-bit integer.  <a href="#aae5b7a1dbd7435f8d84bc5f566dd10b8"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a0ae4e75aa88fe836b774b6357464bf37">setRecord</a> (int8_t cifNum, int32_t bit, const <a class="el" href="classvrt_1_1Record.html">Record</a> *val, int32_t oldLen)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets a block of data.  <a href="#a0ae4e75aa88fe836b774b6357464bf37"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a9af408f3d5b17a7bc72f582f8cfd4717">setStateEventBit</a> (int32_t enable, int32_t indicator, boolNull value)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the specified bit of the State and Event Indicator field.  <a href="#a9af408f3d5b17a7bc72f582f8cfd4717"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a748049142e0cb77b0fdf6b9c701523d9">setTimeStampField</a> (int8_t cifNum, int32_t bit, const <a class="el" href="classvrt_1_1TimeStamp.html">TimeStamp</a> &amp;val)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Packs a <a class="el" href="classvrt_1_1TimeStamp.html" title="An immutable time stamp.">TimeStamp</a> from the payload at the indicated position.  <a href="#a748049142e0cb77b0fdf6b9c701523d9"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a11029d6763b0e0bc28daf4dd5727c7d2">setUUID</a> (int8_t cifNum, int32_t bit, const <a class="el" href="classvrt_1_1UUID.html">UUID</a> &amp;val)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Packs a 128-bit <a class="el" href="classvrt_1_1UUID.html" title="A 128-bit universally unique identifier (UUID).">UUID</a> from the payload at the indicated position.  <a href="#a11029d6763b0e0bc28daf4dd5727c7d2"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a6a26af9e9b1bfff749e37936565da284">setX</a> (int8_t cifNum, int32_t bit, int64_t val)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Packs a 64-bit integer from the payload at the indicated position.  <a href="#a6a26af9e9b1bfff749e37936565da284"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ac410607603d4a2b61cfefb74af4c1835">setI</a> (int8_t cifNum, int32_t bit, int32_t xoff, int16_t val, int32_t cif7bit)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Packs a 16-bit integer from the payload at the indicated position.  <a href="#ac410607603d4a2b61cfefb74af4c1835"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#acc27b5ee6a051f0a15a1c37c9043285e">setL</a> (int8_t cifNum, int32_t bit, int32_t val, int32_t cif7bit)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Set 32-bits of buffer from a 32-bit integer.  <a href="#acc27b5ee6a051f0a15a1c37c9043285e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a0becb7f084cab2e734802ef87fe2f71e">setRecord</a> (int8_t cifNum, int32_t bit, const <a class="el" href="classvrt_1_1Record.html">Record</a> *val, int32_t oldLen, int32_t cif7bit)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets a block of data.  <a href="#a0becb7f084cab2e734802ef87fe2f71e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ae29806f28c4103ce005f49e2ed4950fe">setStateEventBit</a> (int32_t enable, int32_t indicator, boolNull value, int32_t cif7bit)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the specified bit of the State and Event Indicator field.  <a href="#ae29806f28c4103ce005f49e2ed4950fe"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a6d18bf475f8863d62442f18c15a0cab3">setTimeStampField</a> (int8_t cifNum, int32_t bit, const <a class="el" href="classvrt_1_1TimeStamp.html">TimeStamp</a> &amp;val, int32_t cif7bit)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Packs a <a class="el" href="classvrt_1_1TimeStamp.html" title="An immutable time stamp.">TimeStamp</a> from the payload at the indicated position.  <a href="#a6d18bf475f8863d62442f18c15a0cab3"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ac0212d983067ef98db7312c2cb738bd8">setUUID</a> (int8_t cifNum, int32_t bit, const <a class="el" href="classvrt_1_1UUID.html">UUID</a> &amp;val, int32_t cif7bit)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Packs a 128-bit <a class="el" href="classvrt_1_1UUID.html" title="A 128-bit universally unique identifier (UUID).">UUID</a> from the payload at the indicated position.  <a href="#ac0212d983067ef98db7312c2cb738bd8"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aae775f6a44414c32085fc99bdd083c0f">setX</a> (int8_t cifNum, int32_t bit, int64_t val, int32_t cif7bit)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Packs a 64-bit integer from the payload at the indicated position.  <a href="#aae775f6a44414c32085fc99bdd083c0f"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a542a1649d6dfaa4aa0c7ae0989406951">toStringStream</a> (ostringstream &amp;str) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Writes the packet content to a string stream in a user-friendly format.  <a href="#a542a1649d6dfaa4aa0c7ae0989406951"></a><br/></td></tr>
 </table>
@@ -525,7 +535,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 </div>
 </div>
-<a class="anchor" id="a143e9332ac8209fe499ebe9f7d34f1f1"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::addError" ref="a143e9332ac8209fe499ebe9f7d34f1f1" args="(IndicatorFieldEnum_t field, int32_t val)" -->
+<a class="anchor" id="a7bb22672fbeca96ad14e7a5d451b330f"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::addError" ref="a7bb22672fbeca96ad14e7a5d451b330f" args="(IndicatorFieldEnum_t field, int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -539,7 +549,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>val</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -555,15 +571,16 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>field</em>&nbsp;</td><td>Indicator field </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>val</em>&nbsp;</td><td>Error bit field to add (set) to the error bit field. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for CIF7 attribute. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00283">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00259">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a3b68b3597ce9b6d882d7e1dcf7765738">getL()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aae5b7a1dbd7435f8d84bc5f566dd10b8">setL()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aba19e34221cdf05e9a60859aa9d4907d">getL()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#acc27b5ee6a051f0a15a1c37c9043285e">setL()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a9866d3f0f046d28e75d07a55c919c3c1"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::addWarning" ref="a9866d3f0f046d28e75d07a55c919c3c1" args="(IndicatorFieldEnum_t field, int32_t val)" -->
+<a class="anchor" id="a5bc244ad9e445b4ba971be9df21500ef"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::addWarning" ref="a5bc244ad9e445b4ba971be9df21500ef" args="(IndicatorFieldEnum_t field, int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -577,7 +594,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>val</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -593,22 +616,24 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>field</em>&nbsp;</td><td>Indicator field </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>val</em>&nbsp;</td><td>Warning bit field to add (set) to the warning bit field. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for CIF7 attribute. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00283">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00259">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a3b68b3597ce9b6d882d7e1dcf7765738">getL()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aae5b7a1dbd7435f8d84bc5f566dd10b8">setL()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aba19e34221cdf05e9a60859aa9d4907d">getL()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#acc27b5ee6a051f0a15a1c37c9043285e">setL()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a835dc46e63cc8a877dd540d15a83e815"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::get2DPointingAngleStructured" ref="a835dc46e63cc8a877dd540d15a83e815" args="() const " -->
+<a class="anchor" id="a8bc3365260d10b9a802be5156c363512"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::get2DPointingAngleStructured" ref="a8bc3365260d10b9a802be5156c363512" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a> vrt::BasicAcknowledgePacket::get2DPointingAngleStructured </td>
           <td>(</td>
-          <td class="paramname"></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
           <td>&nbsp;)&nbsp;</td>
           <td> const<code> [inline, virtual]</code></td>
         </tr>
@@ -633,15 +658,21 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 <li>Bits 3..2: Reference (00 not specified; 01 ECEF; 10 Platform centered; 11 Array centered)</li>
 <li>Bits 1..0: Beam (00 not specified; 01 Beam or signal direction; 10 Null; 11 reserved) 2D Pointing Angle subfield</li>
 <li>Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]</li>
-<li>Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512) <dl class="return"><dt><b>Returns:</b></dt><dd>2D Pointing Angle as an Array-of-Records (null if not specified). <em>Note that changes to the returned object do not alter the packet.</em> </dd></dl>
+<li>Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512) <dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>2D Pointing Angle as an Array-of-Records (null if not specified). <em>Note that changes to the returned object do not alter the packet.</em> </dd></dl>
 </li>
 </ul>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a3e4bd1d3ba8db8306286b379936078d2">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ac1ee8dd842a7d8999296cf5c1a59e508">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a73f5f6cc0b823d579a61f17fb0d5bed8"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getB" ref="a73f5f6cc0b823d579a61f17fb0d5bed8" args="(int8_t cifNum, int32_t bit, int32_t xoff) const " -->
+<a class="anchor" id="afbfed217a4d70964229c4172b57e19a0"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getB" ref="afbfed217a4d70964229c4172b57e19a0" args="(int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -661,7 +692,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>xoff</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>xoff</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -674,16 +711,16 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Unpacks a 16-bit integer from the payload at the indicated position. </p>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a4a6e8b3eb95edfcfc4614c65b3744bcf">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a755c0e153304c9b97974aca45c664fb6">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a545d96ddcf991ae42f221645f45e04d4"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getCif7Offset" ref="a545d96ddcf991ae42f221645f45e04d4" args="(int32_t attr, int32_t len) const " -->
+<a class="anchor" id="ab1375b964cbaeb86433b08a2a2246964"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getCIF7Offset" ref="ab1375b964cbaeb86433b08a2a2246964" args="(int32_t attr, int32_t len, bool occurrence=0) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">virtual int32_t vrt::BasicAcknowledgePacket::getCif7Offset </td>
+          <td class="memname">virtual int32_t vrt::BasicAcknowledgePacket::getCIF7Offset </td>
           <td>(</td>
           <td class="paramtype">int32_t&nbsp;</td>
           <td class="paramname"> <em>attr</em>, </td>
@@ -692,7 +729,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>len</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>len</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&nbsp;</td>
+          <td class="paramname"> <em>occurrence</em> = <code>0</code></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -708,23 +751,25 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>attr</em>&nbsp;</td><td>CIF7 attribute bitmask </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>len</em>&nbsp;</td><td>Length of the field </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>occurrence</em>&nbsp;</td><td>False (0) if first occurrence (default; almost everything), True (1) if second occurrence (only Errors for <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html" title="BasicAcknowledgePacket (AckV and AckX).">BasicAcknowledgePacket</a>) </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>Offset from start of field </dd></dl>
 
-<p>Reimplemented from <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a24d5c5179ec425cec0935efd029910e8">vrt::IndicatorFieldProvider</a>.</p>
+<p>Reimplemented from <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a778f053866a96dccd1dbcebd16d07142">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a76a146ad6f0cbd18e609aaa130bdbb68"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getCIFsArray" ref="a76a146ad6f0cbd18e609aaa130bdbb68" args="() const " -->
+<a class="anchor" id="a76b522014e29a85ead242159cacebaa8"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getCIFsArray" ref="a76b522014e29a85ead242159cacebaa8" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a> vrt::BasicAcknowledgePacket::getCIFsArray </td>
           <td>(</td>
-          <td class="paramname"></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
           <td>&nbsp;)&nbsp;</td>
           <td> const<code> [inline, virtual]</code></td>
         </tr>
@@ -733,20 +778,27 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 <div class="memdoc">
 
 <p>Gets the CIFs Array Array-of-Records type (See V49.2 spec Section 9.13.1). </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The CIFs Array as an Array-of-Records (null if not specified). <em>Note that changes to the returned object do not alter the packet.</em> </dd></dl>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a18544afb05f62485a3fa6abc74c5b9b1">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a45fcf94010ead4ec653333a563afcf31">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="acf5fa0763a534c60bd94ad32882f7ff1"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getContextAssocLists" ref="acf5fa0763a534c60bd94ad32882f7ff1" args="() const " -->
+<a class="anchor" id="a5de187a9455d1db445d7ea88419a5a7a"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getContextAssocLists" ref="a5de187a9455d1db445d7ea88419a5a7a" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">virtual <a class="el" href="classvrt_1_1ContextAssocLists.html">ContextAssocLists</a> vrt::BasicAcknowledgePacket::getContextAssocLists </td>
           <td>(</td>
-          <td class="paramname"></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
           <td>&nbsp;)&nbsp;</td>
           <td> const<code> [inline, virtual]</code></td>
         </tr>
@@ -756,13 +808,49 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Gets the Context Association Lists. </p>
 <p>These lists indicate the other context/data streams associated with this one. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The context association lists (null if not specified). <em>Note that changes to the returned object do not alter the packet.</em> </dd></dl>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a0f1a608b40309cc94eb6cb0b7cc49278">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a622ab6f7c71f6fd2a00a86a32affa871">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="adf25738d0f0c600b912cda8ae35d06d4"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getEphemeris" ref="adf25738d0f0c600b912cda8ae35d06d4" args="(int8_t cifNum, int32_t field) const " -->
+<a class="anchor" id="aa0c2989915f927c38cdb53c796d3b3f7"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getDataPayloadFormat" ref="aa0c2989915f927c38cdb53c796d3b3f7" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual <a class="el" href="classvrt_1_1PayloadFormat.html">PayloadFormat</a> vrt::BasicAcknowledgePacket::getDataPayloadFormat </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Gets the Data Packet Payload Format. </p>
+<p>This specifies the format of the data in the paired data packet stream. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The payload format (null if not specified). <em>Note that changes to the returned object do not alter the packet.</em> </dd></dl>
+
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a21abe5a47f5d8af5e78c750e1bc13b80">vrt::IndicatorFieldProvider</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a3402b8c7e74665791a4da74de47fd152"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getEphemeris" ref="a3402b8c7e74665791a4da74de47fd152" args="(int8_t cifNum, int32_t field, int32_t cif7bit) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -776,7 +864,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>field</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>field</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -789,11 +883,11 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Used for unpacking ephemeris records. </p>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ad2cb9b8f85d301241e846e9b7e3024ba">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#aa8456b90bbb2ad77fe57e0584826c4b7">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a5cb28959b097a204f94257bbe20144fe"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getError" ref="a5cb28959b097a204f94257bbe20144fe" args="(IndicatorFieldEnum_t field) const " -->
+<a class="anchor" id="a445e54986809b5eb26fb137099a89585"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getError" ref="a445e54986809b5eb26fb137099a89585" args="(IndicatorFieldEnum_t field, IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -801,9 +895,18 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="memname">int32_t vrt::BasicAcknowledgePacket::getError </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
-          <td class="paramname"> <em>field</em></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td> const<code> [inline]</code></td>
+          <td class="paramname"> <em>field</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td> const<code> [inline]</code></td>
         </tr>
       </table>
 </div>
@@ -813,12 +916,14 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>field</em>&nbsp;</td><td>Indicator field </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for CIF7 attribute. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for CIF7 attribute. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>Error bit field (0x0 or WEF_NULL or WEF_NO_WARNING_ERROR if no errors). </dd></dl>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00283">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00259">vrt::IndicatorFields::getCIFNumber()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a3b68b3597ce9b6d882d7e1dcf7765738">getL()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aba19e34221cdf05e9a60859aa9d4907d">getL()</a>.</p>
 
 </div>
 </div>
@@ -842,7 +947,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 </div>
 </div>
-<a class="anchor" id="aa9c0abb9cf4435dd02a8077dcd551251"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getFieldLen" ref="aa9c0abb9cf4435dd02a8077dcd551251" args="(int8_t cifNum, int32_t field) const " -->
+<a class="anchor" id="a074f27c95f68db56c5f2caae51b77196"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getFieldLen" ref="a074f27c95f68db56c5f2caae51b77196" args="(int8_t cifNum, int32_t field, int32_t parent=0) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -856,7 +961,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>field</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>field</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>parent</em> = <code>0</code></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -872,6 +983,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>cifNum</em>&nbsp;</td><td>number of CIF that field belongs to. </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>field</em>&nbsp;</td><td>bitmask associated with field of interest. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>parent</em>&nbsp;</td><td>length of parent field </td></tr>
   </table>
   </dd>
 </dl>
@@ -883,7 +995,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#aeeacdde46560d45572a45411054798b3">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#afd3435a06b36dc7f7f23eb535f3f5c53">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
@@ -907,7 +1019,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 </div>
 </div>
-<a class="anchor" id="add86866f33028a048940a7327bca1eff"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getGeolocation" ref="add86866f33028a048940a7327bca1eff" args="(int8_t cifNum, int32_t field) const " -->
+<a class="anchor" id="a5953970c8e70f2e5bdb4155616ece327"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getGeolocation" ref="a5953970c8e70f2e5bdb4155616ece327" args="(int8_t cifNum, int32_t field, int32_t cif7bit) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -921,7 +1033,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>field</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>field</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -934,18 +1052,19 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Used for unpacking geolocation records. </p>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a364e9dd311d9ded374e039b46daf1ee2">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a9a1437abd6c32298e20de0aa7cf4b914">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a15f71a2d7e9718f2d3bb14ca8db6ef82"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getGeoSentences" ref="a15f71a2d7e9718f2d3bb14ca8db6ef82" args="() const " -->
+<a class="anchor" id="aefa543165b8cbee4e3a91773a2d2c24c"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getGeoSentences" ref="aefa543165b8cbee4e3a91773a2d2c24c" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">virtual <a class="el" href="classvrt_1_1GeoSentences.html">GeoSentences</a> vrt::BasicAcknowledgePacket::getGeoSentences </td>
           <td>(</td>
-          <td class="paramname"></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
           <td>&nbsp;)&nbsp;</td>
           <td> const<code> [inline, virtual]</code></td>
         </tr>
@@ -954,14 +1073,20 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 <div class="memdoc">
 
 <p>Gets the GPS ASCII "sentences". </p>
-<p>These are ASCII "sentences" from a GPS (Global Positioning System) receiver, such as those conforming to NMEA-0183. <em>Due to the great variety in GPS "sentences", this class makes little effort to do anything useful with them. Users are encouraged to use <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#affc2511bc1c3f394e00ab0d165fc74f1">getGeolocationGPS()</a> which essentially provides the same information, but in a consistent form.</em> </p>
+<p>These are ASCII "sentences" from a GPS (Global Positioning System) receiver, such as those conforming to NMEA-0183. <em>Due to the great variety in GPS "sentences", this class makes little effort to do anything useful with them. Users are encouraged to use <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ae21a9667615dba1e528a8c8952f741f0">getGeolocationGPS()</a> which essentially provides the same information, but in a consistent form.</em> </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The geolocation information (null if not specified). <em>Note that changes to the returned object do not alter the packet.</em> </dd></dl>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a2182e17fc7dc3d1c85f7a7816c3cd01c">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#af3f089a411ea7a4cd78c23c46c4fca2a">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ab92f5e63940a44cfeb6932c85cf9532d"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getI" ref="ab92f5e63940a44cfeb6932c85cf9532d" args="(int8_t cifNum, int32_t bit, int32_t xoff) const " -->
+<a class="anchor" id="a3277de3b731f67b67b03ea6e49d9472c"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getI" ref="a3277de3b731f67b67b03ea6e49d9472c" args="(int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -981,7 +1106,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>xoff</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>xoff</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -994,18 +1125,19 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Unpacks a 16-bit integer from the payload at the indicated position. </p>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#add96e7aec1b760ce4c2b5341f3c7159c">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a32d7e8b2310c5520cd1e8ec1d1aa6844">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a8686baeecaae7004cc409676ad4d0166"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getIndexList" ref="a8686baeecaae7004cc409676ad4d0166" args="() const " -->
+<a class="anchor" id="aab814c2fe51425be7c8c85646541ac6d"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getIndexList" ref="aab814c2fe51425be7c8c85646541ac6d" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">virtual <a class="el" href="classvrt_1_1IndexFieldList.html">IndexFieldList</a> vrt::BasicAcknowledgePacket::getIndexList </td>
           <td>(</td>
-          <td class="paramname"></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
           <td>&nbsp;)&nbsp;</td>
           <td> const<code> [inline, virtual]</code></td>
         </tr>
@@ -1015,13 +1147,19 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Gets the Index Field List. </p>
 <p><a class="el" href="classvrt_1_1IndexFieldList.html" title="Specifies a Index Field List.">IndexFieldList</a> type (See V49.2 spec Section 9.3.2) </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The Index Field List (null if not specified). <em>Note that changes to the returned object do not alter the packet.</em> </dd></dl>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a8e33374bf492bcd25ab69837539f40fa">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a65c3a7eb9d32b3c2b3ba7e6d3f490e43">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a3b68b3597ce9b6d882d7e1dcf7765738"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getL" ref="a3b68b3597ce9b6d882d7e1dcf7765738" args="(int8_t cifNum, int32_t bit) const " -->
+<a class="anchor" id="aba19e34221cdf05e9a60859aa9d4907d"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getL" ref="aba19e34221cdf05e9a60859aa9d4907d" args="(int8_t cifNum, int32_t bit, int32_t cif7bit) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1035,7 +1173,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>bit</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>bit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1052,18 +1196,19 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>cifNum</em>&nbsp;</td><td>Indicator field number </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>bit</em>&nbsp;</td><td>Bit mask of field. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7bit</em>&nbsp;</td><td>bitmask of CIF7 attribute </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>32-bit integer from buffer. </dd></dl>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a6d66d5d5fd1c9e6ffacf2e8a2f15ec02">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a7c53b6ac2f492963d5a579294772fdfd">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>Referenced by <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00573">addError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00525">addWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00555">getError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00507">getWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00585">removeError()</a>, and <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00537">removeWarning()</a>.</p>
+<p>Referenced by <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00635">addError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00578">addWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00613">getError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00556">getWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00649">removeError()</a>, and <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00592">removeWarning()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a169145dd16ae08e8259d03f80165769b"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getL24" ref="a169145dd16ae08e8259d03f80165769b" args="(int8_t cifNum, int32_t bit, int32_t offset) const " -->
+<a class="anchor" id="ac1374ab0adfa07a010f6eaa9e09a6a42"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getL24" ref="ac1374ab0adfa07a010f6eaa9e09a6a42" args="(int8_t cifNum, int32_t bit, int32_t offset, int32_t cif7bit) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1083,7 +1228,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>offset</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>offset</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1096,7 +1247,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Unpacks a 32-bit integer from the payload at the indicated position. </p>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#abb50397da5f11683c3fee6c27ae2c695">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ad20a29c84b0155ecec1e1513dbb44b9d">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
@@ -1146,14 +1297,15 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 </div>
 </div>
-<a class="anchor" id="a1bf486a81a2f682187cd2418afe1651a"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getSectorScanStep" ref="a1bf486a81a2f682187cd2418afe1651a" args="() const " -->
+<a class="anchor" id="ab41541979f9e93a243dcecba0c6e6437"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getSectorScanStep" ref="ab41541979f9e93a243dcecba0c6e6437" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a> vrt::BasicAcknowledgePacket::getSectorScanStep </td>
           <td>(</td>
-          <td class="paramname"></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
           <td>&nbsp;)&nbsp;</td>
           <td> const<code> [inline, virtual]</code></td>
         </tr>
@@ -1163,20 +1315,27 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Gets the Sector Scan/Step Field. </p>
 <p>Array-of-Records type (See V49.2 spec Section 9.6.2) </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The Sector Scan/Step Array-of-Records (null if not specified). <em>Note that changes to the returned object do not alter the packet.</em> </dd></dl>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#aeb7b508276fe8cde84e9ecad0c414ef5">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab050b3a8cd376687185ed1651f2c6a04">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a76d2417ca890b801ca97d0e155366459"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getSpectrumField" ref="a76d2417ca890b801ca97d0e155366459" args="() const " -->
+<a class="anchor" id="a5d4be00b5cc30fbe9ac1adc8bbbdec43"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getSpectrumField" ref="a5d4be00b5cc30fbe9ac1adc8bbbdec43" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">virtual <a class="el" href="classvrt_1_1SpectrumField.html">SpectrumField</a> vrt::BasicAcknowledgePacket::getSpectrumField </td>
           <td>(</td>
-          <td class="paramname"></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
           <td>&nbsp;)&nbsp;</td>
           <td> const<code> [inline, virtual]</code></td>
         </tr>
@@ -1185,13 +1344,19 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 <div class="memdoc">
 
 <p>Gets the Spectrum Field <a class="el" href="classvrt_1_1SpectrumField.html" title="Specifies a Spectrum Field.">SpectrumField</a> type (See V49.2 spec Section 9.6.1). </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The Spectrum Field (null if not specified). <em>Note that changes to the returned object do not alter the packet.</em> </dd></dl>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a287f245edede873e722315ed7345ce68">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a40861fcb3cf29b33c4e1fb6d82377283">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a76c9b79e364f1800ca468c314625270d"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getStateEventBit" ref="a76c9b79e364f1800ca468c314625270d" args="(int32_t enable, int32_t indicator) const " -->
+<a class="anchor" id="abed798b31c0f6873f6de1f34a24f642d"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getStateEventBit" ref="abed798b31c0f6873f6de1f34a24f642d" args="(int32_t enable, int32_t indicator, int32_t cif7bit) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1205,7 +1370,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>indicator</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>indicator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1221,16 +1392,17 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>enable</em>&nbsp;</td><td>Bit position of the enable flag. </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>indicator</em>&nbsp;</td><td>Bit position of the indicator flag. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7bit</em>&nbsp;</td><td>Bit position of the CIF7 attribute indicator flag. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>null if field is not present, null if the enable bit is not set, true if the enable bit is set and the indicator bit is set, false if the enable bit is set but the indicator bit is not set. </dd></dl>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a245b4494726a460b368825954d4f9d68">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ac0e4ee6b7aaf1658b71c997c0c9b6596">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aaf1cc96bdeecdec6f385f41671c34378"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getTimeStampField" ref="aaf1cc96bdeecdec6f385f41671c34378" args="(int8_t cifNum, int32_t bit) const " -->
+<a class="anchor" id="a3b37c1c73c1aa70a3308dce70559f3dd"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getTimeStampField" ref="a3b37c1c73c1aa70a3308dce70559f3dd" args="(int8_t cifNum, int32_t bit, int32_t cif7bit) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1244,7 +1416,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>bit</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>bit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1257,11 +1435,50 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Unpacks a <a class="el" href="classvrt_1_1TimeStamp.html" title="An immutable time stamp.">TimeStamp</a> from the payload at the indicated position. </p>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#af143aa3c8bfda45660c7b8ed823dea8a">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ad6b1daf3449fb1d11a1276d9e0d68e50">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a1402ce2adbe981a62a20b0d394f7421c"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getUUID" ref="a1402ce2adbe981a62a20b0d394f7421c" args="(int8_t cifNum, int32_t bit) const " -->
+<a class="anchor" id="a9ce06b83dd12920e81054db38fe98e55"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getTotalFieldSize" ref="a9ce06b83dd12920e81054db38fe98e55" args="(int32_t fieldLen, bool occurrence=0) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual int32_t vrt::BasicAcknowledgePacket::getTotalFieldSize </td>
+          <td>(</td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>fieldLen</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&nbsp;</td>
+          <td class="paramname"> <em>occurrence</em> = <code>0</code></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td> const<code> [protected, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Gets the total size of the field, including all CIF7 attributes. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>fieldLen</em>&nbsp;</td><td>Length of the field w/o including CIF7 attributes </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>occurrence</em>&nbsp;</td><td>False (0) if first occurrence (default; almost everything), True (1) if second occurrence (only Errors for <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html" title="BasicAcknowledgePacket (AckV and AckX).">BasicAcknowledgePacket</a>) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>Length of the field including CIF7 attributes </dd></dl>
+
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a1135ffdc51472f6b6bf86ca42ae9a7f3">vrt::IndicatorFieldProvider</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab4c2f89c0e36d87477370237beb2a127"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getUUID" ref="ab4c2f89c0e36d87477370237beb2a127" args="(int8_t cifNum, int32_t bit, int32_t cif7bit) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1275,7 +1492,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>bit</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>bit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1288,11 +1511,11 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Unpacks a 128-bit <a class="el" href="classvrt_1_1UUID.html" title="A 128-bit universally unique identifier (UUID).">UUID</a> from the payload at the indicated position. </p>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#aad105e30b58d52ba53069c46ef9be017">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a4ff597e579c125ab0609621aa5327ca9">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a9bc4803b4eca12f01c13ebb1726d1504"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getWarning" ref="a9bc4803b4eca12f01c13ebb1726d1504" args="(IndicatorFieldEnum_t field) const " -->
+<a class="anchor" id="aae6497de28153d8e01d46a1e72ae179b"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getWarning" ref="aae6497de28153d8e01d46a1e72ae179b" args="(IndicatorFieldEnum_t field, IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1300,9 +1523,18 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="memname">int32_t vrt::BasicAcknowledgePacket::getWarning </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
-          <td class="paramname"> <em>field</em></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td> const<code> [inline]</code></td>
+          <td class="paramname"> <em>field</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td> const<code> [inline]</code></td>
         </tr>
       </table>
 </div>
@@ -1312,12 +1544,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>field</em>&nbsp;</td><td>Indicator field </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for CIF7 attribute. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>Warning bit field (0x0 or WEF_NULL or WEF_NO_WARNING_ERROR if no warnings). </dd></dl>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00283">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00259">vrt::IndicatorFields::getCIFNumber()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a3b68b3597ce9b6d882d7e1dcf7765738">getL()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aba19e34221cdf05e9a60859aa9d4907d">getL()</a>.</p>
 
 </div>
 </div>
@@ -1341,7 +1574,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 </div>
 </div>
-<a class="anchor" id="a1c8a611f338d79a050809b31a17a3ca8"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getX" ref="a1c8a611f338d79a050809b31a17a3ca8" args="(int8_t cifNum, int32_t bit) const " -->
+<a class="anchor" id="aa0a032a8a6eeacef74f7886421ca2390"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::getX" ref="aa0a032a8a6eeacef74f7886421ca2390" args="(int8_t cifNum, int32_t bit, int32_t cif7bit) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1355,7 +1588,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>bit</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>bit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1368,7 +1607,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Unpacks a 64-bit integer from the payload at the indicated position. </p>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a3990b136121022eb981bc64448da7890">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a244593d0daec5bd4bbe6bf7562941aa5">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
@@ -1392,7 +1631,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 </div>
 </div>
-<a class="anchor" id="acbc43edb88d885c0592440dce254143e"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::removeError" ref="acbc43edb88d885c0592440dce254143e" args="(IndicatorFieldEnum_t field, int32_t val)" -->
+<a class="anchor" id="a66185e324a061e263a55bd4c05bb0290"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::removeError" ref="a66185e324a061e263a55bd4c05bb0290" args="(IndicatorFieldEnum_t field, int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1406,7 +1645,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>val</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1422,15 +1667,16 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>field</em>&nbsp;</td><td>Indicator field </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>val</em>&nbsp;</td><td>Error bit field to remove (unset) from the error bit field. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for CIF7 attribute. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00283">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00259">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a3b68b3597ce9b6d882d7e1dcf7765738">getL()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aae5b7a1dbd7435f8d84bc5f566dd10b8">setL()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aba19e34221cdf05e9a60859aa9d4907d">getL()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#acc27b5ee6a051f0a15a1c37c9043285e">setL()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a143d557d6ae7ee4a961904442a3d0ea9"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::removeWarning" ref="a143d557d6ae7ee4a961904442a3d0ea9" args="(IndicatorFieldEnum_t field, int32_t val)" -->
+<a class="anchor" id="a5cbdba9ef170ca980b3b1b2311e21bd3"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::removeWarning" ref="a5cbdba9ef170ca980b3b1b2311e21bd3" args="(IndicatorFieldEnum_t field, int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1444,7 +1690,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>val</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1460,15 +1712,16 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>field</em>&nbsp;</td><td>Indicator field </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>val</em>&nbsp;</td><td>Warning bit field to remove (unset) from the warning bit field. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for CIF7 attribute. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00283">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00259">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a3b68b3597ce9b6d882d7e1dcf7765738">getL()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aae5b7a1dbd7435f8d84bc5f566dd10b8">setL()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aba19e34221cdf05e9a60859aa9d4907d">getL()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#acc27b5ee6a051f0a15a1c37c9043285e">setL()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a26cc55f08f404f1cbaf031adf401bfe6"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setB" ref="a26cc55f08f404f1cbaf031adf401bfe6" args="(int8_t cifNum, int32_t bit, int32_t xoff, int8_t val)" -->
+<a class="anchor" id="ad4eb9f3612b75751fcc68e0d9d3521ed"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setB" ref="ad4eb9f3612b75751fcc68e0d9d3521ed" args="(int8_t cifNum, int32_t bit, int32_t xoff, int8_t val, int32_t cif7bit)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1494,7 +1747,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int8_t&nbsp;</td>
-          <td class="paramname"> <em>val</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1507,11 +1766,50 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Packs a 16-bit integer from the payload at the indicated position. </p>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a2a979d2bfae9e765ce93e080ed8ba2bf">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab60b58e7ff23bea3088861fb67e27f3c">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a151415619e0432482d51da9d4ba67064"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setError" ref="a151415619e0432482d51da9d4ba67064" args="(IndicatorFieldEnum_t field, int32_t val)" -->
+<a class="anchor" id="a16b8fcff0cf8c74c72f44afc24a522b7"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setDataPayloadFormat" ref="a16b8fcff0cf8c74c72f44afc24a522b7" args="(const PayloadFormat &amp;val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void vrt::BasicAcknowledgePacket::setDataPayloadFormat </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classvrt_1_1PayloadFormat.html">PayloadFormat</a> &amp;&nbsp;</td>
+          <td class="paramname"> <em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [inline, virtual]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Sets the Data Packet Payload Format. </p>
+<p>This specifies the format of the data in the paired data packet stream. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>val</em>&nbsp;</td><td>The payload format (null if not specified). </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#af49514a5dc4d8d88943fec6ec2dce6df">vrt::IndicatorFieldProvider</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a763afbd430b2ea3d2c70ea4649291a98"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setError" ref="a763afbd430b2ea3d2c70ea4649291a98" args="(IndicatorFieldEnum_t field, int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1525,7 +1823,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>val</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1541,11 +1845,12 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>field</em>&nbsp;</td><td>Indicator field </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>val</em>&nbsp;</td><td>Error bit field (0x0 or WEF_NULL or WEF_NO_WARNING_ERROR if no errors). </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for CIF7 attribute. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00283">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00259">vrt::IndicatorFields::getCIFNumber()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aae5b7a1dbd7435f8d84bc5f566dd10b8">setL()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#acc27b5ee6a051f0a15a1c37c9043285e">setL()</a>.</p>
 
 </div>
 </div>
@@ -1575,7 +1880,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 </div>
 </div>
-<a class="anchor" id="a011f950019169b3bba9d40d459ab5faf"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setI" ref="a011f950019169b3bba9d40d459ab5faf" args="(int8_t cifNum, int32_t bit, int32_t xoff, int16_t val)" -->
+<a class="anchor" id="ac410607603d4a2b61cfefb74af4c1835"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setI" ref="ac410607603d4a2b61cfefb74af4c1835" args="(int8_t cifNum, int32_t bit, int32_t xoff, int16_t val, int32_t cif7bit)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1601,7 +1906,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int16_t&nbsp;</td>
-          <td class="paramname"> <em>val</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1614,11 +1925,11 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Packs a 16-bit integer from the payload at the indicated position. </p>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a5b286ab6a8bdefd3b342fbba139f4cb5">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a1548eb04657dc7942aa5beea4d212289">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aae5b7a1dbd7435f8d84bc5f566dd10b8"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setL" ref="aae5b7a1dbd7435f8d84bc5f566dd10b8" args="(int8_t cifNum, int32_t bit, int32_t val)" -->
+<a class="anchor" id="acc27b5ee6a051f0a15a1c37c9043285e"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setL" ref="acc27b5ee6a051f0a15a1c37c9043285e" args="(int8_t cifNum, int32_t bit, int32_t val, int32_t cif7bit)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1638,7 +1949,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>val</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1656,13 +1973,14 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
     <tr><td valign="top"></td><td valign="top"><em>cifNum</em>&nbsp;</td><td>Indicator field number </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>bit</em>&nbsp;</td><td>Bit mask of field. </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>val</em>&nbsp;</td><td>32-bit integer. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7bit</em>&nbsp;</td><td>bitmask of CIF7 attribute </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a9ee7d3971a026103475aa296343d7a74">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>Referenced by <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00573">addError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00525">addWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00585">removeError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00537">removeWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00564">setError()</a>, and <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00516">setWarning()</a>.</p>
+<p>Referenced by <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00635">addError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00578">addWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00649">removeError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00592">removeWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00624">setError()</a>, and <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00567">setWarning()</a>.</p>
 
 </div>
 </div>
@@ -1700,7 +2018,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 </div>
 </div>
-<a class="anchor" id="a0ae4e75aa88fe836b774b6357464bf37"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setRecord" ref="a0ae4e75aa88fe836b774b6357464bf37" args="(int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen)" -->
+<a class="anchor" id="a0becb7f084cab2e734802ef87fe2f71e"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setRecord" ref="a0becb7f084cab2e734802ef87fe2f71e" args="(int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen, int32_t cif7bit)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1726,7 +2044,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>oldLen</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>oldLen</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1739,11 +2063,11 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Gets a block of data. </p>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a72b20546246f1165f58c9c867e0c7bf5">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#afce1ab5b004d88c63826683061b2d4fc">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a9af408f3d5b17a7bc72f582f8cfd4717"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setStateEventBit" ref="a9af408f3d5b17a7bc72f582f8cfd4717" args="(int32_t enable, int32_t indicator, boolNull value)" -->
+<a class="anchor" id="ae29806f28c4103ce005f49e2ed4950fe"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setStateEventBit" ref="ae29806f28c4103ce005f49e2ed4950fe" args="(int32_t enable, int32_t indicator, boolNull value, int32_t cif7bit)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1763,7 +2087,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">boolNull&nbsp;</td>
-          <td class="paramname"> <em>value</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1780,15 +2110,16 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
     <tr><td valign="top"></td><td valign="top"><em>enable</em>&nbsp;</td><td>Bit position of the enable flag. </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>indicator</em>&nbsp;</td><td>Bit position of the indicator flag. </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>value</em>&nbsp;</td><td>The value of the bits: null if the enable bit should not be set, true if the enable bit and the indicator bit should be set, false if the enable bit should be set but the indicator bit should not be set. </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7bit</em>&nbsp;</td><td>Bit position of the CIF7 attribute indicator flag. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#af374a94ab5295d83d69df6eb288aff7d">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a9be43fe473a27039e88f10feee8f5e3d">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a748049142e0cb77b0fdf6b9c701523d9"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setTimeStampField" ref="a748049142e0cb77b0fdf6b9c701523d9" args="(int8_t cifNum, int32_t bit, const TimeStamp &amp;val)" -->
+<a class="anchor" id="a6d18bf475f8863d62442f18c15a0cab3"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setTimeStampField" ref="a6d18bf475f8863d62442f18c15a0cab3" args="(int8_t cifNum, int32_t bit, const TimeStamp &amp;val, int32_t cif7bit)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1808,7 +2139,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="classvrt_1_1TimeStamp.html">TimeStamp</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>val</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1821,11 +2158,11 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Packs a <a class="el" href="classvrt_1_1TimeStamp.html" title="An immutable time stamp.">TimeStamp</a> from the payload at the indicated position. </p>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a7d0b2362abccefd7ac64960e790d1ee2">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a7ff0e1a064394b552cf417f5cd85e9e8">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a11029d6763b0e0bc28daf4dd5727c7d2"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setUUID" ref="a11029d6763b0e0bc28daf4dd5727c7d2" args="(int8_t cifNum, int32_t bit, const UUID &amp;val)" -->
+<a class="anchor" id="ac0212d983067ef98db7312c2cb738bd8"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setUUID" ref="ac0212d983067ef98db7312c2cb738bd8" args="(int8_t cifNum, int32_t bit, const UUID &amp;val, int32_t cif7bit)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1845,7 +2182,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">const <a class="el" href="classvrt_1_1UUID.html">UUID</a> &amp;&nbsp;</td>
-          <td class="paramname"> <em>val</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1858,11 +2201,11 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Packs a 128-bit <a class="el" href="classvrt_1_1UUID.html" title="A 128-bit universally unique identifier (UUID).">UUID</a> from the payload at the indicated position. </p>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a40227346bdf9201536926d146008667d">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a68ada5606ef9b850c1f026c3deab2099">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="aaca92ca1b12dcb11d8670ec7fe3b4ec5"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setWarning" ref="aaca92ca1b12dcb11d8670ec7fe3b4ec5" args="(IndicatorFieldEnum_t field, int32_t val)" -->
+<a class="anchor" id="a577d3d89688cf365bfafc78ed481b043"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setWarning" ref="a577d3d89688cf365bfafc78ed481b043" args="(IndicatorFieldEnum_t field, int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1876,7 +2219,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int32_t&nbsp;</td>
-          <td class="paramname"> <em>val</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1892,15 +2241,16 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>field</em>&nbsp;</td><td>Indicator field </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>val</em>&nbsp;</td><td>Warning bit field (0x0 or WEF_NULL or WEF_NO_WARNING_ERROR if no warnings). </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for CIF7 attribute. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00283">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00259">vrt::IndicatorFields::getCIFNumber()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aae5b7a1dbd7435f8d84bc5f566dd10b8">setL()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, and <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#acc27b5ee6a051f0a15a1c37c9043285e">setL()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a6a26af9e9b1bfff749e37936565da284"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setX" ref="a6a26af9e9b1bfff749e37936565da284" args="(int8_t cifNum, int32_t bit, int64_t val)" -->
+<a class="anchor" id="aae775f6a44414c32085fc99bdd083c0f"></a><!-- doxytag: member="vrt::BasicAcknowledgePacket::setX" ref="aae775f6a44414c32085fc99bdd083c0f" args="(int8_t cifNum, int32_t bit, int64_t val, int32_t cif7bit)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -1920,7 +2270,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">int64_t&nbsp;</td>
-          <td class="paramname"> <em>val</em></td><td>&nbsp;</td>
+          <td class="paramname"> <em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int32_t&nbsp;</td>
+          <td class="paramname"> <em>cif7bit</em></td><td>&nbsp;</td>
         </tr>
         <tr>
           <td></td>
@@ -1933,7 +2289,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Packs a 64-bit integer from the payload at the indicated position. </p>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a8216374e4c950cd25b7917566db7c704">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a11c59bd043831c2f5eab2e296f837040">vrt::IndicatorFieldProvider</a>.</p>
 
 </div>
 </div>
@@ -1969,7 +2325,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 <li>cpp_src/vrt/lib/<a class="el" href="BasicAcknowledgePacket_8h_source.html">BasicAcknowledgePacket.h</a></li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 20 Nov 2017 for VRT by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 7 Mar 2018 for VRT by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

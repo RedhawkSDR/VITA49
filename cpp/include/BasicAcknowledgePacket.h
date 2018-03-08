@@ -121,7 +121,7 @@ namespace vrt {
      *  message string.
      *  @param msg Message string
      */
-    void setMessage(const std::string msg) {
+    void setMessage (const std::string msg) {
       if (msg.size()==0) {
         bbuf.resize(0);
       } else {
@@ -137,7 +137,7 @@ namespace vrt {
      *  @param msg Message byte-buffer
      *  @param len Size of byte-buffer
      */
-    void setMessage(const char* msg, const size_t len) {
+    void setMessage (const char* msg, const size_t len) {
       bbuf.resize(len);
       memcpy(&bbuf[0], msg, len);
     }
@@ -193,6 +193,7 @@ namespace vrt {
   /*****************************************************************************/
   /*****************************************************************************/
   class BasicAcknowledgePacket : public BasicCommandPacket, public IndicatorFieldProvider {
+    using IndicatorFieldProvider::getOffset;
 
     //======================================================================
     // CONSTRUCTORS
@@ -315,18 +316,28 @@ namespace vrt {
      *  Offset is from the start of a field of size specified.
      *  @param attr CIF7 attribute bitmask
      *  @param len Length of the field
+     *  @param  occurrence False (0) if first occurrence (default; almost everything),
+     *                     True (1) if second occurrence (only Errors for BasicAcknowledgePacket)
      *  @return Offset from start of field
      */
-    protected: virtual int32_t getCif7Offset (int32_t attr, int32_t len) const;
+    protected: virtual int32_t getCIF7Offset (int32_t attr, int32_t len, bool occurrence=0) const;
+
+    /** Gets the total size of the field, including all CIF7 attributes
+     *  @param  fieldLen Length of the field w/o including CIF7 attributes
+     *  @param  occurrence False (0) if first occurrence (default; almost everything),
+     *                     True (1) if second occurrence (only Errors for BasicAcknowledgePacket)
+     *  @return Length of the field including CIF7 attributes
+     */
+    protected: virtual int32_t getTotalFieldSize (int32_t fieldLen, bool occurrence=0) const;
 
     /** Gets the length of the given field when present (-1 if variable, -2 if not found).
      *  @param cifNum number of CIF that field belongs to.
      *  @param field bitmask associated with field of interest.
+     *  @param parent length of parent field
      *  @return size of field of interest in bytes.
      *  @throws VRTException If the CIF number is invalid.
      */
-    // TODO - do CIF7 attributes affect this function?
-    protected: virtual int32_t getFieldLen (int8_t cifNum, int32_t field) const;
+    protected: virtual int32_t getFieldLen (int8_t cifNum, int32_t field, int32_t parent=0) const;
 
     /** Get 32-bits from buffer as a 32-bit integer.
      *  Note: INT32_NULL is a valid value (0x80000000==FIELD_NOT_EXECUTED) in
@@ -337,9 +348,10 @@ namespace vrt {
      *  contains that value.
      *  @param cifNum Indicator field number
      *  @param bit Bit mask of field.
+     *  @param cif7bit bitmask of CIF7 attribute
      *  @return 32-bit integer from buffer.
      */
-    protected: virtual int32_t getL (int8_t cifNum, int32_t bit) const;
+    protected: virtual int32_t getL (int8_t cifNum, int32_t bit, int32_t cif7bit) const;
 
     /** Set 32-bits of buffer from a 32-bit integer.
      *  Note: INT32_NULL is a valid value (0x80000000==FIELD_NOT_EXECUTED) in
@@ -351,93 +363,109 @@ namespace vrt {
      *  @param cifNum Indicator field number
      *  @param bit Bit mask of field.
      *  @param val 32-bit integer.
+     *  @param cif7bit bitmask of CIF7 attribute
      */
-    protected: virtual void setL (int8_t cifNum, int32_t bit, int32_t val);
+    protected: virtual void setL (int8_t cifNum, int32_t bit, int32_t val, int32_t cif7bit);
 
     // Warnings and Errors are always a single 32-bit field. Throw VRTException("Not Implemented b/c not useful.");
-    protected: virtual int8_t getB (int8_t cifNum, int32_t bit, int32_t xoff) const {
-      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(xoff);
+    protected: virtual int8_t getB (int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const {
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(xoff); UNUSED_VARIABLE(cif7bit);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    protected: virtual void setB (int8_t cifNum, int32_t bit, int32_t xoff, int8_t val) {
-      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(xoff); UNUSED_VARIABLE(val);
+    protected: virtual void setB (int8_t cifNum, int32_t bit, int32_t xoff, int8_t val, int32_t cif7bit) {
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(xoff); UNUSED_VARIABLE(val); UNUSED_VARIABLE(cif7bit);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports setL.");
     }
-    protected: virtual int16_t getI (int8_t cifNum, int32_t bit, int32_t xoff) const {
-      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(xoff);
+    protected: virtual int16_t getI (int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const {
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(xoff); UNUSED_VARIABLE(cif7bit);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    protected: virtual void setI (int8_t cifNum, int32_t bit, int32_t xoff, int16_t val) {
-      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(xoff); UNUSED_VARIABLE(val);
+    protected: virtual void setI (int8_t cifNum, int32_t bit, int32_t xoff, int16_t val, int32_t cif7bit) {
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(xoff); UNUSED_VARIABLE(val); UNUSED_VARIABLE(cif7bit);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports setL.");
     }
-    protected: virtual int32_t getL24 (int8_t cifNum, int32_t bit, int32_t offset) const {
-      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(offset);
+    protected: virtual int32_t getL24 (int8_t cifNum, int32_t bit, int32_t offset, int32_t cif7bit) const {
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(offset); UNUSED_VARIABLE(cif7bit);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    protected: virtual int64_t getX (int8_t cifNum, int32_t bit) const {
-      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit);
+    protected: virtual int64_t getX (int8_t cifNum, int32_t bit, int32_t cif7bit) const {
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(cif7bit);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    protected: virtual void setX (int8_t cifNum, int32_t bit, int64_t val) {
-      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(val);
+    protected: virtual void setX (int8_t cifNum, int32_t bit, int64_t val, int32_t cif7bit) {
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(val); UNUSED_VARIABLE(cif7bit);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports setL.");
     }
-    protected: virtual UUID getUUID (int8_t cifNum, int32_t bit) const {
-      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit);
+    protected: virtual UUID getUUID (int8_t cifNum, int32_t bit, int32_t cif7bit) const {
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(cif7bit);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    protected: virtual void setUUID (int8_t cifNum, int32_t bit, const UUID &val){
-      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(val);
+    protected: virtual void setUUID (int8_t cifNum, int32_t bit, const UUID &val, int32_t cif7bit){
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(val); UNUSED_VARIABLE(cif7bit);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports setL.");
     }
-    protected: virtual TimeStamp getTimeStampField (int8_t cifNum, int32_t bit) const {
-      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit);
+    protected: virtual TimeStamp getTimeStampField (int8_t cifNum, int32_t bit, int32_t cif7bit) const {
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(cif7bit);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    protected: virtual void setTimeStampField (int8_t cifNum, int32_t bit, const TimeStamp &val){
-      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(val);
+    protected: virtual void setTimeStampField (int8_t cifNum, int32_t bit, const TimeStamp &val, int32_t cif7bit){
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(val); UNUSED_VARIABLE(cif7bit);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports setL.");
     }
-    protected: virtual void setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen) {
-      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(val); UNUSED_VARIABLE(oldLen);
+    protected: virtual void setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen, int32_t cif7bit) {
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(bit); UNUSED_VARIABLE(val); UNUSED_VARIABLE(oldLen); UNUSED_VARIABLE(cif7bit);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports setL.");
     }
-    protected: virtual Geolocation getGeolocation (int8_t cifNum, int32_t field) const {
-      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(field);
+    protected: virtual Geolocation getGeolocation (int8_t cifNum, int32_t field, int32_t cif7bit) const {
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(field); UNUSED_VARIABLE(cif7bit);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    protected: virtual Ephemeris getEphemeris (int8_t cifNum, int32_t field) const {
-      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(field);
+    protected: virtual Ephemeris getEphemeris (int8_t cifNum, int32_t field, int32_t cif7bit) const {
+      UNUSED_VARIABLE(cifNum); UNUSED_VARIABLE(field); UNUSED_VARIABLE(cif7bit);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    public: virtual GeoSentences getGeoSentences () const {
+    public: virtual GeoSentences getGeoSentences (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      UNUSED_VARIABLE(cif7field);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    public: virtual ContextAssocLists getContextAssocLists () const {
+    public: virtual ContextAssocLists getContextAssocLists (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      UNUSED_VARIABLE(cif7field);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    public: virtual IndexFieldList getIndexList () const {
+    public: virtual IndexFieldList getIndexList (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      UNUSED_VARIABLE(cif7field);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    public: virtual ArrayOfRecords getSectorScanStep () const {
+    public: virtual ArrayOfRecords getSectorScanStep (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      UNUSED_VARIABLE(cif7field);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    public: virtual ArrayOfRecords getCIFsArray () const {
+    public: virtual ArrayOfRecords getCIFsArray (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      UNUSED_VARIABLE(cif7field);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    public: virtual ArrayOfRecords get2DPointingAngleStructured () const {
+    public: virtual ArrayOfRecords get2DPointingAngleStructured (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      UNUSED_VARIABLE(cif7field);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    public: virtual SpectrumField getSpectrumField () const {
+    public: virtual SpectrumField getSpectrumField (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      UNUSED_VARIABLE(cif7field);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    protected: virtual boolNull getStateEventBit (int32_t enable, int32_t indicator) const {
-      UNUSED_VARIABLE(enable); UNUSED_VARIABLE(indicator);
+    public: virtual PayloadFormat getDataPayloadFormat (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      UNUSED_VARIABLE(cif7field);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    protected: virtual void setStateEventBit (int32_t enable, int32_t indicator, boolNull value) {
-      UNUSED_VARIABLE(enable); UNUSED_VARIABLE(indicator); UNUSED_VARIABLE(value);
+    public: virtual void setDataPayloadFormat (const PayloadFormat &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      UNUSED_VARIABLE(val); UNUSED_VARIABLE(cif7field);
+      throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports setL.");
+    }
+    protected: virtual boolNull getStateEventBit (int32_t enable, int32_t indicator, int32_t cif7bit) const {
+      UNUSED_VARIABLE(enable); UNUSED_VARIABLE(indicator); UNUSED_VARIABLE(cif7bit);
+      throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
+    }
+    protected: virtual void setStateEventBit (int32_t enable, int32_t indicator, boolNull value, int32_t cif7bit) {
+      UNUSED_VARIABLE(enable); UNUSED_VARIABLE(indicator); UNUSED_VARIABLE(value); UNUSED_VARIABLE(cif7bit);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports setL.");
     }
 
@@ -453,6 +481,24 @@ namespace vrt {
     protected: virtual void setContextIndicatorField3Bit (int32_t bit, bool set, bool occurrence=0);
     protected: virtual void setContextIndicatorField7Bit (int32_t bit, bool set, bool occurrence=0);
 
+    protected: inline bool isCIFEnable (int8_t cifNum) const {
+      bool occurrence = cifNum&0x08; // false for warn / true for error
+      switch(cifNum&0xF7) { // Ignore bit 3 (occurrence)
+        case 0:
+          if ((!occurrence && getWarningsGenerated()) || (occurrence && getErrorsGenerated()))
+            return true;
+          else
+            return false;
+        case 1: return isCIF1Enable(cifNum&0x08);
+        case 2: return isCIF2Enable(cifNum&0x08);
+        case 3: return isCIF3Enable(cifNum&0x08);
+        case 7: return isCIF7Enable(cifNum&0x08);
+        default:
+          throw VRTException("Invalid Context Indicator Field number.");
+      }
+    }
+
+
 
     /** Adds or removes a CIF
      *  Sets the Enable Indicator of CIF0 and adds or removes 4-bytes for the CIF.
@@ -465,6 +511,8 @@ namespace vrt {
     public: virtual void addCIF3 (bool add=true, bool occurrence=false);
     public: virtual void addCIF7 (bool add=true, bool occurrence=false);
 
+    protected: virtual void setCIF7Bit (int32_t cif7bit, bool set, bool occurrence=false);
+
     //Acknowledge-W
     public: virtual void setWarningsGenerated (bool set);
 
@@ -476,24 +524,24 @@ namespace vrt {
     //======================================================================
 
     // Warning Indicator Fields
-    protected: int32_t getWarningIndicatorField(int8_t wifNum) const {
+    protected: int32_t getWarningIndicatorField (int8_t wifNum) const {
       return getContextIndicatorField(wifNum);
     }
-    protected: int32_t getWarningIndicatorField(IndicatorFieldEnum_t field) const {
+    protected: int32_t getWarningIndicatorField (IndicatorFieldEnum_t field) const {
       return getContextIndicatorField(field);
     }
-    protected: boolNull getWarningIndicatorFieldBit(IndicatorFieldEnum_t field) const {
+    protected: boolNull getWarningIndicatorFieldBit (IndicatorFieldEnum_t field) const {
       return getContextIndicatorFieldBit(field);
     }
 
     // Error Indicator Fields
-    protected: int32_t getErrorIndicatorField(int8_t wifNum) const {
-      return getContextIndicatorField(wifNum | 0x8);
+    protected: int32_t getErrorIndicatorField (int8_t eifNum) const {
+      return getContextIndicatorField(eifNum | 0x8);
     }
-    protected: int32_t getErrorIndicatorField(IndicatorFieldEnum_t field) const {
+    protected: int32_t getErrorIndicatorField (IndicatorFieldEnum_t field) const {
       return getContextIndicatorField(getCIFNumber(field) | 0x8);
     }
-    protected: boolNull getErrorIndicatorFieldBit(IndicatorFieldEnum_t field) const {
+    protected: boolNull getErrorIndicatorFieldBit (IndicatorFieldEnum_t field) const {
       return getContextIndicatorFieldBit(getCIFNumber(field) | 0x8, getCIFBitMask(field));
     }
 
@@ -501,31 +549,37 @@ namespace vrt {
 
     /** Gets the warning bit field for the specified indicator field.
      *  @param field Indicator field
+     *  @param cif7field (Optional) Indicator field for CIF7 attribute.
      *  @return Warning bit field (0x0 or WEF_NULL or 
      *  WEF_NO_WARNING_ERROR if no warnings).
      */
-    public: int32_t getWarning(IndicatorFieldEnum_t field) const {
-      return getL(getCIFNumber(field), getCIFBitMask(field));
+    public: int32_t getWarning (IndicatorFieldEnum_t field, IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getL(getCIFNumber(field), getCIFBitMask(field), cif7bit);
     }
 
     /** Sets the warning bit field for the specified indicator field.
      *  @param field Indicator field
      *  @param val Warning bit field (0x0 or WEF_NULL or 
      *  WEF_NO_WARNING_ERROR if no warnings).
+     *  @param cif7field (Optional) Indicator field for CIF7 attribute.
      */
-    public: void setWarning(IndicatorFieldEnum_t field, int32_t val) {
-      setL(getCIFNumber(field), getCIFBitMask(field), val);
+    public: void setWarning (IndicatorFieldEnum_t field, int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setL(getCIFNumber(field), getCIFBitMask(field), val, cif7bit);
     }
     
     /** Adds one or more warnings to the warning bit field for the specified
      *  indicator field. 
      *  @param field Indicator field
      *  @param val Warning bit field to add (set) to the warning bit field. 
+     *  @param cif7field (Optional) Indicator field for CIF7 attribute.
      */
-    public: void addWarning(IndicatorFieldEnum_t field, int32_t val) {
+    public: void addWarning (IndicatorFieldEnum_t field, int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
       if (val == WEF_NULL) return;
-      int32_t bits = getL(getCIFNumber(field), getCIFBitMask(field));
-      setL(getCIFNumber(field), getCIFBitMask(field), val | bits);
+      int32_t bits = getL(getCIFNumber(field), getCIFBitMask(field), cif7bit);
+      setL(getCIFNumber(field), getCIFBitMask(field), val | bits, cif7bit);
     }
 
     /** Removes one or more warnings from the warning bit field for the
@@ -533,47 +587,56 @@ namespace vrt {
      *  @param field Indicator field
      *  @param val Warning bit field to remove (unset) from the warning bit
      *  field.
+     *  @param cif7field (Optional) Indicator field for CIF7 attribute.
      */
-    public: void removeWarning(IndicatorFieldEnum_t field, int32_t val) {
+    public: void removeWarning (IndicatorFieldEnum_t field, int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
       if (val == WEF_NULL) return;
-      int32_t bits = getL(getCIFNumber(field), getCIFBitMask(field));
-      setL(getCIFNumber(field), getCIFBitMask(field), ~val & bits);
+      int32_t bits = getL(getCIFNumber(field), getCIFBitMask(field), cif7bit);
+      setL(getCIFNumber(field), getCIFBitMask(field), ~val & bits, cif7bit);
     }
 
     /** Gets all warnings for all indicator fields.
      *  @return Vector of warnings.
      */
-    public: std::vector<WarningErrorField_t> getWarnings() const;
+    public: std::vector<WarningErrorField_t> getWarnings () const;
 
     // Error Fields
     
     /** Gets the error bit field for the specified indicator field.
      *  @param field Indicator field
+     *  @param cif7field (Optional) Indicator field for CIF7 attribute.
+     *  @param cif7field (Optional) Indicator field for CIF7 attribute.
      *  @return Error bit field (0x0 or WEF_NULL or 
      *  WEF_NO_WARNING_ERROR if no errors).
      */
-    public: int32_t getError(IndicatorFieldEnum_t field) const {
-      return getL(getCIFNumber(field) | 0x8, getCIFBitMask(field));
+    public: int32_t getError (IndicatorFieldEnum_t field, IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getL(getCIFNumber(field) | 0x8, getCIFBitMask(field), cif7bit);
     }
 
     /** Sets the error bit field for the specified indicator field.
      *  @param field Indicator field
      *  @param val Error bit field (0x0 or WEF_NULL or 
      *  WEF_NO_WARNING_ERROR if no errors).
+     *  @param cif7field (Optional) Indicator field for CIF7 attribute.
      */
-    public: void setError(IndicatorFieldEnum_t field, int32_t val){
-      setL(getCIFNumber(field) | 0x8, getCIFBitMask(field), val);
+    public: void setError (IndicatorFieldEnum_t field, int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL){
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setL(getCIFNumber(field) | 0x8, getCIFBitMask(field), val, cif7bit);
     }
     
     /** Adds one or more errors to the error bit field for the specified
      *  indicator field.
      *  @param field Indicator field
      *  @param val Error bit field to add (set) to the error bit field.
+     *  @param cif7field (Optional) Indicator field for CIF7 attribute.
      */
-    public: void addError(IndicatorFieldEnum_t field, int32_t val) {
+    public: void addError (IndicatorFieldEnum_t field, int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
       if (val == WEF_NULL) return;
-      int32_t bits = getL(getCIFNumber(field) | 0x8, getCIFBitMask(field));
-      setL(getCIFNumber(field) | 0x8, getCIFBitMask(field), val | bits);
+      int32_t bits = getL(getCIFNumber(field) | 0x8, getCIFBitMask(field), cif7bit);
+      setL(getCIFNumber(field) | 0x8, getCIFBitMask(field), val | bits, cif7bit);
     }
 
     /** Removes one or more errors from the error bit field for the
@@ -581,32 +644,34 @@ namespace vrt {
      *  @param field Indicator field
      *  @param val Error bit field to remove (unset) from the error bit
      *  field.
+     *  @param cif7field (Optional) Indicator field for CIF7 attribute.
      */
-    public: void removeError(IndicatorFieldEnum_t field, int32_t val) {
+    public: void removeError (IndicatorFieldEnum_t field, int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
       if (val == WEF_NULL) return;
-      int32_t bits = getL(getCIFNumber(field) | 0x8, getCIFBitMask(field));
-      setL(getCIFNumber(field) | 0x8, getCIFBitMask(field), ~val & bits);
+      int32_t bits = getL(getCIFNumber(field) | 0x8, getCIFBitMask(field), cif7bit);
+      setL(getCIFNumber(field) | 0x8, getCIFBitMask(field), ~val & bits, cif7bit);
     }
 
     /** Gets all errors for all indicator fields.
      *  @return Vector of errors.
      */
-    public: std::vector<WarningErrorField_t> getErrors() const;
+    public: std::vector<WarningErrorField_t> getErrors () const;
 
     /** Is there a Free-form Warning/Error Message Field
      *  @return True if Free-form Message; False otherwise
      */
-    public: bool hasFreeFormMessage() const;
+    public: bool hasFreeFormMessage () const;
 
     /** Gets Free-form Warning/Error Message Field
      *  @return Free-form message
      */
-    public: FreeFormMessage_t getFreeFormMessage() const;
+    public: FreeFormMessage_t getFreeFormMessage () const;
 
     /** Sets Free-form Warning/Error Message Field
      *  @param msg Free-form message
      */
-    public: void setFreeFormMessage(const FreeFormMessage_t msg);
+    public: void setFreeFormMessage (const FreeFormMessage_t msg);
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
     // Implement HasFields

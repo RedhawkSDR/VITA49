@@ -25,6 +25,7 @@
 #include "VRTObject.h"
 #include "VRTConfig.h"
 #include "VRTMath.h"
+#include "PayloadFormat.h"
 #include <map>
 #include <iomanip>
 #if NOT_USING_JNI
@@ -60,6 +61,7 @@ namespace vrt {
      *  potential future CIFs 4, 5, and 6.
      */
     enum IndicatorFieldEnum {
+      CIF_NULL = -1,         ///< NULL
       // CIF0 - Legacy Fields and CIF Enables - Starts at 0*32 = 0
       // CIF Key                  Bit #   Description                           (CIF,Bitmask)  <==> CIF|Shift = Enum Value
       CIF0_RESERVED_0 = 0,   ///< Bit 0   Reserved                              (0,0x00000001) <==> 000 00000 =   0
@@ -1495,23 +1497,32 @@ namespace vrt {
       return getOffset(getCIFNumber(field), getCIFBitMask(field));
     }
     // Used for getting attribute of a field, based on CIF7 attributes
-    // A negative return value means attribute not present.
+    // A negative return value means either the field or the attribute is not present, or both.
     // A NULL return value means the entire CIF is not present.
     // @return offset to attribute of specified field
     // @throws VRTException when field has invalid length (size)
-    // @throws VRTException when field is not present (TODO - or return NULL?)
-    protected: virtual int32_t getOffset (int8_t cifNum, int32_t field, int32_t cif7) const {
+    // @throws VRTException when cif7bit is specified (non-zero) and CIF7 is not enabled
+    protected: virtual int32_t getOffset (int8_t cifNum, int32_t field, int32_t cif7bit) const { // TODO CIF7 (done)
       int32_t fieldOffset = getOffset(cifNum, field);
-      if (fieldOffset < 0) throw VRTException("Cannot get attribute of a field that is not present.");
+      if (cif7bit == 0 || isNull(fieldOffset) || fieldOffset<0) return fieldOffset;
+      //if (fieldOffset < 0) throw VRTException("Cannot get attribute of a field that is not present.");
       int32_t fieldLen = getFieldLen(cifNum, field);
       if (fieldLen <= 0) throw VRTException("Cannot get attribute of a field with invalid length.");
-      int32_t cif7Offset = getCif7Offset(cif7, fieldLen);
-      if (cif7Offset < 0) fieldOffset = -fieldOffset;
+      int32_t cif7Offset = getCIF7Offset(cif7bit, fieldLen, cifNum&0x08);
+      int32_t cif7length = getFieldLen(7,cif7bit, fieldLen);
+      if (cif7Offset < 0) {
+        if (fieldOffset > 0) fieldOffset = -fieldOffset;
+        cif7Offset += cif7length; // adjust to be offset to start of attribute, not end
+      } else {
+        cif7Offset -= cif7length; // adjust to be offset to start of attribute, not end
+        if (fieldOffset < 0) cif7Offset = -cif7Offset;
+      }
       return fieldOffset + cif7Offset;
     }
     // XXX this may cause ambiguity since both args are ints, same as first getOffset defined above
-    protected: virtual int32_t getOffset (IndicatorFieldEnum_t field, IndicatorFieldEnum_t cif7) const {
-      return getOffset(getCIFNumber(field), getCIFBitMask(field), getCIFBitMask(cif7));
+    protected: virtual int32_t getOffset (IndicatorFieldEnum_t field, IndicatorFieldEnum_t cif7field) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getOffset(getCIFNumber(field), getCIFBitMask(field), cif7bit);
     }
     // Used for getting second occurrence of CIFs (i.e. Ack packets have second occurrence for errors (first is for warnings)
     protected: virtual int32_t getOffset (IndicatorFieldEnum_t field, bool occurrence) const {
@@ -1519,148 +1530,188 @@ namespace vrt {
     }
     // Combo of cif7 attributes and second occurrence
     // XXX - if this is only ever used with occurrence=true, replace with new function name that does it without occurrence arg
-    protected: virtual int32_t getOffset (IndicatorFieldEnum_t field, IndicatorFieldEnum_t cif7, bool occurrence) const {
-      return getOffset(getCIFNumber(field) | (((int8_t)occurrence)<<3), getCIFBitMask(field), getCIFBitMask(cif7));
+    protected: virtual int32_t getOffset (IndicatorFieldEnum_t field, IndicatorFieldEnum_t cif7field, bool occurrence) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getOffset(getCIFNumber(field) | (((int8_t)occurrence)<<3), getCIFBitMask(field), cif7bit);
     }
 
-    /** Gets the offset of the CIF7 attribute
-     *  Offset is from the start of a field of size specified.
+    /** Gets the offset of the CIF7 attribute, INCLUDING the attribute
+     *  This offset needs to be calculated differently because a value of 0 is
+     *  permitted, and we can't return -0 to indicate not present. Instead,
+     *  offset is from the start of the parent non-CIF7 field and includes
+     *  the entire CIF7 attribute indicated. This is essentially an offset to
+     *  the end of the field instead of the beginning. It can be easily
+     *  adjusted by the calling function by reducing the magnitude by the
+     *  length of the CIF7 attribute (i.e. getFieldLen(7,attr,len) ).
      *  @param attr CIF7 attribute bitmask
-     *  @param len Length of the field
-     *  @return Offset from start of field
+     *  @param len Length of the parent field
+     *  @param  occurrence False (0) if first occurrence (default; almost everything),
+     *                     True (1) if second occurrence (only Errors for BasicAcknowledgePacket)
+     *  @return Offset from start of the parent field to the end of CIF7 attribute
      *  @throws VRTException for classes that do not support CIF7.
      */
-    protected: virtual int32_t getCif7Offset (int32_t attr, int32_t len) const {
+    protected: virtual int32_t getCIF7Offset (int32_t attr, int32_t len, bool occurrence=0) const {
       UNUSED_VARIABLE(attr);
       UNUSED_VARIABLE(len);
+      UNUSED_VARIABLE(occurrence);
       // Default impl throws exception for classes that don't support CIF7
       throw VRTException("Class does not support CIF7.");
     }
 
-    /** Gets the length of the given field when present (-1 if variable, -2 if not found). */
-    // TODO - CIF7 implications on below?
-    protected: virtual int32_t getFieldLen (int8_t cifNum, int32_t field) const = 0;
-    protected: virtual int32_t getFieldLen (IndicatorFieldEnum_t field) const {
-      return getFieldLen(getCIFNumber(field), getCIFBitMask(field));
+    /** Gets the total size of the field, including all CIF7 attributes
+     *  @param  fieldLen Length of the field w/o including CIF7 attributes
+     *  @param  occurrence False (0) if first occurrence (default; almost everything),
+     *                     True (1) if second occurrence (only Errors for BasicAcknowledgePacket)
+     *  @return Length of the field including CIF7 attributes
+     */
+    protected: virtual int32_t getTotalFieldSize (int32_t fieldLen, bool occurrence=0) const = 0;
+
+    /** Gets the length of the given field when present
+     *  @param  cifNum CIF number
+     *  @param  field CIF field bitmask
+     *  @param  parent Length of parent CIF field (only applicable for CIF7 fields)
+     *  @return length of the field. -1 if not found
+     */
+    protected: virtual int32_t getFieldLen (int8_t cifNum, int32_t field, int32_t parent=0) const = 0;
+    protected: virtual int32_t getFieldLen (IndicatorFieldEnum_t field, int32_t parent=0) const {
+      return getFieldLen(getCIFNumber(field), getCIFBitMask(field), parent);
     }
 
     /** Unpacks a 16-bit integer from the payload at the indicated position. */
-    protected: virtual int8_t getB (int8_t cifNum, int32_t bit, int32_t xoff) const = 0;
-    protected: virtual int8_t getB (IndicatorFieldEnum_t field, int32_t xoff) const {
-      return getB(getCIFNumber(field), getCIFBitMask(field), xoff);
+    protected: virtual int8_t getB (int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const = 0;
+    protected: virtual int8_t getB (IndicatorFieldEnum_t field, int32_t xoff, IndicatorFieldEnum_t cif7field) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getB(getCIFNumber(field), getCIFBitMask(field), xoff, cif7bit);
     }
 
     /** Packs a 16-bit integer from the payload at the indicated position. */
-    protected: virtual void setB (int8_t cifNum, int32_t bit, int32_t xoff, int8_t val) = 0;
-    protected: virtual void setB (IndicatorFieldEnum_t field, int32_t xoff, int8_t val) {
-      setB(getCIFNumber(field), getCIFBitMask(field), xoff, val);
+    protected: virtual void setB (int8_t cifNum, int32_t bit, int32_t xoff, int8_t val, int32_t cif7bit) = 0;
+    protected: virtual void setB (IndicatorFieldEnum_t field, int32_t xoff, int8_t val, IndicatorFieldEnum_t cif7field) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setB(getCIFNumber(field), getCIFBitMask(field), xoff, val, cif7bit);
     }
 
     /** Unpacks a 16-bit integer from the payload at the indicated position. */
-    protected: virtual int16_t getI (int8_t cifNum, int32_t bit, int32_t xoff) const = 0;
-    protected: virtual int16_t getI (IndicatorFieldEnum_t field, int32_t xoff) const {
-      return getI(getCIFNumber(field), getCIFBitMask(field), xoff);
+    protected: virtual int16_t getI (int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const = 0;
+    protected: virtual int16_t getI (IndicatorFieldEnum_t field, int32_t xoff, IndicatorFieldEnum_t cif7field) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getI(getCIFNumber(field), getCIFBitMask(field), xoff, cif7bit);
     }
 
     /** Packs a 16-bit integer from the payload at the indicated position. */
-    protected: virtual void setI (int8_t cifNum, int32_t bit, int32_t xoff, int16_t val) = 0;
-    protected: virtual void setI (IndicatorFieldEnum_t field, int32_t xoff, int16_t val) {
-      setI(getCIFNumber(field), getCIFBitMask(field), xoff, val);
+    protected: virtual void setI (int8_t cifNum, int32_t bit, int32_t xoff, int16_t val, int32_t cif7bit) = 0;
+    protected: virtual void setI (IndicatorFieldEnum_t field, int32_t xoff, int16_t val, IndicatorFieldEnum_t cif7field) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setI(getCIFNumber(field), getCIFBitMask(field), xoff, val, cif7bit);
     }
 
     /** Unpacks a 32-bit integer from the payload at the indicated position. */
-    protected: virtual int32_t getL (int8_t cifNum, int32_t bit) const = 0;
-    protected: virtual int32_t getL (IndicatorFieldEnum_t field) const {
-      return getL(getCIFNumber(field), getCIFBitMask(field));
+    protected: virtual int32_t getL (int8_t cifNum, int32_t bit, int32_t cif7bit) const = 0; // TODO CIF7 (done)
+    protected: virtual int32_t getL (IndicatorFieldEnum_t field, IndicatorFieldEnum_t cif7field) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getL(getCIFNumber(field), getCIFBitMask(field), cif7bit);
     }
 
     /** Unpacks a 32-bit integer from the payload at the indicated position. */
-    protected: virtual int32_t getL24 (int8_t cifNum, int32_t bit, int32_t offset) const = 0;
-    protected: virtual int32_t getL24 (IndicatorFieldEnum_t field, int32_t offset) const {
-      return getL24(getCIFNumber(field), getCIFBitMask(field), offset);
+    protected: virtual int32_t getL24 (int8_t cifNum, int32_t bit, int32_t offset, int32_t cif7bit) const = 0;
+    protected: virtual int32_t getL24 (IndicatorFieldEnum_t field, int32_t offset, IndicatorFieldEnum_t cif7field) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getL24(getCIFNumber(field), getCIFBitMask(field), offset, cif7bit);
     }
 
     /** Packs a 32-bit integer from the payload at the indicated position. */
-    protected: virtual void setL (int8_t cifNum, int32_t bit, int32_t val) = 0;
-    protected: virtual void setL (IndicatorFieldEnum_t field, int32_t val) {
-      setL(getCIFNumber(field), getCIFBitMask(field), val);
+    protected: virtual void setL (int8_t cifNum, int32_t bit, int32_t val, int32_t cif7bit) = 0; // TODO CIF7 (done)
+    protected: virtual void setL (IndicatorFieldEnum_t field, int32_t val, IndicatorFieldEnum_t cif7field) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setL(getCIFNumber(field), getCIFBitMask(field), val, cif7bit);
     }
 
     /** Unpacks a 64-bit integer from the payload at the indicated position. */
-    protected: virtual int64_t getX (int8_t cifNum, int32_t bit) const = 0;
-    protected: virtual int64_t getX (IndicatorFieldEnum_t field) const {
-      return getX(getCIFNumber(field), getCIFBitMask(field));
+    protected: virtual int64_t getX (int8_t cifNum, int32_t bit, int32_t cif7bit) const = 0;
+    protected: virtual int64_t getX (IndicatorFieldEnum_t field, IndicatorFieldEnum_t cif7field) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getX(getCIFNumber(field), getCIFBitMask(field), cif7bit);
     }
 
     /** Packs a 64-bit integer from the payload at the indicated position. */
-    protected: virtual void setX (int8_t cifNum, int32_t bit, int64_t val) = 0;
-    protected: virtual void setX (IndicatorFieldEnum_t field, int64_t val) {
-      setX(getCIFNumber(field), getCIFBitMask(field), val);
+    protected: virtual void setX (int8_t cifNum, int32_t bit, int64_t val, int32_t cif7bit) = 0;
+    protected: virtual void setX (IndicatorFieldEnum_t field, int64_t val, IndicatorFieldEnum_t cif7field) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setX(getCIFNumber(field), getCIFBitMask(field), val, cif7bit);
     }
 
     /** Unpacks a 128-bit UUID from the payload at the indicated position. */
-    protected: virtual UUID getUUID (int8_t cifNum, int32_t bit) const = 0;
-    protected: virtual UUID getUUID (IndicatorFieldEnum_t field) const {
-      return getUUID(getCIFNumber(field), getCIFBitMask(field));
+    protected: virtual UUID getUUID (int8_t cifNum, int32_t bit, int32_t cif7bit) const = 0;
+    protected: virtual UUID getUUID (IndicatorFieldEnum_t field, IndicatorFieldEnum_t cif7field) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getUUID(getCIFNumber(field), getCIFBitMask(field), cif7bit);
     }
 
     /** Packs a 128-bit UUID from the payload at the indicated position. */
-    protected: virtual void setUUID (int8_t cifNum, int32_t bit, const UUID &val) = 0;
-    protected: virtual void setUUID (IndicatorFieldEnum_t field, const UUID &val) {
-      setUUID(getCIFNumber(field), getCIFBitMask(field), val);
+    protected: virtual void setUUID (int8_t cifNum, int32_t bit, const UUID &val, int32_t cif7bit) = 0;
+    protected: virtual void setUUID (IndicatorFieldEnum_t field, const UUID &val, IndicatorFieldEnum_t cif7field) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setUUID(getCIFNumber(field), getCIFBitMask(field), val, cif7bit);
     }
 
     /** Unpacks a TimeStamp from the payload at the indicated position. */
-    protected: virtual TimeStamp getTimeStampField (int8_t cifNum, int32_t bit) const = 0;
-    protected: virtual TimeStamp getTimeStampField (IndicatorFieldEnum_t field) const {
-      return getTimeStampField(getCIFNumber(field), getCIFBitMask(field));
+    protected: virtual TimeStamp getTimeStampField (int8_t cifNum, int32_t bit, int32_t cif7bit) const = 0;
+    protected: virtual TimeStamp getTimeStampField (IndicatorFieldEnum_t field, IndicatorFieldEnum_t cif7field) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getTimeStampField(getCIFNumber(field), getCIFBitMask(field), cif7bit);
     }
 
     /** Packs a TimeStamp from the payload at the indicated position. */
-    protected: virtual void setTimeStampField (int8_t cifNum, int32_t bit, const TimeStamp &val) = 0;
-    protected: virtual void setTimeStampField (IndicatorFieldEnum_t field, const TimeStamp &val) {
-      setTimeStampField(getCIFNumber(field), getCIFBitMask(field), val);
+    protected: virtual void setTimeStampField (int8_t cifNum, int32_t bit, const TimeStamp &val, int32_t cif7bit) = 0;
+    protected: virtual void setTimeStampField (IndicatorFieldEnum_t field, const TimeStamp &val, IndicatorFieldEnum_t cif7field) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setTimeStampField(getCIFNumber(field), getCIFBitMask(field), val, cif7bit);
     }
 
     /** Sets a block of data. */
-    protected: inline void setRecord (int8_t cifNum, int32_t bit, const Record &val, const Record &old) {
-      if (isNull(old)) setRecord(cifNum, bit, val, -1);
-      else             setRecord(cifNum, bit, val, old.getByteLength());
+    protected: inline void setRecord (int8_t cifNum, int32_t bit, const Record &val, const Record &old, int32_t cif7bit) {
+      if (isNull(old)) setRecord(cifNum, bit, val, -1, cif7bit);
+      else             setRecord(cifNum, bit, val, old.getByteLength(), cif7bit);
     }
-    protected: inline void setRecord (IndicatorFieldEnum_t field, const Record &val, const Record &old) {
-      setRecord(getCIFNumber(field), getCIFBitMask(field), val, old);
-    }
-
-    /** Sets a block of data. */
-    protected: inline void setRecord (int8_t cifNum, int32_t bit, const Record &val) {
-      setRecord(cifNum, bit, val, getFieldLen(cifNum, bit));
-    }
-    protected: inline void setRecord (IndicatorFieldEnum_t field, const Record &val) {
-      setRecord(getCIFNumber(field), getCIFBitMask(field), val);
+    protected: inline void setRecord (IndicatorFieldEnum_t field, const Record &val, const Record &old, IndicatorFieldEnum_t cif7field) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setRecord(getCIFNumber(field), getCIFBitMask(field), val, old, cif7bit);
     }
 
     /** Sets a block of data. */
-    protected: inline void setRecord (int8_t cifNum, int32_t bit, const Record *val) {
-      setRecord(cifNum, bit, val, getFieldLen(cifNum, bit));
+    protected: inline void setRecord (int8_t cifNum, int32_t bit, const Record &val, int32_t cif7bit) {
+      setRecord(cifNum, bit, val, getFieldLen(cifNum, bit), cif7bit);
     }
-    protected: inline void setRecord (IndicatorFieldEnum_t field, const Record *val) {
-      setRecord(getCIFNumber(field), getCIFBitMask(field), val);
+    protected: inline void setRecord (IndicatorFieldEnum_t field, const Record &val, IndicatorFieldEnum_t cif7field) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setRecord(getCIFNumber(field), getCIFBitMask(field), val, cif7bit);
     }
 
     /** Sets a block of data. */
-    protected: inline void setRecord (int8_t cifNum, int32_t bit, const Record &val, int32_t oldLen) {
-      if (isNull(val)) setRecord(cifNum, bit, NULL, oldLen);
-      else             setRecord(cifNum, bit, &val, oldLen);
+    protected: inline void setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t cif7bit) {
+      setRecord(cifNum, bit, val, getFieldLen(cifNum, bit), cif7bit);
     }
-    protected: inline void setRecord (IndicatorFieldEnum_t field, const Record &val, int32_t oldLen) {
-      setRecord(getCIFNumber(field), getCIFBitMask(field), val, oldLen);
+    protected: inline void setRecord (IndicatorFieldEnum_t field, const Record *val, IndicatorFieldEnum_t cif7field) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setRecord(getCIFNumber(field), getCIFBitMask(field), val, cif7bit);
+    }
+
+    /** Sets a block of data. */
+    protected: inline void setRecord (int8_t cifNum, int32_t bit, const Record &val, int32_t oldLen, int32_t cif7bit) {
+      if (isNull(val)) setRecord(cifNum, bit, NULL, oldLen, cif7bit);
+      else             setRecord(cifNum, bit, &val, oldLen, cif7bit);
+    }
+    protected: inline void setRecord (IndicatorFieldEnum_t field, const Record &val, int32_t oldLen, IndicatorFieldEnum_t cif7field) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setRecord(getCIFNumber(field), getCIFBitMask(field), val, oldLen, cif7bit);
     }
 
     /** Gets a block of data. */
-    protected: virtual void setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen) = 0;
+    protected: virtual void setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen, int32_t cif7bit) = 0;
     
-    protected: void setRecord (IndicatorFieldEnum_t field, const Record *val, int32_t oldLen) {
-      setRecord(getCIFNumber(field), getCIFBitMask(field), val, oldLen);
+    protected: void setRecord (IndicatorFieldEnum_t field, const Record *val, int32_t oldLen, IndicatorFieldEnum_t cif7field) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setRecord(getCIFNumber(field), getCIFBitMask(field), val, oldLen, cif7bit);
     }
 
 
@@ -1704,8 +1755,8 @@ namespace vrt {
       return getContextIndicatorFieldBit(getCIFNumber(field) | (((int8_t)occurrence)<<3), getCIFBitMask(field));
     }
     protected: virtual boolNull getContextIndicatorFieldBit (int8_t cifNum, int32_t bit) const {
+      if (!isCIFEnable(cifNum)) return _NULL;
       int32_t cif = getContextIndicatorField(cifNum);
-      if (isNull(cif)) return _NULL;
       return ((cif & bit) != 0) ? _TRUE : _FALSE;
     }
 
@@ -1763,6 +1814,18 @@ namespace vrt {
       return ((getContextIndicatorField0(occurrence) & protected_CIF0::CIF7_ENABLE_mask) != 0);
     }
 
+    protected: inline bool isCIFEnable(int8_t cifNum) const {
+      switch(cifNum&0xF7) { // Ignore bit 3 (occurrence)
+        case 0: return true;
+        case 1: return isCIF1Enable(cifNum&0x08);
+        case 2: return isCIF2Enable(cifNum&0x08);
+        case 3: return isCIF3Enable(cifNum&0x08);
+        case 7: return isCIF7Enable(cifNum&0x08);
+        default:
+          throw VRTException("Invalid Context Indicator Field number.");
+      }
+    }
+
     /** Adds or removes a CIF
      *  Sets the Enable Indicator of CIF0 and adds or removes 4-bytes for the CIF.
      *  @param add True = add CIF (default), False = remove CIF
@@ -1772,7 +1835,7 @@ namespace vrt {
     public: virtual void addCIF1 (bool add=true, bool occurrence=false) = 0;
     public: virtual void addCIF2 (bool add=true, bool occurrence=false) = 0;
     public: virtual void addCIF3 (bool add=true, bool occurrence=false) = 0;
-    public: virtual void addCIF7 (bool add=true, bool occurrence=false) = 0;
+    public: virtual void addCIF7 (bool add=true, bool occurrence=false) = 0; // TODO CIF7 - if removing, need to adjust packet massively (perhaps true for other CIFs as well)
 
     /** Gets the Context Field Change Indicator.
      *  @return true if <b>anything</b> in the packet has changed since the last context packet,
@@ -1783,80 +1846,94 @@ namespace vrt {
     }
 
     /** Gets the Reference Point Identifier.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The point in the system where this context applies (null if not specified).
      */
-    public: inline int32_t getReferencePointIdentifier () const {
-      return getL(REF_POINT);
+    public: inline int32_t getReferencePointIdentifier (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(REF_POINT, cif7field); // TODO CIF7 (done)
     }
 
     /** Gets the Timestamp Adjustment in picoseconds. This is the required time adjustment
      *  between the time the signal was digitized (i.e. the timestamp) and the time at the reference
      *  point.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The timestamp adjustment (null if not specified).
      */
-    public: inline int64_t getTimeStampAdjustment () const {
-      return getX(TIME_ADJUST);
+    public: inline int64_t getTimeStampAdjustment (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getX(TIME_ADJUST, cif7field);
     }
 
     /** Gets the Timestamp Calibration Time in seconds. This is the most recent date and
      *  time when the timestamp in the Data and Context packets was known to be correct.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The calibration time (null if not specified).
      */
-    public: inline int32_t getTimeStampCalibration () const {
-      return getL(TIME_CALIB);
+    public: inline int32_t getTimeStampCalibration (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(TIME_CALIB, cif7field);
     }
 
     /** Gets the Ephemeris Reference Identifier. This is used specifies the process
      *  whose origin applies to the ephemeris returned by {@link #getEphemerisRelative()}.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The ephemeris information (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: inline int32_t getEphemerisReference () const { return getL(EPHEM_REF); }
+    public: inline int32_t getEphemerisReference (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(EPHEM_REF, cif7field);
+    }
 
     /** Used for unpacking geolocation records. */
     //protected: virtual Geolocation getGeolocation (IndicatorFieldEnum_t field) const = 0;
-    protected: virtual Geolocation getGeolocation (int8_t cifNum, int32_t field) const = 0;
+    protected: virtual Geolocation getGeolocation (int8_t cifNum, int32_t field, int32_t cif7bit) const = 0;
 
     /** Used for unpacking ephemeris records. */
     //private: virtual Ephemeris getEphemeris (IndicatorFieldEnum_t field) const = 0;
-    protected: virtual Ephemeris getEphemeris (int8_t cifNum, int32_t field) const = 0;
+    protected: virtual Ephemeris getEphemeris (int8_t cifNum, int32_t field, int32_t cif7bit) const = 0;
 
     /** Gets the Formatted GPS (Global Positioning System) Geolocation for the collector.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The geolocation information (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: inline Geolocation getGeolocationGPS () const {
+    public: inline Geolocation getGeolocationGPS (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
       //return getGeolocation(GPS_EPHEM);
-      return getGeolocation(0, protected_CIF0::GPS_EPHEM_mask);
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getGeolocation(0, protected_CIF0::GPS_EPHEM_mask, cif7bit);
     }
 
     /** Gets the Formatted INS (Inertial Navigation System) Geolocation for the collector.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The geolocation information (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: inline Geolocation getGeolocationINS () const {
+    public: inline Geolocation getGeolocationINS (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
       //return getGeolocation(INS_EPHEM);
-      return getGeolocation(0, protected_CIF0::INS_EPHEM_mask);
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getGeolocation(0, protected_CIF0::INS_EPHEM_mask, cif7bit);
     }
 
     /** Gets the ECEF (Earth-Centered, Earth-Fixed) Ephemeris for the collector.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The ephemeris information (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: inline Ephemeris getEphemerisECEF () const {
+    public: inline Ephemeris getEphemerisECEF (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
       //return getEphemeris(ECEF_EPHEM);
-      return getEphemeris(0, protected_CIF0::ECEF_EPHEM_mask);
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getEphemeris(0, protected_CIF0::ECEF_EPHEM_mask, cif7bit);
     }
 
     /** Gets the Relative Ephemeris for the collector. Unlike {@link #getEphemerisECEF()}
      *  which uses the ECEF coordinate system, this ephemeris is relative to a user-defined system
      *  specified by {@link #getEphemerisReference()}.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The ephemeris information (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: inline Ephemeris getEphemerisRelative () const {
+    public: inline Ephemeris getEphemerisRelative (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
       //return getEphemeris(REL_EPHEM);
-      return getEphemeris(0, protected_CIF0::REL_EPHEM_mask);
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getEphemeris(0, protected_CIF0::REL_EPHEM_mask, cif7bit);
     }
 
     /** Gets the GPS ASCII "sentences". These are ASCII "sentences" from a GPS (Global
@@ -1864,125 +1941,142 @@ namespace vrt {
      *  variety in GPS "sentences", this class makes little effort to do anything useful with them.
      *  Users are encouraged to use {@link #getGeolocationGPS()} which essentially provides the same
      *  information, but in a consistent form.</i>
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The geolocation information (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: virtual GeoSentences getGeoSentences () const = 0;
+    public: virtual GeoSentences getGeoSentences (IndicatorFieldEnum_t cif7field=CIF_NULL) const = 0;
 
     /** Gets the Context Association Lists. These lists indicate the other context/data
      *  streams associated with this one.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The context association lists (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: virtual ContextAssocLists getContextAssocLists () const = 0;
+    public: virtual ContextAssocLists getContextAssocLists (IndicatorFieldEnum_t cif7field=CIF_NULL) const = 0;
 
     /** Gets the Device Identifier specifying the manufacturer and model of the device
      *  producing this context packet stream.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The device identifier as a string (null if not specified).
      */
-    public: inline string getDeviceID () const { return Utilities::toStringDeviceID(getDeviceIdentifier()); }
+    public: inline string getDeviceID (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return Utilities::toStringDeviceID(getDeviceIdentifier(cif7field));
+    }
 
     /** Gets the Bandwidth of the signal in Hz.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The bandwidth (null if not specified).
      */
-    public: inline double getBandwidth () const {
-      int64_t bits = getX(BANDWIDTH);
+    public: inline double getBandwidth (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(BANDWIDTH, cif7field);
       return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
     }
 
     /** Gets the IF Reference Frequency of the signal in Hz.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The frequency (null if not specified).
      */
-    public: inline double getFrequencyIF () const {
-      int64_t bits = getX(IF_FREQ);
+    public: inline double getFrequencyIF (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(IF_FREQ, cif7field);
       return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
     }
 
     /** Gets the RF Reference Frequency of the signal in Hz.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The frequency (null if not specified).
      */
-    public: inline double getFrequencyRF () const {
-      int64_t bits = getX(RF_FREQ);
+    public: inline double getFrequencyRF (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(RF_FREQ, cif7field);
       return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
     }
 
     /** Gets the RF Reference Frequency Offset of the signal in Hz.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The frequency offset (null if not specified).
      */
-    public: inline double getFrequencyOffsetRF () const {
-      int64_t bits = getX(RF_OFFSET);
+    public: inline double getFrequencyOffsetRF (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(RF_OFFSET, cif7field);
       return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
     }
 
     /** Gets the IF Band Offset of the signal in Hz.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The band offset (null if not specified).
      */
-    public: inline double getBandOffsetIF () const {
-      int64_t bits = getX(IF_OFFSET);
+    public: inline double getBandOffsetIF (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(IF_OFFSET, cif7field);
       return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
     }
 
     /** Gets the Reference Level of the signal in dBm.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The reference level (null if not specified).
      */
-    public: inline float getReferenceLevel () const {
-      int16_t bits = getI(REF_LEVEL,2);
+    public: inline float getReferenceLevel (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(REF_LEVEL,2, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
     /** Gets the Stage 1 Gain of the device in dB. This is the front-end gain of the
      *  system. In cases where a separate Stage 1 and Stage 2 gain is not necessary, this holds
      *  the total gain of the system and Gain 2 is set to zero.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The gain (null if not specified).
      */
-    public: inline float getGain1 () const {
-      int16_t bits = getI(GAIN,2);
+    public: inline float getGain1 (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(GAIN,2, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
     /** Gets the Stage 2 Gain of the device in dB. This is the back-end gain of the
      *  system. In cases where a separate Stage 1 and Stage 2 gain is not necessary, the Stage 1
      *  gain holds the total gain of the system and this is set to zero.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The gain (null if not specified).
      */
-    public: inline float getGain2 () const {
-      int16_t bits = getI(GAIN,0);
+    public: inline float getGain2 (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(GAIN,0, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
     /** Gets the Sample Rate in Hz.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The sample rate (null if not specified).
      */
-    public: inline double getSampleRate () const {
-      int64_t bits = getX(SAMPLE_RATE);
+    public: inline double getSampleRate (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(SAMPLE_RATE, cif7field);
       return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
     }
 
     /** Gets the Sample Period (inverse of Sample Rate) in sec.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The sample period (null if not specified).
      */
-    public: inline double getSamplePeriod () const {
-      double sr = getSampleRate();
+    public: inline double getSamplePeriod (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      double sr = getSampleRate(cif7field);
       return (isNull(sr))? DOUBLE_NAN : 1.0/sr;
     }
 
     /** Gets the Temperature in degrees Celsius. This is used to convey the temperature of
      *  any component that may affect the described signal.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The temperature (null if not specified).
      */
-    public: inline float getTemperature () const {
-      int16_t bits = getI(TEMPERATURE,2);
+    public: inline float getTemperature (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(TEMPERATURE,2, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16( 6,bits);
     }
 
     /** Gets the specified bit from the State and Event Indicator field.
      *  @param enable    Bit position of the enable flag.
      *  @param indicator Bit position of the indicator flag.
+     *  @param cif7bit Bit position of the CIF7 attribute indicator flag.
      *  @return null if field is not present, null if the enable bit is not set, true if the enable
      *          bit is set and the indicator bit is set, false if the enable bit is set but the
      *          indicator bit is not set.
      */
-    protected: virtual boolNull getStateEventBit (int32_t enable, int32_t indicator) const = 0;
+    protected: virtual boolNull getStateEventBit (int32_t enable, int32_t indicator, int32_t cif7bit) const = 0;
 
     /** Gets the calibrated time indicator flag.
      *  <pre>
@@ -1991,11 +2085,13 @@ namespace vrt {
      *            and may be inaccurate
      *    null  = <i>This information is not available</i>
      *  </pre>
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isCalibratedTimeStamp () const {
-      return getStateEventBit(31, 19);
+    public: inline boolNull isCalibratedTimeStamp (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getStateEventBit(31, 19, cif7bit);
     }
 
     /** Gets the valid data indicator flag.
@@ -2006,11 +2102,13 @@ namespace vrt {
      *  </pre>
      *  <i>Note that the definition of "valid" and "invalid" data is application specific, so it is
      *  important to conslut the documentation for the relevent packet class before using this field.</i>
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isDataValid () const {
-      return getStateEventBit(30, 18);
+    public: inline boolNull isDataValid (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getStateEventBit(30, 18, cif7bit);
     }
 
     /** Gets the reference lock indicator flag.
@@ -2019,11 +2117,13 @@ namespace vrt {
      *    false = At least one of the phase-locked loops affecting the data is not locked and stable
      *    null  = <i>This information is not available</i>
      *  </pre>
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isReferenceLocked () const {
-      return getStateEventBit(29, 17);
+    public: inline boolNull isReferenceLocked (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getStateEventBit(29, 17, cif7bit);
     }
 
     /** Gets the AGC/MGC indicator flag.
@@ -2032,11 +2132,13 @@ namespace vrt {
      *    false = MGC (manual gain control) is being used
      *    null  = <i>This information is not available</i>
      *  </pre>
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isAutomaticGainControl () const {
-      return getStateEventBit(28, 16);
+    public: inline boolNull isAutomaticGainControl (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getStateEventBit(28, 16, cif7bit);
     }
 
     /** Gets the signal detected indicator flag.
@@ -2047,11 +2149,13 @@ namespace vrt {
      *  </pre>
      *  <i>Note that the definition of what constitutes a detected signal application specific, so it is
      *  important to conslut the documentation for the relevent packet class before using this field.</i>
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isSignalDetected () const {
-      return getStateEventBit(27, 15);
+    public: inline boolNull isSignalDetected (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getStateEventBit(27, 15, cif7bit);
     }
 
     /** Gets the spectral inversion indicator flag.
@@ -2061,11 +2165,13 @@ namespace vrt {
      *    false = Spectrum is not inverted
      *    null  = <i>This information is not available</i>
      *  </pre>
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isInvertedSpectrum () const {
-      return getStateEventBit(26, 14);
+    public: inline boolNull isInvertedSpectrum (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getStateEventBit(26, 14, cif7bit);
     }
 
     /** Gets the over-range indicator flag.
@@ -2075,11 +2181,13 @@ namespace vrt {
      *    false = No samples over range
      *    null  = <i>This information is not available</i>
      *  </pre>
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isOverRange () const {
-      return getStateEventBit(25, 13);
+    public: inline boolNull isOverRange (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getStateEventBit(25, 13, cif7bit);
     }
 
     /** Gets the sample loss indicator flag.
@@ -2089,11 +2197,13 @@ namespace vrt {
      *    false = No discontinuities present
      *    null  = <i>This information is not available</i>
      *  </pre>
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return true if the flag is set, false if it is not set, null if this optional flag isn't
      *          specified (null is returned for all context packets).
      */
-    public: inline boolNull isDiscontinuous () const {
-      return getStateEventBit(24, 12);
+    public: inline boolNull isDiscontinuous (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      return getStateEventBit(24, 12, cif7bit);
     }
 
     /** Gets the User-Defined Bits from the State and Event Indicator Bits. <i>The
@@ -2102,11 +2212,12 @@ namespace vrt {
      *  of an undefined-value for user bits if the State and Event Indicator Field is present to
      *  support some other bits. As such, zero will be returned if the State and Event Indicator
      *  Field is absent.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return true if the flag is set, false if it is not set, zero if the State and Event
      *  Indicator Field is absent.
      */
-    public: inline int32_t getUserDefinedBits () const {
-      int8_t bits = getB(STATE_EVENT,3);
+    public: inline int32_t getUserDefinedBits (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int8_t bits = getB(STATE_EVENT,3, cif7field);
       return (isNull(bits))? INT32_NULL : ((int32_t)bits)&0x000000FF;
     }
 
@@ -2120,9 +2231,10 @@ namespace vrt {
 
     /** Sets the Reference Point Identifier.
      *  @param val The point in the system where this context applies (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setReferencePointIdentifier (int32_t val) {
-      setL(REF_POINT, val);
+    public: inline void setReferencePointIdentifier (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(REF_POINT, val, cif7field); // TODO CIF7 (done)
     }
 
     /** Sets the specified bit of the State and Event Indicator field.
@@ -2131,71 +2243,88 @@ namespace vrt {
      *  @param value     The value of the bits: null if the enable bit should not be set, true if
      *                   the enable bit and the indicator bit should be set, false if the enable bit
      *                   should be set but the indicator bit should not be set.
+     *  @param cif7bit   Bit position of the CIF7 attribute indicator flag.
      */
-    protected: virtual void setStateEventBit (int32_t enable, int32_t indicator, boolNull value) = 0;
+    protected: virtual void setStateEventBit (int32_t enable, int32_t indicator, boolNull value, int32_t cif7bit) = 0;
 
     /** <i>Optional functionality:</i> Sets the calibrated time indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setCalibratedTimeStamp (boolNull v) {
-      setStateEventBit(31, 19, v);
+    public: inline void setCalibratedTimeStamp (boolNull v, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setStateEventBit(31, 19, v, cif7bit);
     }
 
     /** <i>Optional functionality:</i> Gets the valid data indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setDataValid (boolNull v) {
-      setStateEventBit(30, 18, v);
+    public: inline void setDataValid (boolNull v, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setStateEventBit(30, 18, v, cif7bit);
     }
 
     /** <i>Optional functionality:</i> Gets the reference lock indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setReferenceLocked (boolNull v) {
-      setStateEventBit(29, 17, v);
+    public: inline void setReferenceLocked (boolNull v, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setStateEventBit(29, 17, v, cif7bit);
     }
 
     /** <i>Optional functionality:</i> Gets the AGC/MGC indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setAutomaticGainControl (boolNull v) {
-      setStateEventBit(28, 16, v);
+    public: inline void setAutomaticGainControl (boolNull v, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setStateEventBit(28, 16, v, cif7bit);
     }
 
     /** <i>Optional functionality:</i> Gets the signal detected indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setSignalDetected (boolNull v) {
-      setStateEventBit(27, 15, v);
+    public: inline void setSignalDetected (boolNull v, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setStateEventBit(27, 15, v, cif7bit);
     }
 
     /** <i>Optional functionality:</i> Gets the spectral inversion indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setInvertedSpectrum (boolNull v) {
-      setStateEventBit(26, 14, v);
+    public: inline void setInvertedSpectrum (boolNull v, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setStateEventBit(26, 14, v, cif7bit);
     }
 
     /** <i>Optional functionality:</i> Gets the over-range indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setOverRange (boolNull v) {
-      setStateEventBit(25, 13, v);
+    public: inline void setOverRange (boolNull v, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setStateEventBit(25, 13, v, cif7bit);
     }
 
     /** <i>Optional functionality:</i> Gets the sample loss indicator flag.
      *  @param v true if the flag is set, false if not set, null if this optional flag isn't specified.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @throws VRTException If this method is not supported or if called on a context packet.
      */
-    public: inline void setDiscontinuous (boolNull v) {
-      setStateEventBit(24, 12, v);
+    public: inline void setDiscontinuous (boolNull v, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      setStateEventBit(24, 12, v, cif7bit);
     }
 
     /** Sets the User-Defined Bits from the State and Event Indicator Bits. <i>The
@@ -2204,10 +2333,11 @@ namespace vrt {
      *  of an undefined-value for user bits if the State and Event Indicator Field is present to
      *  support some other bits. As such, no "null value" is supported for the user-defined buts.
      *  @param val true if the flag is set, false if it is not set.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setUserDefinedBits (int32_t val) {
+    public: inline void setUserDefinedBits (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if ((getOffset(STATE_EVENT) > 0) || !isNull(val)) {
-        setB(STATE_EVENT,3,(char)val);
+        setB(STATE_EVENT,3,(char)val, cif7field);
       }
     }
 
@@ -2215,58 +2345,65 @@ namespace vrt {
      *  between the time the signal was digitized (i.e. the timestamp) and the time at the reference
      *  point.
      *  @param val The timestamp adjustment (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setTimeStampAdjustment (int64_t val) {
-      setX(TIME_ADJUST,val);
+    public: inline void setTimeStampAdjustment (int64_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setX(TIME_ADJUST,val, cif7field);
     }
 
     /** Sets the Timestamp Calibration Time in seconds. This is the most recent date and
      *  time when the timestamp in the Data and Context packets was known to be correct.
      *  @param val The calibration time (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setTimeStampCalibration (int32_t val) {
-      setL(TIME_CALIB,val);
+    public: inline void setTimeStampCalibration (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(TIME_CALIB,val, cif7field);
     }
 
     /** Sets the Ephemeris Reference Identifier. This is used specifies the process
      *  whose origin applies to the ephemeris returned by {@link #getEphemerisRelative()}.
      *  @param val The ephemeris information (null if not specified). <i>Note that changes to the
      *             returned object do not alter the packet.</i>
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setEphemerisReference (int32_t val) {
-      setL(EPHEM_REF,val);
+    public: inline void setEphemerisReference (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(EPHEM_REF,val, cif7field);
     }
 
     /** Sets the Formatted GPS (Global Positioning System) Geolocation for the collector.
      *  @param val The geolocation information (null if not specified). <i>Note that changes to the
      *             returned object do not alter the packet.</i>
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setGeolocationGPS (const Geolocation &val) {
-      setRecord(GPS_EPHEM,val);
+    public: inline void setGeolocationGPS (const Geolocation &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setRecord(GPS_EPHEM,val, cif7field);
     }
 
     /** Sets the Formatted INS (Inertial Navigation System) Geolocation for the collector.
      *  @param val The geolocation information (null if not specified). <i>Note that changes to the
      *             returned object do not alter the packet.</i>
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setGeolocationINS (const Geolocation &val) {
-      setRecord(INS_EPHEM,val);
+    public: inline void setGeolocationINS (const Geolocation &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setRecord(INS_EPHEM,val, cif7field);
     }
 
     /** Sets the ECEF (Earth-Centered, Earth-Fixed) Ephemeris for the collector.
      *  @param val The ephemeris information (null if not specified). <i>Note that changes to the
      *             returned object do not alter the packet.</i>
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setEphemerisECEF (const Ephemeris &val) {
-      setRecord(ECEF_EPHEM,val);
+    public: inline void setEphemerisECEF (const Ephemeris &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setRecord(ECEF_EPHEM,val, cif7field);
     }
 
     /** Sets the Relative Ephemeris for the collector.
      *  @param val The ephemeris information (null if not specified). <i>Note that changes to the
      *             returned object do not alter the packet.</i>
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setEphemerisRelative (const Ephemeris &val) {
-      setRecord(REL_EPHEM,val);
+    public: inline void setEphemerisRelative (const Ephemeris &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setRecord(REL_EPHEM,val, cif7field);
     }
 
     /** Sets the GPS ASCII "sentences". These are ASCII "sentences" from a GPS (Global
@@ -2276,74 +2413,83 @@ namespace vrt {
      *  information, but in a consistent form.</i>
      *  @param val The geolocation information (null if not specified). <i>Note that changes to the
      *             returned object do not alter the packet.</i>
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setGeoSentences (const GeoSentences &val) {
-      setRecord(GPS_ASCII, val, getGeoSentences());
+    public: inline void setGeoSentences (const GeoSentences &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setRecord(GPS_ASCII, val, getGeoSentences(), cif7field);
     }
 
     /** Sets the Context Association Lists. These lists indicate the other context/data
      *  streams associated with this one.
      *  @param val The context association lists (null if not specified). <i>Note that changes to the
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *          returned object do not alter the packet.</i>
      */
-    public: inline void setContextAssocLists (const ContextAssocLists &val) {
-      setRecord(CONTEXT_ASOC, val, getContextAssocLists());
+    public: inline void setContextAssocLists (const ContextAssocLists &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setRecord(CONTEXT_ASOC, val, getContextAssocLists(), cif7field);
     }
 
     /** Sets the Device Identifier specifying the manufacturer and model of the device
      *  producing this context packet stream.
      *  @param val The device identifier as a string (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setDeviceID (const string &val) {
-      setDeviceIdentifier(Utilities::fromStringDeviceID(val));
+    public: inline void setDeviceID (const string &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setDeviceIdentifier(Utilities::fromStringDeviceID(val), cif7field);
     }
 
     /** Sets the Bandwidth of the signal in Hz.
      *  @param val The bandwidth (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setBandwidth (double val) {
+    public: inline void setBandwidth (double val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
-      setX(BANDWIDTH,bits);
+      setX(BANDWIDTH,bits, cif7field);
     }
 
     /** Sets the IF Reference Frequency of the signal in Hz.
      *  @param val The frequency (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setFrequencyIF (double val) {
+    public: inline void setFrequencyIF (double val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
-      setX(IF_FREQ,bits);
+      setX(IF_FREQ,bits, cif7field);
     }
 
     /** Sets the RF Reference Frequency of the signal in Hz.
      *  @param val The frequency (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setFrequencyRF (double val) {
+    public: inline void setFrequencyRF (double val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
-      setX(RF_FREQ,bits);
+      setX(RF_FREQ,bits, cif7field);
     }
 
     /** Sets the RF Reference Frequency Offset of the signal in Hz.
      *  @param val The frequency offset (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setFrequencyOffsetRF (double val) {
+    public: inline void setFrequencyOffsetRF (double val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
-      setX(RF_OFFSET,bits);
+      setX(RF_OFFSET,bits, cif7field);
     }
 
     /** Sets the IF Band Offset of the signal in Hz.
      *  @param val The band offset (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setBandOffsetIF (double val) {
+    public: inline void setBandOffsetIF (double val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
-      setX(IF_OFFSET,bits);
+      setX(IF_OFFSET,bits, cif7field);
     }
 
     /** Sets the Reference Level of the signal in dBm.
      *  @param val The reference level (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setReferenceLevel (float val) {
+    public: inline void setReferenceLevel (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int16_t bits = (isNull(val))? INT16_NULL : VRTMath::fromFloat16(7,val);
-      setI(REF_LEVEL,2,bits);
+      setI(REF_LEVEL,2,bits, cif7field);
     }
 
     /** Sets the Stage 1 Gain of the device in dB. This is the front-end gain of the
@@ -2351,10 +2497,11 @@ namespace vrt {
      *  the total gain of the system and Gain 2 is set to zero. <i>If no stage 2 gain has been
      *  specified, it will be set to 0 following the call to this method.</i>
      *  @param val The gain (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setGain1 (float val) {
+    public: inline void setGain1 (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(GAIN,2,bits);
+      setI(GAIN,2,bits, cif7field);
     }
 
     /** Sets the Stage 2 Gain of the device in dB. This is the back-end gain of the
@@ -2362,44 +2509,49 @@ namespace vrt {
      *  gain holds the total gain of the system and this is set to zero. <i>If no stage 1 gain
      *  has been specified, it will be set to 0 following the call to this method.</i>
      *  @param val The gain (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setGain2 (float val) {
+    public: inline void setGain2 (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(GAIN,0,bits);
+      setI(GAIN,0,bits, cif7field);
     }
 
     /** Sets the Sample Rate in Hz.
      *  @param val The sample rate (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setSampleRate (double val) {
+    public: inline void setSampleRate (double val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
-      setX(SAMPLE_RATE,bits);
+      setX(SAMPLE_RATE,bits, cif7field);
     }
 
    /** Sets the Sample Period (inverse of Sample Rate) in sec.
      *  @param val The sample period (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setSamplePeriod (double val) {
-      if (isNull(val)) setSampleRate(val);
-      else             setSampleRate(1.0 / val);
+    public: inline void setSamplePeriod (double val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      if (isNull(val)) setSampleRate(val, cif7field);
+      else             setSampleRate(1.0 / val, cif7field);
     }
 
     /** Sets the Temperature in degrees Celsius. This is used to convey the temperature of
      *  any component that may affect the described signal.
      *  @param val The temperature (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setTemperature (float val) {
+    public: inline void setTemperature (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int16_t bits = (isNull(val))? INT16_NULL : VRTMath::fromFloat16(6,val);
-      setI(TEMPERATURE,2,bits);
+      setI(TEMPERATURE,2,bits, cif7field);
     }
 
     /** Gets the Total Gain of the device in dB. The total gain is the sum of
      *  {@link #getGain1()} and {@link #getGain2()}.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The gain (null if not specified).
      */
-    public: inline float getGain () const {
-      float gain1 = getGain1();
-      float gain2 = getGain2();
+    public: inline float getGain (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      float gain1 = getGain1(cif7field);
+      float gain2 = getGain2(cif7field);
       return (isNull(gain1))? FLOAT_NAN : gain1+gain2;
     }
 
@@ -2408,58 +2560,79 @@ namespace vrt {
      *  as unspecified. <i>(Note that it is not possible to specify one of the gain values and
      *  leave the other as unspecified.)</i>
      *  @param val The total gain (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setGain (float val) {
-      if (isNull(val)) setI(GAIN,0,INT16_NULL); // clears gain field(s)
-      else             setGain(val,0.0f);       // sets gain field(s)
+    public: inline void setGain (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      if (isNull(val)) setI(GAIN,0,INT16_NULL, cif7field); // clears gain field(s)
+      else             setGain(val,0.0f, cif7field);       // sets gain field(s)
     }
 
     /** Sets the Total Gain of the device in dB.
      *  @param gain1 The stage 1 gain.
      *  @param gain2 The stage 2 gain.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setGain (float gain1, float gain2) {
-      setGain1(gain1);
-      setGain2(gain2);
+    public: inline void setGain (float gain1, float gain2, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setGain1(gain1, cif7field);
+      setGain2(gain2, cif7field);
     }
 
     /** Gets the Over-Range Count. This is the count of the number of over-range data
      *  samples in the <b>single</b> paired data packet.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The count (null if not specified).
      */
-    public: inline int64_t getOverRangeCount () const {
-      int32_t bits = getL(OVER_RANGE);
+    public: inline int64_t getOverRangeCount (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t bits = getL(OVER_RANGE, cif7field);
       return (isNull(bits))? INT64_NULL : (bits & __INT64_C(0xFFFFFFFF));
     }
 
     /** Sets the Over-Range Count. This is the count of the number of over-range data
      *  samples in the <b>single</b> paired data packet.
      *  @param val The count (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setOverRangeCount (int64_t val) {
-      if (isNull(val)) setL(OVER_RANGE, INT32_NULL);
-      else             setL(OVER_RANGE, (int32_t)val);
+    public: inline void setOverRangeCount (int64_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      if (isNull(val)) setL(OVER_RANGE, INT32_NULL, cif7field);
+      else             setL(OVER_RANGE, (int32_t)val, cif7field);
     }
 
     /** Gets the Device Identifier specifying the manufacturer and model of the device
      *  producing this context packet stream.
      *  @return The device identifier (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline int64_t getDeviceIdentifier () const {
-      int64_t bits = getX(DEVICE_ID);
+    public: inline int64_t getDeviceIdentifier (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(DEVICE_ID, cif7field);
       return (isNull(bits))? INT64_NULL : (bits & __INT64_C(0x00FFFFFF0000FFFF));
     }
 
     /** Sets the Device Identifier specifying the manufacturer and model of the device
      *  producing this context packet stream.
      *  @param val The device identifier (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setDeviceIdentifier (int64_t val) {
+    public: inline void setDeviceIdentifier (int64_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (!isNull(val) && ((val & ~__INT64_C(0x00FFFFFF0000FFFF)) != 0)) {
         throw VRTException("Invalid device identifier");
       }
-      setX(DEVICE_ID,val);
+      setX(DEVICE_ID,val, cif7field);
     }
+
+    /** Gets the Data Packet Payload Format. This specifies the format of the data in the
+     *  paired data packet stream.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
+     *  @return The payload format (null if not specified). <i>Note that changes to the returned
+     *          object do not alter the packet.</i>
+     */
+    public: virtual PayloadFormat getDataPayloadFormat (IndicatorFieldEnum_t cif7field=CIF_NULL) const = 0; // can't implement here due to special NULL handling
+
+    /** Sets the Data Packet Payload Format. This specifies the format of the data in the
+     *  paired data packet stream.
+     *  @param val The payload format (null if not specified). 
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
+     */
+    public: virtual void setDataPayloadFormat (const PayloadFormat &val, IndicatorFieldEnum_t cif7field=CIF_NULL) = 0; // can't implement here due to special NULL handling
 
     /* XXX END OF CIF0 FUNCTIONS XXX */
 
@@ -2470,10 +2643,11 @@ namespace vrt {
      *  Bits 31-16 | Reserved  | Fixed value of 0x0
      *  Bits 15-8  | Level     | Indicates buffer utilization: empty <=> 0x0; full <=> (either 0x80 if one-hot, or 0xFF; user-defined)
      *  Bits 7-0   | Status    | Used to indicate buffer underrun/overrun/etc.; user-defined
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Buffer Status (null if not specified)
      */
-    public: inline int64_t getBufferStatus () const {
-      int64_t bits = getX(BUFFER_SZ);
+    public: inline int64_t getBufferStatus (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(BUFFER_SZ, cif7field);
       return (isNull(bits))? INT64_NULL : (bits & __INT64_C(0xFFFFFFFF0000FFFF));
     }
 
@@ -2483,12 +2657,13 @@ namespace vrt {
      *  Bits 15-8  | Level     | Indicates buffer utilization: empty <=> 0x0; full <=> (either 0x80 if one-hot, or 0xFF; user-defined)
      *  Bits 7-0   | Status    | Used to indicate buffer underrun/overrun/etc.; user-defined
      *  @param val The Buffer Status (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setBufferStatus (int64_t val) {
+    public: inline void setBufferStatus (int64_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (!isNull(val) && ((val & ~__INT64_C(0xFFFFFFFF0000FFFF)) != 0)) {
         throw VRTException("Invalid Buffer Status field");
       }
-      setX(BUFFER_SZ,val);
+      setX(BUFFER_SZ,val, cif7field);
     }
 
     /** Gets Build Version Information (See V49.2 spec Section 9.10.4)
@@ -2496,10 +2671,11 @@ namespace vrt {
      *  bits 24-16 | Day      | Day of year compiled; Valid values are 1..366, where 1 => Jan 1 (? 366 is for leap year/seconds?)
      *  bits 15-10 | Revision | Used to distinguish between versions made on the same day, allowing up to 64 revisions per day
      *  bits 9-0   | User Def | User defined info associated with the build
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Build Version code (null if not specified)
      */
-    public: inline int32_t getBuildVersion () const {
-      return getL(VER_BLD_CODE);
+    public: inline int32_t getBuildVersion (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(VER_BLD_CODE, cif7field);
     }
 
     /** Sets Build Version Information (See V49.2 spec Section 9.10.4)
@@ -2507,10 +2683,12 @@ namespace vrt {
      *  bits 24-16 | Day      | Day of year compiled; Valid values are 1..366, where 1 => Jan 1 (? 366 is for leap year/seconds?)
      *  bits 15-10 | Revision | Used to distinguish between versions made on the same day, allowing up to 64 revisions per day
      *  bits 9-0   | User Def | User defined info associated with the build
+     *  @param  val       The Build Version (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Build Version code (null if not specified)
      */
-    public: inline void setBuildVersion (int32_t val) {
-      setL(VER_BLD_CODE,val);
+    public: inline void setBuildVersion (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(VER_BLD_CODE,val, cif7field);
     }
 
     /** Gets V49 Standard and Spec Compliance Number (See V49.2 spec Section 9.10.3)
@@ -2518,10 +2696,11 @@ namespace vrt {
      *  0x00000002 => V49.1
      *  0x00000003 => V49A (which implies V49.0 and V49.1)
      *  0x00000004 => V49.2
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The V49 spec version (null if not specified)
      */
-    public: inline int32_t getV49SpecVersion () const {
-      return getL(V49_COMPL);
+    public: inline int32_t getV49SpecVersion (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(V49_COMPL, cif7field);
     }
 
     /** Sets V49 Standard and Spec Compliance Number (See V49.2 spec Section 9.10.3)
@@ -2530,18 +2709,20 @@ namespace vrt {
      *  0x00000003 => V49A (which implies V49.0 and V49.1)
      *  0x00000004 => V49.2
      *  @param val The V49 spec version (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setV49SpecVersion (int32_t val) {
-      setL(V49_COMPL,val);
+    public: inline void setV49SpecVersion (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(V49_COMPL,val, cif7field);
     }
 
     /** Gets Health Status (See V49.2 spec Section 9.10.2)
      *  uses lower 16 bits of 32 bit word
      *  values are user defined and mapped to a defined health state
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Health Status value (null if not specified)
      */
-    public: inline int16_t getHealthStatus () const {
-      int16_t bits = getI(HEALTH_STATUS, 2);
+    public: inline int16_t getHealthStatus (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(HEALTH_STATUS, 2, cif7field);
       return (isNull(bits))? INT16_NULL : bits;
     }
 
@@ -2549,129 +2730,144 @@ namespace vrt {
      *  uses lower 16 bits of 32 bit word
      *  values are user defined and mapped to a defined health state
      *  @param val The Health Status value (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setHealthStatus (int16_t val) {
-      setI(HEALTH_STATUS, 2, val);
+    public: inline void setHealthStatus (int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setI(HEALTH_STATUS, 2, val, cif7field);
     }
 
     /** Gets Discrete IO 64-bit Field (See V49.2 spec Section 9.11)
      *  All bits are user-defined
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Discrete IO 64-bit field (null if not specified)
      */
-    public: inline int64_t getDiscreteIO64 () const {
-      int64_t bits = getX(DISCRETE_IO64);
+    public: inline int64_t getDiscreteIO64 (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(DISCRETE_IO64, cif7field);
       return (isNull(bits))? INT64_NULL : bits;
     }
 
     /** Sets Discrete IO 64-bit Field (See V49.2 spec Section 9.11)
      *  All bits are user-defined
      *  @param val The Discrete IO 64-bit field (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setDiscreteIO64 (int64_t val) {
-      setX(DISCRETE_IO64,val);
+    public: inline void setDiscreteIO64 (int64_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setX(DISCRETE_IO64,val, cif7field);
     }
 
     /** Gets Discrete IO 32-bit Field (See V49.2 spec Section 9.11)
      *  All bits are user-defined
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Discrete IO 32-bit field (null if not specified)
      */
-    public: inline int32_t getDiscreteIO32 () const {
-      return getL(DISCRETE_IO32);
+    public: inline int32_t getDiscreteIO32 (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(DISCRETE_IO32, cif7field);
     }
 
     /** Sets Discrete IO 32-bit Field (See V49.2 spec Section 9.11)
      *  All bits are user-defined
      *  @param val The Discrete IO 32-bit field (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setDiscreteIO32 (int32_t val) {
-      setL(DISCRETE_IO32,val);
+    public: inline void setDiscreteIO32 (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(DISCRETE_IO32,val, cif7field);
     }
 
     /** Gets the Index Field List. 
      *  IndexFieldList type
      *  (See V49.2 spec Section 9.3.2)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Index Field List (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: virtual IndexFieldList getIndexList () const = 0;
+    public: virtual IndexFieldList getIndexList (IndicatorFieldEnum_t cif7field=CIF_NULL) const = 0;
 
     /** Sets the Index Field List.
      *  IndexFieldList type
      *  (See V49.2 spec Section 9.3.2)
      *  @param val The Index Field List (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setIndexList (const IndexFieldList &val) {
-      setRecord(INDEX_LIST, val, getIndexList());
+    public: inline void setIndexList (const IndexFieldList &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setRecord(INDEX_LIST, val, getIndexList(), cif7field);
     }
 
     /** Gets the Sector Scan/Step Field. 
      *  Array-of-Records type
      *  (See V49.2 spec Section 9.6.2)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Sector Scan/Step Array-of-Records (null if not specified).
      *  <i>Note that changes to the returned object do not alter the packet.</i>
      */
-    public: virtual ArrayOfRecords getSectorScanStep () const = 0;
+    public: virtual ArrayOfRecords getSectorScanStep (IndicatorFieldEnum_t cif7field=CIF_NULL) const = 0;
 
     /** Sets the Sector Scan/Step Field.
      *  Array-of-Records type
      *  (See V49.2 spec Section 9.6.2)
      *  @param val The Sector Scan/Step Array-of-Records (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setSectorScanStep (const ArrayOfRecords &val) {
-      setRecord(SECTOR_SCN_STP, val, getSectorScanStep());
+    public: inline void setSectorScanStep (const ArrayOfRecords &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setRecord(SECTOR_SCN_STP, val, getSectorScanStep(), cif7field);
     }
 
     /** Gets the CIFs Array 
      *  Array-of-Records type
      *  (See V49.2 spec Section 9.13.1)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The CIFs Array as an Array-of-Records (null if not specified).
      *  <i>Note that changes to the returned object do not alter the packet.</i>
      */
-    public: virtual ArrayOfRecords getCIFsArray () const = 0;
+    public: virtual ArrayOfRecords getCIFsArray (IndicatorFieldEnum_t cif7field=CIF_NULL) const = 0;
 
     /** Sets the CIFs Array
      *  Array-of-Records type
      *  (See V49.2 spec Section 9.13.1)
      *  @param val The CIFs Array as an Array-of-Records (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setCIFsArray (const ArrayOfRecords &val) {
-      setRecord(CIFS_ARRAY, val, getCIFsArray());
+    public: inline void setCIFsArray (const ArrayOfRecords &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setRecord(CIFS_ARRAY, val, getCIFsArray(), cif7field);
     }
 
     /** Gets the Spectrum Field 
      *  SpectrumField type
      *  (See V49.2 spec Section 9.6.1)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Spectrum Field (null if not specified).
      *  <i>Note that changes to the returned object do not alter the packet.</i>
      */
-    public: virtual SpectrumField getSpectrumField () const = 0;
+    public: virtual SpectrumField getSpectrumField (IndicatorFieldEnum_t cif7field=CIF_NULL) const = 0;
 
     /** Sets the Spectrum Field
      *  SpectrumField type
      *  (See V49.2 spec Section 9.6.1)
      *  @param val The Spectrum Field (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setSpectrumField (const SpectrumField &val) {
-      setRecord(SPECTRUM, val, getSpectrumField());
+    public: inline void setSpectrumField (const SpectrumField &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setRecord(SPECTRUM, val, getSpectrumField(), cif7field);
     }
 
 
     /** Gets the Auxiliary Bandwidth of the signal in Hz.
      *  (See V49.2 spec Section 9.5.16)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The aux bandwidth (null if not specified).
      */
-    public: inline double getAuxBandwidth () const {
-      int64_t bits = getX(AUX_BANDWIDTH);
+    public: inline double getAuxBandwidth (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(AUX_BANDWIDTH, cif7field);
       return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
     }
 
     /** Sets the Auxiliary Bandwidth of the signal in Hz.
      *  (See V49.2 spec Section 9.5.16)
      *  @param val The aux bandwidth (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setAuxBandwidth (double val) {
+    public: inline void setAuxBandwidth (double val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
-      setX(AUX_BANDWIDTH,bits);
+      setX(AUX_BANDWIDTH,bits, cif7field);
     }
 
     /** Gets the Stage 1 Auxiliary Gain of the device in dB.
@@ -2682,10 +2878,11 @@ namespace vrt {
      *  this holds the total aux gain of the system and Stage 2 Auxiliary Gain
      *  is set to zero.
      *  (See V49.2 spec Section 9.5.15)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The stage 1 aux gain (null if not specified).
      */
-    public: inline float getAuxGain1 () const {
-      int16_t bits = getI(AUX_GAIN,2);
+    public: inline float getAuxGain1 (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(AUX_GAIN,2, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
@@ -2697,21 +2894,23 @@ namespace vrt {
      *  Stage 1 Auxiliary Gain holds the total aux gain of the system and this
      *  is set to zero.
      *  (See V49.2 spec Section 9.5.15)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The stage 2 aux gain (null if not specified).
      */
-    public: inline float getAuxGain2 () const {
-      int16_t bits = getI(AUX_GAIN,0);
+    public: inline float getAuxGain2 (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(AUX_GAIN,0, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
     /** Gets the Total Auxiliary Gain of the device in dB. The total aux gain is
      *  the sum of {@link #getAuxGain1()} and {@link #getAuxGain2()}.
      *  (See V49.2 spec Section 9.5.15)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The total aux gain (null if not specified).
      */
-    public: inline float getAuxGain () const {
-      float gain1 = getAuxGain1();
-      float gain2 = getAuxGain2();
+    public: inline float getAuxGain (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      float gain1 = getAuxGain1(cif7field);
+      float gain2 = getAuxGain2(cif7field);
       return (isNull(gain1))? FLOAT_NAN : gain1+gain2;
     }
 
@@ -2725,10 +2924,11 @@ namespace vrt {
      *  will be set to 0 following the call to this method.</i>
      *  (See V49.2 spec Section 9.5.15)
      *  @param val The stage 1 aux gain (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setAuxGain1 (float val) {
+    public: inline void setAuxGain1 (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(AUX_GAIN,2,bits);
+      setI(AUX_GAIN,2,bits, cif7field);
     }
 
     /** Sets the Stage 2 Auxiliary Gain of the device in dB.
@@ -2741,10 +2941,11 @@ namespace vrt {
      *  will be set to 0 following the call to this method.</i>
      *  (See V49.2 spec Section 9.5.15)
      *  @param val The stage 2 aux gain (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setAuxGain2 (float val) {
+    public: inline void setAuxGain2 (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(AUX_GAIN,0,bits);
+      setI(AUX_GAIN,0,bits, cif7field);
     }
 
     /** Sets the Total Auxiliary Gain of the device in dB. This is effectively the same as
@@ -2753,38 +2954,42 @@ namespace vrt {
      *  leave the other as unspecified.)</i>
      *  (See V49.2 spec Section 9.5.15)
      *  @param val The total aux gain (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setAuxGain (float val) {
-      if (isNull(val)) setI(AUX_GAIN,0,INT16_NULL); // clears gain field(s)
-      else             setAuxGain(val,0.0f);       // sets gain field(s)
+    public: inline void setAuxGain (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      if (isNull(val)) setI(AUX_GAIN,0,INT16_NULL, cif7field); // clears gain field(s)
+      else             setAuxGain(val,0.0f, cif7field);       // sets gain field(s)
     }
 
     /** Sets the Total Auxiliary Gain of the device in dB.
      *  (See V49.2 spec Section 9.5.15)
      *  @param gain1 The stage 1 aux gain.
      *  @param gain2 The stage 2 aux gain.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setAuxGain (float gain1, float gain2) {
-      setAuxGain1(gain1);
-      setAuxGain2(gain2);
+    public: inline void setAuxGain (float gain1, float gain2, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setAuxGain1(gain1, cif7field);
+      setAuxGain2(gain2, cif7field);
     }
 
     /** Gets the Auxiliary Frequency of the signal in Hz.
      *  (See V49.2 spec Section 9.5.14)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The aux frequency (null if not specified).
      */
-    public: inline double getAuxFrequency () const {
-      int64_t bits = getX(AUX_FREQUENCY);
+    public: inline double getAuxFrequency (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(AUX_FREQUENCY, cif7field);
       return (isNull(bits))? DOUBLE_NAN : VRTMath::toDouble64(20,bits);
     }
 
     /** Sets the Auxiliary Frequency of the signal in Hz.
      *  (See V49.2 spec Section 9.5.14)
      *  @param val The aux frequency (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setAuxFrequency (double val) {
+    public: inline void setAuxFrequency (double val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int64_t bits = (isNull(val))? INT64_NULL : VRTMath::fromDouble64(20,val);
-      setX(AUX_FREQUENCY,bits);
+      setX(AUX_FREQUENCY,bits, cif7field);
     }
 
     // XXX SNR and Noise Figure share a 32-bit word. Setting either to null will set both to null.
@@ -2793,10 +2998,11 @@ namespace vrt {
 
     /** Gets the Signal-to-Noise Ratio, expressed in decibels.
      *  (See V49.2 spec Section 9.5.7)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The SNR (null if not specified).
      */
-    public: inline float getSNR () const {
-      int16_t bits = getI(SNR_NOISE,0);
+    public: inline float getSNR (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(SNR_NOISE,0, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
@@ -2805,10 +3011,11 @@ namespace vrt {
      *  between the input of the receiver (the antenna) to the output of the RF
      *  processing chain.
      *  (See V49.2 spec Section 9.5.7)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Noise Figure (null if not specified).
      */
-    public: inline float getNoiseFigure () const {
-      int16_t bits = getI(SNR_NOISE,2);
+    public: inline float getNoiseFigure (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(SNR_NOISE,2, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
@@ -2818,13 +3025,14 @@ namespace vrt {
      *  <i>If set to null, both SNR and Noise Figure will be set to null.</i>
      *  (See V49.2 spec Section 9.5.7)
      *  @param val The SNR (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setSNR (float val) {
+    public: inline void setSNR (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
-        setL(SNR_NOISE, INT32_NULL);
+        setL(SNR_NOISE, INT32_NULL, cif7field);
       } else {
         int16_t bits = VRTMath::fromFloat16(7,val);
-        setI(SNR_NOISE,0,bits);
+        setI(SNR_NOISE,0,bits, cif7field);
       }
     }
 
@@ -2837,31 +3045,34 @@ namespace vrt {
      *  <i>If set to null, both SNR and Noise Figure will be set to null.</i>
      *  (See V49.2 spec Section 9.5.7)
      *  @param val The Noise Figure (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setNoiseFigure (float val) {
+    public: inline void setNoiseFigure (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
-        setL(SNR_NOISE, INT32_NULL);
+        setL(SNR_NOISE, INT32_NULL, cif7field);
       } else {
         int16_t bits = VRTMath::fromFloat16(7,val);
-        setI(SNR_NOISE,2,bits);
+        setI(SNR_NOISE,2,bits, cif7field);
       }
     }
 
     /** Gets the Second-order Input Intercept Point (IIP2).
      *  (See V49.2 spec Section 9.5.6)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The IIP2 (null if not specified).
      */
-    public: inline float getSecondOrderInputInterceptPoint () const {
-      int16_t bits = getI(ICPT_PTS_2_3,0);
+    public: inline float getSecondOrderInputInterceptPoint (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(ICPT_PTS_2_3,0, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
     /** Gets the Third-order Input Intercept Point (IIP3).
      *  (See V49.2 spec Section 9.5.6)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The IIP3 (null if not specified).
      */
-    public: inline float getThirdOrderInputInterceptPoint () const {
-      int16_t bits = getI(ICPT_PTS_2_3,2);
+    public: inline float getThirdOrderInputInterceptPoint (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(ICPT_PTS_2_3,2, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
@@ -2871,13 +3082,14 @@ namespace vrt {
      *  <i>If set to null, both IIP2 and IIP3 will be set to null.</i>
      *  (See V49.2 spec Section 9.5.6)
      *  @param val The IIP2 (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setSecondOrderInputInterceptPoint (float val) {
+    public: inline void setSecondOrderInputInterceptPoint (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
-        setL(ICPT_PTS_2_3, INT32_NULL);
+        setL(ICPT_PTS_2_3, INT32_NULL, cif7field);
       } else {
         int16_t bits = VRTMath::fromFloat16(7,val);
-        setI(ICPT_PTS_2_3,0,bits);
+        setI(ICPT_PTS_2_3,0,bits, cif7field);
       }
     }
 
@@ -2887,35 +3099,38 @@ namespace vrt {
      *  <i>If set to null, both IIP2 and IIP3 will be set to null.</i>
      *  (See V49.2 spec Section 9.5.6)
      *  @param val The IIP3 (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setThirdOrderInputInterceptPoint (float val) {
+    public: inline void setThirdOrderInputInterceptPoint (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
-        setL(ICPT_PTS_2_3, INT32_NULL);
+        setL(ICPT_PTS_2_3, INT32_NULL, cif7field);
       } else {
         int16_t bits = VRTMath::fromFloat16(7,val);
-        setI(ICPT_PTS_2_3,2,bits);
+        setI(ICPT_PTS_2_3,2,bits, cif7field);
       }
     }
 
     /** Gets 1-dB Compression Point.
      *  (See V49.2 spec Section 9.5.2)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The 1-dB Compression Point (null if not specified).
      */
-    public: inline float getOneDecibelCompressionPoint () const {
-      int16_t bits = getI(COMPRESS_PT,2);
+    public: inline float getOneDecibelCompressionPoint (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(COMPRESS_PT,2, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
     /** Sets the 1-dB Compression Point.
      *  (See V49.2 spec Section 9.5.2)
      *  @param val The 1-dB Compression Point (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setOneDecibelCompressionPoint  (float val) {
+    public: inline void setOneDecibelCompressionPoint  (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
-        setL(COMPRESS_PT, INT32_NULL);
+        setL(COMPRESS_PT, INT32_NULL, cif7field);
       } else {
         int16_t bits = VRTMath::fromFloat16(7,val);
-        setI(COMPRESS_PT,2,bits);
+        setI(COMPRESS_PT,2,bits, cif7field);
       }
     }
 
@@ -2923,10 +3138,11 @@ namespace vrt {
      *  In cases where Stage 1 and Stage 2 thresholds are not necessary, this
      *  holds the single threshold value and Stage 2 Threshold is set to zero.
      *  (See V49.2 spec Section 9.5.13)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The stage 1 threshold (null if not specified).
      */
-    public: inline float getThreshold1 () const {
-      int16_t bits = getI(THRESHOLD,2);
+    public: inline float getThreshold1 (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(THRESHOLD,2, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
@@ -2935,10 +3151,11 @@ namespace vrt {
      *  shall be set to zero and Stage 1 Threshold holds the single threshold
      *  value.
      *  (See V49.2 spec Section 9.5.13)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The stage 2 threshold (null if not specified).
      */
-    public: inline float getThreshold2 () const {
-      int16_t bits = getI(THRESHOLD,0);
+    public: inline float getThreshold2 (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(THRESHOLD,0, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
@@ -2949,10 +3166,11 @@ namespace vrt {
      *  following the call to this method.</i>
      *  (See V49.2 spec Section 9.5.13)
      *  @param val The stage 1 threshold (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setThreshold1 (float val) {
+    public: inline void setThreshold1 (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(THRESHOLD,2,bits);
+      setI(THRESHOLD,2,bits, cif7field);
     }
 
     /** Sets the Stage 2 Threshold.
@@ -2963,10 +3181,11 @@ namespace vrt {
      *  following the call to this method.</i>
      *  (See V49.2 spec Section 9.5.13)
      *  @param val The stage 2 threshold (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setThreshold2 (float val) {
+    public: inline void setThreshold2 (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(THRESHOLD,0,bits);
+      setI(THRESHOLD,0,bits, cif7field);
     }
 
     /** Sets the Stage 1 Threshold. This is effectively the same as
@@ -2976,30 +3195,33 @@ namespace vrt {
      *  leave the other as unspecified.)</i>
      *  (See V49.2 spec Section 9.5.13)
      *  @param val The total threshold (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setThreshold (float val) {
-      if (isNull(val)) setI(THRESHOLD,0,INT16_NULL); // clears threshold field(s)
-      else             setThreshold(val,0.0f);       // sets threshold field(s)
+    public: inline void setThreshold (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      if (isNull(val)) setI(THRESHOLD,0,INT16_NULL, cif7field); // clears threshold field(s)
+      else             setThreshold(val,0.0f, cif7field);       // sets threshold field(s)
     }
 
     /** Sets the Stage 1 and Stage 2 Threshold subfields.
      *  (See V49.2 spec Section 9.5.13)
      *  @param threshold1 The stage 1 threshold.
      *  @param threshold2 The stage 2 threshold.
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setThreshold (float threshold1, float threshold2) {
-      setThreshold1(threshold1);
-      setThreshold2(threshold2);
+    public: inline void setThreshold (float threshold1, float threshold2, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setThreshold1(threshold1, cif7field);
+      setThreshold2(threshold2, cif7field);
     }
 
     /** Gets the Energy per Bit to Noise Density ratio (Eb/N0).
      *  Valid range is from -256dB to +255.984375dB (= 0x7FFE), with the maximum
      *  positive value (0x7FFF) designating the "Eb/N0 not used" case.
      *  (See V49.2 spec Section 9.5.17)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Eb/N0 (null if not specified).
      */
-    public: inline float getEbN0 () const {
-      int16_t bits = getI(EB_NO_BER,0);
+    public: inline float getEbN0 (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(EB_NO_BER,0, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
@@ -3007,10 +3229,11 @@ namespace vrt {
      *  Valid range is from -256dB to +255.984375dB (= 0x7FFE), with the maximum
      *  positive value (0x7FFF) designating the "BER not used" case.
      *  (See V49.2 spec Section 9.5.17)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The BER (null if not specified).
      */
-    public: inline float getBitErrorRate () const {
-      int16_t bits = getI(EB_NO_BER,2);
+    public: inline float getBitErrorRate (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(EB_NO_BER,2, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
@@ -3022,13 +3245,14 @@ namespace vrt {
      *  <i>If set to null, both Eb/N0 and BER will be set to null.</i>
      *  (See V49.2 spec Section 9.5.17)
      *  @param val The Eb/N0 (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setEbN0 (float val) {
+    public: inline void setEbN0 (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
-        setL(EB_NO_BER, INT32_NULL);
+        setL(EB_NO_BER, INT32_NULL, cif7field);
       } else {
         int16_t bits = VRTMath::fromFloat16(7,val);
-        setI(EB_NO_BER,0,bits);
+        setI(EB_NO_BER,0,bits, cif7field);
       }
     }
 
@@ -3040,55 +3264,60 @@ namespace vrt {
      *  <i>If set to null, both Eb/N0 and BER will be set to null.</i>
      *  (See V49.2 spec Section 9.5.17)
      *  @param val The BER (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setBitErrorRate (float val) {
+    public: inline void setBitErrorRate (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
-        setL(EB_NO_BER, INT32_NULL);
+        setL(EB_NO_BER, INT32_NULL, cif7field);
       } else {
         int16_t bits = VRTMath::fromFloat16(7,val);
-        setI(EB_NO_BER,2,bits);
+        setI(EB_NO_BER,2,bits, cif7field);
       }
     }
 
     /** Gets Range.
      *  (See V49.2 spec Section 9.4.10)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The range (null if not specified)
      */
-    public: inline double getRange () const {
-      int32_t bits = getL(RANGE);
+    public: inline double getRange (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t bits = getL(RANGE, cif7field);
       // XXX if bits==INT32_NULL, could be valid value or could be indicating Range is not set
-      if (isNull(bits) && getOffset(RANGE) < 0) return DOUBLE_NAN;
+      if (isNull(bits) && getOffset(RANGE, cif7field) < 0) return DOUBLE_NAN;
       return (bits == 0x7FFFFFFF)? DOUBLE_NAN : toDouble32(6, bits);
     }
 
     /** Sets Range.
      *  (See V49.2 spec Section 9.4.10)
      *  @param val The range (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setRange (double val) {
+    public: inline void setRange (double val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int32_t bits = (isNull(val))? 0x7FFFFFFF : fromDouble32(6, val);
-      setL(RANGE,bits);
+      setL(RANGE,bits, cif7field);
     }
 
     /** Gets the Beamwidth in degrees. Valid range is from 0 to 360 degrees.
      *  (See V49.2 spec Section 9.4.2)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Beamwidth (null if not specified).
      */
-    public: inline float getBeamwidth () const {
-      int16_t bits = getI(BEAMWIDTH,2);
+    public: inline float getBeamwidth (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(BEAMWIDTH,2, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
     /** Sets the Beamwidth in degrees. Valid range is from 0 to 360 degrees.
      *  (See V49.2 spec Section 9.4.2)
      *  @param val The Beamwidth (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setBeamwidth (float val) {
+    public: inline void setBeamwidth (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
-        setL(BEAMWIDTH, INT32_NULL);
+        setL(BEAMWIDTH, INT32_NULL, cif7field);
       } else {
         int16_t bits = VRTMath::fromFloat16(7,val);
-        setI(BEAMWIDTH,2,bits);
+        setI(BEAMWIDTH,2,bits, cif7field);
       }
     }
 
@@ -3118,10 +3347,11 @@ namespace vrt {
      *  2D Pointing Angle subfield
      *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
      *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return 2D Pointing Angle as an Array-of-Records (null if not specified).
      *  <i>Note that changes to the returned object do not alter the packet.</i>
      */
-    public: virtual ArrayOfRecords get2DPointingAngleStructured () const = 0;
+    public: virtual ArrayOfRecords get2DPointingAngleStructured (IndicatorFieldEnum_t cif7field=CIF_NULL) const = 0;
 
     /** Sets the 2D Pointing Angle (Structured)
      *  See V49.2 spec Section 9.4.1.
@@ -3150,19 +3380,21 @@ namespace vrt {
      *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
      *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
      *  @param val The 2D Pointing Angle as an Array-of-Records (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void set2DPointingAngleStructured (const ArrayOfRecords &val) {
-      setRecord(PNT_ANGL_2D_ST, val, get2DPointingAngleStructured());
+    public: inline void set2DPointingAngleStructured (const ArrayOfRecords &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setRecord(PNT_ANGL_2D_ST, val, get2DPointingAngleStructured(), cif7field);
     }
 
     /** Gets the Elevation Angle subfield of the Single-word 2D Pointing Angle.
      *  (See V49.2 spec Section 9.4.1)
      *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
      *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Elevation Angle (null if not specified).
      */
-    public: inline float get2DPointingAngleElevation () const {
-      int16_t bits = getI(PNT_ANGL_2D_SI,0);
+    public: inline float get2DPointingAngleElevation (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(PNT_ANGL_2D_SI,0, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
@@ -3170,10 +3402,11 @@ namespace vrt {
      *  (See V49.2 spec Section 9.4.1)
      *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
      *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Azimuthal Angle (null if not specified).
      */
-    public: inline float get2DPointingAngleAzimuth () const {
-      int16_t bits = getI(PNT_ANGL_2D_SI,2);
+    public: inline float get2DPointingAngleAzimuth (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(PNT_ANGL_2D_SI,2, cif7field);
       if (isNull(bits)) return FLOAT_NAN;
       float val = VRTMath::toFloat16(7,bits);
       return (val < 0)? 512.0+val : val;
@@ -3188,13 +3421,14 @@ namespace vrt {
      *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
      *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
      *  @param val The Elevation Angle (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void set2DPointingAngleElevation (float val) {
+    public: inline void set2DPointingAngleElevation (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
-        setL(PNT_ANGL_2D_SI, INT32_NULL);
+        setL(PNT_ANGL_2D_SI, INT32_NULL, cif7field);
       } else {
         int16_t bits = VRTMath::fromFloat16(7,val);
-        setI(PNT_ANGL_2D_SI,0,bits);
+        setI(PNT_ANGL_2D_SI,0,bits, cif7field);
       }
     }
 
@@ -3207,32 +3441,35 @@ namespace vrt {
      *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
      *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
      *  @param val The Azimuthal Angle (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void set2DPointingAngleAzimuth (float val) {
+    public: inline void set2DPointingAngleAzimuth (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
-        setL(PNT_ANGL_2D_SI, INT32_NULL);
+        setL(PNT_ANGL_2D_SI, INT32_NULL, cif7field);
       } else {
         if (val > 255.984375) val = val-512;
         int16_t bits = VRTMath::fromFloat16(7,val);
-        setI(PNT_ANGL_2D_SI,2,bits);
+        setI(PNT_ANGL_2D_SI,2,bits, cif7field);
       }
     }
 
     /** Gets the Polarization Tilt Angle in units of Radians.
      *  (See V49.2 spec Section 9.4.8)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Tilt Angle (null if not specified).
      */
-    public: inline float getPolarizationTiltAngle () const {
-      int16_t bits = getI(POLARIZATION,0);
+    public: inline float getPolarizationTiltAngle (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(POLARIZATION,0, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(13,bits);
     }
 
     /** Gets the Polarization Ellipticity Angle in units of Radians.
      *  (See V49.2 spec Section 9.4.8)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Ellipticity Angle (null if not specified).
      */
-    public: inline float getPolarizationEllipticityAngle () const {
-      int16_t bits = getI(POLARIZATION,2);
+    public: inline float getPolarizationEllipticityAngle (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(POLARIZATION,2, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(13,bits);
     }
 
@@ -3243,13 +3480,14 @@ namespace vrt {
      *  null.</i>
      *  (See V49.2 spec Section 9.4.8)
      *  @param val The Tilt Angle (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setPolarizationTiltAngle (float val) {
+    public: inline void setPolarizationTiltAngle (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
-        setL(POLARIZATION, INT32_NULL);
+        setL(POLARIZATION, INT32_NULL, cif7field);
       } else {
         int16_t bits = VRTMath::fromFloat16(13,val);
-        setI(POLARIZATION,0,bits);
+        setI(POLARIZATION,0,bits, cif7field);
       }
     }
 
@@ -3260,13 +3498,14 @@ namespace vrt {
      *  null.</i>
      *  (See V49.2 spec Section 9.4.8)
      *  @param val The Ellipticity Angle (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setPolarizationEllipticityAngle (float val) {
+    public: inline void setPolarizationEllipticityAngle (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
-        setL(POLARIZATION, INT32_NULL);
+        setL(POLARIZATION, INT32_NULL, cif7field);
       } else {
         int16_t bits = VRTMath::fromFloat16(13,val);
-        setI(POLARIZATION,2,bits);
+        setI(POLARIZATION,2,bits, cif7field);
       }
     }
 
@@ -3275,10 +3514,11 @@ namespace vrt {
      *  Signal. The unit of measure for the reference level is the angle
      *  measure in units of radians. This is sometimes called Phase Difference.
      *  (See V49.2 spec Section 9.5.8)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Phase Offset (null if not specified).
      */
-    public: inline float getPhaseOffset () const {
-      int16_t bits = getI(PHASE,2);
+    public: inline float getPhaseOffset (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(PHASE,2, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
@@ -3288,13 +3528,14 @@ namespace vrt {
      *  measure in units of radians. This is sometimes called Phase Difference.
      *  (See V49.2 spec Section 9.5.8)
      *  @param val The Phase Offset (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setPhaseOffset (float val) {
+    public: inline void setPhaseOffset (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
-        setL(PHASE, INT32_NULL);
+        setL(PHASE, INT32_NULL, cif7field);
       } else {
         int16_t bits = VRTMath::fromFloat16(7,val);
-        setI(PHASE,2,bits);
+        setI(PHASE,2,bits, cif7field);
       }
     }
 
@@ -3307,10 +3548,11 @@ namespace vrt {
      *  Spatial Reference Type uses the Generic16 bit Identifier field
      *  See V49.2 spec Section 9.8.11 for Spatial Reference Type
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Spatial Reference Type (null if not specified)
      */
-    public: inline int16_t getSpatialReferenceType () const {
-      int16_t bits = getI(SPATIAL_REF_TYPE, 2);
+    public: inline int16_t getSpatialReferenceType (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(SPATIAL_REF_TYPE, 2, cif7field);
       return (isNull(bits))? INT16_NULL : bits;
     }
 
@@ -3319,19 +3561,21 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.11 for Spatial Reference Type
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @param val The Spatial Reference Type (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setSpatialReferenceType (int16_t val) {
-      setI(SPATIAL_REF_TYPE, 2, val);
+    public: inline void setSpatialReferenceType (int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setI(SPATIAL_REF_TYPE, 2, val, cif7field);
     }
 
     /** Gets Spatial Scan Type.
      *  Spatial Scan Type uses the Generic16 bit Identifier field
      *  See V49.2 spec Section 9.8.11 for Spatial Scan Type
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Spatial Scan Type (null if not specified)
      */
-    public: inline int16_t getSpatialScanType () const {
-      int16_t bits = getI(SPATIAL_SCAN_TYPE, 2);
+    public: inline int16_t getSpatialScanType (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(SPATIAL_SCAN_TYPE, 2, cif7field);
       return (isNull(bits))? INT16_NULL : bits;
     }
 
@@ -3340,9 +3584,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.11 for Spatial Scan Type
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @param val The Spatial Scan Type (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setSpatialScanType (int16_t val) {
-      setI(SPATIAL_SCAN_TYPE, 2, val);
+    public: inline void setSpatialScanType (int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setI(SPATIAL_SCAN_TYPE, 2, val, cif7field);
     }
 
     /** Gets RF Footprint Range.
@@ -3351,10 +3596,11 @@ namespace vrt {
      *  Extension Packet.
      *  See V49.2 spec Section 9.8.12 for RF Footprint Range
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The RF Footprint Range (null if not specified)
      */
-    public: inline int32_t getRFFootprintRange () const {
-      return getL(RF_FOOTPRINT_RANGE);
+    public: inline int32_t getRFFootprintRange (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(RF_FOOTPRINT_RANGE, cif7field);
     }
 
     /** Sets RF Footprint Range.
@@ -3364,9 +3610,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.12 for RF Footprint Range
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
      *  @param val The RF Footprint Range (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setRFFootprintRange (int32_t val) {
-      setL(RF_FOOTPRINT_RANGE, val);
+    public: inline void setRFFootprintRange (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(RF_FOOTPRINT_RANGE, val, cif7field);
     }
 
     /** Gets RF Footprint.
@@ -3375,10 +3622,11 @@ namespace vrt {
      *  in a Data Extension Packet.
      *  See V49.2 spec Section 9.8.12 for RF Footprint
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The RF Footprint (null if not specified)
      */
-    public: inline int32_t getRFFootprint() const {
-      return getL(RF_FOOTPRINT);
+    public: inline int32_t getRFFootprint(IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(RF_FOOTPRINT, cif7field);
     }
 
     /** Sets RF Footprint.
@@ -3388,9 +3636,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.12 for RF Footprint
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
      *  @param val The RF Footprint (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setRFFootprint(int32_t val) {
-      setL(RF_FOOTPRINT, val);
+    public: inline void setRFFootprint(int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(RF_FOOTPRINT, val, cif7field);
     }
 
     /** Gets Communication Priority ID
@@ -3400,10 +3649,11 @@ namespace vrt {
      *  bit Identifier field is used for this field. XXX
      *  See V49.2 spec Section 9.8.10.5 for Communication Priority ID
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Communication Priority ID (null if not specified)
      */
-    public: inline int32_t getCommunicationPriorityID () const {
-      return getL(COMM_PRIORITY_ID);
+    public: inline int32_t getCommunicationPriorityID (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(COMM_PRIORITY_ID, cif7field);
     }
 
     /** Sets Communication Priority ID
@@ -3414,9 +3664,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.10.5 for Communication Priority ID
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
      *  @param val The Communication Priority ID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setCommunicationPriorityID (int32_t val) {
-      setL(COMM_PRIORITY_ID, val);
+    public: inline void setCommunicationPriorityID (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(COMM_PRIORITY_ID, val, cif7field);
     }
 
     /** Gets Function Priority ID
@@ -3426,10 +3677,11 @@ namespace vrt {
      *  Function Priority ID uses the Generic16 bit Identifier field
      *  See V49.2 spec Section 9.8.10.4 for Function Priority ID
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Function Priority ID (null if not specified)
      */
-    public: inline int16_t getFunctionPriorityID () const {
-      int16_t bits = getI(FUNCT_PRIORITY_ID, 2);
+    public: inline int16_t getFunctionPriorityID (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(FUNCT_PRIORITY_ID, 2, cif7field);
       return (isNull(bits))? INT16_NULL : bits;
     }
 
@@ -3441,9 +3693,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.10.4 for Function Priority ID
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @param val The Function Priority ID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setFunctionPriorityID (int16_t val) {
-      setI(FUNCT_PRIORITY_ID, 2, val);
+    public: inline void setFunctionPriorityID (int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setI(FUNCT_PRIORITY_ID, 2, val, cif7field);
     }
 
     /** Gets Event ID
@@ -3454,10 +3707,11 @@ namespace vrt {
      *  Event ID uses the Generic16 bit Identifier field
      *  See V49.2 spec Section 9.8.10.3 for Event ID
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Event ID (null if not specified)
      */
-    public: inline int16_t getEventID () const {
-      int16_t bits = getI(EVENT_ID, 2);
+    public: inline int16_t getEventID (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(EVENT_ID, 2, cif7field);
       return (isNull(bits))? INT16_NULL : bits;
     }
 
@@ -3470,9 +3724,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.10.3 for Event ID
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @param val The Event ID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setEventID (int16_t val) {
-      setI(EVENT_ID, 2, val);
+    public: inline void setEventID (int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setI(EVENT_ID, 2, val, cif7field);
     }
 
     /** Gets Mode ID
@@ -3483,10 +3738,11 @@ namespace vrt {
      *  Mode ID uses the Generic16 bit Identifier field
      *  See V49.2 spec Section 9.8.10.2 for Mode ID
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Mode ID (null if not specified)
      */
-    public: inline int16_t getModeID () const {
-      int16_t bits = getI(MODE_ID, 2);
+    public: inline int16_t getModeID (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(MODE_ID, 2, cif7field);
       return (isNull(bits))? INT16_NULL : bits;
     }
 
@@ -3499,9 +3755,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.10.2 for Mode ID
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @param val The Mode ID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setModeID (int16_t val) {
-      setI(MODE_ID, 2, val);
+    public: inline void setModeID (int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setI(MODE_ID, 2, val, cif7field);
     }
 
     /** Gets Function ID
@@ -3512,10 +3769,11 @@ namespace vrt {
      *  Function ID uses the Generic16 bit Identifier field
      *  See V49.2 spec Section 9.8.10.1 for Function ID
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Function ID (null if not specified)
      */
-    public: inline int16_t getFunctionID () const {
-      int16_t bits = getI(FUNCTION_ID, 2);
+    public: inline int16_t getFunctionID (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(FUNCTION_ID, 2, cif7field);
       return (isNull(bits))? INT16_NULL : bits;
     }
 
@@ -3528,9 +3786,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.10.1 for Function ID
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @param val The Function ID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setFunctionID (int16_t val) {
-      setI(FUNCTION_ID, 2, val);
+    public: inline void setFunctionID (int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setI(FUNCTION_ID, 2, val, cif7field);
     }
 
     /** Gets Modulation Type
@@ -3541,8 +3800,8 @@ namespace vrt {
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @return The Modulation Type (null if not specified)
      */
-    public: inline int16_t getModulationType () const {
-      int16_t bits = getI(MODULATION_TYPE, 2);
+    public: inline int16_t getModulationType (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(MODULATION_TYPE, 2, cif7field);
       return (isNull(bits))? INT16_NULL : bits;
     }
 
@@ -3553,9 +3812,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.9 for Modulation Type
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @param val The Modulation Type (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setModulationType (int16_t val) {
-      setI(MODULATION_TYPE, 2, val);
+    public: inline void setModulationType (int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setI(MODULATION_TYPE, 2, val, cif7field);
     }
 
     /** Gets Modulation Class
@@ -3565,10 +3825,11 @@ namespace vrt {
      *  Modulation Class uses the Generic16 bit Identifier field
      *  See V49.2 spec Section 9.8.9 for Modulation Class
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Modulation Class (null if not specified)
      */
-    public: inline int16_t getModulationClass () const {
-      int16_t bits = getI(MODULATION_CLASS, 2);
+    public: inline int16_t getModulationClass (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(MODULATION_CLASS, 2, cif7field);
       return (isNull(bits))? INT16_NULL : bits;
     }
 
@@ -3580,9 +3841,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.9 for Modulation Class
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @param val The Modulation Class (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setModulationClass (int16_t val) {
-      setI(MODULATION_CLASS, 2, val);
+    public: inline void setModulationClass (int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setI(MODULATION_CLASS, 2, val, cif7field);
     }
 
     /** Gets EMS Device Instance
@@ -3591,10 +3853,11 @@ namespace vrt {
      *  bit Identifier field is used for this field. XXX
      *  See V49.2 spec Section 9.8.9 for EMS Device Instance
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The EMS Device Instance (null if not specified)
      */
-    public: inline int32_t getEmsDeviceInstance () const {
-      return getL(EMS_DEVICE_INSTANCE);
+    public: inline int32_t getEmsDeviceInstance (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(EMS_DEVICE_INSTANCE, cif7field);
     }
 
     /** Sets EMS Device Instance
@@ -3604,9 +3867,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.9 for EMS Device Instance
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
      *  @param val The EMS Device Instance (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setEmsDeviceInstance (int32_t val) {
-      setL(EMS_DEVICE_INSTANCE, val);
+    public: inline void setEmsDeviceInstance (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(EMS_DEVICE_INSTANCE, val, cif7field);
     }
 
     /** Gets EMS Device Type
@@ -3617,10 +3881,11 @@ namespace vrt {
      *  bit Identifier field is used for this field. XXX
      *  See V49.2 spec Section 9.8.9 for EMS Device Type
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The EMS Device Type (null if not specified)
      */
-    public: inline int32_t getEmsDeviceType () const {
-      return getL(EMS_DEVICE_TYPE);
+    public: inline int32_t getEmsDeviceType (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(EMS_DEVICE_TYPE, cif7field);
     }
 
     /** Sets EMS Device Type
@@ -3632,9 +3897,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.9 for EMS Device Type
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
      *  @param val The EMS Device Type (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setEmsDeviceType (int32_t val) {
-      setL(EMS_DEVICE_TYPE, val);
+    public: inline void setEmsDeviceType (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(EMS_DEVICE_TYPE, val, cif7field);
     }
 
     // TODO - could provide additional helper functions for EMS Device Class
@@ -3652,10 +3918,11 @@ namespace vrt {
      *  Bits 11..0: enumeration of general type of EMS device
      *  See V49.2 spec Section 9.8.9 for EMS Device Class
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The EMS Device Class (null if not specified)
      */
-    public: inline int16_t getEmsDeviceClass () const {
-      int16_t bits = getI(EMS_DEVICE_CLASS, 2);
+    public: inline int16_t getEmsDeviceClass (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(EMS_DEVICE_CLASS, 2, cif7field);
       return (isNull(bits))? INT16_NULL : bits;
     }
 
@@ -3668,9 +3935,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.9 for EMS Device Class
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @param val The EMS Device Class (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setEmsDeviceClass (int16_t val) {
-      setI(EMS_DEVICE_CLASS, 2, val);
+    public: inline void setEmsDeviceClass (int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setI(EMS_DEVICE_CLASS, 2, val, cif7field);
     }
 
     /** Gets Platform Display
@@ -3679,10 +3947,11 @@ namespace vrt {
      *  bit Identifier field is used for this field. XXX
      *  See V49.2 spec Section 9.8.8 for Platform Display
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Platform Display (null if not specified)
      */
-    public: inline int32_t getPlatformDisplay () const {
-      return getL(PLATFORM_DISPLAY);
+    public: inline int32_t getPlatformDisplay (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(PLATFORM_DISPLAY, cif7field);
     }
 
     /** Sets Platform Display
@@ -3692,9 +3961,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.8 for Platform Display
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
      *  @param val The Platform Display (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setPlatformDisplay (int32_t val) {
-      setL(PLATFORM_DISPLAY, val);
+    public: inline void setPlatformDisplay (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(PLATFORM_DISPLAY, val, cif7field);
     }
 
 
@@ -3705,10 +3975,11 @@ namespace vrt {
      *  bit Identifier field is used for this field. XXX
      *  See V49.2 spec Section 9.8.8 for Platform Instance
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Platform Instance (null if not specified)
      */
-    public: inline int32_t getPlatformInstance () const {
-      return getL(PLATFORM_INSTANCE);
+    public: inline int32_t getPlatformInstance (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(PLATFORM_INSTANCE, cif7field);
     }
 
     /** Sets Platform Instance
@@ -3719,9 +3990,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.8 for Platform Instance
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
      *  @param val The Platform Instance (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setPlatformInstance (int32_t val) {
-      setL(PLATFORM_INSTANCE, val);
+    public: inline void setPlatformInstance (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(PLATFORM_INSTANCE, val, cif7field);
     }
 
     /** Gets Platform Class
@@ -3731,10 +4003,11 @@ namespace vrt {
      *  bit Identifier field is used for this field. XXX
      *  See V49.2 spec Section 9.8.8 for Platform Class
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Platform Class (null if not specified)
      */
-    public: inline int32_t getPlatformClass () const {
-      return getL(PLATFORM_CLASS);
+    public: inline int32_t getPlatformClass (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(PLATFORM_CLASS, cif7field);
     }
 
     /** Sets Platform Class
@@ -3745,9 +4018,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.8 for Platform Class
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
      *  @param val The Platform Class (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setPlatformClass (int32_t val) {
-      setL(PLATFORM_CLASS, val);
+    public: inline void setPlatformClass (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(PLATFORM_CLASS, val, cif7field);
     }
 
     /** Gets Operator ID
@@ -3755,10 +4029,11 @@ namespace vrt {
      *  Operator ID uses the Generic16 bit Identifier field
      *  See V49.2 spec Section 9.8.7 for Operator ID
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Operator ID (null if not specified)
      */
-    public: inline int16_t getOperator () const {
-      int16_t bits = getI(OPERATOR, 2);
+    public: inline int16_t getOperator (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(OPERATOR, 2, cif7field);
       return (isNull(bits))? INT16_NULL : bits;
     }
 
@@ -3768,9 +4043,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.7 for Operator ID
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @param val The Operator ID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setOperator (int16_t val) {
-      setI(OPERATOR, 2, val);
+    public: inline void setOperator (int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setI(OPERATOR, 2, val, cif7field);
     }
 
     // TODO - could provide additional helper functions for Country Code
@@ -3783,10 +4059,11 @@ namespace vrt {
      *  Country Code uses the Generic16 bit Identifier field
      *  See V49.2 spec Section 9.8.7 for Country Code
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Country Code (null if not specified)
      */
-    public: inline int16_t getCountryCode () const {
-      int16_t bits = getI(COUNTRY_CODE, 2);
+    public: inline int16_t getCountryCode (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(COUNTRY_CODE, 2, cif7field);
       return (isNull(bits))? INT16_NULL : bits;
     }
 
@@ -3799,9 +4076,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.7 for Country Code
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @param val The Country Code (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setCountryCode (int16_t val) {
-      setI(COUNTRY_CODE, 2, val);
+    public: inline void setCountryCode (int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setI(COUNTRY_CODE, 2, val, cif7field);
     }
 
     /** Gets Track ID
@@ -3811,10 +4089,11 @@ namespace vrt {
      *  Track ID uses the Generic32 bit Identifier field
      *  See V49.2 spec Section 9.8.6 for Track ID
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Track ID (null if not specified)
      */
-    public: inline int32_t getTrackID () const {
-      return getL(TRACK_ID);
+    public: inline int32_t getTrackID (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(TRACK_ID, cif7field);
     }
 
     /** Sets Track ID
@@ -3825,9 +4104,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.6 for Track ID
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
      *  @param val The Track ID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setTrackID (int32_t val) {
-      setL(TRACK_ID, val);
+    public: inline void setTrackID (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(TRACK_ID, val, cif7field);
     }
 
     /** Gets Information Source
@@ -3836,10 +4116,11 @@ namespace vrt {
      *  bit Identifier field is used for this field. XXX
      *  See V49.2 spec Section 9.8.5 for Information Source
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Information Source (null if not specified)
      */
-    public: inline int32_t getInformationSource () const {
-      return getL(INFORMATION_SOURCE);
+    public: inline int32_t getInformationSource (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(INFORMATION_SOURCE, cif7field);
     }
 
     /** Sets Information Source
@@ -3849,73 +4130,81 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.5 for Information Source
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
      *  @param val The Information Source (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setInformationSource (int32_t val) {
-      setL(INFORMATION_SOURCE, val);
+    public: inline void setInformationSource (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(INFORMATION_SOURCE, val, cif7field);
     }
 
     /** Gets Controller UUID Indicator Field
      *  See V49.2 spec Section 9.8.3 for Controller UUID
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Controller UUID (null if not specified)
      */
-    public: inline UUID getControllerUUIDField () const {
-      return getUUID(CONTROLLER_UUID);
+    public: inline UUID getControllerUUIDField (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getUUID(CONTROLLER_UUID, cif7field);
     }
 
     /** Sets Controller UUID Indicator Field
      *  See V49.2 spec Section 9.8.3 for Controller UUID
      *  @param val The Controller UUID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setControllerUUIDField (const UUID &val) {
-      setUUID(CONTROLLER_UUID, val);
+    public: inline void setControllerUUIDField (const UUID &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setUUID(CONTROLLER_UUID, val, cif7field);
     }
 
     /** Gets Controller ID Indicator Field
      *  See V49.2 spec Section 9.8.3 for Controller ID
      *  @return The Controller ID (null if not specified)
      */
-    public: inline int32_t getControllerIDField () const {
-      return getL(CONTROLLER_ID);
+    public: inline int32_t getControllerIDField (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(CONTROLLER_ID, cif7field);
     }
 
     /** Sets Controller ID Indicator Field
      *  See V49.2 spec Section 9.8.3 for Controller ID
      *  @param val The Controller ID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setControllerIDField (int32_t val) {
-      setL(CONTROLLER_ID, val);
+    public: inline void setControllerIDField (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(CONTROLLER_ID, val, cif7field);
     }
 
     /** Gets Controllee UUID Indicator Field
      *  See V49.2 spec Section 9.8.3 for Controllee UUID
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Controllee UUID (null if not specified)
      */
-    public: inline UUID getControlleeUUIDField () const {
-      return getUUID(CONTROLLEE_UUID);
+    public: inline UUID getControlleeUUIDField (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getUUID(CONTROLLEE_UUID, cif7field);
     }
 
     /** Sets Controllee UUID Indicator Field
      *  See V49.2 spec Section 9.8.3 for Controllee UUID
      *  @param val The Controllee UUID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setControlleeUUIDField (const UUID &val) {
-      setUUID(CONTROLLEE_UUID, val);
+    public: inline void setControlleeUUIDField (const UUID &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setUUID(CONTROLLEE_UUID, val, cif7field);
     }
 
     /** Gets Controllee ID Indicator Field
      *  See V49.2 spec Section 9.8.3 for Controllee ID
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Controllee ID (null if not specified)
      */
-    public: inline int32_t getControlleeIDField () const {
-      return getL(CONTROLLEE_ID);
+    public: inline int32_t getControlleeIDField (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(CONTROLLEE_ID, cif7field);
     }
 
     /** Sets Controllee ID Indicator Field
      *  See V49.2 spec Section 9.8.3 for Controllee ID
      *  @param val The Controllee ID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setControlleeIDField (int32_t val) {
-      setL(CONTROLLEE_ID, val);
+    public: inline void setControlleeIDField (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(CONTROLLEE_ID, val, cif7field);
     }
 
     /** Gets Cited Message ID
@@ -3925,10 +4214,11 @@ namespace vrt {
      *  bit Identifier field is used for this field. XXX
      *  See V49.2 spec Section 9.8.4 for Cited Message ID
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Cited Message ID (null if not specified)
      */
-    public: inline int32_t getCitedMessageID () const {
-      return getL(CITED_MESSAGE_ID);
+    public: inline int32_t getCitedMessageID (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(CITED_MESSAGE_ID, cif7field);
     }
 
     /** Sets Cited Message ID
@@ -3939,163 +4229,182 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.4 for Cited Message ID
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
      *  @param val The Cited Message ID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setCitedMessageID (int32_t val) {
-      setL(CITED_MESSAGE_ID, val);
+    public: inline void setCitedMessageID (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(CITED_MESSAGE_ID, val, cif7field);
     }
 
     /** Gets Children SID
      *  See V49.2 spec Section 9.8.2 for Children SID
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Children SID (null if not specified)
      */
-    public: inline int32_t getChildrenSID () const {
-      return getL(CHILDREN_SID);
+    public: inline int32_t getChildrenSID (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(CHILDREN_SID, cif7field);
     }
     /** Gets Children SID as a string
      *  See V49.2 spec Section 9.8.2 for Children SID
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Children SID (null if not specified)
      */
-    public: inline string getChildrenSIDString () const {
-      int32_t streamID = getL(CHILDREN_SID);
+    public: inline string getChildrenSIDString (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t streamID = getL(CHILDREN_SID, cif7field);
       return (isNull(streamID))? string("") : Utilities::format("%d", streamID);
     }
 
     /** Sets Children SID
      *  See V49.2 spec Section 9.8.2 for Children SID
      *  @param val The Children SID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setChildrenSID (int32_t val) {
-      setL(CHILDREN_SID, val);
+    public: inline void setChildrenSID (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(CHILDREN_SID, val, cif7field);
     }
     /** Sets Children SID from a string
      *  See V49.2 spec Section 9.8.2 for Children SID
      *  @param val The Children SID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setChildrenSIDString (string val) {
+    public: inline void setChildrenSIDString (string val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (val.size() == 0)
-        setChildrenSID(INT32_NULL);
+        setChildrenSID(INT32_NULL, cif7field);
       else
-        setChildrenSID(atoi(val.c_str()));
+        setChildrenSID(atoi(val.c_str()), cif7field);
     }
 
     /** Gets Parents SID
      *  See V49.2 spec Section 9.8.2 for Parents SID
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Parents SID (null if not specified)
      */
-    public: inline int32_t getParentsSID () const {
-      return getL(PARENTS_SID);
+    public: inline int32_t getParentsSID (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(PARENTS_SID, cif7field);
     }
     /** Gets Parents SID as a string
      *  See V49.2 spec Section 9.8.2 for Parents SID
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Parents SID (null if not specified)
      */
-    public: inline string getParentsSIDString () const {
-      int32_t streamID = getL(PARENTS_SID);
+    public: inline string getParentsSIDString (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t streamID = getL(PARENTS_SID, cif7field);
       return (isNull(streamID))? string("") : Utilities::format("%d", streamID);
     }
 
     /** Sets Parents SID
      *  See V49.2 spec Section 9.8.2 for Parents SID
      *  @param val The Parents SID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setParentsSID (int32_t val) {
-      setL(PARENTS_SID, val);
+    public: inline void setParentsSID (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(PARENTS_SID, val, cif7field);
     }
     /** Sets Parents SID from a string
      *  See V49.2 spec Section 9.8.2 for Parents SID
      *  @param val The Parents SID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setParentsSIDString (string val) {
+    public: inline void setParentsSIDString (string val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (val.size() == 0)
-        setParentsSID(INT32_NULL);
+        setParentsSID(INT32_NULL, cif7field);
       else
-        setParentsSID(atoi(val.c_str()));
+        setParentsSID(atoi(val.c_str()), cif7field);
     }
 
     /** Gets Siblings SID
      *  See V49.2 spec Section 9.8.2 for Siblings SID
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Siblings SID (null if not specified)
      */
-    public: inline int32_t getSiblingsSID () const {
-      return getL(SIBLINGS_SID);
+    public: inline int32_t getSiblingsSID (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(SIBLINGS_SID, cif7field);
     }
     /** Gets Siblings SID as a string
      *  See V49.2 spec Section 9.8.2 for Siblings SID
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Siblings SID (null if not specified)
      */
-    public: inline string getSiblingsSIDString () const {
-      int32_t streamID = getL(SIBLINGS_SID);
+    public: inline string getSiblingsSIDString (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t streamID = getL(SIBLINGS_SID, cif7field);
       return (isNull(streamID))? string("") : Utilities::format("%d", streamID);
     }
 
     /** Sets Siblings SID
      *  See V49.2 spec Section 9.8.2 for Siblings SID
      *  @param val The Siblings SID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setSiblingsSID (int32_t val) {
-      setL(SIBLINGS_SID, val);
+    public: inline void setSiblingsSID (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(SIBLINGS_SID, val, cif7field);
     }
     /** Sets Siblings SID from a string
      *  See V49.2 spec Section 9.8.2 for Siblings SID
      *  @param val The Siblings SID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setSiblingsSIDString (string val) {
+    public: inline void setSiblingsSIDString (string val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (val.size() == 0)
-        setSiblingsSID(INT32_NULL);
+        setSiblingsSID(INT32_NULL, cif7field);
       else
-        setSiblingsSID(atoi(val.c_str()));
+        setSiblingsSID(atoi(val.c_str()), cif7field);
     }
 
     /** Gets Cited SID
      *  See V49.2 spec Section 9.8.2 for Cited SID
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Cited SID (null if not specified)
      */
-    public: inline int32_t getCitedSID () const {
-      return getL(CITED_SID);
+    public: inline int32_t getCitedSID (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(CITED_SID, cif7field);
     }
     /** Gets Cited SID as a string
      *  See V49.2 spec Section 9.8.2 for Cited SID
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Cited SID (null if not specified)
      */
-    public: inline string getCitedSIDString () const {
-      int32_t streamID = getL(CITED_SID);
+    public: inline string getCitedSIDString (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t streamID = getL(CITED_SID, cif7field);
       return (isNull(streamID))? string("") : Utilities::format("%d", streamID);
     }
 
     /** Sets Cited SID
      *  See V49.2 spec Section 9.8.2 for Cited SID
      *  @param val The Cited SID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setCitedSID (int32_t val) {
-      setL(CITED_SID, val);
+    public: inline void setCitedSID (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(CITED_SID, val, cif7field);
     }
     /** Sets Cited SID from a string
      *  See V49.2 spec Section 9.8.2 for Cited SID
      *  @param val The Cited SID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setCitedSIDString (string val) {
+    public: inline void setCitedSIDString (string val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (val.size() == 0)
-        setCitedSID(INT32_NULL);
+        setCitedSID(INT32_NULL, cif7field);
       else
-        setCitedSID(atoi(val.c_str()));
+        setCitedSID(atoi(val.c_str()), cif7field);
     }
 
     // TODO - could provide additional helper functions for Country Code
 
     /** Gets Bind Indicator Field
      *  See V49.2 spec Section 9.8.1 for Bind Indicator Field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Bind field (null if not specified)
      */
-    public: inline int32_t getBindField () const {
-      return getL(BIND);
+    public: inline int32_t getBindField (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(BIND, cif7field);
     }
 
     /** Sets Bind Indicator Field
      *  See V49.2 spec Section 9.8.1 for Bind Indicator Field
      *  @param val The Bind field (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setBindField (int32_t val) {
-      setL(BIND, val);
+    public: inline void setBindField (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(BIND, val, cif7field);
     }
     /* XXX END OF CIF2 FUNCTIONS XXX */
 
@@ -4105,10 +4414,11 @@ namespace vrt {
      *  Network ID uses the Generic32 bit Identifier field
      *  See V49.2 spec Section 9.8.13 for Network ID
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Network ID (null if not specified)
      */
-    public: inline int32_t getNetworkID () const {
-      return getL(NETWORK_ID);
+    public: inline int32_t getNetworkID (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(NETWORK_ID, cif7field);
     }
 
     /** Sets Network ID
@@ -4117,9 +4427,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.8.13 for Network ID
      *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
      *  @param val The Network ID (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setNetworkID (int32_t val) {
-      setL(NETWORK_ID, val);
+    public: inline void setNetworkID (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(NETWORK_ID, val, cif7field);
     }
 
     /** Gets Tropospheric State
@@ -4127,10 +4438,11 @@ namespace vrt {
      *  Tropospheric State uses the Generic16 bit Identifier field
      *  See V49.2 spec Section 9.1.1 for Tropospheric State
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Tropospheric State (null if not specified)
      */
-    public: inline int16_t getTroposphericState () const {
-      int16_t bits = getI(TROPOSPHERIC_STATE, 2);
+    public: inline int16_t getTroposphericState (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(TROPOSPHERIC_STATE, 2, cif7field);
       return (isNull(bits))? INT16_NULL : bits;
     }
 
@@ -4140,9 +4452,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.9.1 for Tropospheric State
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @param val The Tropospheric State (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setTroposphericState (int16_t val) {
-      setI(TROPOSPHERIC_STATE, 2, val);
+    public: inline void setTroposphericState (int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setI(TROPOSPHERIC_STATE, 2, val, cif7field);
     }
 
     /** Gets Sea and Swell State
@@ -4156,10 +4469,11 @@ namespace vrt {
      *  Sea and Swell State uses the Generic16 bit Identifier field
      *  See V49.2 spec Section 9.9.1 for Sea and Swell State
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Sea and Swell State (null if not specified)
      */
-    public: inline int16_t getSeaAndSwellState () const {
-      int16_t bits = getI(SEA_AND_SWELL_STATE, 2);
+    public: inline int16_t getSeaAndSwellState (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(SEA_AND_SWELL_STATE, 2, cif7field);
       return (isNull(bits))? INT16_NULL : bits;
     }
 
@@ -4175,16 +4489,17 @@ namespace vrt {
      *  See V49.2 spec Section 9.9.1 for Sea and Swell State
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @param val The Sea and Swell State (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @throws VRTException if parameter contains invalid sea or swell values
      */
-    public: inline void setSeaAndSwellState (int16_t val) {
+    public: inline void setSeaAndSwellState (int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (!isNull(val)) {
         int8_t sea = val&0x1F;
         int8_t swell = (val>>5)&0x1F;
         if (sea < 0 || swell < 0 || sea > 9 || swell > 9)
           throw VRTException("Sea and Swell must both be between 0 and 9.");
       }
-      setI(SEA_AND_SWELL_STATE, 2, val);
+      setI(SEA_AND_SWELL_STATE, 2, val, cif7field);
     }
 
     // XXX could add set/getSeaState, set/getSwellState, set/getSeaAndSwellStateUserDefinedBits
@@ -4202,15 +4517,16 @@ namespace vrt {
      *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
      *  @param sea The Sea State [0 to 9], not null
      *  @param swell The Swell State [0  to 9], not null
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @throws VRTException if either parameter is invalid, including null
      */
-    public: inline void setSeaAndSwellState (int8_t sea, int8_t swell) {
+    public: inline void setSeaAndSwellState (int8_t sea, int8_t swell, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(sea) || isNull(swell))
         throw VRTException("Sea and Swell must both not be null to use this method.");
       if (sea < 0 || swell < 0 || sea > 9 || swell > 9)
         throw VRTException("Sea and Swell must both be between 0 and 9.");
       int16_t val = (swell<<5) | sea;
-      setI(SEA_AND_SWELL_STATE, 2, val);
+      setI(SEA_AND_SWELL_STATE, 2, val, cif7field);
     }
 
     /** Gets Barometric Pressure
@@ -4218,10 +4534,11 @@ namespace vrt {
      *  Bits 31..17: Reserved; 0x0
      *  Bits 16..0: 0x1FFFF=131071 Pascals; 0x00001=1/131071 Pascals
      *  See V49.2 spec Section 9.9.2 for Barometric Pressure
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Barometric Pressure (null if not specified)
      */
-    public: inline int32_t getBarometricPressure () const {
-      return getL(BAROMETRIC_PRESSURE);
+    public: inline int32_t getBarometricPressure (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(BAROMETRIC_PRESSURE, cif7field);
     }
 
     /** Sets Barometric Pressure
@@ -4230,11 +4547,12 @@ namespace vrt {
      *  Bits 16..0: 0x1FFFF=131071 Pascals; 0x00001=1/131071 Pascals
      *  See V49.2 spec Section 9.9.2 for Barometric Pressure
      *  @param val The Barometric Pressure (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setBarometricPressure (int32_t val) {
+    public: inline void setBarometricPressure (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (!isNull(val))
         val = val&0x1FFFF;
-      setL(BAROMETRIC_PRESSURE, val);
+      setL(BAROMETRIC_PRESSURE, val, cif7field);
     }
 
     /** Gets Humidity
@@ -4242,10 +4560,11 @@ namespace vrt {
      *  Bits 31..16: Reserved; 0x0
      *  Bits 15..0: Percent humidity. 0xFFFF=100%; 0x0001=(1/65535)*100%
      *  See V49.2 spec Section 9.9.2 for Humidity
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Humidity (null if not specified)
      */
-    public: inline int32_t getHumidity () const {
-      return getL(HUMIDITY);
+    public: inline int32_t getHumidity (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(HUMIDITY, cif7field);
     }
 
     /** Sets Humidity
@@ -4254,11 +4573,12 @@ namespace vrt {
      *  Bits 15..0: Percent humidity. 0xFFFF=100%; 0x0001=(1/65535)*100%
      *  See V49.2 spec Section 9.9.2 for Humidity
      *  @param val The Humidity (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setHumidity (int32_t val) {
+    public: inline void setHumidity (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (!isNull(val))
         val = val&0xFFFF;
-      setL(HUMIDITY, val);
+      setL(HUMIDITY, val, cif7field);
     }
 
     /** Gets the Sea/Ground Temperature.
@@ -4268,10 +4588,11 @@ namespace vrt {
      *  Bits 15..0: 16-bit floating point value with radix point to the right of
      *  bit 6.
      *  See V49.2 spec Section 9.9.2 for Sea/Ground Temperature
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Sea/Ground Temperature (null if not specified).
      */
-    public: inline float getSeaGroundTemperature () const {
-      int16_t bits = getI(SEA_GROUND_TEMP,2);
+    public: inline float getSeaGroundTemperature (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(SEA_GROUND_TEMP,2, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(6,bits);
     }
 
@@ -4283,10 +4604,11 @@ namespace vrt {
      *  bit 6.
      *  See V49.2 spec Section 9.9.2 for Sea/Ground Temperature
      *  @param val The Sea/Ground Temperature (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setSeaGroundTemperature (float val) {
+    public: inline void setSeaGroundTemperature (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int16_t bits = (isNull(val))? INT16_NULL : VRTMath::fromFloat16(6,val);
-      setI(SEA_GROUND_TEMP,2,bits);
+      setI(SEA_GROUND_TEMP,2,bits, cif7field);
     }
 
     /** Gets the Air Temperature.
@@ -4296,10 +4618,11 @@ namespace vrt {
      *  Bits 15..0: 16-bit floating point value with radix point to the right of
      *  bit 6.
      *  See V49.2 spec Section 9.9.2 for Air Temperature
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Air Temperature (null if not specified).
      */
-    public: inline float getAirTemperature () const {
-      int16_t bits = getI(AIR_TEMP,2);
+    public: inline float getAirTemperature (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(AIR_TEMP,2, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(6,bits);
     }
 
@@ -4311,20 +4634,22 @@ namespace vrt {
      *  bit 6.
      *  See V49.2 spec Section 9.9.2 for Air Temperature
      *  @param val The Air Temperature (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setAirTemperature (float val) {
+    public: inline void setAirTemperature (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       int16_t bits = (isNull(val))? INT16_NULL : VRTMath::fromFloat16(6,val);
-      setI(AIR_TEMP,2,bits);
+      setI(AIR_TEMP,2,bits, cif7field);
     }
 
     /** Gets Shelf Life
      *  The Shelf Life value and format depends on the packet timestamp format
      *  indicated by TSI and TSF fields of the Packet Prologue.
      *  See V49.2 spec Section 9.7.2 for Shelf Life
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Shelf Life (null if not specified)
      */
-    public: inline TimeStamp getShelfLife () const {
-      return getTimeStampField(SHELF_LIFE);
+    public: inline TimeStamp getShelfLife (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getTimeStampField(SHELF_LIFE, cif7field);
     }
 
     /** Sets Shelf Life
@@ -4332,19 +4657,21 @@ namespace vrt {
      *  indicated by TSI and TSF fields of the Packet Prologue.
      *  See V49.2 spec Section 9.7.2 for Shelf Life
      *  @param val The Shelf Life (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setShelfLife (const TimeStamp &val) {
-      setTimeStampField(SHELF_LIFE, val);
+    public: inline void setShelfLife (const TimeStamp &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setTimeStampField(SHELF_LIFE, val, cif7field);
     }
 
     /** Gets Age
      *  The Age value and format depends on the packet timestamp format
      *  indicated by TSI and TSF fields of the Packet Prologue.
      *  See V49.2 spec Section 9.7.2 for Age
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Age (null if not specified)
      */
-    public: inline TimeStamp getAge () const {
-      return getTimeStampField(AGE);
+    public: inline TimeStamp getAge (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getTimeStampField(AGE, cif7field);
     }
 
     /** Sets Age
@@ -4352,9 +4679,10 @@ namespace vrt {
      *  indicated by TSI and TSF fields of the Packet Prologue.
      *  See V49.2 spec Section 9.7.2 for Age
      *  @param val The Age (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setAge (const TimeStamp &val) {
-      setTimeStampField(AGE, val);
+    public: inline void setAge (const TimeStamp &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setTimeStampField(AGE, val, cif7field);
     }
 
     /** Gets Jitter
@@ -4364,10 +4692,11 @@ namespace vrt {
      *  significant bit represents 1 femtosecond (10e-15 seconds).
      *  See V49.2 spec Section 9.7.1 for Jitter
      *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Jitter (null if not specified)
      */
-    public: inline int64_t getJitter () const {
-      int64_t bits = getX(JITTER);
+    public: inline int64_t getJitter (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(JITTER, cif7field);
       return (isNull(bits))? INT64_NULL : bits;
     }
 
@@ -4379,9 +4708,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.7.1 for Jitter
      *  See V49.2 spec Section 9.7 for Fractional Time format
      *  @param val The Jitter (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setJitter (int64_t val) {
-      setX(JITTER,val);
+    public: inline void setJitter (int64_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setX(JITTER,val, cif7field);
     }
 
     /** Gets Dwell
@@ -4391,10 +4721,11 @@ namespace vrt {
      *  significant bit represents 1 femtosecond (10e-15 seconds).
      *  See V49.2 spec Section 9.7.1 for Dwell
      *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Dwell (null if not specified)
      */
-    public: inline int64_t getDwell () const {
-      int64_t bits = getX(DWELL);
+    public: inline int64_t getDwell (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(DWELL, cif7field);
       return (isNull(bits))? INT64_NULL : bits;
     }
 
@@ -4406,9 +4737,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.7.1 for Dwell
      *  See V49.2 spec Section 9.7 for Fractional Time format
      *  @param val The Dwell (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setDwell (int64_t val) {
-      setX(DWELL,val);
+    public: inline void setDwell (int64_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setX(DWELL,val, cif7field);
     }
 
     /** Gets Duration
@@ -4418,10 +4750,11 @@ namespace vrt {
      *  significant bit represents 1 femtosecond (10e-15 seconds).
      *  See V49.2 spec Section 9.7.1 for Duration
      *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Duration (null if not specified)
      */
-    public: inline int64_t getDuration () const {
-      int64_t bits = getX(DURATION);
+    public: inline int64_t getDuration (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(DURATION, cif7field);
       return (isNull(bits))? INT64_NULL : bits;
     }
 
@@ -4433,9 +4766,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.7.1 for Duration
      *  See V49.2 spec Section 9.7 for Fractional Time format
      *  @param val The Duration (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setDuration (int64_t val) {
-      setX(DURATION,val);
+    public: inline void setDuration (int64_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setX(DURATION,val, cif7field);
     }
 
     /** Gets Period
@@ -4444,10 +4778,11 @@ namespace vrt {
      *  significant bit represents 1 femtosecond (10e-15 seconds).
      *  See V49.2 spec Section 9.7.1 for Period
      *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Period (null if not specified)
      */
-    public: inline int64_t getPeriod () const {
-      int64_t bits = getX(PERIOD);
+    public: inline int64_t getPeriod (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(PERIOD, cif7field);
       return (isNull(bits))? INT64_NULL : bits;
     }
 
@@ -4458,9 +4793,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.7.1 for Period
      *  See V49.2 spec Section 9.7 for Fractional Time format
      *  @param val The Period (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setPeriod (int64_t val) {
-      setX(PERIOD,val);
+    public: inline void setPeriod (int64_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setX(PERIOD,val, cif7field);
     }
 
     /** Gets Pulse Width
@@ -4471,10 +4807,11 @@ namespace vrt {
      *  significant bit represents 1 femtosecond (10e-15 seconds).
      *  See V49.2 spec Section 9.7.1 for Pulse Width
      *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Pulse Width (null if not specified)
      */
-    public: inline int64_t getPulseWidth () const {
-      int64_t bits = getX(PULSE_WIDTH);
+    public: inline int64_t getPulseWidth (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(PULSE_WIDTH, cif7field);
       return (isNull(bits))? INT64_NULL : bits;
     }
 
@@ -4487,9 +4824,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.7.1 for Pulse Width
      *  See V49.2 spec Section 9.7 for Fractional Time format
      *  @param val The Pulse Width (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setPulseWidth (int64_t val) {
-      setX(PULSE_WIDTH,val);
+    public: inline void setPulseWidth (int64_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setX(PULSE_WIDTH,val, cif7field);
     }
 
     /** Gets Offset Time
@@ -4500,10 +4838,11 @@ namespace vrt {
      *  significant bit represents 1 femtosecond (10e-15 seconds).
      *  See V49.2 spec Section 9.7.1 for Offset Time
      *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Offset Time (null if not specified)
      */
-    public: inline int64_t getOffsetTime () const {
-      int64_t bits = getX(OFFSET_TIME);
+    public: inline int64_t getOffsetTime (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(OFFSET_TIME, cif7field);
       return (isNull(bits))? INT64_NULL : bits;
     }
 
@@ -4516,9 +4855,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.7.1 for Offset Time
      *  See V49.2 spec Section 9.7 for Fractional Time format
      *  @param val The Offset Time (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setOffsetTime (int64_t val) {
-      setX(OFFSET_TIME,val);
+    public: inline void setOffsetTime (int64_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setX(OFFSET_TIME,val, cif7field);
     }
 
     /** Gets Fall Time
@@ -4529,10 +4869,11 @@ namespace vrt {
      *  significant bit represents 1 femtosecond (10e-15 seconds).
      *  See V49.2 spec Section 9.7.1 for Fall Time
      *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Fall Time (null if not specified)
      */
-    public: inline int64_t getFallTime () const {
-      int64_t bits = getX(FALL_TIME);
+    public: inline int64_t getFallTime (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(FALL_TIME, cif7field);
       return (isNull(bits))? INT64_NULL : bits;
     }
 
@@ -4545,9 +4886,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.7.1 for Fall Time
      *  See V49.2 spec Section 9.7 for Fractional Time format
      *  @param val The Fall Time (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setFallTime (int64_t val) {
-      setX(FALL_TIME,val);
+    public: inline void setFallTime (int64_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setX(FALL_TIME,val, cif7field);
     }
 
     /** Gets Rise Time
@@ -4558,10 +4900,11 @@ namespace vrt {
      *  significant bit represents 1 femtosecond (10e-15 seconds).
      *  See V49.2 spec Section 9.7.1 for Rise Time
      *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Rise Time (null if not specified)
      */
-    public: inline int64_t getRiseTime () const {
-      int64_t bits = getX(RISE_TIME);
+    public: inline int64_t getRiseTime (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(RISE_TIME, cif7field);
       return (isNull(bits))? INT64_NULL : bits;
     }
 
@@ -4574,9 +4917,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.7.1 for Rise Time
      *  See V49.2 spec Section 9.7 for Fractional Time format
      *  @param val The Rise Time (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setRiseTime (int64_t val) {
-      setX(RISE_TIME,val);
+    public: inline void setRiseTime (int64_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setX(RISE_TIME,val, cif7field);
     }
 
     /** Gets Timestamp Skew
@@ -4586,10 +4930,11 @@ namespace vrt {
      *  significant bit represents 1 femtosecond (10e-15 seconds).
      *  See V49.2 spec Section 9.7.3.2 for Timestamp Skew
      *  See V49.2 spec Section 9.7 for Fractional Time format
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Timestamp Skew (null if not specified)
      */
-    public: inline int64_t getTimestampSkew () const {
-      int64_t bits = getX(TIMESTAMP_SKEW);
+    public: inline int64_t getTimestampSkew (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(TIMESTAMP_SKEW, cif7field);
       return (isNull(bits))? INT64_NULL : bits;
     }
 
@@ -4601,9 +4946,10 @@ namespace vrt {
      *  See V49.2 spec Section 9.7.3.2 for Timestamp Skew
      *  See V49.2 spec Section 9.7 for Fractional Time format
      *  @param val The Timestamp Skew (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setTimestampSkew (int64_t val) {
-      setX(TIMESTAMP_SKEW,val);
+    public: inline void setTimestampSkew (int64_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setX(TIMESTAMP_SKEW,val, cif7field);
     }
 
     // TODO - Could provide additional helpers for Timestamp Details field
@@ -4635,10 +4981,11 @@ namespace vrt {
      *                 field applies. When the TSE Code is set to Unspecified,
      *                 the value in the Timestamp Epoch field has no meaning.
      *  See V49.2 spec Section 9.7.3.4 for Timestamp Details
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Timestamp Details (null if not specified)
      */
-    public: inline int64_t getTimestampDetails () const {
-      int64_t bits = getX(TIMESTAMP_DETAILS);
+    public: inline int64_t getTimestampDetails (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int64_t bits = getX(TIMESTAMP_DETAILS, cif7field);
       return (isNull(bits))? INT64_NULL : bits;
     }
 
@@ -4670,17 +5017,100 @@ namespace vrt {
      *                 the value in the Timestamp Epoch field has no meaning.
      *  See V49.2 spec Section 9.7.3.4 for Timestamp Details
      *  @param val The Timestamp Details (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setTimestampDetails (int64_t val) {
+    public: inline void setTimestampDetails (int64_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (!isNull(val))
         val = val&0xFF07FFFFFFFFFFFF; // force reserved bits to 0
-      setX(TIMESTAMP_DETAILS,val);
+      setX(TIMESTAMP_DETAILS,val, cif7field);
     }
 
     /* XXX END OF CIF3 FUNCTIONS XXX */
 
     /* XXX START OF CIF7 FUNCTIONS XXX */
-    // TODO
+    public: inline void setCIF7Attribute (IndicatorFieldEnum_t cif7field, bool set, bool occurrence=false) {
+      if (getCIFNumber(cif7field) != 7) throw VRTException("setCIF7Attribute: Invalid CIF7 field");
+      int32_t cif7bit = getCIFBitMask(cif7field);
+      setCIF7Bit(cif7bit, set, occurrence);
+    }
+    protected: virtual void setCIF7Bit (int32_t cif7bit, bool set, bool occurrence=false) = 0;
+
+    // null if no cif7, true if cif7 and bit set, false if cif7 and bit not set
+    public: inline boolNull getCIF7Attribute (IndicatorFieldEnum_t cif7field, bool occurrence=false) const {
+      if (getCIFNumber(cif7field) != 7) throw VRTException("getCIF7Attribute: Invalid CIF7 field");
+      int32_t cif7bit = getCIFBitMask(cif7field);
+      return getCIF7Bit(cif7bit, occurrence);
+    }
+    protected: inline boolNull getCIF7Bit (int32_t cif7bit, bool occurrence=false) const {
+      return getContextIndicatorFieldBit(7 | (((int8_t)occurrence)<<3), cif7bit);
+    }
+
+    // TODO CIF7 (done)
+    /** Set CIF7 BELIEF Attribute of a field
+     *  Conveys a factor conveying the degree of confidence that the probability
+     *  is accurate.
+     *  Bits 31..8: Reserved (0x0)
+     *  Bits 7..0:  Belief %
+     *    0xFF = 100%
+     *    0x00 = 0%
+     *    0x01 = 1/255 of 100%
+     *  @param field IndicatorFieldEnum of target field
+     *  @param val BELIEF value
+     */
+    public: inline void setCIF7Belief(IndicatorFieldEnum_t field, int32_t val) {
+      if (!isNull(val)) val&=0x000000FF;
+      setL(field, val, BELIEF);
+    }
+    /** Get CIF7 BELIEF Attribute of a field
+     *  Conveys a factor conveying the degree of confidence that the probability
+     *  is accurate.
+     *  Bits 31..8: Reserved (0x0)
+     *  Bits 7..0:  Belief %
+     *    0xFF = 100%
+     *    0x00 = 0%
+     *    0x01 = 1/255 of 100%
+     *  @param  field IndicatorFieldEnum of target field
+     *  @return val BELIEF value
+     */
+    public: inline int32_t getCIF7Belief(IndicatorFieldEnum_t field) const {
+      return getL(field, BELIEF);
+    }
+    /** Set CIF7 PROBABILITY Attribute of a field
+     *  Conveys the probability of the selected field of being accurate or true.
+     *  Bits 31..16: Reserved (0x0)
+     *  Bits 15..8:  Probability Function
+     *    0x00 = Uniformed Distribution
+     *    0x01 = Normal Distribution
+     *    0x02 to 0xFF = User Defined
+     *  Bits 7..0:   Probability %
+     *    0xFF = 100%
+     *    0x00 = 0%
+     *    0x01 = 1/255 of 100%
+     *  @param field IndicatorFieldEnum of target field
+     *  @param val PROBABILITY value
+     */
+    public: inline void setCIF7Probability(IndicatorFieldEnum_t field, int32_t val) {
+      if (!isNull(val)) val&=0x0000FFFF;
+      setL(field, val, PROBABILITY);
+    }
+    /** Get CIF7 PROBABILITY Attribute of a field
+     *  Conveys the probability of the selected field of being accurate or true.
+     *  Bits 31..16: Reserved (0x0)
+     *  Bits 15..8:  Probability Function
+     *    0x00 = Uniformed Distribution
+     *    0x01 = Normal Distribution
+     *    0x02 to 0xFF = User Defined
+     *  Bits 7..0:   Probability %
+     *    0xFF = 100%
+     *    0x00 = 0%
+     *    0x01 = 1/255 of 100%
+     *  @param  field IndicatorFieldEnum of target field
+     *  @return val PROBABILITY value
+     */
+    public: inline int32_t getCIF7Probability(IndicatorFieldEnum_t field) const {
+      return getL(field, PROBABILITY);
+    }
+
     // BELIEF_mask                = 0x00080000; // 1 (See V49.2 spec Section 9.12 rules)
     // PROBABILITY_mask           = 0x00100000; // 1 (See V49.2 spec Section 9.12 rules)
     // THIRD_DERIVATIVE_mask      = 0x00200000; // same as field it describes

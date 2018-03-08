@@ -35,7 +35,7 @@
 <p>Specifies the payload format.  
 <a href="#_details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="BasicVRTPacket_8h_source.html">BasicVRTPacket.h</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="PayloadFormat_8h_source.html">PayloadFormat.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for vrt::PayloadFormat:</div>
 <div class="dynsection">
@@ -556,8 +556,6 @@ virtual bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>equals</b> (c
 
 <p><em>Internal Use Only:</em> Gets the bits. </p>
 
-<p>Referenced by <a class="el" href="BasicContextPacket_8h_source.html#l00499">vrt::BasicContextPacket::setDataPayloadFormat()</a>.</p>
-
 </div>
 </div>
 <a class="anchor" id="a9520705c20d666f07bf342b44bd8877e"></a><!-- doxytag: member="vrt::PayloadFormat::getChannelTagSize" ref="a9520705c20d666f07bf342b44bd8877e" args="() const " -->
@@ -598,7 +596,7 @@ virtual bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>equals</b> (c
 <p>Gets the data format used. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The format used. </dd></dl>
 
-<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l01388">isSigned()</a>.</p>
+<p>Referenced by <a class="el" href="PayloadFormat_8h_source.html#l00342">isSigned()</a>.</p>
 
 </div>
 </div>
@@ -640,7 +638,7 @@ virtual bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>equals</b> (c
 <p>Gets the data item size. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The data item size (0..63). </dd></dl>
 
-<p>Referenced by <a class="el" href="BasicDataPacket_8h_source.html#l00567">vrt::BasicDataPacket::getLostBytes()</a>.</p>
+<p>Referenced by <a class="el" href="BasicDataPacket_8h_source.html#l00568">vrt::BasicDataPacket::getLostBytes()</a>.</p>
 
 </div>
 </div>
@@ -849,7 +847,7 @@ virtual bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>equals</b> (c
 <p>Gets the real/complex type used. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The type used. </dd></dl>
 
-<p>Referenced by <a class="el" href="StandardDataPacket_8h_source.html#l00220">vrt::StandardDataPacket::getRealComplexType()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01381">isComplex()</a>.</p>
+<p>Referenced by <a class="el" href="StandardDataPacket_8h_source.html#l00220">vrt::StandardDataPacket::getRealComplexType()</a>, and <a class="el" href="PayloadFormat_8h_source.html#l00335">isComplex()</a>.</p>
 
 </div>
 </div>
@@ -892,7 +890,7 @@ virtual bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>equals</b> (c
 <p>This is identical to <a class="el" href="classvrt_1_1PayloadFormat.html#a085e18f724f6407135878715641f9ced">isValid()</a> except that a description of the error is returned. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd>"" if it is valid, a description of the error otherwise. </dd></dl>
 
-<p>Referenced by <a class="el" href="BasicVRTPacket_8h_source.html#l01302">isValid()</a>.</p>
+<p>Referenced by <a class="el" href="PayloadFormat_8h_source.html#l00256">isValid()</a>.</p>
 
 </div>
 </div>
@@ -936,7 +934,7 @@ virtual bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>equals</b> (c
 <p><em>Utility method:</em> Indicates if the payload format is complex. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd><code>true</code> if the data format is complex, <code>false</code> if it is real. </dd></dl>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l01346">getRealComplexType()</a>.</p>
+<p>References <a class="el" href="PayloadFormat_8h_source.html#l00300">getRealComplexType()</a>.</p>
 
 </div>
 </div>
@@ -1019,7 +1017,7 @@ virtual bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>equals</b> (c
 <p><em>Utility method:</em> Indicates if the payload format is signed. </p>
 <dl class="return"><dt><b>Returns:</b></dt><dd><code>true</code> if the data format is signed, <code>false</code> if it is unsigned. </dd></dl>
 
-<p>References <a class="el" href="BasicVRTPacket_8h_source.html#l01395">getDataItemFormat()</a>.</p>
+<p>References <a class="el" href="PayloadFormat_8h_source.html#l00349">getDataItemFormat()</a>.</p>
 
 </div>
 </div>
@@ -1498,10 +1496,10 @@ virtual bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>equals</b> (c
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>cpp_src/vrt/lib/<a class="el" href="BasicVRTPacket_8h_source.html">BasicVRTPacket.h</a></li>
+<li>cpp_src/vrt/lib/<a class="el" href="PayloadFormat_8h_source.html">PayloadFormat.h</a></li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 20 Nov 2017 for VRT by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 7 Mar 2018 for VRT by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

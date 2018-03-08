@@ -81,6 +81,7 @@ namespace vrt {
    */
   class BasicContextPacket : public virtual BasicVRTPacket, public IndicatorFieldProvider {
     //friend class BasicVRTState; // Unnecessary class not updated for V49.2 yet
+    using IndicatorFieldProvider::getOffset;
 
     //======================================================================
     // Constructors/Destructors
@@ -215,11 +216,12 @@ namespace vrt {
     /** Gets the specified bit from the State and Event Indicator field.
      *  @param enable    Bit position of the enable flag.
      *  @param indicator Bit position of the indicator flag.
+     *  @param cif7bit Bit position of the CIF7 indicator flag.
      *  @return null if field is not present, null if the enable bit is not set, true if the enable
      *          bit is set and the indicator bit is set, false if the enable bit is set but the
      *          indicator bit is not set.
      */
-    protected: virtual boolNull getStateEventBit (int32_t enable, int32_t indicator) const;
+    protected: virtual boolNull getStateEventBit (int32_t enable, int32_t indicator, int32_t cif7bit) const;
 
     /** Sets the specified bit of the State and Event Indicator field.
      *  @param enable    Bit position of the enable flag.
@@ -227,8 +229,9 @@ namespace vrt {
      *  @param value     The value of the bits: null if the enable bit should not be set, true if
      *                   the enable bit and the indicator bit should be set, false if the enable bit
      *                   should be set but the indicator bit should not be set.
+     *  @param cif7bit Bit position of the CIF7 indicator flag.
      */
-    protected: virtual void setStateEventBit (int32_t enable, int32_t indicator, boolNull value);
+    protected: virtual void setStateEventBit (int32_t enable, int32_t indicator, boolNull value, int32_t cif7bit);
 
     /** Gets the offset for the given context indicator field relative to the location of the first
      *  occurrence of CIF0. CIF7 is considered an invalid CIF number.
@@ -245,60 +248,70 @@ namespace vrt {
      *  Offset is from the start of a field of size specified.
      *  @param attr CIF7 attribute bitmask
      *  @param len Length of the field
+     *  @param occurrence False (0) if first occurrence (default; almost everything),
+     *                    True (1) if second occurrence (only Errors for BasicAcknowledgePacket)
      *  @return Offset from start of field
      */
-    protected: virtual int32_t getCif7Offset (int32_t attr, int32_t len) const;
+    protected: virtual int32_t getCIF7Offset (int32_t attr, int32_t len, bool occurrence=0) const;
+
+    /** Gets the total size of the field, including all CIF7 attributes
+     *  @param  fieldLen Length of the field w/o including CIF7 attributes
+     *  @param  occurrence False (0) if first occurrence (default; almost everything),
+     *                     True (1) if second occurrence (only Errors for BasicAcknowledgePacket)
+     *  @return Length of the field including CIF7 attributes
+     */
+    protected: virtual int32_t getTotalFieldSize (int32_t fieldLen, bool occurrence=0) const;
 
     /** Gets the length of the given field when present (-1 if variable, -2 if not found).
      *  @param cifNum number of CIF that field belongs to.
      *  @param field bitmask associated with field of interest.
+     *  @param parent length of parent field
      *  @return size of field of interest in bytes.
      *  @throws VRTException If the CIF number is invalid.
      */
-    // TODO - do CIF7 attributes affect this function?
-    protected: virtual int32_t getFieldLen (int8_t cifNum, int32_t field) const;
+    protected: virtual int32_t getFieldLen (int8_t cifNum, int32_t field, int32_t parent=0) const;
 
     /** Unpacks a 16-bit integer from the payload at the indicated position. */
-    protected: virtual int8_t getB (int8_t cifNum, int32_t bit, int32_t xoff) const;
+    protected: virtual int8_t getB (int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const;
 
     /** Packs a 16-bit integer from the payload at the indicated position. */
-    protected: virtual void setB (int8_t cifNum, int32_t bit, int32_t xoff, int8_t val);
+    protected: virtual void setB (int8_t cifNum, int32_t bit, int32_t xoff, int8_t val, int32_t cif7bit);
 
     /** Unpacks a 16-bit integer from the payload at the indicated position. */
-    protected: virtual int16_t getI (int8_t cifNum, int32_t bit, int32_t xoff) const;
+    protected: virtual int16_t getI (int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const;
 
     /** Packs a 16-bit integer from the payload at the indicated position. */
-    protected: virtual void setI (int8_t cifNum, int32_t bit, int32_t xoff, int16_t val);
+    protected: virtual void setI (int8_t cifNum, int32_t bit, int32_t xoff, int16_t val, int32_t cif7bit);
 
     /** Unpacks a 32-bit integer from the payload at the indicated position. */
-    protected: virtual int32_t getL (int8_t cifNum, int32_t bit) const;
+    protected: virtual int32_t getL (int8_t cifNum, int32_t bit, int32_t cif7bit) const;
 
     /** Unpacks a 32-bit integer from the payload at the indicated position. */
-    protected: virtual int32_t getL24 (int8_t cifNum, int32_t bit, int32_t offset) const;
+    protected: virtual int32_t getL24 (int8_t cifNum, int32_t bit, int32_t offset, int32_t cif7bit) const;
 
     /** Packs a 32-bit integer from the payload at the indicated position. */
-    protected: virtual void setL (int8_t cifNum, int32_t bit, int32_t val);
+    protected: virtual void setL (int8_t cifNum, int32_t bit, int32_t val, int32_t cif7bit);
 
     /** Unpacks a 64-bit integer from the payload at the indicated position. */
-    protected: virtual int64_t getX (int8_t cifNum, int32_t bit) const;
+    protected: virtual int64_t getX (int8_t cifNum, int32_t bit, int32_t cif7bit) const;
 
     /** Packs a 64-bit integer from the payload at the indicated position. */
-    protected: virtual void setX (int8_t cifNum, int32_t bit, int64_t val);
+    protected: virtual void setX (int8_t cifNum, int32_t bit, int64_t val, int32_t cif7bit);
 
     /** Unpacks a 128-bit UUID from the payload at the indicated position. */
-    protected: virtual UUID getUUID (int8_t cifNum, int32_t bit) const;
+    protected: virtual UUID getUUID (int8_t cifNum, int32_t bit, int32_t cif7bit) const;
 
     /** Packs a 128-bit UUID from the payload at the indicated position. */
-    protected: virtual void setUUID (int8_t cifNum, int32_t bit, const UUID &val);
+    protected: virtual void setUUID (int8_t cifNum, int32_t bit, const UUID &val, int32_t cif7bit);
 
     /** Unpacks a TimeStamp from the payload at the indicated position. */
-    protected: virtual TimeStamp getTimeStampField (int8_t cifNum, int32_t bit) const;
+    protected: virtual TimeStamp getTimeStampField (int8_t cifNum, int32_t bit, int32_t cif7bit) const;
 
     /** Packs a TimeStamp from the payload at the indicated position. */
-    protected: virtual void setTimeStampField (int8_t cifNum, int32_t bit, const TimeStamp &val);
+    protected: virtual void setTimeStampField (int8_t cifNum, int32_t bit, const TimeStamp &val, int32_t cif7bit);
 
     /** Gets a block of data. */
-    protected: virtual void setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen);
+    protected: virtual void setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen, int32_t cif7bit);
 
     /** Gets the header type, used with getOffset(..) and OFFSET_TABLE. */
     protected: virtual int32_t getContextIndicatorField0 (bool occurrence=0) const {
@@ -307,19 +320,19 @@ namespace vrt {
     }
     protected: virtual int32_t getContextIndicatorField1 (bool occurrence=0) const {
       UNUSED_VARIABLE(occurrence);
-      if (!isCIF1Enable()) return INT32_NULL;
+      if (!isCIF1Enable()) return 0;
       return VRTMath::unpackInt(bbuf, getPrologueLength()+4);
     }
     protected: virtual int32_t getContextIndicatorField2 (bool occurrence=0) const {
       UNUSED_VARIABLE(occurrence);
-      if (!isCIF2Enable()) return INT32_NULL;
+      if (!isCIF2Enable()) return 0;
       int32_t off = 0;
       if (isCIF1Enable()) off+=4;
       return VRTMath::unpackInt(bbuf, getPrologueLength()+4+off);
     }
     protected: virtual int32_t getContextIndicatorField3 (bool occurrence=0) const {
       UNUSED_VARIABLE(occurrence);
-      if (!isCIF3Enable()) return INT32_NULL;
+      if (!isCIF3Enable()) return 0;
       int32_t off = 0;
       if (isCIF1Enable()) off+=4;
       if (isCIF2Enable()) off+=4;
@@ -327,7 +340,7 @@ namespace vrt {
     }
     protected: virtual int32_t getContextIndicatorField7 (bool occurrence=0) const {
       UNUSED_VARIABLE(occurrence);
-      if (!isCIF7Enable()) return INT32_NULL;
+      if (!isCIF7Enable()) return 0;
       int32_t off = 0;
       if (isCIF1Enable()) off+=4;
       if (isCIF2Enable()) off+=4;
@@ -351,6 +364,8 @@ namespace vrt {
     public: virtual void addCIF3 (bool add=true, bool occurrence=false);
     public: virtual void addCIF7 (bool add=true, bool occurrence=false);
 
+    protected: virtual void setCIF7Bit (int32_t cif7bit, bool set, bool occurrence=false);
+
     /** Functions that require pack/unpack functions from BasicVRTPacket **/
 
 // XXX Commented out in favor of those below
@@ -371,16 +386,16 @@ namespace vrt {
 //    }
 
     /** Used for unpacking geolocation records. */
-    protected: inline Geolocation getGeolocation (int8_t cifNum, int32_t field) const {
-      int32_t     off = getOffset(cifNum, field);
+    protected: inline Geolocation getGeolocation (int8_t cifNum, int32_t field, int32_t cif7bit) const {
+      int32_t off = getOffset(cifNum, field, cif7bit);
       Geolocation val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
     }
 
     /** Used for unpacking ephemeris records. */
-    protected: inline Ephemeris getEphemeris (int8_t cifNum, int32_t field) const {
-      int32_t     off = getOffset(cifNum, field);
+    protected: inline Ephemeris getEphemeris (int8_t cifNum, int32_t field, int32_t cif7bit) const {
+      int32_t off = getOffset(cifNum, field, cif7bit);
       Ephemeris val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
@@ -391,12 +406,13 @@ namespace vrt {
      *  variety in GPS "sentences", this class makes little effort to do anything useful with them.
      *  Users are encouraged to use {@link #getGeolocationGPS()} which essentially provides the same
      *  information, but in a consistent form.</i>
+     *  @param  cif7field Indicator field for the CIF7 attribute.
      *  @return The geolocation information (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: inline GeoSentences getGeoSentences () const {
-      //int32_t      off = IndicatorFieldProvider::getOffset(GPS_ASCII);
-      int32_t      off = getOffset(0, protected_CIF0::GPS_ASCII_mask);
+    public: inline GeoSentences getGeoSentences (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      int32_t off = getOffset(0, protected_CIF0::GPS_ASCII_mask, cif7bit);
       GeoSentences val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
@@ -404,48 +420,52 @@ namespace vrt {
 
     /** Gets the Context Association Lists. These lists indicate the other context/data
      *  streams associated with this one.
+     *  @param  cif7field Indicator field for the CIF7 attribute.
      *  @return The context association lists (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: inline ContextAssocLists getContextAssocLists () const {
-      //int32_t           off = IndicatorFieldProvider::getOffset(CONTEXT_ASOC);
-      int32_t           off = getOffset(0, protected_CIF0::CONTEXT_ASOC_mask);
+    public: inline ContextAssocLists getContextAssocLists (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      int32_t off = getOffset(0, protected_CIF0::CONTEXT_ASOC_mask, cif7bit);
       ContextAssocLists val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
     }
 
     /** Gets the Index Field List.
+     *  @param  cif7field Indicator field for the CIF7 attribute.
      *  @return The Index Field List (null if not specified). <i>Note that changes to the
      *          returned object do not alter the packet.</i>
      */
-    public: inline IndexFieldList getIndexList () const {
-      //int32_t           off = IndicatorFieldProvider::getOffset(INDEX_LIST);
-      int32_t           off = getOffset(1, protected_CIF1::INDEX_LIST_mask);
+    public: inline IndexFieldList getIndexList (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      int32_t off = getOffset(1, protected_CIF1::INDEX_LIST_mask, cif7bit);
       IndexFieldList val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
     }
 
     /** Gets the Sector Scan/Step Field. 
+     *  @param  cif7field Indicator field for the CIF7 attribute.
      *  @return The Sector Scan/Step Array-of-Records (null if not specified).
      *  <i>Note that changes to the returned object do not alter the packet.</i>
      */
-    public: virtual ArrayOfRecords getSectorScanStep () const {
-      //int32_t           off = IndicatorFieldProvider::getOffset(SECTOR_SCN_STP);
-      int32_t           off = getOffset(1, protected_CIF1::SECTOR_SCN_STP_mask);
+    public: virtual ArrayOfRecords getSectorScanStep (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      int32_t off = getOffset(1, protected_CIF1::SECTOR_SCN_STP_mask, cif7bit);
       ArrayOfRecords val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
     }
 
     /** Gets the CIFs Array
+     *  @param  cif7field Indicator field for the CIF7 attribute.
      *  @return The CIFs Array as an Array-of-Records (null if not specified).
      *  <i>Note that changes to the returned object do not alter the packet.</i>
      */
-    public: virtual ArrayOfRecords getCIFsArray () const {
-      //int32_t           off = IndicatorFieldProvider::getOffset(CIFS_ARRAY);
-      int32_t           off = getOffset(1, protected_CIF1::CIFS_ARRAY_mask);
+    public: virtual ArrayOfRecords getCIFsArray (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      int32_t off = getOffset(1, protected_CIF1::CIFS_ARRAY_mask, cif7bit);
       ArrayOfRecords val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
@@ -454,24 +474,26 @@ namespace vrt {
     /** Gets the Spectrum Field 
      *  SpectrumField type
      *  (See V49.2 spec Section 9.6.1)
+     *  @param  cif7field Indicator field for the CIF7 attribute.
      *  @return The Spectrum Field (null if not specified).
      *  <i>Note that changes to the returned object do not alter the packet.</i>
      */
-    public: virtual SpectrumField getSpectrumField () const {
-      //int32_t           off = IndicatorFieldProvider::getOffset(SPECTRUM);
-      int32_t           off = getOffset(1, protected_CIF1::SPECTRUM_mask);
+    public: virtual SpectrumField getSpectrumField (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      int32_t off = getOffset(1, protected_CIF1::SPECTRUM_mask, cif7bit);
       SpectrumField val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
     }
 
     /** Gets the 2D Pointing Angle (Structured)
+     *  @param  cif7field Indicator field for the CIF7 attribute.
      *  @return 2D Pointing Angle as an Array-of-Records (null if not specified).
      *  <i>Note that changes to the returned object do not alter the packet.</i>
      */
-    public: virtual ArrayOfRecords get2DPointingAngleStructured () const {
-      //int32_t           off = IndicatorFieldProvider::getOffset(PNT_ANGL_2D_ST);
-      int32_t           off = getOffset(1, protected_CIF1::PNT_ANGL_2D_ST_mask);
+    public: virtual ArrayOfRecords get2DPointingAngleStructured (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      int32_t off = getOffset(1, protected_CIF1::PNT_ANGL_2D_ST_mask, cif7bit);
       ArrayOfRecords val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;
@@ -481,25 +503,26 @@ namespace vrt {
 
     /** Gets the Data Packet Payload Format. This specifies the format of the data in the
      *  paired data packet stream.
+     *  @param  cif7field Indicator field for the CIF7 attribute.
      *  @return The payload format (null if not specified). <i>Note that changes to the returned
      *          object do not alter the packet.</i>
      */
-    public: inline PayloadFormat getDataPayloadFormat () const {
+    public: virtual PayloadFormat getDataPayloadFormat (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
       // INT64_NULL (0x8000000000000000) is actually a valid PayloadFormat bit arrangement, so we
       // can't use the normal isNull(bits) check. This isn't an issue in Java where null is
       // not equal to a legal 64-bit integer value.
-      return (getOffset(0, protected_CIF0::DATA_FORMAT_mask) < 0)? PayloadFormat() // NULL
-                                                                 : PayloadFormat(getX(0, protected_CIF0::DATA_FORMAT_mask));
+      int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
+      int32_t off = getOffset(0, protected_CIF0::DATA_FORMAT_mask, cif7bit);
+      return (off < 0)? PayloadFormat() // NULL
+                      : PayloadFormat(getX(0, protected_CIF0::DATA_FORMAT_mask, cif7bit));
     }
 
     /** Sets the Data Packet Payload Format. This specifies the format of the data in the
      *  paired data packet stream.
      *  @param val The payload format (null if not specified). 
+     *  @param  cif7field Indicator field for the CIF7 attribute.
      */
-    public: inline void setDataPayloadFormat (const PayloadFormat &val) {
-      setX(0, protected_CIF0::DATA_FORMAT_mask, val.getBits());
-    }
-
+    public: virtual void setDataPayloadFormat (const PayloadFormat &val, IndicatorFieldEnum_t cif7field=CIF_NULL);
 
 // XXX - Commented out because I don't see how they're useful... or even make sense. What are they doing?
 //    /** <!-- Gets the Data Packet Payload Format. This specifies the format of the data in the
