@@ -29,8 +29,8 @@
 %define _infodir       %{_prefix}/info
 
 Name:           rh.VITA49
-Version:        4.0.0
-Release:        4%{?dist}
+Version:        4.1.0
+Release:        1%{?dist}
 Summary:        REDHAWK shared library %{name}
 
 Group:          REDHAWK/Shared Libraries
