@@ -17,7 +17,7 @@ You should have received a copy of the GNU Lesser General Public License along w
 program.  If not, see http://www.gnu.org/licenses/.
 -->
 <!DOCTYPE softpkg PUBLIC "-//JTRS//DTD SCA V2.2.2 SPD//EN" "softpkg.dtd">
-<softpkg id="DCE:3c3a810d-9b73-40a9-9e91-840da1f5ca40" name="rh.VITA49" type="2.0.0" version="4.1.0">
+<softpkg id="DCE:3c3a810d-9b73-40a9-9e91-840da1f5ca40" name="rh.VITA49" type="2.0.0" version="5.0.0">
   <author/>
   <description>This is the REDHAWK VITA49 shared library.</description>
   <implementation id="cpp">

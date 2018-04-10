@@ -29,7 +29,7 @@
 %define _infodir       %{_prefix}/info
 
 Name:           rh.VITA49
-Version:        4.1.0
+Version:        5.0.0
 Release:        1%{?dist}
 Summary:        REDHAWK shared library %{name}
 
@@ -43,7 +43,7 @@ Obsoletes:      redhawk-libVITA49_v1 < 3.0.0
 
 
 %description
-REDHAWK shared library %{name}. VITA49 packet processing library for REDHAWK. Uses VITA49 Library version 2759.
+REDHAWK shared library %{name}. VITA 49 packet processing library for REDHAWK (uses VRT Library).
  * Commit: __REVISION__
  * Source Date/Time: __DATETIME__
 
