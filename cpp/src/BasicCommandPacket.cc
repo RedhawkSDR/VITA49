@@ -71,7 +71,7 @@ static inline int32_t bitCount (int32_t val) {
  */
 static inline vector<char> BasicCommandPacket_createDefaultPacket () {
   vector<char> buf(BasicVRTPacket::MAX_PROLOGUE_LENGTH + 4);
-  buf[0]  = 0x68; // Control w/ CID, not StaleTs, not Cancel
+  buf[0]  = 0x68; // Control w/ CID, not Cancel
   buf[1]  = 0x60; // TSI: UTC, TSF: Real-Time (ps) fractional timestamp, packet count =0
   buf[2]  = 0x00; // 
   buf[3]  = 0x12; // Packet size = 18 (full header, full psp, +1 for CIF0)
@@ -231,14 +231,6 @@ void BasicCommandPacket::setControllerFormat (bool set) {
   setCtrlAckSettingsBit(CONTROL_IR_BIT, set);
 }
 
-//Control-A
-bool BasicCommandPacket::getActionFlag () const {
-  return getCtrlAckSettingsBit(CONTROL_A_BIT);
-}
-void BasicCommandPacket::setActionFlag (bool set) {
-  setCtrlAckSettingsBit(CONTROL_A_BIT, set);
-}
-
 //Control-P
 bool BasicCommandPacket::isPartialChangePermitted() const {
   return getCtrlAckSettingsBit(CONTROL_P_BIT);
@@ -263,6 +255,58 @@ void BasicCommandPacket::setErrorsPermitted (bool set) {
   setCtrlAckSettingsBit(CONTROL_E_BIT, set);
 }
 
+//Control-A1..A0
+// 00: no action; no fields (no payload?)
+// 01: dry run
+// 10: take action
+// 11: reserved
+bool BasicCommandPacket::getAction1Flag () const {
+  return getCtrlAckSettingsBit(CONTROL_A1_BIT);
+}
+void BasicCommandPacket::setAction1Flag (bool set) {
+  setCtrlAckSettingsBit(CONTROL_A1_BIT, set);
+}
+bool BasicCommandPacket::getAction0Flag () const {
+  return getCtrlAckSettingsBit(CONTROL_A0_BIT);
+}
+void BasicCommandPacket::setAction0Flag (bool set) {
+  setCtrlAckSettingsBit(CONTROL_A0_BIT, set);
+}
+int8_t BasicCommandPacket::getAction () const {
+  int8_t action = getCtrlAckSettingsBit(CONTROL_A0_BIT) ? 1 : 0;
+  if (getCtrlAckSettingsBit(CONTROL_A1_BIT)) action+=2;
+  return action;
+}
+void BasicCommandPacket::setAction (int8_t action) {
+  switch(action) {
+  case 0:  setActionNoAction(); break;
+  case 1:  setActionDryRun(); break;
+  case 2:  setActionTakeAction(); break;
+  default: throw VRTException("Tried to set invalid action to command packet PSP");
+  }
+}
+bool BasicCommandPacket::isActionNoAction () const {
+  return (getAction()==0);
+}
+void BasicCommandPacket::setActionNoAction () {
+  setCtrlAckSettingsBit(CONTROL_A1_BIT, 0);
+  setCtrlAckSettingsBit(CONTROL_A0_BIT, 0);
+}
+bool BasicCommandPacket::isActionDryRun () const {
+  return (getAction()==1);
+}
+void BasicCommandPacket::setActionDryRun () {
+  setCtrlAckSettingsBit(CONTROL_A1_BIT, 0);
+  setCtrlAckSettingsBit(CONTROL_A0_BIT, 1);
+}
+bool BasicCommandPacket::isActionTakeAction () const {
+  return (getAction()==2);
+}
+void BasicCommandPacket::setActionTakeAction () {
+  setCtrlAckSettingsBit(CONTROL_A1_BIT, 1);
+  setCtrlAckSettingsBit(CONTROL_A0_BIT, 0);
+}
+
 //Control-NK
 bool BasicCommandPacket::getNotAckOnly() const {
   return getCtrlAckSettingsBit(CONTROL_NK_BIT);
@@ -271,36 +315,85 @@ void BasicCommandPacket::setNotAckOnly (bool set) {
   setCtrlAckSettingsBit(CONTROL_NK_BIT, set);
 }
 
-//Control-QV
+//Control/Ack-V
 bool BasicCommandPacket::getRequestValidationAcknowledge() const {
-  return getCtrlAckSettingsBit(CONTROL_QV_BIT);
+  return getCtrlAckSettingsBit(CTRLACK_V_BIT);
 }
 void BasicCommandPacket::setRequestValidationAcknowledge (bool set) {
-  setCtrlAckSettingsBit(CONTROL_QV_BIT, set);
+  setCtrlAckSettingsBit(CTRLACK_V_BIT, set);
 }
 
-//Control-QX
+//Control/Ack-X
 bool BasicCommandPacket::getRequestExecutionAcknowledge() const {
-  return getCtrlAckSettingsBit(CONTROL_QX_BIT);
+  return getCtrlAckSettingsBit(CTRLACK_X_BIT);
 }
 void BasicCommandPacket::setRequestExecutionAcknowledge (bool set) {
-  setCtrlAckSettingsBit(CONTROL_QX_BIT, set);
+  setCtrlAckSettingsBit(CTRLACK_X_BIT, set);
 }
 
-//Control-QS
+//Control/Ack-S
 bool BasicCommandPacket::getRequestQueryAcknowledge() const {
-  return getCtrlAckSettingsBit(CONTROL_QS_BIT);
+  return getCtrlAckSettingsBit(CTRLACK_S_BIT);
 }
 void BasicCommandPacket::setRequestQueryAcknowledge (bool set) {
-  setCtrlAckSettingsBit(CONTROL_QS_BIT, set);
+  setCtrlAckSettingsBit(CTRLACK_S_BIT, set);
 }
 
-//Acknowledge-SX
-bool BasicCommandPacket::getActionExecuted() const {
-  return getCtrlAckSettingsBit(ACK_SX_BIT);
+//Acknowledge-W
+bool BasicCommandPacket::getWarningsGenerated() const {
+  return getCtrlAckSettingsBit(CTRLACK_W_BIT);
 }
-void BasicCommandPacket::setActionExecuted (bool set) {
-  setCtrlAckSettingsBit(ACK_SX_BIT, set);
+void BasicCommandPacket::setWarningsGenerated (bool set) {
+  setCtrlAckSettingsBit(CTRLACK_W_BIT, set);
+}
+
+//Acknowledge-E
+bool BasicCommandPacket::getErrorsGenerated() const {
+  return getCtrlAckSettingsBit(CTRLACK_E_BIT);
+}
+void BasicCommandPacket::setErrorsGenerated (bool set) {
+  setCtrlAckSettingsBit(CTRLACK_E_BIT, set);
+}
+
+//Control/Ack-T2,T1,T0
+// 000: Ignore timestamp
+// 001: Only specified
+// 010: Late and specified
+// 011: Early and specified
+// 100: Permitted early/late
+// 101: Reserved
+// 11X: Reserved
+bool BasicCommandPacket::getTimestampControl2Bit() const {
+  return getCtrlAckSettingsBit(CTRLACK_T2_BIT);
+}
+void BasicCommandPacket::setTimestampControl2Bit (bool set) {
+  setCtrlAckSettingsBit(CTRLACK_T2_BIT, set);
+}
+bool BasicCommandPacket::getTimestampControl1Bit() const {
+  return getCtrlAckSettingsBit(CTRLACK_T1_BIT);
+}
+void BasicCommandPacket::setTimestampControl1Bit (bool set) {
+  setCtrlAckSettingsBit(CTRLACK_T1_BIT, set);
+}
+bool BasicCommandPacket::getTimestampControl0Bit() const {
+  return getCtrlAckSettingsBit(CTRLACK_T0_BIT);
+}
+void BasicCommandPacket::setTimestampControl0Bit (bool set) {
+  setCtrlAckSettingsBit(CTRLACK_T0_BIT, set);
+}
+int8_t BasicCommandPacket::getTimestampControlMode() const {
+  int8_t mode = getCtrlAckSettingsBit(CTRLACK_T0_BIT) ? 1 : 0;
+  if (getCtrlAckSettingsBit(CTRLACK_T1_BIT)) mode+=2;
+  if (getCtrlAckSettingsBit(CTRLACK_T2_BIT)) mode+=4;
+  return mode;
+}
+void BasicCommandPacket::setTimestampControlMode (int8_t mode) {
+  if ((mode&0x1)!=0) setCtrlAckSettingsBit(CTRLACK_T0_BIT, 1);
+  else setCtrlAckSettingsBit(CTRLACK_T0_BIT, 0);
+  if ((mode&0x2)!=0) setCtrlAckSettingsBit(CTRLACK_T1_BIT, 1);
+  else setCtrlAckSettingsBit(CTRLACK_T1_BIT, 0);
+  if ((mode&0x4)!=0) setCtrlAckSettingsBit(CTRLACK_T2_BIT, 1);
+  else setCtrlAckSettingsBit(CTRLACK_T2_BIT, 0);
 }
 
 //Acknowledge-P
@@ -311,20 +404,12 @@ void BasicCommandPacket::setPartialAction (bool set) {
   setCtrlAckSettingsBit(ACK_P_BIT, set);
 }
 
-//Acknowledge-W
-bool BasicCommandPacket::getWarningsGenerated() const {
-  return getCtrlAckSettingsBit(ACK_W_BIT);
+//Acknowledge-SX
+bool BasicCommandPacket::getActionExecuted() const {
+  return getCtrlAckSettingsBit(ACK_SX_BIT);
 }
-void BasicCommandPacket::setWarningsGenerated (bool set) {
-  setCtrlAckSettingsBit(ACK_W_BIT, set);
-}
-
-//Acknowledge-E
-bool BasicCommandPacket::getErrorsGenerated() const {
-  return getCtrlAckSettingsBit(ACK_E_BIT);
-}
-void BasicCommandPacket::setErrorsGenerated (bool set) {
-  setCtrlAckSettingsBit(ACK_E_BIT, set);
+void BasicCommandPacket::setActionExecuted (bool set) {
+  setCtrlAckSettingsBit(ACK_SX_BIT, set);
 }
 
 // Message ID - 32Bit Number

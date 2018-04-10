@@ -39,34 +39,34 @@ namespace vrt {
     static const int32_t CONTROL_IE_BIT  = 0x40000000; // Bit 30
     static const int32_t CONTROL_CR_BIT  = 0x20000000; // Bit 29
     static const int32_t CONTROL_IR_BIT  = 0x10000000; // Bit 28
-    static const int32_t CONTROL_A_BIT   = 0x08000000; // Bit 27
-    static const int32_t CONTROL_P_BIT   = 0x04000000; // Bit 26
-    static const int32_t CONTROL_W_BIT   = 0x02000000; // Bit 25
-    static const int32_t CONTROL_E_BIT   = 0x01000000; // Bit 24
-    static const int32_t CONTROL_NK_BIT  = 0x00800000; // Bit 23
-    static const int32_t CONTROL_QV_BIT  = 0x00400000; // Bit 22
-    static const int32_t CONTROL_QX_BIT  = 0x00200000; // Bit 21
-    static const int32_t CONTROL_QS_BIT  = 0x00100000; // Bit 20
-    static const int32_t ACK_SX_BIT      = 0x00080000; // Bit 19
-    static const int32_t ACK_P_BIT       = 0x00040000; // Bit 18
-    static const int32_t ACK_W_BIT       = 0x00020000; // Bit 17
-    static const int32_t ACK_E_BIT       = 0x00010000; // Bit 16
-    static const int32_t PSP_RESERVED_15 = 0x00008000; // Bits 0..15 are reserved
-    static const int32_t PSP_RESERVED_14 = 0x00004000; // Bits 0..15 are reserved
-    static const int32_t PSP_RESERVED_13 = 0x00002000; // Bits 0..15 are reserved
-    static const int32_t PSP_RESERVED_12 = 0x00001000; // Bits 0..15 are reserved
-    static const int32_t PSP_RESERVED_11 = 0x00000800; // Bits 0..15 are reserved
-    static const int32_t PSP_RESERVED_10 = 0x00000400; // Bits 0..15 are reserved
-    static const int32_t PSP_RESERVED_9  = 0x00000200; // Bits 0..15 are reserved
-    static const int32_t PSP_RESERVED_8  = 0x00000100; // Bits 0..15 are reserved
-    static const int32_t PSP_RESERVED_7  = 0x00000080; // Bits 0..15 are reserved
-    static const int32_t PSP_RESERVED_6  = 0x00000040; // Bits 0..15 are reserved
-    static const int32_t PSP_RESERVED_5  = 0x00000020; // Bits 0..15 are reserved
-    static const int32_t PSP_RESERVED_4  = 0x00000010; // Bits 0..15 are reserved
-    static const int32_t PSP_RESERVED_3  = 0x00000008; // Bits 0..15 are reserved
-    static const int32_t PSP_RESERVED_2  = 0x00000004; // Bits 0..15 are reserved
-    static const int32_t PSP_RESERVED_1  = 0x00000002; // Bits 0..15 are reserved
-    static const int32_t PSP_RESERVED_0  = 0x00000001; // Bits 0..15 are reserved
+    static const int32_t CONTROL_P_BIT   = 0x08000000; // Bit 27
+    static const int32_t CONTROL_W_BIT   = 0x04000000; // Bit 26
+    static const int32_t CONTROL_E_BIT   = 0x02000000; // Bit 25
+    static const int32_t CONTROL_A1_BIT  = 0x01000000; // Bit 24
+    static const int32_t CONTROL_A0_BIT  = 0x00800000; // Bit 23
+    static const int32_t CONTROL_NK_BIT  = 0x00400000; // Bit 22
+    static const int32_t PSP_RESERVED_21 = 0x00200000; // Bit 21
+    static const int32_t CTRLACK_V_BIT   = 0x00100000; // Bit 20
+    static const int32_t CTRLACK_X_BIT   = 0x00080000; // Bit 19
+    static const int32_t CTRLACK_S_BIT   = 0x00040000; // Bit 18
+    static const int32_t CTRLACK_W_BIT   = 0x00020000; // Bit 17
+    static const int32_t CTRLACK_E_BIT   = 0x00010000; // Bit 16
+    static const int32_t PSP_RESERVED_15 = 0x00008000; // Bit 15
+    static const int32_t CTRLACK_T2_BIT  = 0x00004000; // Bit 14
+    static const int32_t CTRLACK_T1_BIT  = 0x00002000; // Bit 13
+    static const int32_t CTRLACK_T0_BIT  = 0x00001000; // Bit 12
+    static const int32_t ACK_P_BIT       = 0x00000800; // Bit 11
+    static const int32_t ACK_SX_BIT      = 0x00000400; // Bit 10
+    static const int32_t PSP_RESERVED_9  = 0x00000200; // Bit 9
+    static const int32_t PSP_RESERVED_8  = 0x00000100; // Bit 8
+    static const int32_t PSP_RESERVED_7  = 0x00000080; // Bit 7
+    static const int32_t PSP_RESERVED_6  = 0x00000040; // Bit 6
+    static const int32_t PSP_RESERVED_5  = 0x00000020; // Bit 5
+    static const int32_t PSP_RESERVED_4  = 0x00000010; // Bit 4
+    static const int32_t PSP_RESERVED_3  = 0x00000008; // Bit 3
+    static const int32_t PSP_RESERVED_2  = 0x00000004; // Bit 2
+    static const int32_t PSP_RESERVED_1  = 0x00000002; // Bit 1
+    static const int32_t PSP_RESERVED_0  = 0x00000001; // Bit 0
   } END_NAMESPACE // protected_PSP namespace
   using namespace protected_PSP;
 
@@ -225,10 +225,6 @@ namespace vrt {
     public: bool getControllerFormat () const;
     public: void setControllerFormat (bool set);
 
-    //Control-A
-    public: bool getActionFlag () const;
-    public: void setActionFlag (bool set);
-
     //Control-P
     public: bool isPartialChangePermitted () const;
     public: void setPartialChangePermitted (bool set);
@@ -241,37 +237,96 @@ namespace vrt {
     public: bool isErrorsPermitted () const;
     public: void setErrorsPermitted (bool set);
 
+    //Control-A (A1..A0)
+    public: bool getAction1Flag () const;
+    public: void setAction1Flag (bool set);
+    public: bool getAction0Flag () const;
+    public: void setAction0Flag (bool set);
+    public: int8_t getAction () const;
+    public: void setAction (int8_t action);
+    public: bool isActionNoAction () const;
+    public: void setActionNoAction ();
+    public: bool isActionDryRun () const;
+    public: void setActionDryRun ();
+    public: bool isActionTakeAction () const;
+    public: void setActionTakeAction ();
+
     //Control-NK
     public: bool getNotAckOnly () const;
     public: void setNotAckOnly (bool set);
 
-    //Control-QV
+    //Control-V
     public: bool getRequestValidationAcknowledge () const;
     public: void setRequestValidationAcknowledge (bool set);
+    //Acknowledge-V
+    public: bool isValidationAcknowledge () const {
+      return getRequestValidationAcknowledge();
+    }
+    public: void setValidationAcknowledge (bool set) {
+      setRequestValidationAcknowledge(set);
+    }
 
-    //Control-QX
+    //Control-X
     public: bool getRequestExecutionAcknowledge () const;
     public: void setRequestExecutionAcknowledge (bool set);
+    //Acknowledge-X
+    public: bool isExecutionAcknowledge () const {
+      return getRequestExecutionAcknowledge();
+    }
+    public: void setExecutionAcknowledge (bool set) {
+      setRequestExecutionAcknowledge(set);
+    }
 
-    //Control-QS
+    //Control-S
     public: bool getRequestQueryAcknowledge () const;
     public: void setRequestQueryAcknowledge (bool set);
+    //Acknowledge-S
+    public: bool isQueryAcknowledge () const {
+      return getRequestQueryAcknowledge();
+    }
+    public: void setQueryAcknowledge (bool set) {
+      setRequestQueryAcknowledge(set);
+    }
 
-    //Acknowledge-SX
-    public: bool getActionExecuted () const;
-    public: void setActionExecuted (bool set);
+    //Acknowledge-W
+    public: bool getWarningsGenerated () const;
+    public: virtual void setWarningsGenerated (bool set);
+    //Control-W
+    public: bool getRequestWarningsGenerated () const {
+      return getWarningsGenerated();
+    }
+    public: virtual void setRequestWarningsGenerated (bool set) {
+      setWarningsGenerated(set);
+    }
+
+    //Acknowledge-E
+    public: bool getErrorsGenerated () const;
+    public: virtual void setErrorsGenerated (bool set);
+    //Control-E
+    public: bool getRequestErrorsGenerated () const {
+      return getErrorsGenerated();
+    }
+    public: virtual void setRequestErrorsGenerated (bool set) {
+      setErrorsGenerated(set);
+    }
+
+    //Control/Ack-T2,T1,T0
+    public: bool getTimestampControl2Bit () const;
+    public: void setTimestampControl2Bit (bool set);
+    public: bool getTimestampControl1Bit () const;
+    public: void setTimestampControl1Bit (bool set);
+    public: bool getTimestampControl0Bit () const;
+    public: void setTimestampControl0Bit (bool set);
+    public: int8_t getTimestampControlMode () const;
+    public: void setTimestampControlMode (int8_t mode);
 
     //Acknowledge-P
     public: bool getPartialAction () const;
     public: void setPartialAction (bool set);
 
-    //Acknowledge-W
-    public: bool getWarningsGenerated () const;
-    public: virtual void setWarningsGenerated (bool set);
-
-    //Acknowledge-E
-    public: bool getErrorsGenerated () const;
-    public: virtual void setErrorsGenerated (bool set);
+    //Acknowledge-SX
+    public: bool getActionExecuted () const;
+    public: void setActionExecuted (bool set);
 
     // Rest of Packet Specific Prologue for Command Packets
     // Message ID - 32Bit Number

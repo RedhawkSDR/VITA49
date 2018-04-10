@@ -34,15 +34,15 @@ static const char CLASS_ID_BIT = 0x8;  // Class ID present bit in buf[0]
 
 // Data Indicator bits
 static const char TRAILER_BIT  = 0x4;  // Trailer present bit in buf[0]
-static const char SPECTRAL_BIT = 0x2;  // Spectral data bit in buf[0]
+static const char SPECTRAL_BIT = 0x1;  // Spectral data bit in buf[0]
 
 // Context Indicator bits
 static const char TSM_BIT      = 0x1;  // TimeStamp Mode bit in buf[0]
 
 // Command Indicator bits
-static const char CTRL_ACK_BIT = 0x4;  // Control (0) or Ack (1) packet bit in buf[0]
-static const char STALE_TS_BIT = 0x2;  // Stale or no timestamp mode bit in buf[0]
-static const char CANCEL_BIT   = 0x1;  // Cancel previous command bit in buf[0]
+static const char CTRL_ACK_BIT    = 0x4;  // Control (0) or Ack (1) packet bit in buf[0]
+static const char CI_RESERVED_BIT = 0x2;  // Reserved (0)
+static const char CANCEL_BIT      = 0x1;  // Cancel previous command bit in buf[0]
 
 // Flags for getOffset(..). These values are in the form:
 //   AABBaabb         AA - Bit mask to apply to bbuf[0] indicating flag is present
@@ -259,7 +259,6 @@ void BasicVRTPacket::toStringStream (ostringstream &str) const {
   Utilities::append(str, " TimeStampMode=",      isTimeStampMode());
   Utilities::append(str, " SpectrumMode=",       isSpectrumMode());
   Utilities::append(str, " ControlAckMode=",     isControlAckMode());
-  Utilities::append(str, " StaleTimeStampMode=", isStaleTimeStampMode());
   Utilities::append(str, " CancelMode=",         isCancelMode());
 }
 
@@ -659,12 +658,6 @@ boolNull BasicVRTPacket::isControlAckMode () const {
   return _FALSE;
 }
 
-boolNull BasicVRTPacket::isStaleTimeStampMode () const {
-  if (!isCommand()) return _NULL;
-  if ((bbuf[0]&STALE_TS_BIT)!=0) return _TRUE;
-  return _FALSE;
-}
-
 boolNull BasicVRTPacket::isCancelMode () const {
   if (!isCommand()) return _NULL;
   if ((bbuf[0]&CANCEL_BIT)!=0) return _TRUE;
@@ -743,14 +736,6 @@ void BasicVRTPacket::setControlAckMode (bool v) {
 
   if (v) bbuf[0] |=  CTRL_ACK_BIT;
   else   bbuf[0] &= ~CTRL_ACK_BIT;
-}
-
-void BasicVRTPacket::setStaleTimeStampMode (bool v) {
-  if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
-  if (!isCommand()) throw VRTException("Can not set stale timestamp mode on a data or context packet.");
-
-  if (v) bbuf[0] |=  STALE_TS_BIT;
-  else   bbuf[0] &= ~STALE_TS_BIT;
 }
 
 void BasicVRTPacket::setCancelMode (bool v) {

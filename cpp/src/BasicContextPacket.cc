@@ -811,7 +811,7 @@ int32_t BasicContextPacket::getFieldLen (int8_t cifNum, int32_t field, int32_t p
   case 1:
     if ((field & protected_CIF1::CTX_4_OCTETS ) != 0) return 4;
     if ((field & protected_CIF1::CTX_8_OCTETS ) != 0) return 8;
-    if ((field & protected_CIF1::CTX_56_OCTETS ) != 0) return 56;
+    if ((field & protected_CIF1::CTX_52_OCTETS ) != 0) return 52;
     if ((field & protected_CIF1::CTX_ARR_OF_RECS ) != 0) {
       int32_t prologlen = getPrologueLength();
       int off = getOffset(cifNum, field);
@@ -994,21 +994,21 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int8_t cifNum, int32
   if((cif0 & protected_CIF0::CIF1_ENABLE_mask) != 0) {
     int32_t cif1 = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
     cifOffset += 4; // increment for next CIF
-    // Only count fields before the first variable length field (PNT_ANGL_2D_ST)
+    // Only count fields before the first variable length field (PNT_VECT_3D_ST)
     // Note: all of which are 4-octets, so only check that one
     m = cif1 & mask1 & 0xE0000000;
     int32_t off1 = (bitCount(m & protected_CIF1::CTX_4_OCTETS) * (cif7Add + (4*cif7Mult) ));
 
-    // PNT_ANGL_2D_ST length is Array-of-Records format, which has variable size
+    // PNT_VECT_3D_ST length is Array-of-Records format, which has variable size
     // so we handle it separately if applicable. Note that off+off1 is the offset
-    // up to point to the start of the PNT_ANGL_2D_ST field.
-    if (field1 < protected_CIF1::PNT_ANGL_2D_ST_mask) {
-      if ((cif1 & protected_CIF1::PNT_ANGL_2D_ST_mask) != 0) {
+    // up to point to the start of the PNT_VECT_3D_ST field.
+    if (field1 < protected_CIF1::PNT_VECT_3D_ST_mask) {
+      if ((cif1 & protected_CIF1::PNT_VECT_3D_ST_mask) != 0) {
         // TODO - when and where does cif7Mult apply? perhaps not all field sizes are affected.    
         off1 += (VRTMath::unpackInt(bbuf, prologlen+off+off1)*4)*cif7Mult + cif7Add;
       }
 
-      // Only count fields not yet counted (i.e. after PNT_ANGL_2D_ST) and before
+      // Only count fields not yet counted (i.e. after PNT_VECT_3D_ST) and before
       // the next variable length field (CIFS_ARRAY).
       // Note: all of which are either 4- or 8-octets, so only check those
       m = cif1 & mask1 & 0x0FFFF000;
@@ -1016,7 +1016,7 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int8_t cifNum, int32
             + (bitCount(m & (protected_CIF1::CTX_8_OCTETS)) * (cif7Add + (8*cif7Mult) ));
 
       // CIFS_ARRAY is also Array-of-Records format, and since it comes after
-      // PNT_ANGL_2D_ST, we nest it here so the check can be skipped.
+      // PNT_VECT_3D_ST, we nest it here so the check can be skipped.
       if (field1 < protected_CIF1::CIFS_ARRAY_mask) {
         if ((cif1 & protected_CIF1::CIFS_ARRAY_mask) != 0) {
           // TODO - when and where does cif7Mult apply? perhaps not all field sizes are affected.    

@@ -124,17 +124,17 @@ namespace vrt {
       CIF1_RESERVED_23,      ///< Bit 23  Reserved                              (1,0x00800000)
       RANGE,                 ///< Bit 24  Range (Distance)                      (1,0x01000000)
       BEAMWIDTH,             ///< Bit 25  Beamwidth                             (1,0x02000000)
-      CIF1_RESERVED_26,      ///< Bit 26  Reserved                              (1,0x04000000)
-      CIF1_RESERVED_27,      ///< Bit 27  Reserved                              (1,0x08000000)
-      PNT_ANGL_2D_ST,        ///< Bit 28  2-D Pointing Angle (structured)       (1,0x10000000)
-      PNT_ANGL_2D_SI,        ///< Bit 29  2-D Pointing Angle (simple)           (1,0x20000000)
+      SPATIAL_REF_TYPE,      ///< Bit 26  Spatial Reference Type                (1,0x04000000)
+      SPATIAL_SCAN_TYPE,     ///< Bit 27  Spatial Scan Type                     (1,0x08000000)
+      PNT_VECT_3D_ST,        ///< Bit 28  2-D Pointing Angle (structured)       (1,0x10000000)
+      PNT_VECT_3D_SI,        ///< Bit 29  2-D Pointing Angle (simple)           (1,0x20000000)
       POLARIZATION,          ///< Bit 30  Polarization                          (1,0x40000000)
       PHASE,                 ///< Bit 31  Phase                                 (1,0x80000000)
       
       // CIF2 - Identifiers (tags) - Starts at 2*32 = 64
       CIF2_RESERVED_0 = 64,  ///< Bit 0   Reserved                              (2,0x00000001) <==> 010 00000 =  64
-      SPATIAL_REF_TYPE,      ///< Bit 1   Spatial Reference Type                (2,0x00000002)
-      SPATIAL_SCAN_TYPE,     ///< Bit 2   Spatial Scan Type                     (2,0x00000004)
+      CIF2_RESERVED_1,       ///< Bit 1   Reserved                              (2,0x00000002)
+      CIF2_RESERVED_2,       ///< Bit 2   Reserved                              (2,0x00000004)
       RF_FOOTPRINT_RANGE,    ///< Bit 3   RF Footprint Range                    (2,0x00000008)
       RF_FOOTPRINT,          ///< Bit 4   RF Footprint                          (2,0x00000010)
       COMM_PRIORITY_ID,      ///< Bit 5   Communication Priority ID             (2,0x00000020)
@@ -396,21 +396,21 @@ namespace vrt {
       static const int32_t CIF1_RESERVED_23_mask      = 0x00800000; // N/A (0)
       static const int32_t RANGE_mask                 = 0x01000000; // 1
       static const int32_t BEAMWIDTH_mask             = 0x02000000; // 1
-      static const int32_t CIF1_RESERVED_26_mask      = 0x04000000; // N/A (0)
-      static const int32_t CIF1_RESERVED_27_mask      = 0x08000000; // N/A (0)
-      static const int32_t PNT_ANGL_2D_ST_mask        = 0x10000000; // variable (See V49.2 spec Section 9.4.1)
-      static const int32_t PNT_ANGL_2D_SI_mask        = 0x20000000; // 1
+      static const int32_t SPATIAL_REF_TYPE_mask      = 0x04000000; // 1 (See V49.2 spec Section 9.8.11 for the next 2)
+      static const int32_t SPATIAL_SCAN_TYPE_mask     = 0x08000000; // 1
+      static const int32_t PNT_VECT_3D_ST_mask        = 0x10000000; // variable (See V49.2 spec Section 9.4.1)
+      static const int32_t PNT_VECT_3D_SI_mask        = 0x20000000; // 1
       static const int32_t POLARIZATION_mask          = 0x40000000; // 1
       static const int32_t PHASE_mask                 = 0x80000000; // 1
 
       /** define field lengths */
-      static const int32_t CTX_4_OCTETS = PHASE_mask | POLARIZATION_mask | PNT_ANGL_2D_SI_mask | BEAMWIDTH_mask | RANGE_mask
+      static const int32_t CTX_4_OCTETS = PHASE_mask | POLARIZATION_mask | PNT_VECT_3D_SI_mask | BEAMWIDTH_mask | RANGE_mask
                                         | EB_NO_BER_mask | THRESHOLD_mask | COMPRESS_PT_mask | ICPT_PTS_2_3_mask
                                         | SNR_NOISE_mask | AUX_GAIN_mask | DISCRETE_IO32_mask | HEALTH_STATUS_mask
-                                        | V49_COMPL_mask | VER_BLD_CODE_mask;
+                                        | V49_COMPL_mask | VER_BLD_CODE_mask | SPATIAL_SCAN_TYPE_mask | SPATIAL_REF_TYPE_mask;
       static const int32_t CTX_8_OCTETS = AUX_FREQUENCY_mask | AUX_BANDWIDTH_mask | DISCRETE_IO64_mask | BUFFER_SZ_mask;
-      static const int32_t CTX_56_OCTETS = SPECTRUM_mask;
-      static const int32_t CTX_ARR_OF_RECS = PNT_ANGL_2D_ST_mask | CIFS_ARRAY_mask | SECTOR_SCN_STP_mask | INDEX_LIST_mask;
+      static const int32_t CTX_52_OCTETS = SPECTRUM_mask;
+      static const int32_t CTX_ARR_OF_RECS = PNT_VECT_3D_ST_mask | CIFS_ARRAY_mask | SECTOR_SCN_STP_mask | INDEX_LIST_mask;
 
     } END_NAMESPACE // protected_CIF1 namespace
 
@@ -420,8 +420,8 @@ namespace vrt {
       
       /** Bitmasks                                                     Field Size (# of 32-bit words) */
       static const int32_t CIF2_RESERVED_0_mask       = 0x00000001; // N/A (0)
-      static const int32_t SPATIAL_REF_TYPE_mask      = 0x00000002; // 1 (See V49.2 spec Section 9.8.11 for the next 2)
-      static const int32_t SPATIAL_SCAN_TYPE_mask     = 0x00000004; // 1
+      static const int32_t CIF2_RESERVED_1_mask       = 0x00000002; // N/A (0)
+      static const int32_t CIF2_RESERVED_2_mask       = 0x00000004; // N/A (0)
       static const int32_t RF_FOOTPRINT_RANGE_mask    = 0x00000008; // 1 (See V49.2 spec Section 9.8.12 for the next 2)
       static const int32_t RF_FOOTPRINT_mask          = 0x00000010; // 1
       static const int32_t COMM_PRIORITY_ID_mask      = 0x00000020; // 1 (See V49.2 spec Section 9.8.10 for the next 5)
@@ -460,7 +460,7 @@ namespace vrt {
                                          | EMS_DEVICE_CLASS_mask | EMS_DEVICE_TYPE_mask | EMS_DEVICE_INSTANCE_mask
                                          | MODULATION_CLASS_mask | MODULATION_TYPE_mask | FUNCTION_ID_mask | MODE_ID_mask
                                          | EVENT_ID_mask | FUNCT_PRIORITY_ID_mask | COMM_PRIORITY_ID_mask | RF_FOOTPRINT_mask
-                                         | RF_FOOTPRINT_RANGE_mask | SPATIAL_SCAN_TYPE_mask | SPATIAL_REF_TYPE_mask;
+                                         | RF_FOOTPRINT_RANGE_mask;
       static const int32_t CTX_16_OCTETS = CONTROLLEE_UUID_mask | CONTROLLER_UUID_mask;
 
     } END_NAMESPACE // protected_CIF2 namespace
@@ -1450,16 +1450,16 @@ namespace vrt {
     public: virtual int32_t getWindowTimeDeltaInt () const { return unpackInt(48); }
     public: virtual void setWindowTimeDeltaInt (int32_t val) { packInt(48, val); }
 
-    /** WindowTimeDelta(float): word 13
+    /** WindowTimeDelta(float): word 12
      *  32-bit floating-point w/ radix point to the right of bit 12
      */
     public: virtual double getWindowTimeDeltaFloat () const {
-      int32_t bits = unpackInt(52);
+      int32_t bits = unpackInt(48);
       return (bits == 0x7FFFFFFF)? DOUBLE_NAN : VRTMath::toDouble32(12, bits);
     }
     public: virtual void setWindowTimeDeltaFloat (double val) {
       int32_t bits = (isNull(val))? 0x7FFFFFFF : VRTMath::fromDouble32(12, val);
-      packInt(52, bits);
+      packInt(48, bits);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
@@ -3297,122 +3297,192 @@ namespace vrt {
       setL(RANGE,bits, cif7field);
     }
 
-    /** Gets the Beamwidth in degrees. Valid range is from 0 to 360 degrees.
+    /** Sets the Horizontal and Vertical Beamwidth in degrees.
+     *  Valid range is from 0 to 360 degrees.
+     *  Radix point to the right of bit 7 for each 16-bit number
+     *  fractional resolution: 0.0078125 (1/128) degrees
+     *  Bits 31..16: Horizontal Degrees
+     *  Bits 15..0:  Vertical Degrees
      *  (See V49.2 spec Section 9.4.2)
+     *  @param hval The Horizontal Beamwidth (null will override vval).
+     *  @param vval The Vertical Beamwidth (null will override hval).
      *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
-     *  @return The Beamwidth (null if not specified).
      */
-    public: inline float getBeamwidth (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
-      int16_t bits = getI(BEAMWIDTH,2, cif7field);
-      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
+    public: inline void setBeamwidth (float hval, float vval, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      if (isNull(hval) || isNull(vval)) {
+        setL(BEAMWIDTH, INT32_NULL, cif7field);
+      } else {
+        int32_t hbits = VRTMath::fromFloat32(7,hval);
+        int32_t vbits = VRTMath::fromFloat32(7,vval);
+        int32_t bits = (hbits<<16) | (vbits&0xFFFF);
+        setL(BEAMWIDTH, bits, cif7field);
+      }
     }
 
-    /** Sets the Beamwidth in degrees. Valid range is from 0 to 360 degrees.
+    /** Gets the Horizontal Beamwidth in degrees. Valid range is from 0 to 360 degrees.
      *  (See V49.2 spec Section 9.4.2)
-     *  @param val The Beamwidth (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
+     *  @return The Horizontal Beamwidth (null if not specified).
+     */
+    public: inline float getHorizontalBeamwidth (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t bits = getL(BEAMWIDTH, cif7field);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat32(7,(bits>>16)&0xFFFF);
+    }
+
+    /** Sets the Horizontal Beamwidth in degrees. Valid range is from 0 to 360 degrees.
+     *  (See V49.2 spec Section 9.4.2)
+     *  @param val The Horizontal Beamwidth (null if not specified, which will override
+     *             Vertical Beamwidth as well).
      *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void setBeamwidth (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+    public: inline void setHorizontalBeamwidth (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
         setL(BEAMWIDTH, INT32_NULL, cif7field);
       } else {
-        int16_t bits = VRTMath::fromFloat16(7,val);
+        int16_t bits = (int16_t)(VRTMath::fromFloat32(7,val)&0xFFFF);
+        setI(BEAMWIDTH,0,bits, cif7field);
+      }
+    }
+
+    /** Gets the Vertical Beamwidth in degrees. Valid range is from 0 to 360 degrees.
+     *  (See V49.2 spec Section 9.4.2)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
+     *  @return The Vertical Beamwidth (null if not specified).
+     */
+    public: inline float getVerticalBeamwidth (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int32_t bits = getL(BEAMWIDTH, cif7field);
+      return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat32(7,bits&0xFFFF);
+    }
+
+    /** Sets the Vertical Beamwidth in degrees. Valid range is from 0 to 360 degrees.
+     *  (See V49.2 spec Section 9.4.2)
+     *  @param val The Vertical Beamwidth (null if not specified, which will override
+     *             Horizontal Beamwidth as well).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
+     */
+    public: inline void setVerticalBeamwidth (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      if (isNull(val)) {
+        setL(BEAMWIDTH, INT32_NULL, cif7field);
+      } else {
+        int16_t bits = (int16_t)(VRTMath::fromFloat32(7,val)&0xFFFF);
         setI(BEAMWIDTH,2,bits, cif7field);
       }
     }
 
-    /** Gets the 2D Pointing Angle (Structured)
-     *  See V49.2 spec Section 9.4.1.
-     *  Array-of-Records format
-     *  HeaderSize is either 0 or 1
-     *    - Note: docs say 3 or 4, but that's inconsistent with definition of ArrayOfRecords, so ignoring that guidance
-     *            3 or 4 must include the required 3 words of every ArrayOfRecords, which is incorrect.
-     *    - depends on whether optional App-Specific Header is included, which is a 32-bit word if so
-     *    - optional App-Specific Header is a *Global* Index/Ref/Beam subfield
-     *  NumWords/Record is either 1 or 2
-     *    - depends on whether optional Index/Ref/Beam subfield is included in each record
-     *  Bitmapped CIF subfield only uses bits 31 and 30
-     *    - Bit 31: Set when each record includes the optional Index/Ref/Beam subfield
-     *    - Bit 30: Always set; Indicates presence of 2D Pointing Angle subfield in each record, which is required
-     *  App-Specific header is optional 32-bit word
-     *    - as mentioned above, this is a *Global* Index/Ref/Beam subfield
-     *  Each Record is at most 2 words
-     *    - First 32-bit word is optional, and is the Index/Ref/Beam subfield
-     *    - Second 32-bit word is required, and is the 2D Pointing Angle subfield
-     *  Index/Ref/Beam subfield
-     *    - Bits 31..16: Record Index (optional; 0 when global or unused in records)
-     *    - Bits 15..4: Reserved
-     *    - Bits 3..2: Reference (00 not specified; 01 ECEF; 10 Platform centered; 11 Array centered)
-     *    - Bits 1..0: Beam (00 not specified; 01 Beam or signal direction; 10 Null; 11 reserved)
-     *  2D Pointing Angle subfield
-     *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
-     *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
+    /** Gets Spatial Reference Type.
+     *  Spatial Reference Type uses the Generic32 bit Identifier field
+     *  See V49.2 spec Section 9.8.11 for Spatial Reference Type
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
      *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
-     *  @return 2D Pointing Angle as an Array-of-Records (null if not specified).
-     *  <i>Note that changes to the returned object do not alter the packet.</i>
+     *  @return The Spatial Reference Type (null if not specified)
      */
-    public: virtual ArrayOfRecords get2DPointingAngleStructured (IndicatorFieldEnum_t cif7field=CIF_NULL) const = 0;
-
-    /** Sets the 2D Pointing Angle (Structured)
-     *  See V49.2 spec Section 9.4.1.
-     *  Array-of-Records format
-     *  HeaderSize is either 0 or 1
-     *    - Note: docs say 3 or 4, but that's inconsistent with definition of ArrayOfRecords, so ignoring that guidance
-     *            3 or 4 must include the required 3 words of every ArrayOfRecords, which is incorrect.
-     *    - depends on whether optional App-Specific Header is included, which is a 32-bit word if so
-     *    - optional App-Specific Header is a *Global* Index/Ref/Beam subfield
-     *  NumWords/Record is either 1 or 2
-     *    - depends on whether optional Index/Ref/Beam subfield is included in each record
-     *  Bitmapped CIF subfield only uses bits 31 and 30
-     *    - Bit 31: Set when each record includes the optional Index/Ref/Beam subfield
-     *    - Bit 30: Always set; Indicates presence of 2D Pointing Angle subfield in each record, which is required
-     *  App-Specific header is optional 32-bit word
-     *    - as mentioned above, this is a *Global* Index/Ref/Beam subfield
-     *  Each Record is at most 2 words
-     *    - First 32-bit word is optional, and is the Index/Ref/Beam subfield
-     *    - Second 32-bit word is required, and is the 2D Pointing Angle subfield
-     *  Index/Ref/Beam subfield
-     *    - Bits 31..16: Record Index (optional; 0 when global or unused in records)
-     *    - Bits 15..4: Reserved
-     *    - Bits 3..2: Reference (00 not specified; 01 ECEF; 10 Platform centered; 11 Array centered)
-     *    - Bits 1..0: Beam (00 not specified; 01 Beam or signal direction; 10 Null; 11 reserved)
-     *  2D Pointing Angle subfield
-     *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
-     *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
-     *  @param val The 2D Pointing Angle as an Array-of-Records (null if not specified).
-     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
-     */
-    public: inline void set2DPointingAngleStructured (const ArrayOfRecords &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
-      setRecord(PNT_ANGL_2D_ST, val, get2DPointingAngleStructured(), cif7field);
+    public: inline int32_t getSpatialReferenceType (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      return getL(SPATIAL_REF_TYPE, cif7field);
     }
 
-    /** Gets the Elevation Angle subfield of the Single-word 2D Pointing Angle.
+    /** Sets Spatial Reference Type.
+     *  Spatial Reference Type uses the Generic32 bit Identifier field
+     *  See V49.2 spec Section 9.8.11 for Spatial Reference Type
+     *  See V49.2 spec Section 9.8 for Generic32 bit Identifier field
+     *  @param val The Spatial Reference Type (null if not specified)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
+     */
+    public: inline void setSpatialReferenceType (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setL(SPATIAL_REF_TYPE, val, cif7field);
+    }
+
+    /** Gets the 3D Pointing Vector (Structured)
+     *  See V49.2 spec Section 9.4.1.
+     *  Array-of-Records format
+     *  HeaderSize is either 0 or 1
+     *    - Note: docs say 3 or 4, but that's inconsistent with definition of ArrayOfRecords, so ignoring that guidance
+     *            3 or 4 must include the required 3 words of every ArrayOfRecords, which is incorrect.
+     *    - depends on whether optional App-Specific Header is included, which is a 32-bit word if so
+     *    - optional App-Specific Header is a *Global* Index/Ref/Beam subfield
+     *  NumWords/Record is either 1 or 2
+     *    - depends on whether optional Index/Ref/Beam subfield is included in each record
+     *  Bitmapped CIF subfield only uses bits 31 and 30
+     *    - Bit 31: Set when each record includes the optional Index/Ref/Beam subfield
+     *    - Bit 30: Always set; Indicates presence of 3D Pointing Vector subfield in each record, which is required
+     *  App-Specific header is optional 32-bit word
+     *    - as mentioned above, this is a *Global* Index/Ref/Beam subfield
+     *  Each Record is at most 2 words
+     *    - First 32-bit word is optional, and is the Index/Ref/Beam subfield
+     *    - Second 32-bit word is required, and is the 3D Pointing Vector subfield
+     *  Index/Ref/Beam subfield
+     *    - Bits 31..16: Record Index (optional; 0 when global or unused in records)
+     *    - Bits 15..4: Reserved
+     *    - Bits 3..2: Reference (00 not specified; 01 ECEF; 10 Platform centered; 11 Array centered)
+     *    - Bits 1..0: Beam (00 not specified; 01 Beam or signal direction; 10 Null; 11 reserved)
+     *  3D Pointing Vector subfield
+     *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
+     *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
+     *  @return 3D Pointing Vector as an Array-of-Records (null if not specified).
+     *  <i>Note that changes to the returned object do not alter the packet.</i>
+     */
+    public: virtual ArrayOfRecords get3DPointingVectorStructured (IndicatorFieldEnum_t cif7field=CIF_NULL) const = 0;
+
+    /** Sets the 3D Pointing Vector (Structured)
+     *  See V49.2 spec Section 9.4.1.
+     *  Array-of-Records format
+     *  HeaderSize is either 0 or 1
+     *    - Note: docs say 3 or 4, but that's inconsistent with definition of ArrayOfRecords, so ignoring that guidance
+     *            3 or 4 must include the required 3 words of every ArrayOfRecords, which is incorrect.
+     *    - depends on whether optional App-Specific Header is included, which is a 32-bit word if so
+     *    - optional App-Specific Header is a *Global* Index/Ref/Beam subfield
+     *  NumWords/Record is either 1 or 2
+     *    - depends on whether optional Index/Ref/Beam subfield is included in each record
+     *  Bitmapped CIF subfield only uses bits 31 and 30
+     *    - Bit 31: Set when each record includes the optional Index/Ref/Beam subfield
+     *    - Bit 30: Always set; Indicates presence of 3D Pointing Vector subfield in each record, which is required
+     *  App-Specific header is optional 32-bit word
+     *    - as mentioned above, this is a *Global* Index/Ref/Beam subfield
+     *  Each Record is at most 2 words
+     *    - First 32-bit word is optional, and is the Index/Ref/Beam subfield
+     *    - Second 32-bit word is required, and is the 3D Pointing Vector subfield
+     *  Index/Ref/Beam subfield
+     *    - Bits 31..16: Record Index (optional; 0 when global or unused in records)
+     *    - Bits 15..4: Reserved
+     *    - Bits 3..2: Reference (00 not specified; 01 ECEF; 10 Platform centered; 11 Array centered)
+     *    - Bits 1..0: Beam (00 not specified; 01 Beam or signal direction; 10 Null; 11 reserved)
+     *  3D Pointing Vector subfield
+     *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
+     *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
+     *  @param val The 3D Pointing Vector as an Array-of-Records (null if not specified).
+     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
+     */
+    public: inline void set3DPointingVectorStructured (const ArrayOfRecords &val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+      setRecord(PNT_VECT_3D_ST, val, get3DPointingVectorStructured(), cif7field);
+    }
+
+    /** Gets the Elevation Angle subfield of the Single-word 3D Pointing Vector.
      *  (See V49.2 spec Section 9.4.1)
      *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
      *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
      *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Elevation Angle (null if not specified).
      */
-    public: inline float get2DPointingAngleElevation (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
-      int16_t bits = getI(PNT_ANGL_2D_SI,0, cif7field);
+    public: inline float get3DPointingVectorElevation (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(PNT_VECT_3D_SI,0, cif7field);
       return (isNull(bits))? FLOAT_NAN : VRTMath::toFloat16(7,bits);
     }
 
-    /** Gets the Azimuthal Angle subfield of the Single-word 2D Pointing Angle.
+    /** Gets the Azimuthal Angle subfield of the Single-word 3D Pointing Vector.
      *  (See V49.2 spec Section 9.4.1)
      *    - Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]
      *    - Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512)
      *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      *  @return The Azimuthal Angle (null if not specified).
      */
-    public: inline float get2DPointingAngleAzimuth (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
-      int16_t bits = getI(PNT_ANGL_2D_SI,2, cif7field);
+    public: inline float get3DPointingVectorAzimuth (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+      int16_t bits = getI(PNT_VECT_3D_SI,2, cif7field);
       if (isNull(bits)) return FLOAT_NAN;
       float val = VRTMath::toFloat16(7,bits);
       return (val < 0)? 512.0+val : val;
     }
 
-    /** Sets the Elevation Angle subfield of the Single-word 2D Pointing Angle.
+    /** Sets the Elevation Angle subfield of the Single-word 3D Pointing Vector.
      *  <i>If no Azimuthal Angle has been specified, it will be set to zero
      *  following the call to this method.</i>
      *  <i>If set to null, both Elevation and Azimuthal Angles will be set to 
@@ -3423,16 +3493,16 @@ namespace vrt {
      *  @param val The Elevation Angle (null if not specified).
      *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void set2DPointingAngleElevation (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+    public: inline void set3DPointingVectorElevation (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
-        setL(PNT_ANGL_2D_SI, INT32_NULL, cif7field);
+        setL(PNT_VECT_3D_SI, INT32_NULL, cif7field);
       } else {
         int16_t bits = VRTMath::fromFloat16(7,val);
-        setI(PNT_ANGL_2D_SI,0,bits, cif7field);
+        setI(PNT_VECT_3D_SI,0,bits, cif7field);
       }
     }
 
-    /** Sets the Azimuthal Angle subfield of the Single-word 2D Pointing Angle.
+    /** Sets the Azimuthal Angle subfield of the Single-word 3D Pointing Vector.
      *  <i>If no Elevation Angle has been specified, it will be set to zero 
      *  following the call to this method.</i>
      *  <i>If set to null, both Elevation and Azimuthal Angles will be set to 
@@ -3443,13 +3513,13 @@ namespace vrt {
      *  @param val The Azimuthal Angle (null if not specified).
      *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
-    public: inline void set2DPointingAngleAzimuth (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
+    public: inline void set3DPointingVectorAzimuth (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
       if (isNull(val)) {
-        setL(PNT_ANGL_2D_SI, INT32_NULL, cif7field);
+        setL(PNT_VECT_3D_SI, INT32_NULL, cif7field);
       } else {
         if (val > 255.984375) val = val-512;
         int16_t bits = VRTMath::fromFloat16(7,val);
-        setI(PNT_ANGL_2D_SI,2,bits, cif7field);
+        setI(PNT_VECT_3D_SI,2,bits, cif7field);
       }
     }
 
@@ -3544,29 +3614,6 @@ namespace vrt {
 
     /* XXX START OF CIF2 FUNCTIONS XXX */
     
-    /** Gets Spatial Reference Type.
-     *  Spatial Reference Type uses the Generic16 bit Identifier field
-     *  See V49.2 spec Section 9.8.11 for Spatial Reference Type
-     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
-     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
-     *  @return The Spatial Reference Type (null if not specified)
-     */
-    public: inline int16_t getSpatialReferenceType (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
-      int16_t bits = getI(SPATIAL_REF_TYPE, 2, cif7field);
-      return (isNull(bits))? INT16_NULL : bits;
-    }
-
-    /** Sets Spatial Reference Type.
-     *  Spatial Reference Type uses the Generic16 bit Identifier field
-     *  See V49.2 spec Section 9.8.11 for Spatial Reference Type
-     *  See V49.2 spec Section 9.8 for Generic16 bit Identifier field
-     *  @param val The Spatial Reference Type (null if not specified)
-     *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
-     */
-    public: inline void setSpatialReferenceType (int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
-      setI(SPATIAL_REF_TYPE, 2, val, cif7field);
-    }
-
     /** Gets Spatial Scan Type.
      *  Spatial Scan Type uses the Generic16 bit Identifier field
      *  See V49.2 spec Section 9.8.11 for Spatial Scan Type

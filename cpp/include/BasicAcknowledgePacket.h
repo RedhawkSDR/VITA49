@@ -444,7 +444,7 @@ namespace vrt {
       UNUSED_VARIABLE(cif7field);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }
-    public: virtual ArrayOfRecords get2DPointingAngleStructured (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+    public: virtual ArrayOfRecords get3DPointingVectorStructured (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
       UNUSED_VARIABLE(cif7field);
       throw VRTException("All Warn/Error fields are 32 bits; BasicAcknowledgePacket only supports getL.");
     }

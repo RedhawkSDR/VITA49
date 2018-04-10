@@ -26,7 +26,7 @@ using namespace vrt;
 using namespace IndicatorFields;
 
 
-SpectrumField::SpectrumField             ()                             : Record(56) { }
+SpectrumField::SpectrumField             ()                             : Record(52) { }
 SpectrumField::SpectrumField             (const SpectrumField       &r) : Record(r) { }
 ArrayOfRecords::ArrayOfRecords           ()                             : Record(12) { }
 ArrayOfRecords::ArrayOfRecords           (const ArrayOfRecords      &r) : Record(r) { }
@@ -898,7 +898,8 @@ ValueType SpectrumField::getFieldType (int32_t id) const {
     case  9: return ValueType_Int32;
     case 10: return ValueType_Int32;
     case 11: return ValueType_Int32;
-    case 12: return ValueType_Double;
+    case 12: return ValueType_Int32;
+    case 13: return ValueType_Double;
     default: return Record::getFieldType(id);
   }
 }

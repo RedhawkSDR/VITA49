@@ -486,14 +486,14 @@ namespace vrt {
       return val;
     }
 
-    /** Gets the 2D Pointing Angle (Structured)
+    /** Gets the 3D Pointing Vector (Structured)
      *  @param  cif7field Indicator field for the CIF7 attribute.
-     *  @return 2D Pointing Angle as an Array-of-Records (null if not specified).
+     *  @return 3D Pointing Vector as an Array-of-Records (null if not specified).
      *  <i>Note that changes to the returned object do not alter the packet.</i>
      */
-    public: virtual ArrayOfRecords get2DPointingAngleStructured (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
+    public: virtual ArrayOfRecords get3DPointingVectorStructured (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
       int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
-      int32_t off = getOffset(1, protected_CIF1::PNT_ANGL_2D_ST_mask, cif7bit);
+      int32_t off = getOffset(1, protected_CIF1::PNT_VECT_3D_ST_mask, cif7bit);
       ArrayOfRecords val;
       if (off >= 0) unpackPayloadRecord(off,val);
       return val;

@@ -932,12 +932,12 @@ void BasicAcknowledgePacket::setCIF7Bit (int32_t cif7bit, bool set, bool occurre
 void BasicAcknowledgePacket::setWarningsGenerated (bool set) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   // Replaced trivial implementation with one that adds/removes WIF0
-  //setCtrlAckSettingsBit(ACK_W_BIT, set);
+  //setCtrlAckSettingsBit(CTRLACK_W_BIT, set);
   int32_t field = getCtrlAckSettingsField();
   int32_t val;
 
-  if (set) val = field | ACK_W_BIT;
-  else     val = field & ~ACK_W_BIT;
+  if (set) val = field | CTRLACK_W_BIT;
+  else     val = field & ~CTRLACK_W_BIT;
 
   if (val != field) {
     // Update bit and adjust payload
@@ -955,19 +955,19 @@ void BasicAcknowledgePacket::setWarningsGenerated (bool set) {
 void BasicAcknowledgePacket::setErrorsGenerated (bool set) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   // Replaced trivial implementation with one that adds/removes EIF0
-  //setCtrlAckSettingsBit(ACK_E_BIT, set);
+  //setCtrlAckSettingsBit(CTRLACK_E_BIT, set);
   int32_t field = getCtrlAckSettingsField();
   int32_t val;
 
-  if (set) val = field | ACK_E_BIT;
-  else     val = field & ~ACK_E_BIT;
+  if (set) val = field | CTRLACK_E_BIT;
+  else     val = field & ~CTRLACK_E_BIT;
 
   if (val != field) {
     VRTMath::packInt(bbuf, getHeaderLength(), val);
     // find offset for EIF0
     int32_t off = 0;
     int32_t prologlen = getPrologueLength();
-    if ((field & ACK_W_BIT) != 0) {
+    if ((field & CTRLACK_W_BIT) != 0) {
       int32_t wif0 = VRTMath::unpackInt(bbuf, prologlen);
       off += (4 + (bitCount(wif0 & 0x000000FF) * 4)); // 4 bytes for each WIF present
       if (set) off = -off; // negative if not already there

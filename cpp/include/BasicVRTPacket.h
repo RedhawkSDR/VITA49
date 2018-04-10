@@ -566,24 +566,6 @@ namespace vrt {
      */
     public: virtual boolNull isControlAckMode () const;
 
-    /** Command packets only: Gets the Stale TimeStamp Mode (T). This indicates how controls
-     *  are to be executed with stale or no timestamp, or in the case of ack packets, how the
-     *  controls were executed with regard to the timestamp.
-     *  <pre>
-     *    true  = Control: execute controls if time stamp is stale or expired, and execute controls
-     *                     immediately if no time stamp is present.
-     *            Ack: controls were executed at the specified time, or there was no time stamp
-     *                 present.
-     *    false = Control: do not execute controls if time stamp is stale, or there are no
-     *                     timing restrictions when no time stamp is present.
-     *            Ack: the controllee was unable to execute the controls at the specified time,
-     *            or the controllee does not implement time stamped controls.
-     *    null  = <i>Error: not a command packet</i>
-     *  </pre>
-     *  @return true or false as indicated above or null if this is not a command packet.
-     */
-    public: virtual boolNull isStaleTimeStampMode () const;
-
     /** Command packets only: Gets the Cancel Mode (L). This indicates if a command packet
      *  is a Control-Cancel packet:
      *  <pre>
@@ -759,13 +741,6 @@ namespace vrt {
      *                                        doesn't support this setting.
      */
     public: virtual void setControlAckMode (bool v);
-
-    /** <i>Optional functionality:</i> Command packets only: Gets the Stale TimeStamp Mode (T).
-     *  @param v The new value, see {@link #isStaleTimeStampMode()} for details.
-     *  @throws VRTException If this method is not supported or if the packet type
-     *                                        doesn't support this setting.
-     */
-    public: virtual void setStaleTimeStampMode (bool v);
 
     /** <i>Optional functionality:</i> Command packets only: Gets the Cancel Mode (L).
      *  @param v The new value, see {@link #isCancelMode()} for details.
