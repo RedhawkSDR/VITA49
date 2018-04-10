@@ -73,16 +73,16 @@
 <li>GeoSentences()
 : <a class="el" href="classvrt_1_1GeoSentences.html#ae36c052aa492e3c4a33e22cf4ff90a27">vrt::GeoSentences</a>
 </li>
-<li>get2DPointingAngleAzimuth()
-: <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a611e084d0dc4d171b553caf3bee69d50">vrt::IndicatorFieldProvider</a>
+<li>get3DPointingVectorAzimuth()
+: <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a6acc895f3c398f3dded225c2eb2e0657">vrt::IndicatorFieldProvider</a>
 </li>
-<li>get2DPointingAngleElevation()
-: <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ae82680a4dd76e82e228ac56cf9943f44">vrt::IndicatorFieldProvider</a>
+<li>get3DPointingVectorElevation()
+: <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a3ea7e61b5ad7cb8a48849e195dac8b3c">vrt::IndicatorFieldProvider</a>
 </li>
-<li>get2DPointingAngleStructured()
-: <a class="el" href="classvrt_1_1BasicContextPacket.html#a86b361944b68a347b0a7e7577fa9cca0">vrt::BasicContextPacket</a>
-, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ac1ee8dd842a7d8999296cf5c1a59e508">vrt::IndicatorFieldProvider</a>
-, <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a8bc3365260d10b9a802be5156c363512">vrt::BasicAcknowledgePacket</a>
+<li>get3DPointingVectorStructured()
+: <a class="el" href="classvrt_1_1BasicContextPacket.html#a398b13df734738e2d24e3448aed85c59">vrt::BasicContextPacket</a>
+, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a2e9f953d1dda415b197ae95434a8d9d5">vrt::IndicatorFieldProvider</a>
+, <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a1d3adcf3543f81d73b438774f6bd5c62">vrt::BasicAcknowledgePacket</a>
 </li>
 <li>getAbortError()
 : <a class="el" href="classvrt_1_1Threadable.html#af79288b927998927c65b582103682076">vrt::Threadable</a>
@@ -185,9 +185,6 @@
 <li>getBarometricPressure()
 : <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#aff43daba7c3326f0eab002d240b6cbbc">vrt::IndicatorFieldProvider</a>
 </li>
-<li>getBeamwidth()
-: <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ae6d0d3df9106872ea8ccaecaa24da17f">vrt::IndicatorFieldProvider</a>
-</li>
 <li>getBindField()
 : <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a98e5f6ab0340ee3379262bd9114e6951">vrt::IndicatorFieldProvider</a>
 </li>
@@ -230,9 +227,9 @@
 : <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a19b59f10d65696c3880dde04a95ba581">vrt::IndicatorFieldProvider</a>
 </li>
 <li>getCIFsArray()
-: <a class="el" href="classvrt_1_1BasicContextPacket.html#a685c59c3934d168a2fd46fe5a2426e9d">vrt::BasicContextPacket</a>
-, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a45fcf94010ead4ec653333a563afcf31">vrt::IndicatorFieldProvider</a>
+: <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a45fcf94010ead4ec653333a563afcf31">vrt::IndicatorFieldProvider</a>
 , <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a76b522014e29a85ead242159cacebaa8">vrt::BasicAcknowledgePacket</a>
+, <a class="el" href="classvrt_1_1BasicContextPacket.html#a685c59c3934d168a2fd46fe5a2426e9d">vrt::BasicContextPacket</a>
 </li>
 <li>getCitedMessageID()
 : <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ac29ba0cae7d5437bb86a71215393b84d">vrt::IndicatorFieldProvider</a>
@@ -508,8 +505,7 @@
 , <a class="el" href="classvrt_1_1TimestampAccuracyPacket.html#afc1430c5bb78fe563c0c676c04709a62">vrt::TimestampAccuracyPacket</a>
 </li>
 <li>getFieldType()
-: <a class="el" href="classvrt_1_1TimestampAccuracyPacket.html#a0be3359af283839cbf697ec1f544ff7a">vrt::TimestampAccuracyPacket</a>
-, <a class="el" href="classvrt_1_1BasicContextPacket.html#af274bb458105f4fbee75a1590561e8b5">vrt::BasicContextPacket</a>
+: <a class="el" href="classvrt_1_1BasicContextPacket.html#af274bb458105f4fbee75a1590561e8b5">vrt::BasicContextPacket</a>
 , <a class="el" href="classvrt_1_1BasicDataPacket.html#a8013a7abb16b51db23230578ba7b8d64">vrt::BasicDataPacket</a>
 , <a class="el" href="classvrt_1_1BasicVRTPacket.html#a4cb1678a3a71c7abda7c621b2f96363a">vrt::BasicVRTPacket</a>
 , <a class="el" href="classvrt_1_1HasFields.html#ac0808fd37f45dfcc0f76c7ceaceb553d">vrt::HasFields</a>
@@ -532,6 +528,7 @@
 , <a class="el" href="classvrt_1_1ReferencePointPacket.html#a82d0ce6221469018f1f9a7280c2104a4">vrt::ReferencePointPacket</a>
 , <a class="el" href="classvrt_1_1StandardContextPacket.html#ad071e32ce3d52885350a3657cccb1cbe">vrt::StandardContextPacket</a>
 , <a class="el" href="classvrt_1_1StreamStatePacket.html#a0a58177f49118acfbb32ea227e5b011b">vrt::StreamStatePacket</a>
+, <a class="el" href="classvrt_1_1TimestampAccuracyPacket.html#a0be3359af283839cbf697ec1f544ff7a">vrt::TimestampAccuracyPacket</a>
 </li>
 <li>getFileLength()
 : <a class="el" href="classvrt_1_1AbstractVRAFile.html#a0213c800ae24579a77d67a8f152b6bb9">vrt::AbstractVRAFile</a>
@@ -634,6 +631,9 @@
 </li>
 <li>getHealthStatus()
 : <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a83958be70c40755570bb39199c88f8be">vrt::IndicatorFieldProvider</a>
+</li>
+<li>getHorizontalBeamwidth()
+: <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a57ef193e4441a2fc451bac4171392327">vrt::IndicatorFieldProvider</a>
 </li>
 <li>getHostAddress()
 : <a class="el" href="classvrt_1_1InetAddress.html#a9e54de3044918c38e8c77bf47f0da716">vrt::InetAddress</a>
@@ -832,11 +832,11 @@
 : <a class="el" href="classvrt_1_1BasicVRTPacket.html#a3e6eeeb361350724ee2e7c75c6c41c15">vrt::BasicVRTPacket</a>
 </li>
 <li>getPacketValid()
-: <a class="el" href="classvrt_1_1ReferencePointPacket.html#a1a6fe538027381cae9a0f621e27f8ac2">vrt::ReferencePointPacket</a>
+: <a class="el" href="classvrt_1_1BasicVRTPacket.html#a75a0cfaedb0818423b932ebaf633468e">vrt::BasicVRTPacket</a>
 , <a class="el" href="classvrt_1_1BasicCommandPacket.html#a4716cfda99101722eef6096dbf9b4485">vrt::BasicCommandPacket</a>
 , <a class="el" href="classvrt_1_1BasicControlPacket.html#a68dba5a6ce4b30256aef34f0b135f8de">vrt::BasicControlPacket</a>
 , <a class="el" href="classvrt_1_1BasicDataPacket.html#aeba2eca140af729e176d8c628f497cf5">vrt::BasicDataPacket</a>
-, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a75a0cfaedb0818423b932ebaf633468e">vrt::BasicVRTPacket</a>
+, <a class="el" href="classvrt_1_1ReferencePointPacket.html#a1a6fe538027381cae9a0f621e27f8ac2">vrt::ReferencePointPacket</a>
 , <a class="el" href="classvrt_1_1StandardDataPacket.html#ad8162920cb8afb64b6dcd5209dd5e953">vrt::StandardDataPacket</a>
 , <a class="el" href="classvrt_1_1EphemerisPacket.html#a575813113c25d361c46982bdc0a6c4b9">vrt::EphemerisPacket</a>
 , <a class="el" href="classvrt_1_1NoDataPacket.html#a37cd51914b5eda5cfc98cdcdba5f0918">vrt::NoDataPacket</a>
@@ -844,7 +844,6 @@
 , <a class="el" href="classvrt_1_1StreamStatePacket.html#ae8b2345643dc36976f64c642dfeada03">vrt::StreamStatePacket</a>
 , <a class="el" href="classvrt_1_1TimestampAccuracyPacket.html#a2d310492254388ce10c9434e5020124f">vrt::TimestampAccuracyPacket</a>
 , <a class="el" href="classvrt_1_1BasicContextPacket.html#a9f29563dc9672db682a28e1762bdce4c">vrt::BasicContextPacket</a>
-, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a0f09daf0899cc4d9d069ecdfeaea0a0c">vrt::BasicVRTPacket</a>
 </li>
 <li>getPacketVector()
 : <a class="el" href="classvrt_1_1BasicVRTPacket.html#a7363dea90200c32c000dc6879d45e18b">vrt::BasicVRTPacket</a>
@@ -862,8 +861,8 @@
 : <a class="el" href="classvrt_1_1BasicVRTPacket.html#ac1aba013c1743a58d53e6a55025285a3">vrt::BasicVRTPacket</a>
 </li>
 <li>getPayloadFormat()
-: <a class="el" href="classvrt_1_1BasicDataPacket.html#a218104e7d259c4e852254d65e304e3f8">vrt::BasicDataPacket</a>
-, <a class="el" href="classvrt_1_1StandardDataPacket.html#aafa6149cc97f84bb2af44349caa20d75">vrt::StandardDataPacket</a>
+: <a class="el" href="classvrt_1_1StandardDataPacket.html#aafa6149cc97f84bb2af44349caa20d75">vrt::StandardDataPacket</a>
+, <a class="el" href="classvrt_1_1BasicDataPacket.html#a218104e7d259c4e852254d65e304e3f8">vrt::BasicDataPacket</a>
 </li>
 <li>getPayloadLength()
 : <a class="el" href="classvrt_1_1BasicVRTPacket.html#a408e5bbadcd6099619e264a412223c36">vrt::BasicVRTPacket</a>
@@ -878,11 +877,11 @@
 : <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#af3fddc786861fceef586cb591f35b77c">vrt::IndicatorFieldProvider</a>
 </li>
 <li>getPicoSeconds()
-: <a class="el" href="classvrt_1_1TimeStamp.html#aa4f90c1fbc57038c7f1b31dcb203971d">vrt::TimeStamp</a>
+: <a class="el" href="classvrt_1_1TimeStamp.html#a765f699c0bd679c5e2a4efb3e1d87196">vrt::TimeStamp</a>
 </li>
 <li>getPktSpecificPrologueLength()
-: <a class="el" href="classvrt_1_1BasicCommandPacket.html#a09be68308a83d8391436bedc4b104651">vrt::BasicCommandPacket</a>
-, <a class="el" href="classvrt_1_1BasicControlPacket.html#a081f7ed57723743433d3e86edeed8e6b">vrt::BasicControlPacket</a>
+: <a class="el" href="classvrt_1_1BasicControlPacket.html#a081f7ed57723743433d3e86edeed8e6b">vrt::BasicControlPacket</a>
+, <a class="el" href="classvrt_1_1BasicCommandPacket.html#a09be68308a83d8391436bedc4b104651">vrt::BasicCommandPacket</a>
 , <a class="el" href="classvrt_1_1BasicVRTPacket.html#a4a6710bd7de5d1416c8377dc5a92d9a6">vrt::BasicVRTPacket</a>
 </li>
 <li>getPlatformClass()
@@ -918,8 +917,8 @@
 , <a class="el" href="classvrt_1_1Point.html#ab0a0196739b8b1887fad41f15777101f">vrt::Point</a>
 </li>
 <li>getPositionZ()
-: <a class="el" href="classvrt_1_1Ephemeris.html#a3ce673b32be7e34935015f5379c4fb9c">vrt::Ephemeris</a>
-, <a class="el" href="classvrt_1_1Point.html#a16b38a735f0b05d2bf864f5b0c239078">vrt::Point</a>
+: <a class="el" href="classvrt_1_1Point.html#a16b38a735f0b05d2bf864f5b0c239078">vrt::Point</a>
+, <a class="el" href="classvrt_1_1Ephemeris.html#a3ce673b32be7e34935015f5379c4fb9c">vrt::Ephemeris</a>
 </li>
 <li>getPOSIXSeconds()
 : <a class="el" href="classvrt_1_1TimeStamp.html#a331d7b738aa8a07b9c92efcb7958f4aa">vrt::TimeStamp</a>
@@ -928,8 +927,8 @@
 : <a class="el" href="classvrt_1_1EphemerisPacket.html#ad7a3062df0ec309ea130d94903f5c948">vrt::EphemerisPacket</a>
 </li>
 <li>getPrologueLength()
-: <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">vrt::BasicVRTPacket</a>
-, <a class="el" href="classvrt_1_1BasicCommandPacket.html#a2bd7b5952c6fdee424fe8faad91f82e1">vrt::BasicCommandPacket</a>
+: <a class="el" href="classvrt_1_1BasicCommandPacket.html#a2bd7b5952c6fdee424fe8faad91f82e1">vrt::BasicCommandPacket</a>
+, <a class="el" href="classvrt_1_1BasicVRTPacket.html#a200f38adde97a2778b330fd75a5cbc8d">vrt::BasicVRTPacket</a>
 , <a class="el" href="classvrt_1_1BasicControlPacket.html#a442228f7a5b94844edf913e8b409868d">vrt::BasicControlPacket</a>
 </li>
 <li>getPulseWidth()
@@ -985,8 +984,8 @@
 : <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a3060f6d13f100984638d0d6ff0771f1e">vrt::IndicatorFieldProvider</a>
 </li>
 <li>getSampleRate()
-: <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a5dcc6bcf6855ab5378d167044a77c25f">vrt::IndicatorFieldProvider</a>
-, <a class="el" href="classvrt_1_1TimeStamp.html#af9e04694b696b9e4fedadc3219acdcef">vrt::TimeStamp</a>
+: <a class="el" href="classvrt_1_1TimeStamp.html#af9e04694b696b9e4fedadc3219acdcef">vrt::TimeStamp</a>
+, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a5dcc6bcf6855ab5378d167044a77c25f">vrt::IndicatorFieldProvider</a>
 </li>
 <li>getScalarDataLength()
 : <a class="el" href="classvrt_1_1BasicDataPacket.html#a93844600fe4d42f517b585bed68bdd8e">vrt::BasicDataPacket</a>
@@ -1014,8 +1013,8 @@
 </li>
 <li>getSectorScanStep()
 : <a class="el" href="classvrt_1_1BasicContextPacket.html#af1937b2ba28c3699e6fad28c3e2d11b1">vrt::BasicContextPacket</a>
-, <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ab41541979f9e93a243dcecba0c6e6437">vrt::BasicAcknowledgePacket</a>
 , <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab050b3a8cd376687185ed1651f2c6a04">vrt::IndicatorFieldProvider</a>
+, <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ab41541979f9e93a243dcecba0c6e6437">vrt::BasicAcknowledgePacket</a>
 </li>
 <li>getSentences()
 : <a class="el" href="classvrt_1_1GeoSentences.html#a1922518f78751dda786f7e21c06fb7a6">vrt::GeoSentences</a>
@@ -1048,7 +1047,7 @@
 : <a class="el" href="classvrt_1_1SpectrumField.html#a62f4939d872a129d611dfa7d623380df">vrt::SpectrumField</a>
 </li>
 <li>getSpatialReferenceType()
-: <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#af5b481ea0b8a1235460961bc34b949c1">vrt::IndicatorFieldProvider</a>
+: <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ade0341b7c69ffc54a54eb00eb9066ce9">vrt::IndicatorFieldProvider</a>
 </li>
 <li>getSpatialScanType()
 : <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#aaeaec56e0ce47413691a427cb25d4d93">vrt::IndicatorFieldProvider</a>
@@ -1060,9 +1059,9 @@
 : <a class="el" href="classvrt_1_1SpectrumField.html#a26cf0be4cc064453a4d5a20b79b30a02">vrt::SpectrumField</a>
 </li>
 <li>getSpectrumField()
-: <a class="el" href="classvrt_1_1BasicContextPacket.html#a9be575d78c2c925b00a50eb77bd683a2">vrt::BasicContextPacket</a>
+: <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a5d4be00b5cc30fbe9ac1adc8bbbdec43">vrt::BasicAcknowledgePacket</a>
 , <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a40861fcb3cf29b33c4e1fb6d82377283">vrt::IndicatorFieldProvider</a>
-, <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a5d4be00b5cc30fbe9ac1adc8bbbdec43">vrt::BasicAcknowledgePacket</a>
+, <a class="el" href="classvrt_1_1BasicContextPacket.html#a9be575d78c2c925b00a50eb77bd683a2">vrt::BasicContextPacket</a>
 </li>
 <li>getSpectrumType()
 : <a class="el" href="classvrt_1_1SpectrumField.html#a3c6fbc96f28d17c5c4ab0d19fa46e3dd">vrt::SpectrumField</a>
@@ -1086,11 +1085,11 @@
 : <a class="el" href="classvrt_1_1BasicDataPacket.html#a95ec9b3fc553ea59a173163d9257c432">vrt::BasicDataPacket</a>
 </li>
 <li>getStateEventBit()
-: <a class="el" href="classvrt_1_1BasicContextPacket.html#acb7a5d88b6182f89a4f73c9e003be860">vrt::BasicContextPacket</a>
-, <a class="el" href="classvrt_1_1BasicVRTPacket.html#aece0316a5d3a949e27f87e7d0e390045">vrt::BasicVRTPacket</a>
-, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ac0e4ee6b7aaf1658b71c997c0c9b6596">vrt::IndicatorFieldProvider</a>
-, <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#abed798b31c0f6873f6de1f34a24f642d">vrt::BasicAcknowledgePacket</a>
+: <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#abed798b31c0f6873f6de1f34a24f642d">vrt::BasicAcknowledgePacket</a>
 , <a class="el" href="classvrt_1_1Record.html#a6fdb310a9ce251f637604d14e0954c9c">vrt::Record</a>
+, <a class="el" href="classvrt_1_1BasicContextPacket.html#acb7a5d88b6182f89a4f73c9e003be860">vrt::BasicContextPacket</a>
+, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ac0e4ee6b7aaf1658b71c997c0c9b6596">vrt::IndicatorFieldProvider</a>
+, <a class="el" href="classvrt_1_1BasicVRTPacket.html#aece0316a5d3a949e27f87e7d0e390045">vrt::BasicVRTPacket</a>
 </li>
 <li>getStatus()
 : <a class="el" href="classvrt_1_1Threadable.html#ad531f68d68130fb98ca1ae8d02af523b">vrt::Threadable</a>
@@ -1133,8 +1132,8 @@
 : <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a4fa0dc6903e7a6a5617ae618ebb4232f">vrt::IndicatorFieldProvider</a>
 </li>
 <li>getTimeStamp()
-: <a class="el" href="classvrt_1_1BasicVRTPacket.html#aa3addceef948a38f998e049d7e7cc678">vrt::BasicVRTPacket</a>
-, <a class="el" href="classvrt_1_1GeoSentences.html#a1ae9fe4638531cbae33df4f2db539239">vrt::GeoSentences</a>
+: <a class="el" href="classvrt_1_1GeoSentences.html#a1ae9fe4638531cbae33df4f2db539239">vrt::GeoSentences</a>
+, <a class="el" href="classvrt_1_1BasicVRTPacket.html#aa3addceef948a38f998e049d7e7cc678">vrt::BasicVRTPacket</a>
 , <a class="el" href="classvrt_1_1AbstractGeolocation.html#ad70e8446f5cec61cb7fc5d6e9c42413f">vrt::AbstractGeolocation</a>
 , <a class="el" href="classvrt_1_1BasicVRTPacket.html#ab380dc8f0635a24acd0f82e9eb2c36cb">vrt::BasicVRTPacket</a>
 </li>
@@ -1151,9 +1150,9 @@
 : <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a0813cf547ccfbd1ab14df50e9ae7a2bb">vrt::IndicatorFieldProvider</a>
 </li>
 <li>getTimeStampField()
-: <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a3b37c1c73c1aa70a3308dce70559f3dd">vrt::BasicAcknowledgePacket</a>
+: <a class="el" href="classvrt_1_1BasicContextPacket.html#a79e42fa1b609b47abe629c182857536b">vrt::BasicContextPacket</a>
+, <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a3b37c1c73c1aa70a3308dce70559f3dd">vrt::BasicAcknowledgePacket</a>
 , <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ad6b1daf3449fb1d11a1276d9e0d68e50">vrt::IndicatorFieldProvider</a>
-, <a class="el" href="classvrt_1_1BasicContextPacket.html#a79e42fa1b609b47abe629c182857536b">vrt::BasicContextPacket</a>
 </li>
 <li>getTimeStampFractional()
 : <a class="el" href="classvrt_1_1TimeStamp.html#ac11fd40f909f09ffc0997b0a0289de1c">vrt::TimeStamp</a>
@@ -1165,11 +1164,11 @@
 : <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a2ecd320c6c33749811ac0d82712f7f9b">vrt::IndicatorFieldProvider</a>
 </li>
 <li>getTotalFieldSize()
-: <a class="el" href="classvrt_1_1IndexFieldList.html#a5fc8aa2fda72e963d78a2ab48e0ff0e2">vrt::IndexFieldList</a>
-, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a1135ffdc51472f6b6bf86ca42ae9a7f3">vrt::IndicatorFieldProvider</a>
-, <a class="el" href="classvrt_1_1ArrayOfRecords.html#ae556bb83fec8609ead7185d070818cc6">vrt::ArrayOfRecords</a>
+: <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a1135ffdc51472f6b6bf86ca42ae9a7f3">vrt::IndicatorFieldProvider</a>
+, <a class="el" href="classvrt_1_1IndexFieldList.html#a5fc8aa2fda72e963d78a2ab48e0ff0e2">vrt::IndexFieldList</a>
 , <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a9ce06b83dd12920e81054db38fe98e55">vrt::BasicAcknowledgePacket</a>
 , <a class="el" href="classvrt_1_1BasicContextPacket.html#af419cda0b890e658a5fa81e661e0fc9f">vrt::BasicContextPacket</a>
+, <a class="el" href="classvrt_1_1ArrayOfRecords.html#ae556bb83fec8609ead7185d070818cc6">vrt::ArrayOfRecords</a>
 </li>
 <li>getTrackAngle()
 : <a class="el" href="classvrt_1_1Geolocation.html#a3c7601660ec0c8218e20d5bf29b808c0">vrt::Geolocation</a>
@@ -1205,9 +1204,9 @@
 : <a class="el" href="classvrt_1_1TimeStamp.html#a9763836a5a65bd60e0639ddae063d534">vrt::TimeStamp</a>
 </li>
 <li>getUUID()
-: <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a4ff597e579c125ab0609621aa5327ca9">vrt::IndicatorFieldProvider</a>
-, <a class="el" href="classvrt_1_1BasicContextPacket.html#ad2caa8b603ba8d33c238bf5d91e39662">vrt::BasicContextPacket</a>
+: <a class="el" href="classvrt_1_1BasicContextPacket.html#ad2caa8b603ba8d33c238bf5d91e39662">vrt::BasicContextPacket</a>
 , <a class="el" href="classvrt_1_1UUID.html#ab795b71d49fa5fcc28c24ad79c36cf6a">vrt::UUID</a>
+, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a4ff597e579c125ab0609621aa5327ca9">vrt::IndicatorFieldProvider</a>
 , <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ab4c2f89c0e36d87477370237beb2a127">vrt::BasicAcknowledgePacket</a>
 </li>
 <li>getUUIDPointer()
@@ -1220,8 +1219,8 @@
 : <a class="el" href="classvrt_1_1PayloadFormat.html#a2135669106f8ed600b009158a6894f52">vrt::PayloadFormat</a>
 </li>
 <li>getValue()
-: <a class="el" href="classvrt_1_1MetadataEntry.html#ad5c2b0f7d6854e14e927d3fffdc493d3">vrt::MetadataEntry</a>
-, <a class="el" href="classvrt_1_1UUID.html#a72226ee4f70ea6b053e9e7239300167e">vrt::UUID</a>
+: <a class="el" href="classvrt_1_1UUID.html#a72226ee4f70ea6b053e9e7239300167e">vrt::UUID</a>
+, <a class="el" href="classvrt_1_1MetadataEntry.html#ad5c2b0f7d6854e14e927d3fffdc493d3">vrt::MetadataEntry</a>
 </li>
 <li>getVectorComponent()
 : <a class="el" href="classvrt_1_1ContextAssocLists.html#a966f67f804957e51422589f1477ece28">vrt::ContextAssocLists</a>
@@ -1236,19 +1235,22 @@
 : <a class="el" href="classvrt_1_1EphemerisPacket.html#a0e626425d7544ca508e5dd54601034c8">vrt::EphemerisPacket</a>
 </li>
 <li>getVelocityX()
-: <a class="el" href="classvrt_1_1Ephemeris.html#a4f0031a6f51b2b6f9c54296437763f0c">vrt::Ephemeris</a>
-, <a class="el" href="classvrt_1_1Point.html#adc32016a8cc04788b0e0570e35001e7a">vrt::Point</a>
+: <a class="el" href="classvrt_1_1Point.html#adc32016a8cc04788b0e0570e35001e7a">vrt::Point</a>
+, <a class="el" href="classvrt_1_1Ephemeris.html#a4f0031a6f51b2b6f9c54296437763f0c">vrt::Ephemeris</a>
 </li>
 <li>getVelocityY()
-: <a class="el" href="classvrt_1_1Ephemeris.html#a4d5831beb7fdf4d7824fbee4a7fd5e35">vrt::Ephemeris</a>
-, <a class="el" href="classvrt_1_1Point.html#a232ed93caa9966955f9f0e3194c3b472">vrt::Point</a>
+: <a class="el" href="classvrt_1_1Point.html#a232ed93caa9966955f9f0e3194c3b472">vrt::Point</a>
+, <a class="el" href="classvrt_1_1Ephemeris.html#a4d5831beb7fdf4d7824fbee4a7fd5e35">vrt::Ephemeris</a>
 </li>
 <li>getVelocityZ()
-: <a class="el" href="classvrt_1_1Ephemeris.html#a6de0123225be098cea8562d996869d38">vrt::Ephemeris</a>
-, <a class="el" href="classvrt_1_1Point.html#a78a20406727605f45418efbc8f9b3063">vrt::Point</a>
+: <a class="el" href="classvrt_1_1Point.html#a78a20406727605f45418efbc8f9b3063">vrt::Point</a>
+, <a class="el" href="classvrt_1_1Ephemeris.html#a6de0123225be098cea8562d996869d38">vrt::Ephemeris</a>
 </li>
 <li>getVersion()
 : <a class="el" href="classvrt_1_1AbstractVRAFile.html#ab5e7701f58addbb06f5cc239acc9921e">vrt::AbstractVRAFile</a>
+</li>
+<li>getVerticalBeamwidth()
+: <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#acea40b7ba71368be1c070b31f19c8fa5">vrt::IndicatorFieldProvider</a>
 </li>
 <li>getVRTPackets()
 : <a class="el" href="classvrt_1_1BasicVRLFrame.html#a5d2dbbaeaeda39d2ecb751038c7921fc">vrt::BasicVRLFrame</a>
@@ -1278,8 +1280,8 @@
 : <a class="el" href="classvrt_1_1SpectrumField.html#ac29380fc5bdf060c4f7e478c9e3c03cc">vrt::SpectrumField</a>
 </li>
 <li>getX()
-: <a class="el" href="classvrt_1_1BasicContextPacket.html#a8f919e6c07a23152297c67bef2a85009">vrt::BasicContextPacket</a>
-, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a244593d0daec5bd4bbe6bf7562941aa5">vrt::IndicatorFieldProvider</a>
+: <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a244593d0daec5bd4bbe6bf7562941aa5">vrt::IndicatorFieldProvider</a>
+, <a class="el" href="classvrt_1_1BasicContextPacket.html#a8f919e6c07a23152297c67bef2a85009">vrt::BasicContextPacket</a>
 , <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aa0a032a8a6eeacef74f7886421ca2390">vrt::BasicAcknowledgePacket</a>
 </li>
 <li>getYear()
@@ -1294,7 +1296,7 @@
 </li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 7 Mar 2018 for VRT by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 10 Apr 2018 for VRT by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

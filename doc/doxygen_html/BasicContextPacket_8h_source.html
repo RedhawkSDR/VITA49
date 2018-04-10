@@ -24,7 +24,7 @@
       <li><a href="files.html"><span>File&nbsp;List</span></a></li>
     </ul>
   </div>
-  <div class="navpath"><a class="el" href="dir_a3ee2da6a7acd12cfebd7023a400e49c.html">cpp_src</a>&nbsp;&raquo&nbsp;<a class="el" href="dir_8681eeff97ce1dcaa2c2dd525f1d5b83.html">vrt</a>&nbsp;&raquo&nbsp;<a class="el" href="dir_4cbb2aeb8e883b102012504fe756c455.html">lib</a>
+  <div class="navpath"><a class="el" href="dir_9cdb84786025dce5341bd6779587713e.html">cpp_src</a>&nbsp;&raquo&nbsp;<a class="el" href="dir_2a85b8859a218345fc0faac8bfab6e3b.html">vrt</a>&nbsp;&raquo&nbsp;<a class="el" href="dir_cc9e5102231cfbdf7534bbc43e2ed466.html">lib</a>
   </div>
 </div>
 <div class="contents">
@@ -297,9 +297,9 @@
 <a name="l00486"></a>00486       <span class="keywordflow">return</span> val;
 <a name="l00487"></a>00487     }
 <a name="l00488"></a>00488 
-<a name="l00494"></a><a class="code" href="classvrt_1_1BasicContextPacket.html#a86b361944b68a347b0a7e7577fa9cca0">00494</a>     <span class="keyword">public</span>: <span class="keyword">virtual</span> <a class="code" href="classvrt_1_1ArrayOfRecords.html" title="Specifies an Array of Records.">ArrayOfRecords</a> <a class="code" href="classvrt_1_1BasicContextPacket.html#a86b361944b68a347b0a7e7577fa9cca0" title="Gets the 2D Pointing Angle (Structured).">get2DPointingAngleStructured</a> (<a class="code" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f" title="Enumeration of all Context/Control Indicator Fields.">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)<span class="keyword"> const </span>{
+<a name="l00494"></a><a class="code" href="classvrt_1_1BasicContextPacket.html#a398b13df734738e2d24e3448aed85c59">00494</a>     <span class="keyword">public</span>: <span class="keyword">virtual</span> <a class="code" href="classvrt_1_1ArrayOfRecords.html" title="Specifies an Array of Records.">ArrayOfRecords</a> <a class="code" href="classvrt_1_1BasicContextPacket.html#a398b13df734738e2d24e3448aed85c59" title="Gets the 3D Pointing Vector (Structured).">get3DPointingVectorStructured</a> (<a class="code" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f" title="Enumeration of all Context/Control Indicator Fields.">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)<span class="keyword"> const </span>{
 <a name="l00495"></a>00495       int32_t cif7bit = (<a class="code" href="namespacevrt_1_1IndicatorFields.html#a5d25153dabff1fd76f93ecb36ec05004" title="Get the CIF number from the IndicatorFieldEnum_t The top three (most-significant)...">getCIFNumber</a>(cif7field) != 7) ? 0 : <a class="code" href="namespacevrt_1_1IndicatorFields.html#ac48d658229ebdcbc8ddfc7074efcc3e7" title="Get the 1-hot bit mask from IndicatorFieldEnum_t The top three (most-significant)...">getCIFBitMask</a>(cif7field);
-<a name="l00496"></a>00496       int32_t off = <a class="code" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd" title="Gets the offset for the given context indicator field relative to the location of...">getOffset</a>(1, protected_CIF1::PNT_ANGL_2D_ST_mask, cif7bit);
+<a name="l00496"></a>00496       int32_t off = <a class="code" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd" title="Gets the offset for the given context indicator field relative to the location of...">getOffset</a>(1, protected_CIF1::PNT_VECT_3D_ST_mask, cif7bit);
 <a name="l00497"></a>00497       <a class="code" href="classvrt_1_1ArrayOfRecords.html" title="Specifies an Array of Records.">ArrayOfRecords</a> val;
 <a name="l00498"></a>00498       <span class="keywordflow">if</span> (off &gt;= 0) <a class="code" href="classvrt_1_1BasicVRTPacket.html#a72b46b8fab765919e60f2c710d5fd832" title="Unpacks a record from the payload of the packet.">unpackPayloadRecord</a>(off,val);
 <a name="l00499"></a>00499       <span class="keywordflow">return</span> val;
@@ -360,7 +360,7 @@
 <a name="l00569"></a>00569 } END_NAMESPACE
 <a name="l00570"></a>00570 <span class="preprocessor">#endif </span><span class="comment">/* _BasicContextPacket_h */</span>
 </pre></div></div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 7 Mar 2018 for VRT by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 10 Apr 2018 for VRT by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

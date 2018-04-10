@@ -62,12 +62,12 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>addCIF2</b> (
 virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>addCIF3</b> (bool add=true, bool occurrence=false)=0</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adb0cf76b3e8333454ad6b28f646fbb4d"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::addCIF7" ref="adb0cf76b3e8333454ad6b28f646fbb4d" args="(bool add=true, bool occurrence=false)=0" -->
 virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>addCIF7</b> (bool add=true, bool occurrence=false)=0</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a611e084d0dc4d171b553caf3bee69d50">get2DPointingAngleAzimuth</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Azimuthal Angle subfield of the Single-word 2D Pointing Angle.  <a href="#a611e084d0dc4d171b553caf3bee69d50"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ae82680a4dd76e82e228ac56cf9943f44">get2DPointingAngleElevation</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Elevation Angle subfield of the Single-word 2D Pointing Angle.  <a href="#ae82680a4dd76e82e228ac56cf9943f44"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ac1ee8dd842a7d8999296cf5c1a59e508">get2DPointingAngleStructured</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const =0</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the 2D Pointing Angle (Structured) See V49.2 spec Section 9.4.1.  <a href="#ac1ee8dd842a7d8999296cf5c1a59e508"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a6acc895f3c398f3dded225c2eb2e0657">get3DPointingVectorAzimuth</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Azimuthal Angle subfield of the Single-word 3D Pointing Vector.  <a href="#a6acc895f3c398f3dded225c2eb2e0657"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a3ea7e61b5ad7cb8a48849e195dac8b3c">get3DPointingVectorElevation</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Elevation Angle subfield of the Single-word 3D Pointing Vector.  <a href="#a3ea7e61b5ad7cb8a48849e195dac8b3c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a2e9f953d1dda415b197ae95434a8d9d5">get3DPointingVectorStructured</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const =0</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the 3D Pointing Vector (Structured) See V49.2 spec Section 9.4.1.  <a href="#a2e9f953d1dda415b197ae95434a8d9d5"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrt_1_1TimeStamp.html">TimeStamp</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a1ee94da1f511a2eb59301d45ecc737fc">getAge</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets Age The Age value and format depends on the packet timestamp format indicated by TSI and TSF fields of the Packet Prologue.  <a href="#a1ee94da1f511a2eb59301d45ecc737fc"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a6a63e2939b9d45ff64e8f242b5d4981d">getAirTemperature</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
@@ -88,8 +88,6 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>addCIF7</b> (
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Bandwidth of the signal in Hz.  <a href="#a06771bfb15a05ff050c77c255f1c3c86"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#aff43daba7c3326f0eab002d240b6cbbc">getBarometricPressure</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets Barometric Pressure Atmospheric pressure measured in the units of Pascal.  <a href="#aff43daba7c3326f0eab002d240b6cbbc"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ae6d0d3df9106872ea8ccaecaa24da17f">getBeamwidth</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Beamwidth in degrees.  <a href="#ae6d0d3df9106872ea8ccaecaa24da17f"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a98e5f6ab0340ee3379262bd9114e6951">getBindField</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets Bind Indicator Field See V49.2 spec Section 9.8.1 for Bind Indicator Field.  <a href="#a98e5f6ab0340ee3379262bd9114e6951"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a9543616ce1cbbfc7e173c087775dac3b">getBitErrorRate</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
@@ -186,6 +184,8 @@ boolNull&nbsp;</td><td class="memItemRight" valign="bottom"><b>getCIF7Attribute<
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the GPS ASCII "sentences".  <a href="#af3f089a411ea7a4cd78c23c46c4fca2a"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int16_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a83958be70c40755570bb39199c88f8be">getHealthStatus</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets Health Status (See V49.2 spec Section 9.10.2) uses lower 16 bits of 32 bit word values are user defined and mapped to a defined health state.  <a href="#a83958be70c40755570bb39199c88f8be"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a57ef193e4441a2fc451bac4171392327">getHorizontalBeamwidth</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Horizontal Beamwidth in degrees.  <a href="#a57ef193e4441a2fc451bac4171392327"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a380dd09b4c09b54ee1736b1af46f8d27">getHumidity</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets Humidity Percent humidity.  <a href="#a380dd09b4c09b54ee1736b1af46f8d27"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1IndexFieldList.html">IndexFieldList</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a65c3a7eb9d32b3c2b3ba7e6d3f490e43">getIndexList</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const =0</td></tr>
@@ -264,8 +264,8 @@ boolNull&nbsp;</td><td class="memItemRight" valign="bottom"><b>getCIF7Attribute<
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets Siblings SID as a string See V49.2 spec Section 9.8.2 for Siblings SID.  <a href="#aa986d642b89fe206b0ca99efd67891d5"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a76dc0401a1f5fe9fcf45414560f3230c">getSNR</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Signal-to-Noise Ratio, expressed in decibels.  <a href="#a76dc0401a1f5fe9fcf45414560f3230c"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">int16_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#af5b481ea0b8a1235460961bc34b949c1">getSpatialReferenceType</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets Spatial Reference Type.  <a href="#af5b481ea0b8a1235460961bc34b949c1"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ade0341b7c69ffc54a54eb00eb9066ce9">getSpatialReferenceType</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets Spatial Reference Type.  <a href="#ade0341b7c69ffc54a54eb00eb9066ce9"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int16_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#aaeaec56e0ce47413691a427cb25d4d93">getSpatialScanType</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets Spatial Scan Type.  <a href="#aaeaec56e0ce47413691a427cb25d4d93"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1SpectrumField.html">SpectrumField</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a40861fcb3cf29b33c4e1fb6d82377283">getSpectrumField</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const =0</td></tr>
@@ -294,6 +294,8 @@ boolNull&nbsp;</td><td class="memItemRight" valign="bottom"><b>getCIF7Attribute<
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the User-Defined Bits from the State and Event Indicator Bits.  <a href="#a343203572a01ba2c586c98f216bf58e3"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a9e3a73ca7a53d700da662fc799339606">getV49SpecVersion</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets V49 Standard and Spec Compliance Number (See V49.2 spec Section 9.10.3) 0x00000001 =&gt; V49.0 0x00000002 =&gt; V49.1 0x00000003 =&gt; V49A (which implies V49.0 and V49.1) 0x00000004 =&gt; V49.2.  <a href="#a9e3a73ca7a53d700da662fc799339606"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">float&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#acea40b7ba71368be1c070b31f19c8fa5">getVerticalBeamwidth</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the Vertical Beamwidth in degrees.  <a href="#acea40b7ba71368be1c070b31f19c8fa5"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">boolNull&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#aedbc9190ab83def659152ba1e82df0a3">isAutomaticGainControl</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the AGC/MGC indicator flag.  <a href="#aedbc9190ab83def659152ba1e82df0a3"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">boolNull&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#aecd09d1c79a97447347db7bcb9a0d108">isCalibratedTimeStamp</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
@@ -320,12 +322,12 @@ boolNull&nbsp;</td><td class="memItemRight" valign="bottom"><b>getCIF7Attribute<
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the reference lock indicator flag.  <a href="#ae7f7b5030686f0f424aef6fa3812e864"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">boolNull&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a2cf1b2cf29ebe88dce3798c908fcbbaa">isSignalDetected</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the signal detected indicator flag.  <a href="#a2cf1b2cf29ebe88dce3798c908fcbbaa"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a845e53227060982f8a860eb9bca39dfb">set2DPointingAngleAzimuth</a> (float val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the Azimuthal Angle subfield of the Single-word 2D Pointing Angle.  <a href="#a845e53227060982f8a860eb9bca39dfb"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a6c07e1722cb79c057c88a72f23ace209">set2DPointingAngleElevation</a> (float val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the Elevation Angle subfield of the Single-word 2D Pointing Angle.  <a href="#a6c07e1722cb79c057c88a72f23ace209"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a6ffd83a9673e1a600c534ed08a3a2666">set2DPointingAngleStructured</a> (const <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a> &amp;val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the 2D Pointing Angle (Structured) See V49.2 spec Section 9.4.1.  <a href="#a6ffd83a9673e1a600c534ed08a3a2666"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a31e4513ba1ed5223018b164840749c76">set3DPointingVectorAzimuth</a> (float val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the Azimuthal Angle subfield of the Single-word 3D Pointing Vector.  <a href="#a31e4513ba1ed5223018b164840749c76"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a01a7ee528aecc38f9db768c7c34d484b">set3DPointingVectorElevation</a> (float val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the Elevation Angle subfield of the Single-word 3D Pointing Vector.  <a href="#a01a7ee528aecc38f9db768c7c34d484b"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a3f00f29d886396a3e9f72e232e4fc7dd">set3DPointingVectorStructured</a> (const <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a> &amp;val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the 3D Pointing Vector (Structured) See V49.2 spec Section 9.4.1.  <a href="#a3f00f29d886396a3e9f72e232e4fc7dd"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a46e7999abfa4e8d7815feb46c51aa1da">setAge</a> (const <a class="el" href="classvrt_1_1TimeStamp.html">TimeStamp</a> &amp;val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets Age The Age value and format depends on the packet timestamp format indicated by TSI and TSF fields of the Packet Prologue.  <a href="#a46e7999abfa4e8d7815feb46c51aa1da"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#adf35dd38fac013ceede727d05b214c6c">setAirTemperature</a> (float val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
@@ -350,8 +352,8 @@ boolNull&nbsp;</td><td class="memItemRight" valign="bottom"><b>getCIF7Attribute<
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the Bandwidth of the signal in Hz.  <a href="#a8453e72e46cea61661017fe82db176a3"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#aa8f7976475aa22188377a4010f4854a5">setBarometricPressure</a> (int32_t val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets Barometric Pressure Atmospheric pressure measured in the units of Pascal.  <a href="#aa8f7976475aa22188377a4010f4854a5"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a02fa6cb6c5de52099c6f588b54acd9c3">setBeamwidth</a> (float val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the Beamwidth in degrees.  <a href="#a02fa6cb6c5de52099c6f588b54acd9c3"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ae66840de3179ddfd0d429f96e2c5af23">setBeamwidth</a> (float hval, float vval, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the Horizontal and Vertical Beamwidth in degrees.  <a href="#ae66840de3179ddfd0d429f96e2c5af23"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a635059749ebc2b73bc138509933f2f35">setBindField</a> (int32_t val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets Bind Indicator Field See V49.2 spec Section 9.8.1 for Bind Indicator Field.  <a href="#a635059749ebc2b73bc138509933f2f35"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a2e3852c3698287c9bb4d4267d9b25d28">setBitErrorRate</a> (float val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
@@ -458,6 +460,8 @@ void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setCIF7Attribute</b> 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the GPS ASCII "sentences".  <a href="#a6c88348ce5628169aa7681bb4977c2d7"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#af6b75d96c7a2a8612714c630516cd1a7">setHealthStatus</a> (int16_t val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets Health Status (See V49.2 spec Section 9.10.2) uses lower 16 bits of 32 bit word values are user defined and mapped to a defined health state.  <a href="#af6b75d96c7a2a8612714c630516cd1a7"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a7243ee9d7bb083f13d5e51df5e6ec7dd">setHorizontalBeamwidth</a> (float val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the Horizontal Beamwidth in degrees.  <a href="#a7243ee9d7bb083f13d5e51df5e6ec7dd"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a5101f5f0e80607a17531200909c51535">setHumidity</a> (int32_t val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets Humidity Percent humidity.  <a href="#a5101f5f0e80607a17531200909c51535"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab91527eb187b54889e89dacf071f4eaa">setIndexList</a> (const <a class="el" href="classvrt_1_1IndexFieldList.html">IndexFieldList</a> &amp;val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
@@ -546,8 +550,8 @@ void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setCIF7Attribute</b> 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight"><em>Optional functionality:</em> Gets the signal detected indicator flag.  <a href="#ae10a98fb81262f9f8804e7f536440339"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ac8f84bcbe068dbbeeff199b4c07ba0a5">setSNR</a> (float val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the Signal-to-Noise Ratio, expressed in decibels.  <a href="#ac8f84bcbe068dbbeeff199b4c07ba0a5"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a6da8d5af0c350e6ddf04ef80bcaec697">setSpatialReferenceType</a> (int16_t val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets Spatial Reference Type.  <a href="#a6da8d5af0c350e6ddf04ef80bcaec697"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a259df7a6bad7ea77ce2969cf77cd7141">setSpatialReferenceType</a> (int32_t val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets Spatial Reference Type.  <a href="#a259df7a6bad7ea77ce2969cf77cd7141"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#aa6bd9b1974f749262dc711e368da46f5">setSpatialScanType</a> (int16_t val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets Spatial Scan Type.  <a href="#aa6bd9b1974f749262dc711e368da46f5"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a5bcd038a043065c16c128f06909e3b47">setSpectrumField</a> (const <a class="el" href="classvrt_1_1SpectrumField.html">SpectrumField</a> &amp;val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
@@ -580,6 +584,8 @@ void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setCIF7Attribute</b> 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the User-Defined Bits from the State and Event Indicator Bits.  <a href="#abf7bb5ca71968407322a7e0219176b32"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#aac50ca9213a90d111cd420967a1e882d">setV49SpecVersion</a> (int32_t val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets V49 Standard and Spec Compliance Number (See V49.2 spec Section 9.10.3) 0x00000001 =&gt; V49.0 0x00000002 =&gt; V49.1 0x00000003 =&gt; V49A (which implies V49.0 and V49.1) 0x00000004 =&gt; V49.2.  <a href="#aac50ca9213a90d111cd420967a1e882d"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1IndicatorFieldProvider.html#aa811dc2516423f5c4bc11023f41f2139">setVerticalBeamwidth</a> (float val, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the Vertical Beamwidth in degrees.  <a href="#aa811dc2516423f5c4bc11023f41f2139"></a><br/></td></tr>
 <tr><td colspan="2"><h2>Protected Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a55540bf362dc0718ff8247b72a022970"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::getB" ref="a55540bf362dc0718ff8247b72a022970" args="(IndicatorFieldEnum_t field, int32_t xoff, IndicatorFieldEnum_t cif7field) const " -->
 virtual int8_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>getB</b> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> field, int32_t xoff, <a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field) const </td></tr>
@@ -761,12 +767,12 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 </div>
 </div>
-<a class="anchor" id="a611e084d0dc4d171b553caf3bee69d50"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::get2DPointingAngleAzimuth" ref="a611e084d0dc4d171b553caf3bee69d50" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
+<a class="anchor" id="a6acc895f3c398f3dded225c2eb2e0657"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::get3DPointingVectorAzimuth" ref="a6acc895f3c398f3dded225c2eb2e0657" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float vrt::IndicatorFieldProvider::get2DPointingAngleAzimuth </td>
+          <td class="memname">float vrt::IndicatorFieldProvider::get3DPointingVectorAzimuth </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
           <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
@@ -777,7 +783,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 </div>
 <div class="memdoc">
 
-<p>Gets the Azimuthal Angle subfield of the Single-word 2D Pointing Angle. </p>
+<p>Gets the Azimuthal Angle subfield of the Single-word 3D Pointing Vector. </p>
 <p>(See V49.2 spec Section 9.4.1)</p>
 <ul>
 <li>Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]</li>
@@ -791,16 +797,16 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 </li>
 </ul>
 
-<p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a32d7e8b2310c5520cd1e8ec1d1aa6844">getI()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00130">vrt::IndicatorFields::PNT_ANGL_2D_SI</a>, and <a class="el" href="VRTMath_8h_source.html#l00667">vrt::VRTMath::toFloat16()</a>.</p>
+<p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a32d7e8b2310c5520cd1e8ec1d1aa6844">getI()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00130">vrt::IndicatorFields::PNT_VECT_3D_SI</a>, and <a class="el" href="VRTMath_8h_source.html#l00667">vrt::VRTMath::toFloat16()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ae82680a4dd76e82e228ac56cf9943f44"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::get2DPointingAngleElevation" ref="ae82680a4dd76e82e228ac56cf9943f44" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
+<a class="anchor" id="a3ea7e61b5ad7cb8a48849e195dac8b3c"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::get3DPointingVectorElevation" ref="a3ea7e61b5ad7cb8a48849e195dac8b3c" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">float vrt::IndicatorFieldProvider::get2DPointingAngleElevation </td>
+          <td class="memname">float vrt::IndicatorFieldProvider::get3DPointingVectorElevation </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
           <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
@@ -811,7 +817,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 </div>
 <div class="memdoc">
 
-<p>Gets the Elevation Angle subfield of the Single-word 2D Pointing Angle. </p>
+<p>Gets the Elevation Angle subfield of the Single-word 3D Pointing Vector. </p>
 <p>(See V49.2 spec Section 9.4.1)</p>
 <ul>
 <li>Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]</li>
@@ -825,16 +831,16 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 </li>
 </ul>
 
-<p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a32d7e8b2310c5520cd1e8ec1d1aa6844">getI()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00130">vrt::IndicatorFields::PNT_ANGL_2D_SI</a>, and <a class="el" href="VRTMath_8h_source.html#l00667">vrt::VRTMath::toFloat16()</a>.</p>
+<p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a32d7e8b2310c5520cd1e8ec1d1aa6844">getI()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00130">vrt::IndicatorFields::PNT_VECT_3D_SI</a>, and <a class="el" href="VRTMath_8h_source.html#l00667">vrt::VRTMath::toFloat16()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="ac1ee8dd842a7d8999296cf5c1a59e508"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::get2DPointingAngleStructured" ref="ac1ee8dd842a7d8999296cf5c1a59e508" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const =0" -->
+<a class="anchor" id="a2e9f953d1dda415b197ae95434a8d9d5"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::get3DPointingVectorStructured" ref="a2e9f953d1dda415b197ae95434a8d9d5" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const =0" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a> vrt::IndicatorFieldProvider::get2DPointingAngleStructured </td>
+          <td class="memname">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a> vrt::IndicatorFieldProvider::get3DPointingVectorStructured </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
           <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
@@ -845,7 +851,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 </div>
 <div class="memdoc">
 
-<p>Gets the 2D Pointing Angle (Structured) See V49.2 spec Section 9.4.1. </p>
+<p>Gets the 3D Pointing Vector (Structured) See V49.2 spec Section 9.4.1. </p>
 <p>Array-of-Records format HeaderSize is either 0 or 1</p>
 <ul>
 <li>Note: docs say 3 or 4, but that's inconsistent with definition of <a class="el" href="classvrt_1_1ArrayOfRecords.html" title="Specifies an Array of Records.">ArrayOfRecords</a>, so ignoring that guidance 3 or 4 must include the required 3 words of every <a class="el" href="classvrt_1_1ArrayOfRecords.html" title="Specifies an Array of Records.">ArrayOfRecords</a>, which is incorrect.</li>
@@ -853,14 +859,14 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 <li>optional App-Specific Header is a *Global* Index/Ref/Beam subfield NumWords/Record is either 1 or 2</li>
 <li>depends on whether optional Index/Ref/Beam subfield is included in each record Bitmapped CIF subfield only uses bits 31 and 30</li>
 <li>Bit 31: Set when each record includes the optional Index/Ref/Beam subfield</li>
-<li>Bit 30: Always set; Indicates presence of 2D Pointing Angle subfield in each record, which is required App-Specific header is optional 32-bit word</li>
+<li>Bit 30: Always set; Indicates presence of 3D Pointing Vector subfield in each record, which is required App-Specific header is optional 32-bit word</li>
 <li>as mentioned above, this is a *Global* Index/Ref/Beam subfield Each <a class="el" href="classvrt_1_1Record.html" title="Defines a record that could be in a BasicVRTPacket.">Record</a> is at most 2 words</li>
 <li>First 32-bit word is optional, and is the Index/Ref/Beam subfield</li>
-<li>Second 32-bit word is required, and is the 2D Pointing Angle subfield Index/Ref/Beam subfield</li>
+<li>Second 32-bit word is required, and is the 3D Pointing Vector subfield Index/Ref/Beam subfield</li>
 <li>Bits 31..16: <a class="el" href="classvrt_1_1Record.html" title="Defines a record that could be in a BasicVRTPacket.">Record</a> Index (optional; 0 when global or unused in records)</li>
 <li>Bits 15..4: Reserved</li>
 <li>Bits 3..2: Reference (00 not specified; 01 ECEF; 10 Platform centered; 11 Array centered)</li>
-<li>Bits 1..0: Beam (00 not specified; 01 Beam or signal direction; 10 Null; 11 reserved) 2D Pointing Angle subfield</li>
+<li>Bits 1..0: Beam (00 not specified; 01 Beam or signal direction; 10 Null; 11 reserved) 3D Pointing Vector subfield</li>
 <li>Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]</li>
 <li>Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512) <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
@@ -868,13 +874,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>2D Pointing Angle as an Array-of-Records (null if not specified). <em>Note that changes to the returned object do not alter the packet.</em> </dd></dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>3D Pointing Vector as an Array-of-Records (null if not specified). <em>Note that changes to the returned object do not alter the packet.</em> </dd></dl>
 </li>
 </ul>
 
-<p>Implemented in <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a8bc3365260d10b9a802be5156c363512">vrt::BasicAcknowledgePacket</a>, and <a class="el" href="classvrt_1_1BasicContextPacket.html#a86b361944b68a347b0a7e7577fa9cca0">vrt::BasicContextPacket</a>.</p>
+<p>Implemented in <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a1d3adcf3543f81d73b438774f6bd5c62">vrt::BasicAcknowledgePacket</a>, and <a class="el" href="classvrt_1_1BasicContextPacket.html#a398b13df734738e2d24e3448aed85c59">vrt::BasicContextPacket</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l03385">set2DPointingAngleStructured()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l03455">set3DPointingVectorStructured()</a>.</p>
 
 </div>
 </div>
@@ -1222,36 +1228,6 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 <dl class="return"><dt><b>Returns:</b></dt><dd>The Barometric Pressure (null if not specified) </dd></dl>
 
 <p>References <a class="el" href="IndicatorFields_8h_source.html#l00173">vrt::IndicatorFields::BAROMETRIC_PRESSURE</a>, and <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a7c53b6ac2f492963d5a579294772fdfd">getL()</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ae6d0d3df9106872ea8ccaecaa24da17f"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::getBeamwidth" ref="ae6d0d3df9106872ea8ccaecaa24da17f" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">float vrt::IndicatorFieldProvider::getBeamwidth </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
-          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
-          <td>&nbsp;)&nbsp;</td>
-          <td> const<code> [inline]</code></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Gets the Beamwidth in degrees. </p>
-<p>Valid range is from 0 to 360 degrees. (See V49.2 spec Section 9.4.2) </p>
-<dl><dt><b>Parameters:</b></dt><dd>
-  <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>The Beamwidth (null if not specified). </dd></dl>
-
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00126">vrt::IndicatorFields::BEAMWIDTH</a>, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a32d7e8b2310c5520cd1e8ec1d1aa6844">getI()</a>, and <a class="el" href="VRTMath_8h_source.html#l00667">vrt::VRTMath::toFloat16()</a>.</p>
 
 </div>
 </div>
@@ -2901,6 +2877,36 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 </div>
 </div>
+<a class="anchor" id="a57ef193e4441a2fc451bac4171392327"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::getHorizontalBeamwidth" ref="a57ef193e4441a2fc451bac4171392327" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float vrt::IndicatorFieldProvider::getHorizontalBeamwidth </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Gets the Horizontal Beamwidth in degrees. </p>
+<p>Valid range is from 0 to 360 degrees. (See V49.2 spec Section 9.4.2) </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The Horizontal Beamwidth (null if not specified). </dd></dl>
+
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00126">vrt::IndicatorFields::BEAMWIDTH</a>, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a7c53b6ac2f492963d5a579294772fdfd">getL()</a>, and <a class="el" href="VRTMath_8h_source.html#l00580">vrt::VRTMath::toFloat32()</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a380dd09b4c09b54ee1736b1af46f8d27"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::getHumidity" ref="a380dd09b4c09b54ee1736b1af46f8d27" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
 <div class="memitem">
 <div class="memproto">
@@ -2972,7 +2978,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 <p>Implemented in <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a3277de3b731f67b67b03ea6e49d9472c">vrt::BasicAcknowledgePacket</a>, and <a class="el" href="classvrt_1_1BasicContextPacket.html#a3fcf11bc683be3ae54e8449ffd85d17b">vrt::BasicContextPacket</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l03408">get2DPointingAngleAzimuth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03396">get2DPointingAngleElevation()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04624">getAirTemperature()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02884">getAuxGain1()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02900">getAuxGain2()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03305">getBeamwidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03235">getBitErrorRate()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04065">getCountryCode()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03223">getEbN0()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03924">getEmsDeviceClass()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03713">getEventID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03775">getFunctionID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03683">getFunctionPriorityID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02027">getGain1()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02038">getGain2()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02724">getHealthStatus()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03744">getModeID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03831">getModulationClass()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03803">getModulationType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03017">getNoiseFigure()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03118">getOneDecibelCompressionPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04035">getOperator()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03520">getPhaseOffset()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03471">getPolarizationEllipticityAngle()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03461">getPolarizationTiltAngle()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02016">getReferenceLevel()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04475">getSeaAndSwellState()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04594">getSeaGroundTemperature()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03064">getSecondOrderInputInterceptPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03004">getSNR()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03554">getSpatialReferenceType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03577">getSpatialScanType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02066">getTemperature()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03074">getThirdOrderInputInterceptPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03144">getThreshold1()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03157">getThreshold2()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l04444">getTroposphericState()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l03478">get3DPointingVectorAzimuth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03466">get3DPointingVectorElevation()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04671">getAirTemperature()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02884">getAuxGain1()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02900">getAuxGain2()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03235">getBitErrorRate()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04112">getCountryCode()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03223">getEbN0()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03971">getEmsDeviceClass()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03760">getEventID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03822">getFunctionID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03730">getFunctionPriorityID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02027">getGain1()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02038">getGain2()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02724">getHealthStatus()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03791">getModeID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03878">getModulationClass()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03850">getModulationType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03017">getNoiseFigure()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03118">getOneDecibelCompressionPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04082">getOperator()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03590">getPhaseOffset()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03541">getPolarizationEllipticityAngle()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03531">getPolarizationTiltAngle()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02016">getReferenceLevel()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04522">getSeaAndSwellState()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04641">getSeaGroundTemperature()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03064">getSecondOrderInputInterceptPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03004">getSNR()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03624">getSpatialScanType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02066">getTemperature()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03074">getThirdOrderInputInterceptPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03144">getThreshold1()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03157">getThreshold2()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l04491">getTroposphericState()</a>.</p>
 
 </div>
 </div>
@@ -3103,7 +3109,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 <p>Implemented in <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aba19e34221cdf05e9a60859aa9d4907d">vrt::BasicAcknowledgePacket</a>, and <a class="el" href="classvrt_1_1BasicContextPacket.html#afb7d3b0fcabd056a11470e00b20a58ea">vrt::BasicContextPacket</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04540">getBarometricPressure()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04397">getBindField()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02677">getBuildVersion()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04243">getChildrenSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04251">getChildrenSIDString()</a>, <a class="el" href="IndicatorFields_8h_source.html#l05075">getCIF7Belief()</a>, <a class="el" href="IndicatorFields_8h_source.html#l05110">getCIF7Probability()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04220">getCitedMessageID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04357">getCitedSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04365">getCitedSIDString()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03655">getCommunicationPriorityID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04197">getControlleeIDField()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04161">getControllerIDField()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02763">getDiscreteIO32()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03859">getEmsDeviceInstance()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03887">getEmsDeviceType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01881">getEphemerisReference()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04566">getHumidity()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04122">getInformationSource()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04420">getNetworkID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02585">getOverRangeCount()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04281">getParentsSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04289">getParentsSIDString()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04009">getPlatformClass()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03953">getPlatformDisplay()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03981">getPlatformInstance()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03283">getRange()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01852">getReferencePointIdentifier()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03628">getRFFootprint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03602">getRFFootprintRange()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04319">getSiblingsSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04327">getSiblingsSIDString()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01871">getTimeStampCalibration()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04095">getTrackID()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l02702">getV49SpecVersion()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04587">getBarometricPressure()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04444">getBindField()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02677">getBuildVersion()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04290">getChildrenSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04298">getChildrenSIDString()</a>, <a class="el" href="IndicatorFields_8h_source.html#l05122">getCIF7Belief()</a>, <a class="el" href="IndicatorFields_8h_source.html#l05157">getCIF7Probability()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04267">getCitedMessageID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04404">getCitedSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04412">getCitedSIDString()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03702">getCommunicationPriorityID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04244">getControlleeIDField()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04208">getControllerIDField()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02763">getDiscreteIO32()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03906">getEmsDeviceInstance()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03934">getEmsDeviceType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01881">getEphemerisReference()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03327">getHorizontalBeamwidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04613">getHumidity()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04169">getInformationSource()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04467">getNetworkID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02585">getOverRangeCount()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04328">getParentsSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04336">getParentsSIDString()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04056">getPlatformClass()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04000">getPlatformDisplay()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04028">getPlatformInstance()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03283">getRange()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01852">getReferencePointIdentifier()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03675">getRFFootprint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03649">getRFFootprintRange()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04366">getSiblingsSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04374">getSiblingsSIDString()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03379">getSpatialReferenceType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01871">getTimeStampCalibration()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04142">getTrackID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02702">getV49SpecVersion()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l03352">getVerticalBeamwidth()</a>.</p>
 
 </div>
 </div>
@@ -4237,12 +4243,12 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 </div>
 </div>
-<a class="anchor" id="af5b481ea0b8a1235460961bc34b949c1"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::getSpatialReferenceType" ref="af5b481ea0b8a1235460961bc34b949c1" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
+<a class="anchor" id="ade0341b7c69ffc54a54eb00eb9066ce9"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::getSpatialReferenceType" ref="ade0341b7c69ffc54a54eb00eb9066ce9" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">int16_t vrt::IndicatorFieldProvider::getSpatialReferenceType </td>
+          <td class="memname">int32_t vrt::IndicatorFieldProvider::getSpatialReferenceType </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
           <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
@@ -4254,7 +4260,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 <div class="memdoc">
 
 <p>Gets Spatial Reference Type. </p>
-<p>Spatial Reference Type uses the Generic16 bit Identifier field See V49.2 spec Section 9.8.11 for Spatial Reference Type See V49.2 spec Section 9.8 for Generic16 bit Identifier field </p>
+<p>Spatial Reference Type uses the Generic32 bit Identifier field See V49.2 spec Section 9.8.11 for Spatial Reference Type See V49.2 spec Section 9.8 for Generic32 bit Identifier field </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
@@ -4263,7 +4269,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The Spatial Reference Type (null if not specified) </dd></dl>
 
-<p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a32d7e8b2310c5520cd1e8ec1d1aa6844">getI()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l00136">vrt::IndicatorFields::SPATIAL_REF_TYPE</a>.</p>
+<p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a7c53b6ac2f492963d5a579294772fdfd">getL()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l00127">vrt::IndicatorFields::SPATIAL_REF_TYPE</a>.</p>
 
 </div>
 </div>
@@ -4293,7 +4299,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The Spatial Scan Type (null if not specified) </dd></dl>
 
-<p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a32d7e8b2310c5520cd1e8ec1d1aa6844">getI()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l00137">vrt::IndicatorFields::SPATIAL_SCAN_TYPE</a>.</p>
+<p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a32d7e8b2310c5520cd1e8ec1d1aa6844">getI()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l00128">vrt::IndicatorFields::SPATIAL_SCAN_TYPE</a>.</p>
 
 </div>
 </div>
@@ -4623,7 +4629,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 <p>Implemented in <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a3b37c1c73c1aa70a3308dce70559f3dd">vrt::BasicAcknowledgePacket</a>, and <a class="el" href="classvrt_1_1BasicContextPacket.html#a79e42fa1b609b47abe629c182857536b">vrt::BasicContextPacket</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04673">getAge()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l04651">getShelfLife()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04720">getAge()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l04698">getShelfLife()</a>.</p>
 
 </div>
 </div>
@@ -4821,7 +4827,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 <p>Implemented in <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ab4c2f89c0e36d87477370237beb2a127">vrt::BasicAcknowledgePacket</a>, and <a class="el" href="classvrt_1_1BasicContextPacket.html#ad2caa8b603ba8d33c238bf5d91e39662">vrt::BasicContextPacket</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04179">getControlleeUUIDField()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l04144">getControllerUUIDField()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04226">getControlleeUUIDField()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l04191">getControllerUUIDField()</a>.</p>
 
 </div>
 </div>
@@ -4851,6 +4857,36 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 <dl class="return"><dt><b>Returns:</b></dt><dd>The V49 spec version (null if not specified) </dd></dl>
 
 <p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a7c53b6ac2f492963d5a579294772fdfd">getL()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l00104">vrt::IndicatorFields::V49_COMPL</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="acea40b7ba71368be1c070b31f19c8fa5"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::getVerticalBeamwidth" ref="acea40b7ba71368be1c070b31f19c8fa5" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float vrt::IndicatorFieldProvider::getVerticalBeamwidth </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td> const<code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Gets the Vertical Beamwidth in degrees. </p>
+<p>Valid range is from 0 to 360 degrees. (See V49.2 spec Section 9.4.2) </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>The Vertical Beamwidth (null if not specified). </dd></dl>
+
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00126">vrt::IndicatorFields::BEAMWIDTH</a>, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a7c53b6ac2f492963d5a579294772fdfd">getL()</a>, and <a class="el" href="VRTMath_8h_source.html#l00580">vrt::VRTMath::toFloat32()</a>.</p>
 
 </div>
 </div>
@@ -4889,7 +4925,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 <p>Implemented in <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aa0a032a8a6eeacef74f7886421ca2390">vrt::BasicAcknowledgePacket</a>, and <a class="el" href="classvrt_1_1BasicContextPacket.html#a8f919e6c07a23152297c67bef2a85009">vrt::BasicContextPacket</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l02858">getAuxBandwidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02980">getAuxFrequency()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02007">getBandOffsetIF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01971">getBandwidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02649">getBufferStatus()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02605">getDeviceIdentifier()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02744">getDiscreteIO64()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04756">getDuration()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04727">getDwell()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04875">getFallTime()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01980">getFrequencyIF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01998">getFrequencyOffsetRF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01989">getFrequencyRF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04698">getJitter()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04844">getOffsetTime()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04784">getPeriod()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04813">getPulseWidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04906">getRiseTime()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02047">getSampleRate()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01862">getTimeStampAdjustment()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04987">getTimestampDetails()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l04936">getTimestampSkew()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l02858">getAuxBandwidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02980">getAuxFrequency()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02007">getBandOffsetIF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01971">getBandwidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02649">getBufferStatus()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02605">getDeviceIdentifier()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02744">getDiscreteIO64()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04803">getDuration()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04774">getDwell()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04922">getFallTime()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01980">getFrequencyIF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01998">getFrequencyOffsetRF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01989">getFrequencyRF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04745">getJitter()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04891">getOffsetTime()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04831">getPeriod()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04860">getPulseWidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04953">getRiseTime()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02047">getSampleRate()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01862">getTimeStampAdjustment()</a>, <a class="el" href="IndicatorFields_8h_source.html#l05034">getTimestampDetails()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l04983">getTimestampSkew()</a>.</p>
 
 </div>
 </div>
@@ -5269,12 +5305,12 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 </div>
 </div>
-<a class="anchor" id="a845e53227060982f8a860eb9bca39dfb"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::set2DPointingAngleAzimuth" ref="a845e53227060982f8a860eb9bca39dfb" args="(float val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
+<a class="anchor" id="a31e4513ba1ed5223018b164840749c76"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::set3DPointingVectorAzimuth" ref="a31e4513ba1ed5223018b164840749c76" args="(float val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void vrt::IndicatorFieldProvider::set2DPointingAngleAzimuth </td>
+          <td class="memname">void vrt::IndicatorFieldProvider::set3DPointingVectorAzimuth </td>
           <td>(</td>
           <td class="paramtype">float&nbsp;</td>
           <td class="paramname"> <em>val</em>, </td>
@@ -5294,7 +5330,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 </div>
 <div class="memdoc">
 
-<p>Sets the Azimuthal Angle subfield of the Single-word 2D Pointing Angle. </p>
+<p>Sets the Azimuthal Angle subfield of the Single-word 3D Pointing Vector. </p>
 <p><em>If no Elevation Angle has been specified, it will be set to zero following the call to this method.</em> <em>If set to null, both Elevation and Azimuthal Angles will be set to null.</em> (See V49.2 spec Section 9.4.1)</p>
 <ul>
 <li>Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]</li>
@@ -5308,16 +5344,16 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 </li>
 </ul>
 
-<p>References <a class="el" href="VRTMath_8h_source.html#l00676">vrt::VRTMath::fromFloat16()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00130">vrt::IndicatorFields::PNT_ANGL_2D_SI</a>, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a1548eb04657dc7942aa5beea4d212289">setI()</a>, and <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">setL()</a>.</p>
+<p>References <a class="el" href="VRTMath_8h_source.html#l00676">vrt::VRTMath::fromFloat16()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00130">vrt::IndicatorFields::PNT_VECT_3D_SI</a>, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a1548eb04657dc7942aa5beea4d212289">setI()</a>, and <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">setL()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a6c07e1722cb79c057c88a72f23ace209"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::set2DPointingAngleElevation" ref="a6c07e1722cb79c057c88a72f23ace209" args="(float val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
+<a class="anchor" id="a01a7ee528aecc38f9db768c7c34d484b"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::set3DPointingVectorElevation" ref="a01a7ee528aecc38f9db768c7c34d484b" args="(float val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void vrt::IndicatorFieldProvider::set2DPointingAngleElevation </td>
+          <td class="memname">void vrt::IndicatorFieldProvider::set3DPointingVectorElevation </td>
           <td>(</td>
           <td class="paramtype">float&nbsp;</td>
           <td class="paramname"> <em>val</em>, </td>
@@ -5337,7 +5373,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 </div>
 <div class="memdoc">
 
-<p>Sets the Elevation Angle subfield of the Single-word 2D Pointing Angle. </p>
+<p>Sets the Elevation Angle subfield of the Single-word 3D Pointing Vector. </p>
 <p><em>If no Azimuthal Angle has been specified, it will be set to zero following the call to this method.</em> <em>If set to null, both Elevation and Azimuthal Angles will be set to null.</em> (See V49.2 spec Section 9.4.1)</p>
 <ul>
 <li>Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]</li>
@@ -5351,16 +5387,16 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 </li>
 </ul>
 
-<p>References <a class="el" href="VRTMath_8h_source.html#l00676">vrt::VRTMath::fromFloat16()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00130">vrt::IndicatorFields::PNT_ANGL_2D_SI</a>, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a1548eb04657dc7942aa5beea4d212289">setI()</a>, and <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">setL()</a>.</p>
+<p>References <a class="el" href="VRTMath_8h_source.html#l00676">vrt::VRTMath::fromFloat16()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00130">vrt::IndicatorFields::PNT_VECT_3D_SI</a>, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a1548eb04657dc7942aa5beea4d212289">setI()</a>, and <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">setL()</a>.</p>
 
 </div>
 </div>
-<a class="anchor" id="a6ffd83a9673e1a600c534ed08a3a2666"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::set2DPointingAngleStructured" ref="a6ffd83a9673e1a600c534ed08a3a2666" args="(const ArrayOfRecords &amp;val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
+<a class="anchor" id="a3f00f29d886396a3e9f72e232e4fc7dd"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::set3DPointingVectorStructured" ref="a3f00f29d886396a3e9f72e232e4fc7dd" args="(const ArrayOfRecords &amp;val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void vrt::IndicatorFieldProvider::set2DPointingAngleStructured </td>
+          <td class="memname">void vrt::IndicatorFieldProvider::set3DPointingVectorStructured </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a> &amp;&nbsp;</td>
           <td class="paramname"> <em>val</em>, </td>
@@ -5380,7 +5416,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 </div>
 <div class="memdoc">
 
-<p>Sets the 2D Pointing Angle (Structured) See V49.2 spec Section 9.4.1. </p>
+<p>Sets the 3D Pointing Vector (Structured) See V49.2 spec Section 9.4.1. </p>
 <p>Array-of-Records format HeaderSize is either 0 or 1</p>
 <ul>
 <li>Note: docs say 3 or 4, but that's inconsistent with definition of <a class="el" href="classvrt_1_1ArrayOfRecords.html" title="Specifies an Array of Records.">ArrayOfRecords</a>, so ignoring that guidance 3 or 4 must include the required 3 words of every <a class="el" href="classvrt_1_1ArrayOfRecords.html" title="Specifies an Array of Records.">ArrayOfRecords</a>, which is incorrect.</li>
@@ -5388,18 +5424,18 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 <li>optional App-Specific Header is a *Global* Index/Ref/Beam subfield NumWords/Record is either 1 or 2</li>
 <li>depends on whether optional Index/Ref/Beam subfield is included in each record Bitmapped CIF subfield only uses bits 31 and 30</li>
 <li>Bit 31: Set when each record includes the optional Index/Ref/Beam subfield</li>
-<li>Bit 30: Always set; Indicates presence of 2D Pointing Angle subfield in each record, which is required App-Specific header is optional 32-bit word</li>
+<li>Bit 30: Always set; Indicates presence of 3D Pointing Vector subfield in each record, which is required App-Specific header is optional 32-bit word</li>
 <li>as mentioned above, this is a *Global* Index/Ref/Beam subfield Each <a class="el" href="classvrt_1_1Record.html" title="Defines a record that could be in a BasicVRTPacket.">Record</a> is at most 2 words</li>
 <li>First 32-bit word is optional, and is the Index/Ref/Beam subfield</li>
-<li>Second 32-bit word is required, and is the 2D Pointing Angle subfield Index/Ref/Beam subfield</li>
+<li>Second 32-bit word is required, and is the 3D Pointing Vector subfield Index/Ref/Beam subfield</li>
 <li>Bits 31..16: <a class="el" href="classvrt_1_1Record.html" title="Defines a record that could be in a BasicVRTPacket.">Record</a> Index (optional; 0 when global or unused in records)</li>
 <li>Bits 15..4: Reserved</li>
 <li>Bits 3..2: Reference (00 not specified; 01 ECEF; 10 Platform centered; 11 Array centered)</li>
-<li>Bits 1..0: Beam (00 not specified; 01 Beam or signal direction; 10 Null; 11 reserved) 2D Pointing Angle subfield</li>
+<li>Bits 1..0: Beam (00 not specified; 01 Beam or signal direction; 10 Null; 11 reserved) 3D Pointing Vector subfield</li>
 <li>Bits 31..16: Elevation angle in degrees; radix point to the right of bit 23; range [-90,90]</li>
 <li>Bits 15..0: Azimuthal angle in degrees; radix point to the right of bit 7; range [0,512) <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>val</em>&nbsp;</td><td>The 2D Pointing Angle as an Array-of-Records (null if not specified). </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>val</em>&nbsp;</td><td>The 3D Pointing Vector as an Array-of-Records (null if not specified). </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
   </table>
   </dd>
@@ -5407,7 +5443,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 </li>
 </ul>
 
-<p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ac1ee8dd842a7d8999296cf5c1a59e508">get2DPointingAngleStructured()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00129">vrt::IndicatorFields::PNT_ANGL_2D_ST</a>, and <a class="el" href="IndicatorFields_8h_source.html#l01672">setRecord()</a>.</p>
+<p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a2e9f953d1dda415b197ae95434a8d9d5">get3DPointingVectorStructured()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00129">vrt::IndicatorFields::PNT_VECT_3D_ST</a>, and <a class="el" href="IndicatorFields_8h_source.html#l01672">setRecord()</a>.</p>
 
 </div>
 </div>
@@ -5944,7 +5980,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 </div>
 </div>
-<a class="anchor" id="a02fa6cb6c5de52099c6f588b54acd9c3"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::setBeamwidth" ref="a02fa6cb6c5de52099c6f588b54acd9c3" args="(float val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
+<a class="anchor" id="ae66840de3179ddfd0d429f96e2c5af23"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::setBeamwidth" ref="ae66840de3179ddfd0d429f96e2c5af23" args="(float hval, float vval, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -5952,7 +5988,13 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
           <td class="memname">void vrt::IndicatorFieldProvider::setBeamwidth </td>
           <td>(</td>
           <td class="paramtype">float&nbsp;</td>
-          <td class="paramname"> <em>val</em>, </td>
+          <td class="paramname"> <em>hval</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&nbsp;</td>
+          <td class="paramname"> <em>vval</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -5969,17 +6011,18 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 </div>
 <div class="memdoc">
 
-<p>Sets the Beamwidth in degrees. </p>
-<p>Valid range is from 0 to 360 degrees. (See V49.2 spec Section 9.4.2) </p>
+<p>Sets the Horizontal and Vertical Beamwidth in degrees. </p>
+<p>Valid range is from 0 to 360 degrees. Radix point to the right of bit 7 for each 16-bit number fractional resolution: 0.0078125 (1/128) degrees Bits 31..16: Horizontal Degrees Bits 15..0: Vertical Degrees (See V49.2 spec Section 9.4.2) </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
-    <tr><td valign="top"></td><td valign="top"><em>val</em>&nbsp;</td><td>The Beamwidth (null if not specified). </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>hval</em>&nbsp;</td><td>The Horizontal Beamwidth (null will override vval). </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>vval</em>&nbsp;</td><td>The Vertical Beamwidth (null will override hval). </td></tr>
     <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00126">vrt::IndicatorFields::BEAMWIDTH</a>, <a class="el" href="VRTMath_8h_source.html#l00676">vrt::VRTMath::fromFloat16()</a>, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a1548eb04657dc7942aa5beea4d212289">setI()</a>, and <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">setL()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00126">vrt::IndicatorFields::BEAMWIDTH</a>, <a class="el" href="VRTMath_8h_source.html#l00589">vrt::VRTMath::fromFloat32()</a>, and <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">setL()</a>.</p>
 
 </div>
 </div>
@@ -6246,7 +6289,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 <p>References <a class="el" href="IndicatorFields_8h_source.html#l00162">vrt::IndicatorFields::CHILDREN_SID</a>, and <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">setL()</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04269">setChildrenSIDString()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04316">setChildrenSIDString()</a>.</p>
 
 </div>
 </div>
@@ -6284,7 +6327,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
   </dd>
 </dl>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l04261">setChildrenSID()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l04308">setChildrenSID()</a>.</p>
 
 </div>
 </div>
@@ -6479,7 +6522,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 <p>References <a class="el" href="IndicatorFields_8h_source.html#l00165">vrt::IndicatorFields::CITED_SID</a>, and <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">setL()</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04383">setCitedSIDString()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04430">setCitedSIDString()</a>.</p>
 
 </div>
 </div>
@@ -6517,7 +6560,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
   </dd>
 </dl>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l04375">setCitedSID()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l04422">setCitedSID()</a>.</p>
 
 </div>
 </div>
@@ -8056,6 +8099,45 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 </div>
 </div>
+<a class="anchor" id="a7243ee9d7bb083f13d5e51df5e6ec7dd"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::setHorizontalBeamwidth" ref="a7243ee9d7bb083f13d5e51df5e6ec7dd" args="(float val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrt::IndicatorFieldProvider::setHorizontalBeamwidth </td>
+          <td>(</td>
+          <td class="paramtype">float&nbsp;</td>
+          <td class="paramname"> <em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Sets the Horizontal Beamwidth in degrees. </p>
+<p>Valid range is from 0 to 360 degrees. (See V49.2 spec Section 9.4.2) </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>val</em>&nbsp;</td><td>The Horizontal Beamwidth (null if not specified, which will override Vertical Beamwidth as well). </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00126">vrt::IndicatorFields::BEAMWIDTH</a>, <a class="el" href="VRTMath_8h_source.html#l00589">vrt::VRTMath::fromFloat32()</a>, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a1548eb04657dc7942aa5beea4d212289">setI()</a>, and <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">setL()</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a5101f5f0e80607a17531200909c51535"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::setHumidity" ref="a5101f5f0e80607a17531200909c51535" args="(int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
 <div class="memitem">
 <div class="memproto">
@@ -8142,7 +8224,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 <p>Implemented in <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ac410607603d4a2b61cfefb74af4c1835">vrt::BasicAcknowledgePacket</a>, and <a class="el" href="classvrt_1_1BasicContextPacket.html#a7d633409cbcfd9887c64a260b144c905">vrt::BasicContextPacket</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l03446">set2DPointingAngleAzimuth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03426">set2DPointingAngleElevation()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04639">setAirTemperature()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02959">setAuxGain()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02929">setAuxGain1()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02946">setAuxGain2()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03315">setBeamwidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03269">setBitErrorRate()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04081">setCountryCode()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03250">setEbN0()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03940">setEmsDeviceClass()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03729">setEventID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03791">setFunctionID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03698">setFunctionPriorityID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02565">setGain()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02502">setGain1()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02514">setGain2()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02735">setHealthStatus()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03760">setModeID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03846">setModulationClass()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03817">setModulationType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03050">setNoiseFigure()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03128">setOneDecibelCompressionPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04048">setOperator()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03533">setPhaseOffset()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03503">setPolarizationEllipticityAngle()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03485">setPolarizationTiltAngle()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02490">setReferenceLevel()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04495">setSeaAndSwellState()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04609">setSeaGroundTemperature()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03087">setSecondOrderInputInterceptPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03030">setSNR()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03566">setSpatialReferenceType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03589">setSpatialScanType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02542">setTemperature()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03104">setThirdOrderInputInterceptPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03200">setThreshold()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03171">setThreshold1()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03186">setThreshold2()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l04457">setTroposphericState()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l03516">set3DPointingVectorAzimuth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03496">set3DPointingVectorElevation()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04686">setAirTemperature()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02959">setAuxGain()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02929">setAuxGain1()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02946">setAuxGain2()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03269">setBitErrorRate()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04128">setCountryCode()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03250">setEbN0()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03987">setEmsDeviceClass()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03776">setEventID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03838">setFunctionID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03745">setFunctionPriorityID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02565">setGain()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02502">setGain1()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02514">setGain2()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02735">setHealthStatus()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03338">setHorizontalBeamwidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03807">setModeID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03893">setModulationClass()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03864">setModulationType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03050">setNoiseFigure()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03128">setOneDecibelCompressionPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04095">setOperator()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03603">setPhaseOffset()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03573">setPolarizationEllipticityAngle()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03555">setPolarizationTiltAngle()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02490">setReferenceLevel()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04542">setSeaAndSwellState()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04656">setSeaGroundTemperature()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03087">setSecondOrderInputInterceptPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03030">setSNR()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03636">setSpatialScanType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02542">setTemperature()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03104">setThirdOrderInputInterceptPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03200">setThreshold()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03171">setThreshold1()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03186">setThreshold2()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04504">setTroposphericState()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l03363">setVerticalBeamwidth()</a>.</p>
 
 </div>
 </div>
@@ -8348,7 +8430,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 <p>Implemented in <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#acc27b5ee6a051f0a15a1c37c9043285e">vrt::BasicAcknowledgePacket</a>, and <a class="el" href="classvrt_1_1BasicContextPacket.html#aa0e65f628526b8ff2bc554503c26444c">vrt::BasicContextPacket</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l03446">set2DPointingAngleAzimuth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03426">set2DPointingAngleElevation()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04552">setBarometricPressure()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03315">setBeamwidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04406">setBindField()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03269">setBitErrorRate()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02690">setBuildVersion()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04261">setChildrenSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l05060">setCIF7Belief()</a>, <a class="el" href="IndicatorFields_8h_source.html#l05092">setCIF7Probability()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04234">setCitedMessageID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04375">setCitedSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03669">setCommunicationPriorityID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04206">setControlleeIDField()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04170">setControllerIDField()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02772">setDiscreteIO32()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03250">setEbN0()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03872">setEmsDeviceInstance()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03902">setEmsDeviceType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02369">setEphemerisReference()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04578">setHumidity()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04135">setInformationSource()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04432">setNetworkID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03050">setNoiseFigure()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03128">setOneDecibelCompressionPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02595">setOverRangeCount()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04299">setParentsSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03533">setPhaseOffset()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04023">setPlatformClass()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03966">setPlatformDisplay()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03995">setPlatformInstance()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03503">setPolarizationEllipticityAngle()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03485">setPolarizationTiltAngle()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03295">setRange()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02236">setReferencePointIdentifier()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03641">setRFFootprint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03615">setRFFootprintRange()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03087">setSecondOrderInputInterceptPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04337">setSiblingsSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03030">setSNR()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03104">setThirdOrderInputInterceptPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02359">setTimeStampCalibration()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04109">setTrackID()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l02714">setV49SpecVersion()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l03516">set3DPointingVectorAzimuth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03496">set3DPointingVectorElevation()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04599">setBarometricPressure()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03311">setBeamwidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04453">setBindField()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03269">setBitErrorRate()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02690">setBuildVersion()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04308">setChildrenSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l05107">setCIF7Belief()</a>, <a class="el" href="IndicatorFields_8h_source.html#l05139">setCIF7Probability()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04281">setCitedMessageID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04422">setCitedSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03716">setCommunicationPriorityID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04253">setControlleeIDField()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04217">setControllerIDField()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02772">setDiscreteIO32()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03250">setEbN0()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03919">setEmsDeviceInstance()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03949">setEmsDeviceType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02369">setEphemerisReference()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03338">setHorizontalBeamwidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04625">setHumidity()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04182">setInformationSource()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04479">setNetworkID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03050">setNoiseFigure()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03128">setOneDecibelCompressionPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02595">setOverRangeCount()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04346">setParentsSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03603">setPhaseOffset()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04070">setPlatformClass()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04013">setPlatformDisplay()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04042">setPlatformInstance()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03573">setPolarizationEllipticityAngle()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03555">setPolarizationTiltAngle()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03295">setRange()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02236">setReferencePointIdentifier()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03688">setRFFootprint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03662">setRFFootprintRange()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03087">setSecondOrderInputInterceptPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04384">setSiblingsSID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03030">setSNR()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03390">setSpatialReferenceType()</a>, <a class="el" href="IndicatorFields_8h_source.html#l03104">setThirdOrderInputInterceptPoint()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02359">setTimeStampCalibration()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04156">setTrackID()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02714">setV49SpecVersion()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l03363">setVerticalBeamwidth()</a>.</p>
 
 </div>
 </div>
@@ -8782,7 +8864,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 <p>References <a class="el" href="IndicatorFields_8h_source.html#l00163">vrt::IndicatorFields::PARENTS_SID</a>, and <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">setL()</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04307">setParentsSIDString()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04354">setParentsSIDString()</a>.</p>
 
 </div>
 </div>
@@ -8820,7 +8902,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
   </dd>
 </dl>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l04299">setParentsSID()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l04346">setParentsSID()</a>.</p>
 
 </div>
 </div>
@@ -9406,7 +9488,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 <p>References <a class="el" href="Record_8h_source.html#l00076">vrt::Record::getByteLength()</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l03385">set2DPointingAngleStructured()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02829">setCIFsArray()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02428">setContextAssocLists()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02396">setEphemerisECEF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02405">setEphemerisRelative()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02378">setGeolocationGPS()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02387">setGeolocationINS()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02418">setGeoSentences()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02791">setIndexList()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01682">setRecord()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02810">setSectorScanStep()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l02848">setSpectrumField()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l03455">set3DPointingVectorStructured()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02829">setCIFsArray()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02428">setContextAssocLists()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02396">setEphemerisECEF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02405">setEphemerisRelative()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02378">setGeolocationGPS()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02387">setGeolocationINS()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02418">setGeoSentences()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02791">setIndexList()</a>, <a class="el" href="IndicatorFields_8h_source.html#l01682">setRecord()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02810">setSectorScanStep()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l02848">setSpectrumField()</a>.</p>
 
 </div>
 </div>
@@ -10014,7 +10096,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 <p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">setL()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l00164">vrt::IndicatorFields::SIBLINGS_SID</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04345">setSiblingsSIDString()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04392">setSiblingsSIDString()</a>.</p>
 
 </div>
 </div>
@@ -10052,7 +10134,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
   </dd>
 </dl>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l04337">setSiblingsSID()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l04384">setSiblingsSID()</a>.</p>
 
 </div>
 </div>
@@ -10139,14 +10221,14 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 </div>
 </div>
-<a class="anchor" id="a6da8d5af0c350e6ddf04ef80bcaec697"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::setSpatialReferenceType" ref="a6da8d5af0c350e6ddf04ef80bcaec697" args="(int16_t val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
+<a class="anchor" id="a259df7a6bad7ea77ce2969cf77cd7141"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::setSpatialReferenceType" ref="a259df7a6bad7ea77ce2969cf77cd7141" args="(int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void vrt::IndicatorFieldProvider::setSpatialReferenceType </td>
           <td>(</td>
-          <td class="paramtype">int16_t&nbsp;</td>
+          <td class="paramtype">int32_t&nbsp;</td>
           <td class="paramname"> <em>val</em>, </td>
         </tr>
         <tr>
@@ -10165,7 +10247,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 <div class="memdoc">
 
 <p>Sets Spatial Reference Type. </p>
-<p>Spatial Reference Type uses the Generic16 bit Identifier field See V49.2 spec Section 9.8.11 for Spatial Reference Type See V49.2 spec Section 9.8 for Generic16 bit Identifier field </p>
+<p>Spatial Reference Type uses the Generic32 bit Identifier field See V49.2 spec Section 9.8.11 for Spatial Reference Type See V49.2 spec Section 9.8 for Generic32 bit Identifier field </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>val</em>&nbsp;</td><td>The Spatial Reference Type (null if not specified) </td></tr>
@@ -10174,7 +10256,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
   </dd>
 </dl>
 
-<p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a1548eb04657dc7942aa5beea4d212289">setI()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l00136">vrt::IndicatorFields::SPATIAL_REF_TYPE</a>.</p>
+<p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">setL()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l00127">vrt::IndicatorFields::SPATIAL_REF_TYPE</a>.</p>
 
 </div>
 </div>
@@ -10213,7 +10295,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
   </dd>
 </dl>
 
-<p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a1548eb04657dc7942aa5beea4d212289">setI()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l00137">vrt::IndicatorFields::SPATIAL_SCAN_TYPE</a>.</p>
+<p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a1548eb04657dc7942aa5beea4d212289">setI()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l00128">vrt::IndicatorFields::SPATIAL_SCAN_TYPE</a>.</p>
 
 </div>
 </div>
@@ -10712,7 +10794,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 <p>Implemented in <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#a6d18bf475f8863d62442f18c15a0cab3">vrt::BasicAcknowledgePacket</a>, and <a class="el" href="classvrt_1_1BasicContextPacket.html#a8ef603b054bb86e7f6485322ddbcd1e4">vrt::BasicContextPacket</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04684">setAge()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l04662">setShelfLife()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04731">setAge()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l04709">setShelfLife()</a>.</p>
 
 </div>
 </div>
@@ -10913,7 +10995,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 <p>Implemented in <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#ac0212d983067ef98db7312c2cb738bd8">vrt::BasicAcknowledgePacket</a>, and <a class="el" href="classvrt_1_1BasicContextPacket.html#a2afce8f3590a493239927b2ea0a0eee3">vrt::BasicContextPacket</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04188">setControlleeUUIDField()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l04153">setControllerUUIDField()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l04235">setControlleeUUIDField()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l04200">setControllerUUIDField()</a>.</p>
 
 </div>
 </div>
@@ -10952,6 +11034,45 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 </dl>
 
 <p>References <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">setL()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l00104">vrt::IndicatorFields::V49_COMPL</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa811dc2516423f5c4bc11023f41f2139"></a><!-- doxytag: member="vrt::IndicatorFieldProvider::setVerticalBeamwidth" ref="aa811dc2516423f5c4bc11023f41f2139" args="(float val, IndicatorFieldEnum_t cif7field=CIF_NULL)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrt::IndicatorFieldProvider::setVerticalBeamwidth </td>
+          <td>(</td>
+          <td class="paramtype">float&nbsp;</td>
+          <td class="paramname"> <em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
+          <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td><td>&nbsp;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td><td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Sets the Vertical Beamwidth in degrees. </p>
+<p>Valid range is from 0 to 360 degrees. (See V49.2 spec Section 9.4.2) </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>val</em>&nbsp;</td><td>The Vertical Beamwidth (null if not specified, which will override Horizontal Beamwidth as well). </td></tr>
+    <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>(Optional) Indicator field for the CIF7 attribute. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00126">vrt::IndicatorFields::BEAMWIDTH</a>, <a class="el" href="VRTMath_8h_source.html#l00589">vrt::VRTMath::fromFloat32()</a>, <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a1548eb04657dc7942aa5beea4d212289">setI()</a>, and <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">setL()</a>.</p>
 
 </div>
 </div>
@@ -10996,7 +11117,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 
 <p>Implemented in <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#aae775f6a44414c32085fc99bdd083c0f">vrt::BasicAcknowledgePacket</a>, and <a class="el" href="classvrt_1_1BasicContextPacket.html#a07505f34ed2179d102762a71a5704097">vrt::BasicContextPacket</a>.</p>
 
-<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l02868">setAuxBandwidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02990">setAuxFrequency()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02481">setBandOffsetIF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02445">setBandwidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02662">setBufferStatus()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02615">setDeviceIdentifier()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02754">setDiscreteIO64()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04771">setDuration()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04742">setDwell()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04891">setFallTime()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02454">setFrequencyIF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02472">setFrequencyOffsetRF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02463">setFrequencyRF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04713">setJitter()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04860">setOffsetTime()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04798">setPeriod()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04829">setPulseWidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04922">setRiseTime()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02523">setSampleRate()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02350">setTimeStampAdjustment()</a>, <a class="el" href="IndicatorFields_8h_source.html#l05022">setTimestampDetails()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l04951">setTimestampSkew()</a>.</p>
+<p>Referenced by <a class="el" href="IndicatorFields_8h_source.html#l02868">setAuxBandwidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02990">setAuxFrequency()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02481">setBandOffsetIF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02445">setBandwidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02662">setBufferStatus()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02615">setDeviceIdentifier()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02754">setDiscreteIO64()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04818">setDuration()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04789">setDwell()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04938">setFallTime()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02454">setFrequencyIF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02472">setFrequencyOffsetRF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02463">setFrequencyRF()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04760">setJitter()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04907">setOffsetTime()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04845">setPeriod()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04876">setPulseWidth()</a>, <a class="el" href="IndicatorFields_8h_source.html#l04969">setRiseTime()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02523">setSampleRate()</a>, <a class="el" href="IndicatorFields_8h_source.html#l02350">setTimeStampAdjustment()</a>, <a class="el" href="IndicatorFields_8h_source.html#l05069">setTimestampDetails()</a>, and <a class="el" href="IndicatorFields_8h_source.html#l04998">setTimestampSkew()</a>.</p>
 
 </div>
 </div>
@@ -11004,7 +11125,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setX</b> (<a 
 <li>cpp_src/vrt/lib/<a class="el" href="IndicatorFields_8h_source.html">IndicatorFields.h</a></li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 7 Mar 2018 for VRT by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 10 Apr 2018 for VRT by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

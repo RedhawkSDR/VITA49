@@ -73,10 +73,14 @@ Inheritance diagram for vrt::BasicCommandPacket:</div>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Basic copy constructor.  <a href="#a4f0e630b75d241aa16ef54ab6c3a6ca8"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicCommandPacket.html#a6d010fe194f9b894889ee25c0cdbe326">~BasicCommandPacket</a> ()</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Basic destructor.  <a href="#a6d010fe194f9b894889ee25c0cdbe326"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a767ee88ef944e15f4b7782615f984859"></a><!-- doxytag: member="vrt::BasicCommandPacket::getAction" ref="a767ee88ef944e15f4b7782615f984859" args="() const " -->
+int8_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>getAction</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a346348285c9ad8fbc3081ea3aa03d23c"></a><!-- doxytag: member="vrt::BasicCommandPacket::getAction0Flag" ref="a346348285c9ad8fbc3081ea3aa03d23c" args="() const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>getAction0Flag</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4ce86e9154f92604b744747af08f4835"></a><!-- doxytag: member="vrt::BasicCommandPacket::getAction1Flag" ref="a4ce86e9154f92604b744747af08f4835" args="() const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>getAction1Flag</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0664833acd74aa8bf0e693fc2813a14d"></a><!-- doxytag: member="vrt::BasicCommandPacket::getActionExecuted" ref="a0664833acd74aa8bf0e693fc2813a14d" args="() const " -->
 bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>getActionExecuted</b> () const </td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7c3909d76cd01992386d8df0e8558fb0"></a><!-- doxytag: member="vrt::BasicCommandPacket::getActionFlag" ref="a7c3909d76cd01992386d8df0e8558fb0" args="() const " -->
-bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>getActionFlag</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa59662e780bf7be0ba68ff83082524bb"></a><!-- doxytag: member="vrt::BasicCommandPacket::getControlleeFormat" ref="aa59662e780bf7be0ba68ff83082524bb" args="() const " -->
 bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>getControlleeFormat</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a761d3bb1aa3fbb55102169fc6167a752"></a><!-- doxytag: member="vrt::BasicCommandPacket::getControlleeIDNumber" ref="a761d3bb1aa3fbb55102169fc6167a752" args="() const " -->
@@ -103,28 +107,62 @@ bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>getPartialAction</b> 
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Prepares a packet for resend resetting any non-persistent values.  <a href="#a09be68308a83d8391436bedc4b104651"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual int32_t&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicCommandPacket.html#a2bd7b5952c6fdee424fe8faad91f82e1">getPrologueLength</a> () const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the prologue length in bytes (includes header and packet specific prologue, but does not include trailer).  <a href="#a2bd7b5952c6fdee424fe8faad91f82e1"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a63ddfcf1a245c937103cfeabd36f167a"></a><!-- doxytag: member="vrt::BasicCommandPacket::getRequestErrorsGenerated" ref="a63ddfcf1a245c937103cfeabd36f167a" args="() const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>getRequestErrorsGenerated</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a09e38db0e09b7e745ea697fe9a1f72b2"></a><!-- doxytag: member="vrt::BasicCommandPacket::getRequestExecutionAcknowledge" ref="a09e38db0e09b7e745ea697fe9a1f72b2" args="() const " -->
 bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>getRequestExecutionAcknowledge</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad3f95f5b1ce235aa41f0d8f49a152b62"></a><!-- doxytag: member="vrt::BasicCommandPacket::getRequestQueryAcknowledge" ref="ad3f95f5b1ce235aa41f0d8f49a152b62" args="() const " -->
 bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>getRequestQueryAcknowledge</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a26f710633eb10b40228b692e6e1c0eca"></a><!-- doxytag: member="vrt::BasicCommandPacket::getRequestValidationAcknowledge" ref="a26f710633eb10b40228b692e6e1c0eca" args="() const " -->
 bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>getRequestValidationAcknowledge</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeb88afccf76f7702e84742335b1347f5"></a><!-- doxytag: member="vrt::BasicCommandPacket::getRequestWarningsGenerated" ref="aeb88afccf76f7702e84742335b1347f5" args="() const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>getRequestWarningsGenerated</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1e2501bdbbd318825f43a764913d48b6"></a><!-- doxytag: member="vrt::BasicCommandPacket::getTimestampControl0Bit" ref="a1e2501bdbbd318825f43a764913d48b6" args="() const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>getTimestampControl0Bit</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7cca8e4586911f01fd19c5886af9f261"></a><!-- doxytag: member="vrt::BasicCommandPacket::getTimestampControl1Bit" ref="a7cca8e4586911f01fd19c5886af9f261" args="() const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>getTimestampControl1Bit</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeeeff00495b69c3a47d7b29252cdba93"></a><!-- doxytag: member="vrt::BasicCommandPacket::getTimestampControl2Bit" ref="aeeeff00495b69c3a47d7b29252cdba93" args="() const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>getTimestampControl2Bit</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4c115b64b195567b6e44fbba040f37e5"></a><!-- doxytag: member="vrt::BasicCommandPacket::getTimestampControlMode" ref="a4c115b64b195567b6e44fbba040f37e5" args="() const " -->
+int8_t&nbsp;</td><td class="memItemRight" valign="bottom"><b>getTimestampControlMode</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a97b1f0301e8235c3dcbdefc0294def55"></a><!-- doxytag: member="vrt::BasicCommandPacket::getWarningsGenerated" ref="a97b1f0301e8235c3dcbdefc0294def55" args="() const " -->
 bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>getWarningsGenerated</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a190497db55a85294c84cdbae0872f11b"></a><!-- doxytag: member="vrt::BasicCommandPacket::isActionDryRun" ref="a190497db55a85294c84cdbae0872f11b" args="() const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>isActionDryRun</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac2de84c4cfb281589dff748a08a47aec"></a><!-- doxytag: member="vrt::BasicCommandPacket::isActionNoAction" ref="ac2de84c4cfb281589dff748a08a47aec" args="() const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>isActionNoAction</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab558abbeb005f81f235d9cfe3a89af2b"></a><!-- doxytag: member="vrt::BasicCommandPacket::isActionTakeAction" ref="ab558abbeb005f81f235d9cfe3a89af2b" args="() const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>isActionTakeAction</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a07cee552eab4a8f1cf3f4f37f23d9a1c"></a><!-- doxytag: member="vrt::BasicCommandPacket::isControlleeEnable" ref="a07cee552eab4a8f1cf3f4f37f23d9a1c" args="() const " -->
 bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>isControlleeEnable</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abbb508137d9c479e9872e540575be185"></a><!-- doxytag: member="vrt::BasicCommandPacket::isControllerEnable" ref="abbb508137d9c479e9872e540575be185" args="() const " -->
 bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>isControllerEnable</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab8a7f2827ca18d5d28012a464f0d8d59"></a><!-- doxytag: member="vrt::BasicCommandPacket::isErrorsPermitted" ref="ab8a7f2827ca18d5d28012a464f0d8d59" args="() const " -->
 bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>isErrorsPermitted</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3b54070f4dace69b173707603a9d9cad"></a><!-- doxytag: member="vrt::BasicCommandPacket::isExecutionAcknowledge" ref="a3b54070f4dace69b173707603a9d9cad" args="() const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>isExecutionAcknowledge</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad2546804d57bd0d23df084a9dc29ae86"></a><!-- doxytag: member="vrt::BasicCommandPacket::isPartialChangePermitted" ref="ad2546804d57bd0d23df084a9dc29ae86" args="() const " -->
 bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>isPartialChangePermitted</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c32bb594f4823833a2c0715ebf6fb3d"></a><!-- doxytag: member="vrt::BasicCommandPacket::isQueryAcknowledge" ref="a0c32bb594f4823833a2c0715ebf6fb3d" args="() const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>isQueryAcknowledge</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a803fb9cd3fb3f3ebc7958df623a6123d"></a><!-- doxytag: member="vrt::BasicCommandPacket::isValidationAcknowledge" ref="a803fb9cd3fb3f3ebc7958df623a6123d" args="() const " -->
+bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>isValidationAcknowledge</b> () const </td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2f43ebb9c7629110d681d44c6574d13d"></a><!-- doxytag: member="vrt::BasicCommandPacket::isWarningsPermitted" ref="a2f43ebb9c7629110d681d44c6574d13d" args="() const " -->
 bool&nbsp;</td><td class="memItemRight" valign="bottom"><b>isWarningsPermitted</b> () const </td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae67883bc4e16d25949fc3743eecc6a7d"></a><!-- doxytag: member="vrt::BasicCommandPacket::setAction" ref="ae67883bc4e16d25949fc3743eecc6a7d" args="(int8_t action)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setAction</b> (int8_t action)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a44d5c90b2454059d77f8ff5385498d5b"></a><!-- doxytag: member="vrt::BasicCommandPacket::setAction0Flag" ref="a44d5c90b2454059d77f8ff5385498d5b" args="(bool set)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setAction0Flag</b> (bool set)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a08d0657a121d3bb9e257507d8bea5887"></a><!-- doxytag: member="vrt::BasicCommandPacket::setAction1Flag" ref="a08d0657a121d3bb9e257507d8bea5887" args="(bool set)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setAction1Flag</b> (bool set)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af7d1524b12e60b16e10f3b5bbc97c51d"></a><!-- doxytag: member="vrt::BasicCommandPacket::setActionDryRun" ref="af7d1524b12e60b16e10f3b5bbc97c51d" args="()" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setActionDryRun</b> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aab0db60fb401e6a935a33a3c9716ed51"></a><!-- doxytag: member="vrt::BasicCommandPacket::setActionExecuted" ref="aab0db60fb401e6a935a33a3c9716ed51" args="(bool set)" -->
 void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setActionExecuted</b> (bool set)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a044954507ef77beff7738f41c657fffb"></a><!-- doxytag: member="vrt::BasicCommandPacket::setActionFlag" ref="a044954507ef77beff7738f41c657fffb" args="(bool set)" -->
-void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setActionFlag</b> (bool set)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c69650e07c05daeebdd4ac1a0ad63ab"></a><!-- doxytag: member="vrt::BasicCommandPacket::setActionNoAction" ref="a0c69650e07c05daeebdd4ac1a0ad63ab" args="()" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setActionNoAction</b> ()</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1463f8cd27e62cc2722da408e3cb8505"></a><!-- doxytag: member="vrt::BasicCommandPacket::setActionTakeAction" ref="a1463f8cd27e62cc2722da408e3cb8505" args="()" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setActionTakeAction</b> ()</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a81ae69f31054e6dca279a128049f0912"></a><!-- doxytag: member="vrt::BasicCommandPacket::setControlleeEnable" ref="a81ae69f31054e6dca279a128049f0912" args="(bool set)" -->
 void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setControlleeEnable</b> (bool set)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab0f4d2445ee32a4d9c070a8e79e2b384"></a><!-- doxytag: member="vrt::BasicCommandPacket::setControlleeFormat" ref="ab0f4d2445ee32a4d9c070a8e79e2b384" args="(bool set)" -->
@@ -145,6 +183,8 @@ void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setControllerUUID</b>
 virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setErrorsGenerated</b> (bool set)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a35b3ca130d6648eb9582be4db82dc581"></a><!-- doxytag: member="vrt::BasicCommandPacket::setErrorsPermitted" ref="a35b3ca130d6648eb9582be4db82dc581" args="(bool set)" -->
 void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setErrorsPermitted</b> (bool set)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa6e39601752f7b7ce75116c311e896cd"></a><!-- doxytag: member="vrt::BasicCommandPacket::setExecutionAcknowledge" ref="aa6e39601752f7b7ce75116c311e896cd" args="(bool set)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setExecutionAcknowledge</b> (bool set)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad014dcaa1c5eacd8a16c17238f7cbda0"></a><!-- doxytag: member="vrt::BasicCommandPacket::setMessageID" ref="ad014dcaa1c5eacd8a16c17238f7cbda0" args="(int32_t val)" -->
 void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setMessageID</b> (int32_t val)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a46f3015e488b16023c7e8d9c36767fd8"></a><!-- doxytag: member="vrt::BasicCommandPacket::setNotAckOnly" ref="a46f3015e488b16023c7e8d9c36767fd8" args="(bool set)" -->
@@ -155,12 +195,28 @@ void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setNotAckOnly</b> (bo
 void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setPartialAction</b> (bool set)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a60ad43974fd42a14f487a44a61bb3199"></a><!-- doxytag: member="vrt::BasicCommandPacket::setPartialChangePermitted" ref="a60ad43974fd42a14f487a44a61bb3199" args="(bool set)" -->
 void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setPartialChangePermitted</b> (bool set)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aff434f690c69d1801291f81730d094d6"></a><!-- doxytag: member="vrt::BasicCommandPacket::setQueryAcknowledge" ref="aff434f690c69d1801291f81730d094d6" args="(bool set)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setQueryAcknowledge</b> (bool set)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a54881130063764478f9969abe1a8c025"></a><!-- doxytag: member="vrt::BasicCommandPacket::setRequestErrorsGenerated" ref="a54881130063764478f9969abe1a8c025" args="(bool set)" -->
+virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setRequestErrorsGenerated</b> (bool set)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abad60606bbeb3f31cb036b17d968c5da"></a><!-- doxytag: member="vrt::BasicCommandPacket::setRequestExecutionAcknowledge" ref="abad60606bbeb3f31cb036b17d968c5da" args="(bool set)" -->
 void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setRequestExecutionAcknowledge</b> (bool set)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa4aaf360459fb427a9e111f30c401a5f"></a><!-- doxytag: member="vrt::BasicCommandPacket::setRequestQueryAcknowledge" ref="aa4aaf360459fb427a9e111f30c401a5f" args="(bool set)" -->
 void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setRequestQueryAcknowledge</b> (bool set)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a81c2225e04bde4d83f257ed72646ed56"></a><!-- doxytag: member="vrt::BasicCommandPacket::setRequestValidationAcknowledge" ref="a81c2225e04bde4d83f257ed72646ed56" args="(bool set)" -->
 void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setRequestValidationAcknowledge</b> (bool set)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af51a2bea947fca7f2e7beea6391ebb15"></a><!-- doxytag: member="vrt::BasicCommandPacket::setRequestWarningsGenerated" ref="af51a2bea947fca7f2e7beea6391ebb15" args="(bool set)" -->
+virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setRequestWarningsGenerated</b> (bool set)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa76baf34c2339b14343730e1dda80a87"></a><!-- doxytag: member="vrt::BasicCommandPacket::setTimestampControl0Bit" ref="aa76baf34c2339b14343730e1dda80a87" args="(bool set)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setTimestampControl0Bit</b> (bool set)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3bb840f504459673c84900f272f12731"></a><!-- doxytag: member="vrt::BasicCommandPacket::setTimestampControl1Bit" ref="a3bb840f504459673c84900f272f12731" args="(bool set)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setTimestampControl1Bit</b> (bool set)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a05e213a8e36846be7ce8aafa7028597e"></a><!-- doxytag: member="vrt::BasicCommandPacket::setTimestampControl2Bit" ref="a05e213a8e36846be7ce8aafa7028597e" args="(bool set)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setTimestampControl2Bit</b> (bool set)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a68cd42167d68b4c8ef511bdb39de6d84"></a><!-- doxytag: member="vrt::BasicCommandPacket::setTimestampControlMode" ref="a68cd42167d68b4c8ef511bdb39de6d84" args="(int8_t mode)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setTimestampControlMode</b> (int8_t mode)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a13ae0eed80424511e55600020810f606"></a><!-- doxytag: member="vrt::BasicCommandPacket::setValidationAcknowledge" ref="a13ae0eed80424511e55600020810f606" args="(bool set)" -->
+void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setValidationAcknowledge</b> (bool set)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a62f1ddd6fee724784fa101133416b3df"></a><!-- doxytag: member="vrt::BasicCommandPacket::setWarningsGenerated" ref="a62f1ddd6fee724784fa101133416b3df" args="(bool set)" -->
 virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setWarningsGenerated</b> (bool set)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a590f3bde1218eb2e3987398b4821a135"></a><!-- doxytag: member="vrt::BasicCommandPacket::setWarningsPermitted" ref="a590f3bde1218eb2e3987398b4821a135" args="(bool set)" -->
@@ -620,7 +676,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setCtrlAckSet
 <li>cpp_src/vrt/lib/<a class="el" href="BasicCommandPacket_8h_source.html">BasicCommandPacket.h</a></li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 7 Mar 2018 for VRT by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 10 Apr 2018 for VRT by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

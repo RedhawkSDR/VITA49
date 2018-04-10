@@ -82,8 +82,8 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>addCIF2</b> (
 virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>addCIF3</b> (bool add=true, bool occurrence=false)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af28b75089470ef37e58b1cd18b6683d2"></a><!-- doxytag: member="vrt::BasicContextPacket::addCIF7" ref="af28b75089470ef37e58b1cd18b6683d2" args="(bool add=true, bool occurrence=false)" -->
 virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>addCIF7</b> (bool add=true, bool occurrence=false)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicContextPacket.html#a86b361944b68a347b0a7e7577fa9cca0">get2DPointingAngleStructured</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the 2D Pointing Angle (Structured).  <a href="#a86b361944b68a347b0a7e7577fa9cca0"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicContextPacket.html#a398b13df734738e2d24e3448aed85c59">get3DPointingVectorStructured</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the 3D Pointing Vector (Structured).  <a href="#a398b13df734738e2d24e3448aed85c59"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="classvrt_1_1TimeStamp.html">TimeStamp</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicContextPacket.html#a229054fb0dfb128d91ea0e7a2275c806">getAdjustedTimeStamp</a> () const </td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets the adjusted time stamp of the packet.  <a href="#a229054fb0dfb128d91ea0e7a2275c806"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicContextPacket.html#a685c59c3934d168a2fd46fe5a2426e9d">getCIFsArray</a> (<a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a> cif7field=CIF_NULL) const </td></tr>
@@ -555,12 +555,12 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 </div>
 </div>
-<a class="anchor" id="a86b361944b68a347b0a7e7577fa9cca0"></a><!-- doxytag: member="vrt::BasicContextPacket::get2DPointingAngleStructured" ref="a86b361944b68a347b0a7e7577fa9cca0" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
+<a class="anchor" id="a398b13df734738e2d24e3448aed85c59"></a><!-- doxytag: member="vrt::BasicContextPacket::get3DPointingVectorStructured" ref="a398b13df734738e2d24e3448aed85c59" args="(IndicatorFieldEnum_t cif7field=CIF_NULL) const " -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a> vrt::BasicContextPacket::get2DPointingAngleStructured </td>
+          <td class="memname">virtual <a class="el" href="classvrt_1_1ArrayOfRecords.html">ArrayOfRecords</a> vrt::BasicContextPacket::get3DPointingVectorStructured </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespacevrt_1_1IndicatorFields.html#ad1a173f26d5e4158fe25e3980f98919f">IndicatorFieldEnum_t</a>&nbsp;</td>
           <td class="paramname"> <em>cif7field</em> = <code>CIF_NULL</code></td>
@@ -571,18 +571,18 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 </div>
 <div class="memdoc">
 
-<p>Gets the 2D Pointing Angle (Structured). </p>
+<p>Gets the 3D Pointing Vector (Structured). </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>cif7field</em>&nbsp;</td><td>Indicator field for the CIF7 attribute. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>2D Pointing Angle as an Array-of-Records (null if not specified). <em>Note that changes to the returned object do not alter the packet.</em> </dd></dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>3D Pointing Vector as an Array-of-Records (null if not specified). <em>Note that changes to the returned object do not alter the packet.</em> </dd></dl>
 
-<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ac1ee8dd842a7d8999296cf5c1a59e508">vrt::IndicatorFieldProvider</a>.</p>
+<p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a2e9f953d1dda415b197ae95434a8d9d5">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01062">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01037">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
 
 </div>
 </div>
@@ -730,7 +730,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a45fcf94010ead4ec653333a563afcf31">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01062">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01037">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
 
 </div>
 </div>
@@ -762,7 +762,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a622ab6f7c71f6fd2a00a86a32affa871">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01062">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01037">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
 
 </div>
 </div>
@@ -858,7 +858,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#aa8456b90bbb2ad77fe57e0584826c4b7">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>References <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01062">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
+<p>References <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01037">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
 
 </div>
 </div>
@@ -1082,7 +1082,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a9a1437abd6c32298e20de0aa7cf4b914">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>References <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01062">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
+<p>References <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01037">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
 
 </div>
 </div>
@@ -1114,7 +1114,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#af3f089a411ea7a4cd78c23c46c4fca2a">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01062">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01037">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
 
 </div>
 </div>
@@ -1188,7 +1188,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a65c3a7eb9d32b3c2b3ba7e6d3f490e43">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01062">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01037">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
 
 </div>
 </div>
@@ -1316,7 +1316,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a12d281e12018c835e595893381b1f718">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>Referenced by <a class="el" href="BasicContextPacket_8h_source.html#l00494">get2DPointingAngleStructured()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00466">getCIFsArray()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00427">getContextAssocLists()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00510">getDataPayloadFormat()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00397">getEphemeris()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00389">getGeolocation()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00413">getGeoSentences()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00440">getIndexList()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00453">getSectorScanStep()</a>, and <a class="el" href="BasicContextPacket_8h_source.html#l00481">getSpectrumField()</a>.</p>
+<p>Referenced by <a class="el" href="BasicContextPacket_8h_source.html#l00494">get3DPointingVectorStructured()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00466">getCIFsArray()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00427">getContextAssocLists()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00510">getDataPayloadFormat()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00397">getEphemeris()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00389">getGeolocation()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00413">getGeoSentences()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00440">getIndexList()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00453">getSectorScanStep()</a>, and <a class="el" href="BasicContextPacket_8h_source.html#l00481">getSpectrumField()</a>.</p>
 
 </div>
 </div>
@@ -1389,7 +1389,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab050b3a8cd376687185ed1651f2c6a04">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01062">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01037">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
 
 </div>
 </div>
@@ -1420,7 +1420,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a40861fcb3cf29b33c4e1fb6d82377283">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01062">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
+<p>References <a class="el" href="IndicatorFields_8h_source.html#l00285">vrt::IndicatorFields::getCIFBitMask()</a>, <a class="el" href="IndicatorFields_8h_source.html#l00261">vrt::IndicatorFields::getCIFNumber()</a>, <a class="el" href="classvrt_1_1BasicContextPacket.html#ad27eb40fd53fc60233830c12c3a2cebd">getOffset()</a>, and <a class="el" href="BasicVRTPacket_8h_source.html#l01037">vrt::BasicVRTPacket::unpackPayloadRecord()</a>.</p>
 
 </div>
 </div>
@@ -2206,7 +2206,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 <li>cpp_src/vrt/lib/<a class="el" href="BasicContextPacket_8h_source.html">BasicContextPacket.h</a></li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 7 Mar 2018 for VRT by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 10 Apr 2018 for VRT by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>
