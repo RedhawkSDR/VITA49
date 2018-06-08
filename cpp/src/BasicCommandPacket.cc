@@ -507,7 +507,7 @@ int32_t BasicCommandPacket::getOffset (bool controller) const {
   }
 }
 
-int32_t BasicCommandPacket::getFieldLen(bool controller) const {
+int32_t BasicCommandPacket::getFieldLen (bool controller) const {
   if (!controller) {
     return (getControlleeFormat() ? 16 : 4);
   }

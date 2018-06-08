@@ -210,20 +210,20 @@ namespace vrt {
 
     // Control Acknowledge Settings Field
     //Control-CE
-    public: bool isControlleeEnable () const;
-    public: void setControlleeEnable (bool set);
+    public:    bool isControlleeEnable () const;
+    protected: void setControlleeEnable (bool set);
 
     //Control-IE
-    public: bool getControlleeFormat () const;
-    public: void setControlleeFormat (bool set);
+    public:    bool getControlleeFormat () const;
+    protected: void setControlleeFormat (bool set);
 
     //Control-CR
-    public: bool isControllerEnable () const;
-    public: void setControllerEnable (bool set);
+    public:    bool isControllerEnable () const;
+    protected: void setControllerEnable (bool set);
 
     //Control-IR
-    public: bool getControllerFormat () const;
-    public: void setControllerFormat (bool set);
+    public:    bool getControllerFormat () const;
+    protected: void setControllerFormat (bool set);
 
     //Control-P
     public: bool isPartialChangePermitted () const;
