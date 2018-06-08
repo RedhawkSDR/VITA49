@@ -214,7 +214,7 @@ bool BasicContextPacket::resetForResend (const TimeStamp &t) {
 
 // This is the State and Event Indicator, which has the same format as the Trailer for Data/ExtData packets
 // The trailer function is leveraged to eliminate duplicate code.
-boolNull BasicContextPacket::getStateEventBit (int32_t enable, int32_t indicator, int32_t cif7bit) const { // TODO CIF7 (done)
+boolNull BasicContextPacket::getStateEventBit (int32_t enable, int32_t indicator, int32_t cif7bit) const {
   int32_t off = getOffset(0, protected_CIF0::STATE_EVENT_mask, cif7bit);
   if (off < 0) return _NULL;
   // Note: offset passed to BasicVRTPacket is from start of bbuf
@@ -223,7 +223,7 @@ boolNull BasicContextPacket::getStateEventBit (int32_t enable, int32_t indicator
 
 // This is the State and Event Indicator, which has the same format as the Trailer for Data/ExtData packets
 // The trailer function is leveraged to eliminate duplicate code.
-void BasicContextPacket::setStateEventBit (int32_t enable, int32_t indicator, boolNull value, int32_t cif7bit) { // TODO CIF7 (done)
+void BasicContextPacket::setStateEventBit (int32_t enable, int32_t indicator, boolNull value, int32_t cif7bit) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   int32_t cif7off = 0;
   int32_t fieldLen = 4; // STATE_EVENT is 4 bytes
@@ -248,7 +248,7 @@ void BasicContextPacket::setStateEventBit (int32_t enable, int32_t indicator, bo
   BasicVRTPacket::setStateEventBit(bbuf, poff+cif7off+getPrologueLength(), enable, indicator, value);
 }
 
-void BasicContextPacket::setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen, int32_t cif7bit) { // TODO CIF7 (done)
+void BasicContextPacket::setRecord (int8_t cifNum, int32_t bit, const Record *val, int32_t oldLen, int32_t cif7bit) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   int32_t cif7off = 0;
   int32_t newLen = (val == NULL)? 0 : val->getByteLength();
@@ -506,12 +506,12 @@ void BasicContextPacket::setCIF7Bit (int32_t cif7bit, bool set, bool occurrence)
   }
 }
 
-int8_t BasicContextPacket::getB (int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const { // TODO CIF7 (done)
+int8_t BasicContextPacket::getB (int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const {
   int32_t off = getOffset(cifNum, bit, cif7bit);
   if (isNull(off) || off < 0) return INT8_NULL;
   return bbuf[off+xoff+getPrologueLength()];
 }
-void BasicContextPacket::setB (int8_t cifNum, int32_t bit, int32_t xoff, int8_t val, int32_t cif7bit) { // TODO CIF7 (done)
+void BasicContextPacket::setB (int8_t cifNum, int32_t bit, int32_t xoff, int8_t val, int32_t cif7bit) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   int32_t cif7off = 0;
   int32_t fieldLen = getFieldLen(cifNum,bit);
@@ -540,12 +540,12 @@ void BasicContextPacket::setB (int8_t cifNum, int32_t bit, int32_t xoff, int8_t 
     bbuf[poff+cif7off+xoff+getPrologueLength()] = val;
   }
 }
-int16_t BasicContextPacket::getI (int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const { // TODO CIF7 (done)
+int16_t BasicContextPacket::getI (int8_t cifNum, int32_t bit, int32_t xoff, int32_t cif7bit) const {
   int32_t off = getOffset(cifNum, bit, cif7bit);
   if (isNull(off) || off < 0) return INT16_NULL;
   return VRTMath::unpackShort(bbuf, off+xoff+getPrologueLength());
 }
-void BasicContextPacket::setI (int8_t cifNum, int32_t bit, int32_t xoff, int16_t val, int32_t cif7bit) { // TODO CIF7 (done)
+void BasicContextPacket::setI (int8_t cifNum, int32_t bit, int32_t xoff, int16_t val, int32_t cif7bit) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   int32_t cif7off = 0;
   int32_t fieldLen = getFieldLen(cifNum,bit);
@@ -574,19 +574,19 @@ void BasicContextPacket::setI (int8_t cifNum, int32_t bit, int32_t xoff, int16_t
     VRTMath::packShort(bbuf, poff+cif7off+xoff+getPrologueLength(), val);
   }
 }
-int32_t BasicContextPacket::getL24 (int8_t cifNum, int32_t bit, int32_t offset, int32_t cif7bit) const { // TODO CIF7 (done)
+int32_t BasicContextPacket::getL24 (int8_t cifNum, int32_t bit, int32_t offset, int32_t cif7bit) const {
   int32_t off = getOffset(cifNum, bit, cif7bit);
   if (isNull(off) || off < 0) return INT32_NULL;
   int32_t bits = VRTMath::unpackInt(bbuf, off+getPrologueLength());
   bits = (bits & (0xFFFFFF00 >> 8*offset)) >> 8*offset;
   return bits;
 }
-int32_t BasicContextPacket::getL (int8_t cifNum, int32_t bit, int32_t cif7bit) const { // TODO CIF7 (done)
+int32_t BasicContextPacket::getL (int8_t cifNum, int32_t bit, int32_t cif7bit) const {
   int32_t off = getOffset(cifNum, bit, cif7bit);
   if (isNull(off) || off < 0) return INT32_NULL;
   return VRTMath::unpackInt(bbuf, off+getPrologueLength());
 }
-void BasicContextPacket::setL (int8_t cifNum, int32_t bit, int32_t val, int32_t cif7bit) { // TODO CIF7 (done)
+void BasicContextPacket::setL (int8_t cifNum, int32_t bit, int32_t val, int32_t cif7bit) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   int32_t cif7off = 0;
   int32_t fieldLen = getFieldLen(cifNum,bit);
@@ -615,12 +615,12 @@ void BasicContextPacket::setL (int8_t cifNum, int32_t bit, int32_t val, int32_t 
     VRTMath::packInt(bbuf, poff+cif7off+getPrologueLength(), val);
   }
 }
-int64_t BasicContextPacket::getX (int8_t cifNum, int32_t bit, int32_t cif7bit) const { // TODO CIF7 (done)
+int64_t BasicContextPacket::getX (int8_t cifNum, int32_t bit, int32_t cif7bit) const {
   int32_t off = getOffset(cifNum, bit, cif7bit);
   if (isNull(off) || off < 0) return INT64_NULL;
   return VRTMath::unpackLong(bbuf, off+getPrologueLength());
 }
-void BasicContextPacket::setX (int8_t cifNum, int32_t bit, int64_t val, int32_t cif7bit) { // TODO CIF7 (done)
+void BasicContextPacket::setX (int8_t cifNum, int32_t bit, int64_t val, int32_t cif7bit) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   int32_t cif7off = 0;
   int32_t fieldLen = getFieldLen(cifNum,bit);
@@ -650,12 +650,12 @@ void BasicContextPacket::setX (int8_t cifNum, int32_t bit, int64_t val, int32_t 
   }
 }
 
-UUID BasicContextPacket::getUUID (int8_t cifNum, int32_t bit, int32_t cif7bit) const { // TODO CIF7 (done)
+UUID BasicContextPacket::getUUID (int8_t cifNum, int32_t bit, int32_t cif7bit) const {
   int32_t off = getOffset(cifNum, bit, cif7bit);
   if (isNull(off) || off < 0) return UUID(); // return NULL UUID
   return VRTMath::unpackUUID(bbuf, off+getPrologueLength());
 }
-void BasicContextPacket::setUUID (int8_t cifNum, int32_t bit, const UUID &val, int32_t cif7bit) { // TODO CIF7 (done)
+void BasicContextPacket::setUUID (int8_t cifNum, int32_t bit, const UUID &val, int32_t cif7bit) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
   int32_t cif7off = 0;
   int32_t fieldLen = getFieldLen(cifNum,bit);
@@ -685,7 +685,7 @@ void BasicContextPacket::setUUID (int8_t cifNum, int32_t bit, const UUID &val, i
   }
 }
 
-TimeStamp BasicContextPacket::getTimeStampField (int8_t cifNum, int32_t bit, int32_t cif7bit) const { // TODO CIF7 (done)
+TimeStamp BasicContextPacket::getTimeStampField (int8_t cifNum, int32_t bit, int32_t cif7bit) const {
   int32_t off = getOffset(cifNum, bit, cif7bit);
   if (isNull(off) || off < 0) return TimeStamp(); // return NULL TimeStamp (int/frac modes both set to None)
 
@@ -705,7 +705,7 @@ TimeStamp BasicContextPacket::getTimeStampField (int8_t cifNum, int32_t bit, int
   }
   return TimeStamp(tsiMode, tsfMode, tsi, tsf, DOUBLE_NAN);
 }
-void BasicContextPacket::setTimeStampField (int8_t cifNum, int32_t bit, const TimeStamp &val, int32_t cif7bit) { // TODO CIF7 (done)
+void BasicContextPacket::setTimeStampField (int8_t cifNum, int32_t bit, const TimeStamp &val, int32_t cif7bit) {
   if (readOnly) throw VRTException("Can not write to read-only VRTPacket.");
 
   // Get packet timestamp info from TSI/TSF
@@ -783,7 +783,7 @@ int32_t BasicContextPacket::getTotalFieldSize (int32_t fieldLen, bool occurrence
   return sz;
 }
 
-int32_t BasicContextPacket::getFieldLen (int8_t cifNum, int32_t field, int32_t parent) const { // TODO CIF7 (done)
+int32_t BasicContextPacket::getFieldLen (int8_t cifNum, int32_t field, int32_t parent) const {
   switch(cifNum) {
   case 0:
     if ((field & protected_CIF0::CTX_4_OCTETS ) != 0) return  4;
@@ -861,7 +861,7 @@ string BasicContextPacket::getPacketValid (bool strict, int32_t length) const {
   return "";
 }
 
-int32_t BasicContextPacket::getCIF7Offset (int32_t attr, int32_t len, bool occurrence) const { // TODO CIF7 (done)
+int32_t BasicContextPacket::getCIF7Offset (int32_t attr, int32_t len, bool occurrence) const {
   UNUSED_VARIABLE(occurrence);
   if (!isCIF7Enable()) throw VRTException("CIF7 is not enabled.");
   int32_t cif7 = getContextIndicatorField7();

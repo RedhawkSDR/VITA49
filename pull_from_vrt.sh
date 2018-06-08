@@ -20,7 +20,7 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 
 
-vrt_path="../vrt/"
+vrt_path="../../redhawk-dependencies/vrt/"
 USAGE="Usage: $0 [path to vrt source]
     Default vrt source path: $vrt_path"
 

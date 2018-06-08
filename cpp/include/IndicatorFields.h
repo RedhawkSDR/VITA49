@@ -1502,7 +1502,7 @@ namespace vrt {
     // @return offset to attribute of specified field
     // @throws VRTException when field has invalid length (size)
     // @throws VRTException when cif7bit is specified (non-zero) and CIF7 is not enabled
-    protected: virtual int32_t getOffset (int8_t cifNum, int32_t field, int32_t cif7bit) const { // TODO CIF7 (done)
+    protected: virtual int32_t getOffset (int8_t cifNum, int32_t field, int32_t cif7bit) const {
       int32_t fieldOffset = getOffset(cifNum, field);
       if (cif7bit == 0 || isNull(fieldOffset) || fieldOffset<0) return fieldOffset;
       //if (fieldOffset < 0) throw VRTException("Cannot get attribute of a field that is not present.");
@@ -1606,7 +1606,7 @@ namespace vrt {
     }
 
     /** Unpacks a 32-bit integer from the payload at the indicated position. */
-    protected: virtual int32_t getL (int8_t cifNum, int32_t bit, int32_t cif7bit) const = 0; // TODO CIF7 (done)
+    protected: virtual int32_t getL (int8_t cifNum, int32_t bit, int32_t cif7bit) const = 0;
     protected: virtual int32_t getL (IndicatorFieldEnum_t field, IndicatorFieldEnum_t cif7field) const {
       int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
       return getL(getCIFNumber(field), getCIFBitMask(field), cif7bit);
@@ -1620,7 +1620,7 @@ namespace vrt {
     }
 
     /** Packs a 32-bit integer from the payload at the indicated position. */
-    protected: virtual void setL (int8_t cifNum, int32_t bit, int32_t val, int32_t cif7bit) = 0; // TODO CIF7 (done)
+    protected: virtual void setL (int8_t cifNum, int32_t bit, int32_t val, int32_t cif7bit) = 0;
     protected: virtual void setL (IndicatorFieldEnum_t field, int32_t val, IndicatorFieldEnum_t cif7field) {
       int32_t cif7bit = (getCIFNumber(cif7field) != 7) ? 0 : getCIFBitMask(cif7field);
       setL(getCIFNumber(field), getCIFBitMask(field), val, cif7bit);
@@ -1850,7 +1850,7 @@ namespace vrt {
      *  @return The point in the system where this context applies (null if not specified).
      */
     public: inline int32_t getReferencePointIdentifier (IndicatorFieldEnum_t cif7field=CIF_NULL) const {
-      return getL(REF_POINT, cif7field); // TODO CIF7 (done)
+      return getL(REF_POINT, cif7field);
     }
 
     /** Gets the Timestamp Adjustment in picoseconds. This is the required time adjustment
@@ -2234,7 +2234,7 @@ namespace vrt {
      *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
     public: inline void setReferencePointIdentifier (int32_t val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
-      setL(REF_POINT, val, cif7field); // TODO CIF7 (done)
+      setL(REF_POINT, val, cif7field);
     }
 
     /** Sets the specified bit of the State and Event Indicator field.
@@ -2500,8 +2500,12 @@ namespace vrt {
      *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
     public: inline void setGain1 (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
-      int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(GAIN,2,bits, cif7field);
+      if (isNull(val)) {
+        setI(GAIN,0,INT16_NULL, cif7field); // clears gain field(s)
+      } else {
+        int16_t bits = VRTMath::fromFloat16(7,val);
+        setI(GAIN,2,bits, cif7field);
+      }
     }
 
     /** Sets the Stage 2 Gain of the device in dB. This is the back-end gain of the
@@ -2512,8 +2516,12 @@ namespace vrt {
      *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
     public: inline void setGain2 (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
-      int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(GAIN,0,bits, cif7field);
+      if (isNull(val)) {
+        setI(GAIN,0,INT16_NULL, cif7field); // clears gain field(s)
+      } else {
+        int16_t bits = VRTMath::fromFloat16(7,val);
+        setI(GAIN,0,bits, cif7field);
+      }
     }
 
     /** Sets the Sample Rate in Hz.
@@ -2927,8 +2935,12 @@ namespace vrt {
      *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
     public: inline void setAuxGain1 (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
-      int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(AUX_GAIN,2,bits, cif7field);
+      if (isNull(val)) {
+        setI(AUX_GAIN,0,INT16_NULL, cif7field); // clears aux gain field(s)
+      } else {
+        int16_t bits = VRTMath::fromFloat16(7,val);
+        setI(AUX_GAIN,2,bits, cif7field);
+      }
     }
 
     /** Sets the Stage 2 Auxiliary Gain of the device in dB.
@@ -2944,8 +2956,12 @@ namespace vrt {
      *  @param  cif7field (Optional) Indicator field for the CIF7 attribute.
      */
     public: inline void setAuxGain2 (float val, IndicatorFieldEnum_t cif7field=CIF_NULL) {
-      int16_t bits = VRTMath::fromFloat16(7,val);
-      setI(AUX_GAIN,0,bits, cif7field);
+      if (isNull(val)) {
+        setI(AUX_GAIN,0,INT16_NULL, cif7field); // clears aux gain field(s)
+      } else {
+        int16_t bits = VRTMath::fromFloat16(7,val);
+        setI(AUX_GAIN,0,bits, cif7field);
+      }
     }
 
     /** Sets the Total Auxiliary Gain of the device in dB. This is effectively the same as
@@ -5092,7 +5108,6 @@ namespace vrt {
       return getContextIndicatorFieldBit(7 | (((int8_t)occurrence)<<3), cif7bit);
     }
 
-    // TODO CIF7 (done)
     /** Set CIF7 BELIEF Attribute of a field
      *  Conveys a factor conveying the degree of confidence that the probability
      *  is accurate.
