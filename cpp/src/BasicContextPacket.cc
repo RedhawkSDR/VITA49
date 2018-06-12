@@ -989,7 +989,7 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int8_t cifNum, int32
   }
   off += off0;
   if (cifNum == 0) return ((cif0 & field) != 0)? off: -off;  // -off if not present
-  
+
   // CIF1
   if((cif0 & protected_CIF0::CIF1_ENABLE_mask) != 0) {
     int32_t cif1 = VRTMath::unpackInt(bbuf, prologlen+cifOffset);
@@ -1024,12 +1024,12 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int8_t cifNum, int32
         }
 
         // Only count SPECTRUM since it is the only field between the previous
-        // and next variable length fields. SPECTRUM is 56-octets.
-        if ((cif1 & mask1 & protected_CIF1::SPECTRUM_mask) != 0) off1 += (cif7Add + (56*cif7Mult));
+        // and next variable length fields. SPECTRUM is 52-octets.
+        if ((cif1 & mask1 & protected_CIF1::SPECTRUM_mask) != 0) off1 += (cif7Add + (52*cif7Mult));
 
         // SECTOR_SCN_STP is also Array-of-Records format, and since it comes after
         // CIFS_ARRAY, we nest it here so the check can be skipped.
-        if (field < protected_CIF1::SECTOR_SCN_STP_mask) {
+        if (field1 < protected_CIF1::SECTOR_SCN_STP_mask) {
           if ((cif1 & protected_CIF1::SECTOR_SCN_STP_mask) != 0) {
             // TODO - when and where does cif7Mult apply? perhaps not all field sizes are affected.    
             off1 += (VRTMath::unpackInt(bbuf, prologlen+off+off1)*4)*cif7Mult + cif7Add;
@@ -1040,7 +1040,7 @@ int32_t __attribute__((hot)) BasicContextPacket::getOffset (int8_t cifNum, int32
 
           // INDEX_LIST is also Array-of-Records format, and since it comes after
           // SECTOR_SCN_STP, we nest it here so the check can be skipped.
-          if (field < protected_CIF1::INDEX_LIST_mask) {
+          if (field1 < protected_CIF1::INDEX_LIST_mask) {
             if ((cif1 & protected_CIF1::INDEX_LIST_mask) != 0) {
               // TODO - when and where does cif7Mult apply? perhaps not all field sizes are affected.    
               off1 += (VRTMath::unpackInt(bbuf, prologlen+off+off1)*4)*cif7Mult + cif7Add;
