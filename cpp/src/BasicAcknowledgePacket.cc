@@ -76,7 +76,7 @@ static inline vector<char> BasicAcknowledgePacket_createDefaultPacket () {
   buf[2]  = 0x00; // 
   buf[3]  = 0x11; // Packet size = 17 (full header, full psp, no payload!)
   buf[28] = 0xF0; // Has 128-bit ControlleeID and 128-bit ControllerID
-  buf[29] = 0x20; // AckX
+  buf[29] = 0x08; // AckX
   return buf;
 }
 
