@@ -226,151 +226,155 @@
 <a name="l00262"></a>00262     <span class="keyword">public</span>: <span class="keywordtype">bool</span> isValidationAcknowledge ()<span class="keyword"> const </span>{
 <a name="l00263"></a>00263       <span class="keywordflow">return</span> getRequestValidationAcknowledge();
 <a name="l00264"></a>00264     }
-<a name="l00265"></a>00265     <span class="keyword">public</span>: <span class="keywordtype">void</span> setValidationAcknowledge (<span class="keywordtype">bool</span> <span class="keyword">set</span>) {
-<a name="l00266"></a>00266       setRequestValidationAcknowledge(<span class="keyword">set</span>);
-<a name="l00267"></a>00267     }
-<a name="l00268"></a>00268 
-<a name="l00269"></a>00269     <span class="comment">//Control-X</span>
-<a name="l00270"></a>00270     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getRequestExecutionAcknowledge () <span class="keyword">const</span>;
-<a name="l00271"></a>00271     <span class="keyword">public</span>: <span class="keywordtype">void</span> setRequestExecutionAcknowledge (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
-<a name="l00272"></a>00272     <span class="comment">//Acknowledge-X</span>
-<a name="l00273"></a>00273     <span class="keyword">public</span>: <span class="keywordtype">bool</span> isExecutionAcknowledge ()<span class="keyword"> const </span>{
-<a name="l00274"></a>00274       <span class="keywordflow">return</span> getRequestExecutionAcknowledge();
-<a name="l00275"></a>00275     }
-<a name="l00276"></a>00276     <span class="keyword">public</span>: <span class="keywordtype">void</span> setExecutionAcknowledge (<span class="keywordtype">bool</span> <span class="keyword">set</span>) {
-<a name="l00277"></a>00277       setRequestExecutionAcknowledge(<span class="keyword">set</span>);
-<a name="l00278"></a>00278     }
-<a name="l00279"></a>00279 
-<a name="l00280"></a>00280     <span class="comment">//Control-S</span>
-<a name="l00281"></a>00281     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getRequestQueryAcknowledge () <span class="keyword">const</span>;
-<a name="l00282"></a>00282     <span class="keyword">public</span>: <span class="keywordtype">void</span> setRequestQueryAcknowledge (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
-<a name="l00283"></a>00283     <span class="comment">//Acknowledge-S</span>
-<a name="l00284"></a>00284     <span class="keyword">public</span>: <span class="keywordtype">bool</span> isQueryAcknowledge ()<span class="keyword"> const </span>{
-<a name="l00285"></a>00285       <span class="keywordflow">return</span> getRequestQueryAcknowledge();
-<a name="l00286"></a>00286     }
-<a name="l00287"></a>00287     <span class="keyword">public</span>: <span class="keywordtype">void</span> setQueryAcknowledge (<span class="keywordtype">bool</span> <span class="keyword">set</span>) {
-<a name="l00288"></a>00288       setRequestQueryAcknowledge(<span class="keyword">set</span>);
-<a name="l00289"></a>00289     }
-<a name="l00290"></a>00290 
-<a name="l00291"></a>00291     <span class="comment">//Acknowledge-W</span>
-<a name="l00292"></a>00292     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getWarningsGenerated () <span class="keyword">const</span>;
-<a name="l00293"></a>00293     <span class="keyword">public</span>: <span class="keyword">virtual</span> <span class="keywordtype">void</span> setWarningsGenerated (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
-<a name="l00294"></a>00294     <span class="comment">//Control-W</span>
-<a name="l00295"></a>00295     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getRequestWarningsGenerated ()<span class="keyword"> const </span>{
-<a name="l00296"></a>00296       <span class="keywordflow">return</span> getWarningsGenerated();
-<a name="l00297"></a>00297     }
-<a name="l00298"></a>00298     <span class="keyword">public</span>: <span class="keyword">virtual</span> <span class="keywordtype">void</span> setRequestWarningsGenerated (<span class="keywordtype">bool</span> <span class="keyword">set</span>) {
-<a name="l00299"></a>00299       setWarningsGenerated(<span class="keyword">set</span>);
+<a name="l00265"></a>00265 
+<a name="l00271"></a><a class="code" href="classvrt_1_1BasicCommandPacket.html#aa75b3ca1d6ad770a5e1ef645d9160c99">00271</a>     <span class="keyword">public</span>: <span class="keywordtype">void</span> <a class="code" href="classvrt_1_1BasicCommandPacket.html#aa75b3ca1d6ad770a5e1ef645d9160c99" title="Sets specific type of Acknowledge Packet With no arguments, default is to set packet...">setValidationAcknowledge</a> (<span class="keywordtype">bool</span> <span class="keyword">set</span>=<span class="keyword">true</span>) {
+<a name="l00272"></a>00272       setRequestExecutionAcknowledge(!<span class="keyword">set</span>);
+<a name="l00273"></a>00273       setRequestValidationAcknowledge(<span class="keyword">set</span>);
+<a name="l00274"></a>00274     }
+<a name="l00275"></a>00275 
+<a name="l00276"></a>00276     <span class="comment">//Control-X</span>
+<a name="l00277"></a>00277     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getRequestExecutionAcknowledge () <span class="keyword">const</span>;
+<a name="l00278"></a>00278     <span class="keyword">public</span>: <span class="keywordtype">void</span> setRequestExecutionAcknowledge (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
+<a name="l00279"></a>00279     <span class="comment">//Acknowledge-X</span>
+<a name="l00280"></a>00280     <span class="keyword">public</span>: <span class="keywordtype">bool</span> isExecutionAcknowledge ()<span class="keyword"> const </span>{
+<a name="l00281"></a>00281       <span class="keywordflow">return</span> getRequestExecutionAcknowledge();
+<a name="l00282"></a>00282     }
+<a name="l00283"></a>00283 
+<a name="l00289"></a><a class="code" href="classvrt_1_1BasicCommandPacket.html#a2c8bc954ebbe0c2f75fd08b1be5daff7">00289</a>     <span class="keyword">public</span>: <span class="keywordtype">void</span> <a class="code" href="classvrt_1_1BasicCommandPacket.html#a2c8bc954ebbe0c2f75fd08b1be5daff7" title="Sets specific type of Acknowledge Packet With no arguments, default is to set packet...">setExecutionAcknowledge</a> (<span class="keywordtype">bool</span> <span class="keyword">set</span>=<span class="keyword">true</span>) {
+<a name="l00290"></a>00290       setRequestValidationAcknowledge(!<span class="keyword">set</span>);
+<a name="l00291"></a>00291       setRequestExecutionAcknowledge(<span class="keyword">set</span>);
+<a name="l00292"></a>00292     }
+<a name="l00293"></a>00293 
+<a name="l00294"></a>00294     <span class="comment">//Control-S</span>
+<a name="l00295"></a>00295     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getRequestQueryAcknowledge () <span class="keyword">const</span>;
+<a name="l00296"></a>00296     <span class="keyword">public</span>: <span class="keywordtype">void</span> setRequestQueryAcknowledge (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
+<a name="l00297"></a>00297     <span class="comment">//Acknowledge-S</span>
+<a name="l00298"></a>00298     <span class="keyword">public</span>: <span class="keywordtype">bool</span> isQueryAcknowledge ()<span class="keyword"> const </span>{
+<a name="l00299"></a>00299       <span class="keywordflow">return</span> getRequestQueryAcknowledge();
 <a name="l00300"></a>00300     }
-<a name="l00301"></a>00301 
-<a name="l00302"></a>00302     <span class="comment">//Acknowledge-E</span>
-<a name="l00303"></a>00303     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getErrorsGenerated () <span class="keyword">const</span>;
-<a name="l00304"></a>00304     <span class="keyword">public</span>: <span class="keyword">virtual</span> <span class="keywordtype">void</span> setErrorsGenerated (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
-<a name="l00305"></a>00305     <span class="comment">//Control-E</span>
-<a name="l00306"></a>00306     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getRequestErrorsGenerated ()<span class="keyword"> const </span>{
-<a name="l00307"></a>00307       <span class="keywordflow">return</span> getErrorsGenerated();
-<a name="l00308"></a>00308     }
-<a name="l00309"></a>00309     <span class="keyword">public</span>: <span class="keyword">virtual</span> <span class="keywordtype">void</span> setRequestErrorsGenerated (<span class="keywordtype">bool</span> <span class="keyword">set</span>) {
-<a name="l00310"></a>00310       setErrorsGenerated(<span class="keyword">set</span>);
+<a name="l00301"></a>00301     <span class="keyword">public</span>: <span class="keywordtype">void</span> setQueryAcknowledge (<span class="keywordtype">bool</span> <span class="keyword">set</span>) {
+<a name="l00302"></a>00302       setRequestQueryAcknowledge(<span class="keyword">set</span>);
+<a name="l00303"></a>00303     }
+<a name="l00304"></a>00304 
+<a name="l00305"></a>00305     <span class="comment">//Acknowledge-W</span>
+<a name="l00306"></a>00306     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getWarningsGenerated () <span class="keyword">const</span>;
+<a name="l00307"></a>00307     <span class="keyword">public</span>: <span class="keyword">virtual</span> <span class="keywordtype">void</span> setWarningsGenerated (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
+<a name="l00308"></a>00308     <span class="comment">//Control-W</span>
+<a name="l00309"></a>00309     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getRequestWarningsGenerated ()<span class="keyword"> const </span>{
+<a name="l00310"></a>00310       <span class="keywordflow">return</span> getWarningsGenerated();
 <a name="l00311"></a>00311     }
-<a name="l00312"></a>00312 
-<a name="l00313"></a>00313     <span class="comment">//Control/Ack-T2,T1,T0</span>
-<a name="l00314"></a>00314     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getTimestampControl2Bit () <span class="keyword">const</span>;
-<a name="l00315"></a>00315     <span class="keyword">public</span>: <span class="keywordtype">void</span> setTimestampControl2Bit (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
-<a name="l00316"></a>00316     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getTimestampControl1Bit () <span class="keyword">const</span>;
-<a name="l00317"></a>00317     <span class="keyword">public</span>: <span class="keywordtype">void</span> setTimestampControl1Bit (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
-<a name="l00318"></a>00318     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getTimestampControl0Bit () <span class="keyword">const</span>;
-<a name="l00319"></a>00319     <span class="keyword">public</span>: <span class="keywordtype">void</span> setTimestampControl0Bit (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
-<a name="l00320"></a>00320     <span class="keyword">public</span>: int8_t getTimestampControlMode () <span class="keyword">const</span>;
-<a name="l00321"></a>00321     <span class="keyword">public</span>: <span class="keywordtype">void</span> setTimestampControlMode (int8_t mode);
-<a name="l00322"></a>00322 
-<a name="l00323"></a>00323     <span class="comment">//Acknowledge-P</span>
-<a name="l00324"></a>00324     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getPartialAction () <span class="keyword">const</span>;
-<a name="l00325"></a>00325     <span class="keyword">public</span>: <span class="keywordtype">void</span> setPartialAction (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
+<a name="l00312"></a>00312     <span class="keyword">public</span>: <span class="keyword">virtual</span> <span class="keywordtype">void</span> setRequestWarningsGenerated (<span class="keywordtype">bool</span> <span class="keyword">set</span>) {
+<a name="l00313"></a>00313       setWarningsGenerated(<span class="keyword">set</span>);
+<a name="l00314"></a>00314     }
+<a name="l00315"></a>00315 
+<a name="l00316"></a>00316     <span class="comment">//Acknowledge-E</span>
+<a name="l00317"></a>00317     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getErrorsGenerated () <span class="keyword">const</span>;
+<a name="l00318"></a>00318     <span class="keyword">public</span>: <span class="keyword">virtual</span> <span class="keywordtype">void</span> setErrorsGenerated (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
+<a name="l00319"></a>00319     <span class="comment">//Control-E</span>
+<a name="l00320"></a>00320     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getRequestErrorsGenerated ()<span class="keyword"> const </span>{
+<a name="l00321"></a>00321       <span class="keywordflow">return</span> getErrorsGenerated();
+<a name="l00322"></a>00322     }
+<a name="l00323"></a>00323     <span class="keyword">public</span>: <span class="keyword">virtual</span> <span class="keywordtype">void</span> setRequestErrorsGenerated (<span class="keywordtype">bool</span> <span class="keyword">set</span>) {
+<a name="l00324"></a>00324       setErrorsGenerated(<span class="keyword">set</span>);
+<a name="l00325"></a>00325     }
 <a name="l00326"></a>00326 
-<a name="l00327"></a>00327     <span class="comment">//Acknowledge-SX</span>
-<a name="l00328"></a>00328     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getActionExecuted () <span class="keyword">const</span>;
-<a name="l00329"></a>00329     <span class="keyword">public</span>: <span class="keywordtype">void</span> setActionExecuted (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
-<a name="l00330"></a>00330 
-<a name="l00331"></a>00331     <span class="comment">// Rest of Packet Specific Prologue for Command Packets</span>
-<a name="l00332"></a>00332     <span class="comment">// Message ID - 32Bit Number</span>
-<a name="l00333"></a>00333     <span class="keyword">public</span>: int32_t getMessageID () <span class="keyword">const</span>;
-<a name="l00334"></a>00334     <span class="keyword">public</span>: <span class="keywordtype">void</span> setMessageID (int32_t val);
-<a name="l00335"></a>00335 
-<a name="l00336"></a>00336     <span class="comment">// Controllee ID/UUID</span>
-<a name="l00337"></a>00337     <span class="keyword">public</span>: int32_t getControlleeIDNumber () <span class="keyword">const</span>;
-<a name="l00338"></a>00338     <span class="keyword">public</span>: <span class="keywordtype">void</span> setControlleeIDNumber (int32_t val);
-<a name="l00339"></a>00339     <span class="keyword">public</span>: UUID getControlleeUUID () <span class="keyword">const</span>;
-<a name="l00340"></a>00340     <span class="keyword">public</span>: <span class="keywordtype">void</span> setControlleeUUID (<span class="keyword">const</span> UUID &amp;val);
-<a name="l00341"></a>00341 
-<a name="l00342"></a>00342     <span class="comment">// Controller ID/UUID</span>
-<a name="l00343"></a>00343     <span class="keyword">public</span>: int32_t getControllerIDNumber () <span class="keyword">const</span>;
-<a name="l00344"></a>00344     <span class="keyword">public</span>: <span class="keywordtype">void</span> setControllerIDNumber (int32_t val);
-<a name="l00345"></a>00345     <span class="keyword">public</span>: UUID getControllerUUID () <span class="keyword">const</span>;
-<a name="l00346"></a>00346     <span class="keyword">public</span>: <span class="keywordtype">void</span> setControllerUUID (<span class="keyword">const</span> UUID &amp;val);
-<a name="l00347"></a>00347 
-<a name="l00348"></a>00348     <span class="comment">// HELPERS</span>
-<a name="l00349"></a>00349     <span class="keyword">protected</span>: <span class="keyword">virtual</span> int32_t getCtrlAckSettingsField ()<span class="keyword"> const </span>{
-<a name="l00350"></a>00350       <span class="keywordflow">return</span> <a class="code" href="namespacevrt_1_1VRTMath.html#ad5bf9b32f28078eab2d733c2318fa1d1" title="Unpack int data from a byte buffer.">VRTMath::unpackInt</a>(<a class="code" href="classvrt_1_1BasicVRTPacket.html#a11bdcad0429c5f6899f5a37848d4ffb2" title="Packet buffer (always includes the header).">bbuf</a>, <a class="code" href="classvrt_1_1BasicVRTPacket.html#a0da41f9a95a036c7591f264fb992fb36" title="Gets the header length in bytes (does not include packet specific prologue or trailer)...">getHeaderLength</a>());
-<a name="l00351"></a>00351     }
-<a name="l00352"></a>00352     <span class="keyword">protected</span>: <span class="keyword">virtual</span> <span class="keywordtype">bool</span> getCtrlAckSettingsBit (int32_t bit)<span class="keyword"> const </span>{
-<a name="l00353"></a>00353       <span class="keywordflow">return</span> ((getCtrlAckSettingsField() &amp; bit) != 0);
-<a name="l00354"></a>00354     }
-<a name="l00355"></a>00355     <span class="keyword">protected</span>: <span class="keyword">virtual</span> <span class="keywordtype">void</span> setCtrlAckSettingsBit (int32_t bit, <span class="keywordtype">bool</span> <span class="keyword">set</span>);
-<a name="l00356"></a>00356 
-<a name="l00357"></a>00357     <span class="keyword">private</span>: int32_t getOffset (<span class="keywordtype">bool</span> controller) <span class="keyword">const</span>; <span class="comment">// TODO why not name it getPspOffset(...)?</span>
-<a name="l00358"></a>00358     <span class="keyword">private</span>: int32_t getFieldLen (<span class="keywordtype">bool</span> controller) <span class="keyword">const</span>; <span class="comment">// TODO why not name it getPspFieldLen(...)?</span>
-<a name="l00359"></a>00359 
-<a name="l00360"></a>00360     <span class="comment">// Optional PSP fields - getters</span>
-<a name="l00361"></a>00361     <span class="keyword">private</span>: int32_t getControlIDNumber (<span class="keywordtype">bool</span> controller) <span class="keyword">const</span>;
-<a name="l00362"></a>00362     <span class="keyword">private</span>: UUID getControlUUID (<span class="keywordtype">bool</span> controller) <span class="keyword">const</span>;
-<a name="l00363"></a>00363 
-<a name="l00364"></a>00364     <span class="comment">// Optional PSP fields - setters</span>
-<a name="l00365"></a>00365     <span class="keyword">private</span>: <span class="keywordtype">void</span> setControlIDNumber (<span class="keywordtype">bool</span> controller, int32_t val);
-<a name="l00366"></a>00366     <span class="keyword">private</span>: <span class="keywordtype">void</span> setControlUUID (<span class="keywordtype">bool</span> controller, <span class="keyword">const</span> UUID &amp;val);
-<a name="l00367"></a>00367 
-<a name="l00368"></a>00368 
-<a name="l00369"></a>00369     <span class="comment">/* deprecated - using UUID lib instead</span>
-<a name="l00370"></a>00370 <span class="comment">    public: string getControlleeUUID () const;</span>
-<a name="l00371"></a>00371 <span class="comment">    public: void setControlleeUUID (string val);</span>
-<a name="l00372"></a>00372 <span class="comment">    public: void getControlleeUUID (int32_t&amp; val0, int32_t&amp; val1, int32_t&amp; val2, int32_t&amp; val3) const;</span>
-<a name="l00373"></a>00373 <span class="comment">    public: void setControlleeUUID (int32_t val0, int32_t val1, int32_t val2, int32_t val3);</span>
-<a name="l00374"></a>00374 <span class="comment">    */</span>
-<a name="l00375"></a>00375     <span class="comment">/* deprecated - using UUID lib instead</span>
-<a name="l00376"></a>00376 <span class="comment">    public: string getControllerUUID () const;</span>
-<a name="l00377"></a>00377 <span class="comment">    public: void setControllerUUID (string val);</span>
-<a name="l00378"></a>00378 <span class="comment">    public: void getControllerUUID (int32_t&amp; val0, int32_t&amp; val1, int32_t&amp; val2, int32_t&amp; val3) const;</span>
-<a name="l00379"></a>00379 <span class="comment">    public: void setControllerUUID (int32_t val0, int32_t val1, int32_t val2, int32_t val3);</span>
-<a name="l00380"></a>00380 <span class="comment">    */</span>
-<a name="l00381"></a>00381     <span class="comment">/* deprecated - using UUID lib instead</span>
-<a name="l00382"></a>00382 <span class="comment">    private: void getControlUUID (bool controller,</span>
-<a name="l00383"></a>00383 <span class="comment">                                  int32_t&amp; val0, int32_t&amp; val1, int32_t&amp; val2, int32_t&amp; val3) const;</span>
-<a name="l00384"></a>00384 <span class="comment">    // delim=0 will produce string with no delimiters</span>
-<a name="l00385"></a>00385 <span class="comment">    private: string getControlUUID (bool controller, char delim=&apos;-&apos;) const;</span>
-<a name="l00386"></a>00386 <span class="comment">    */</span>
-<a name="l00387"></a>00387     <span class="comment">/* deprecated - using UUID lib instead</span>
-<a name="l00388"></a>00388 <span class="comment">    private: void setControlUUID (bool controller,</span>
-<a name="l00389"></a>00389 <span class="comment">                                  int32_t val0, int32_t val1, int32_t val2, int32_t val3);</span>
-<a name="l00390"></a>00390 <span class="comment">    private: void setControlUUID (bool controller, string val);</span>
-<a name="l00391"></a>00391 <span class="comment">    */</span>
-<a name="l00392"></a>00392 
-<a name="l00393"></a>00393 
-<a name="l00395"></a>00395     <span class="comment">// Implement HasFields</span>
-<a name="l00397"></a>00397 <span class="comment"></span>    <span class="comment">/* TODO</span>
-<a name="l00398"></a>00398 <span class="comment">    public: virtual int32_t   getFieldCount () const;</span>
-<a name="l00399"></a>00399 <span class="comment">    public: virtual string    getFieldName  (int32_t id) const;</span>
-<a name="l00400"></a>00400 <span class="comment">    public: virtual ValueType getFieldType  (int32_t id) const;</span>
-<a name="l00401"></a>00401 <span class="comment">    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));</span>
-<a name="l00402"></a>00402 <span class="comment">    public: virtual void      setField      (int32_t id, const Value* val);</span>
-<a name="l00403"></a>00403 <span class="comment">    */</span>
-<a name="l00404"></a>00404 
-<a name="l00405"></a>00405   }; <span class="comment">/* class BasicCommandPacket */</span>
+<a name="l00327"></a>00327     <span class="comment">//Control/Ack-T2,T1,T0</span>
+<a name="l00328"></a>00328     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getTimestampControl2Bit () <span class="keyword">const</span>;
+<a name="l00329"></a>00329     <span class="keyword">public</span>: <span class="keywordtype">void</span> setTimestampControl2Bit (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
+<a name="l00330"></a>00330     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getTimestampControl1Bit () <span class="keyword">const</span>;
+<a name="l00331"></a>00331     <span class="keyword">public</span>: <span class="keywordtype">void</span> setTimestampControl1Bit (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
+<a name="l00332"></a>00332     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getTimestampControl0Bit () <span class="keyword">const</span>;
+<a name="l00333"></a>00333     <span class="keyword">public</span>: <span class="keywordtype">void</span> setTimestampControl0Bit (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
+<a name="l00334"></a>00334     <span class="keyword">public</span>: int8_t getTimestampControlMode () <span class="keyword">const</span>;
+<a name="l00335"></a>00335     <span class="keyword">public</span>: <span class="keywordtype">void</span> setTimestampControlMode (int8_t mode);
+<a name="l00336"></a>00336 
+<a name="l00337"></a>00337     <span class="comment">//Acknowledge-P</span>
+<a name="l00338"></a>00338     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getPartialAction () <span class="keyword">const</span>;
+<a name="l00339"></a>00339     <span class="keyword">public</span>: <span class="keywordtype">void</span> setPartialAction (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
+<a name="l00340"></a>00340 
+<a name="l00341"></a>00341     <span class="comment">//Acknowledge-SX</span>
+<a name="l00342"></a>00342     <span class="keyword">public</span>: <span class="keywordtype">bool</span> getActionExecuted () <span class="keyword">const</span>;
+<a name="l00343"></a>00343     <span class="keyword">public</span>: <span class="keywordtype">void</span> setActionExecuted (<span class="keywordtype">bool</span> <span class="keyword">set</span>);
+<a name="l00344"></a>00344 
+<a name="l00345"></a>00345     <span class="comment">// Rest of Packet Specific Prologue for Command Packets</span>
+<a name="l00346"></a>00346     <span class="comment">// Message ID - 32Bit Number</span>
+<a name="l00347"></a>00347     <span class="keyword">public</span>: int32_t getMessageID () <span class="keyword">const</span>;
+<a name="l00348"></a>00348     <span class="keyword">public</span>: <span class="keywordtype">void</span> setMessageID (int32_t val);
+<a name="l00349"></a>00349 
+<a name="l00350"></a>00350     <span class="comment">// Controllee ID/UUID</span>
+<a name="l00351"></a>00351     <span class="keyword">public</span>: int32_t getControlleeIDNumber () <span class="keyword">const</span>;
+<a name="l00352"></a>00352     <span class="keyword">public</span>: <span class="keywordtype">void</span> setControlleeIDNumber (int32_t val);
+<a name="l00353"></a>00353     <span class="keyword">public</span>: UUID getControlleeUUID () <span class="keyword">const</span>;
+<a name="l00354"></a>00354     <span class="keyword">public</span>: <span class="keywordtype">void</span> setControlleeUUID (<span class="keyword">const</span> UUID &amp;val);
+<a name="l00355"></a>00355 
+<a name="l00356"></a>00356     <span class="comment">// Controller ID/UUID</span>
+<a name="l00357"></a>00357     <span class="keyword">public</span>: int32_t getControllerIDNumber () <span class="keyword">const</span>;
+<a name="l00358"></a>00358     <span class="keyword">public</span>: <span class="keywordtype">void</span> setControllerIDNumber (int32_t val);
+<a name="l00359"></a>00359     <span class="keyword">public</span>: UUID getControllerUUID () <span class="keyword">const</span>;
+<a name="l00360"></a>00360     <span class="keyword">public</span>: <span class="keywordtype">void</span> setControllerUUID (<span class="keyword">const</span> UUID &amp;val);
+<a name="l00361"></a>00361 
+<a name="l00362"></a>00362     <span class="comment">// HELPERS</span>
+<a name="l00363"></a>00363     <span class="keyword">protected</span>: <span class="keyword">virtual</span> int32_t getCtrlAckSettingsField ()<span class="keyword"> const </span>{
+<a name="l00364"></a>00364       <span class="keywordflow">return</span> <a class="code" href="namespacevrt_1_1VRTMath.html#ad5bf9b32f28078eab2d733c2318fa1d1" title="Unpack int data from a byte buffer.">VRTMath::unpackInt</a>(<a class="code" href="classvrt_1_1BasicVRTPacket.html#a11bdcad0429c5f6899f5a37848d4ffb2" title="Packet buffer (always includes the header).">bbuf</a>, <a class="code" href="classvrt_1_1BasicVRTPacket.html#a0da41f9a95a036c7591f264fb992fb36" title="Gets the header length in bytes (does not include packet specific prologue or trailer)...">getHeaderLength</a>());
+<a name="l00365"></a>00365     }
+<a name="l00366"></a>00366     <span class="keyword">protected</span>: <span class="keyword">virtual</span> <span class="keywordtype">bool</span> getCtrlAckSettingsBit (int32_t bit)<span class="keyword"> const </span>{
+<a name="l00367"></a>00367       <span class="keywordflow">return</span> ((getCtrlAckSettingsField() &amp; bit) != 0);
+<a name="l00368"></a>00368     }
+<a name="l00369"></a>00369     <span class="keyword">protected</span>: <span class="keyword">virtual</span> <span class="keywordtype">void</span> setCtrlAckSettingsBit (int32_t bit, <span class="keywordtype">bool</span> <span class="keyword">set</span>);
+<a name="l00370"></a>00370 
+<a name="l00371"></a>00371     <span class="keyword">private</span>: int32_t getOffset (<span class="keywordtype">bool</span> controller) <span class="keyword">const</span>; <span class="comment">// TODO why not name it getPspOffset(...)?</span>
+<a name="l00372"></a>00372     <span class="keyword">private</span>: int32_t getFieldLen (<span class="keywordtype">bool</span> controller) <span class="keyword">const</span>; <span class="comment">// TODO why not name it getPspFieldLen(...)?</span>
+<a name="l00373"></a>00373 
+<a name="l00374"></a>00374     <span class="comment">// Optional PSP fields - getters</span>
+<a name="l00375"></a>00375     <span class="keyword">private</span>: int32_t getControlIDNumber (<span class="keywordtype">bool</span> controller) <span class="keyword">const</span>;
+<a name="l00376"></a>00376     <span class="keyword">private</span>: UUID getControlUUID (<span class="keywordtype">bool</span> controller) <span class="keyword">const</span>;
+<a name="l00377"></a>00377 
+<a name="l00378"></a>00378     <span class="comment">// Optional PSP fields - setters</span>
+<a name="l00379"></a>00379     <span class="keyword">private</span>: <span class="keywordtype">void</span> setControlIDNumber (<span class="keywordtype">bool</span> controller, int32_t val);
+<a name="l00380"></a>00380     <span class="keyword">private</span>: <span class="keywordtype">void</span> setControlUUID (<span class="keywordtype">bool</span> controller, <span class="keyword">const</span> UUID &amp;val);
+<a name="l00381"></a>00381 
+<a name="l00382"></a>00382 
+<a name="l00383"></a>00383     <span class="comment">/* deprecated - using UUID lib instead</span>
+<a name="l00384"></a>00384 <span class="comment">    public: string getControlleeUUID () const;</span>
+<a name="l00385"></a>00385 <span class="comment">    public: void setControlleeUUID (string val);</span>
+<a name="l00386"></a>00386 <span class="comment">    public: void getControlleeUUID (int32_t&amp; val0, int32_t&amp; val1, int32_t&amp; val2, int32_t&amp; val3) const;</span>
+<a name="l00387"></a>00387 <span class="comment">    public: void setControlleeUUID (int32_t val0, int32_t val1, int32_t val2, int32_t val3);</span>
+<a name="l00388"></a>00388 <span class="comment">    */</span>
+<a name="l00389"></a>00389     <span class="comment">/* deprecated - using UUID lib instead</span>
+<a name="l00390"></a>00390 <span class="comment">    public: string getControllerUUID () const;</span>
+<a name="l00391"></a>00391 <span class="comment">    public: void setControllerUUID (string val);</span>
+<a name="l00392"></a>00392 <span class="comment">    public: void getControllerUUID (int32_t&amp; val0, int32_t&amp; val1, int32_t&amp; val2, int32_t&amp; val3) const;</span>
+<a name="l00393"></a>00393 <span class="comment">    public: void setControllerUUID (int32_t val0, int32_t val1, int32_t val2, int32_t val3);</span>
+<a name="l00394"></a>00394 <span class="comment">    */</span>
+<a name="l00395"></a>00395     <span class="comment">/* deprecated - using UUID lib instead</span>
+<a name="l00396"></a>00396 <span class="comment">    private: void getControlUUID (bool controller,</span>
+<a name="l00397"></a>00397 <span class="comment">                                  int32_t&amp; val0, int32_t&amp; val1, int32_t&amp; val2, int32_t&amp; val3) const;</span>
+<a name="l00398"></a>00398 <span class="comment">    // delim=0 will produce string with no delimiters</span>
+<a name="l00399"></a>00399 <span class="comment">    private: string getControlUUID (bool controller, char delim=&apos;-&apos;) const;</span>
+<a name="l00400"></a>00400 <span class="comment">    */</span>
+<a name="l00401"></a>00401     <span class="comment">/* deprecated - using UUID lib instead</span>
+<a name="l00402"></a>00402 <span class="comment">    private: void setControlUUID (bool controller,</span>
+<a name="l00403"></a>00403 <span class="comment">                                  int32_t val0, int32_t val1, int32_t val2, int32_t val3);</span>
+<a name="l00404"></a>00404 <span class="comment">    private: void setControlUUID (bool controller, string val);</span>
+<a name="l00405"></a>00405 <span class="comment">    */</span>
 <a name="l00406"></a>00406 
-<a name="l00407"></a>00407 } END_NAMESPACE <span class="comment">/* vrt namespace */</span>
-<a name="l00408"></a>00408 
-<a name="l00409"></a>00409 <span class="preprocessor">#endif </span><span class="comment">/* _BasicCommandPacket_h */</span>
+<a name="l00407"></a>00407 
+<a name="l00409"></a>00409     <span class="comment">// Implement HasFields</span>
+<a name="l00411"></a>00411 <span class="comment"></span>    <span class="comment">/* TODO</span>
+<a name="l00412"></a>00412 <span class="comment">    public: virtual int32_t   getFieldCount () const;</span>
+<a name="l00413"></a>00413 <span class="comment">    public: virtual string    getFieldName  (int32_t id) const;</span>
+<a name="l00414"></a>00414 <span class="comment">    public: virtual ValueType getFieldType  (int32_t id) const;</span>
+<a name="l00415"></a>00415 <span class="comment">    public: virtual Value*    getField      (int32_t id) const __attribute__((warn_unused_result));</span>
+<a name="l00416"></a>00416 <span class="comment">    public: virtual void      setField      (int32_t id, const Value* val);</span>
+<a name="l00417"></a>00417 <span class="comment">    */</span>
+<a name="l00418"></a>00418 
+<a name="l00419"></a>00419   }; <span class="comment">/* class BasicCommandPacket */</span>
+<a name="l00420"></a>00420 
+<a name="l00421"></a>00421 } END_NAMESPACE <span class="comment">/* vrt namespace */</span>
+<a name="l00422"></a>00422 
+<a name="l00423"></a>00423 <span class="preprocessor">#endif </span><span class="comment">/* _BasicCommandPacket_h */</span>
 </pre></div></div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 12 Jun 2018 for VRT by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 25 Jun 2018 for VRT by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

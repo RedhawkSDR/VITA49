@@ -175,8 +175,8 @@ void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setControllerUUID</b>
 virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setErrorsGenerated</b> (bool set)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a35b3ca130d6648eb9582be4db82dc581"></a><!-- doxytag: member="vrt::BasicCommandPacket::setErrorsPermitted" ref="a35b3ca130d6648eb9582be4db82dc581" args="(bool set)" -->
 void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setErrorsPermitted</b> (bool set)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa6e39601752f7b7ce75116c311e896cd"></a><!-- doxytag: member="vrt::BasicCommandPacket::setExecutionAcknowledge" ref="aa6e39601752f7b7ce75116c311e896cd" args="(bool set)" -->
-void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setExecutionAcknowledge</b> (bool set)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicCommandPacket.html#a2c8bc954ebbe0c2f75fd08b1be5daff7">setExecutionAcknowledge</a> (bool set=true)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets specific type of Acknowledge Packet With no arguments, default is to set packet to Execution Acknowledge.  <a href="#a2c8bc954ebbe0c2f75fd08b1be5daff7"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad014dcaa1c5eacd8a16c17238f7cbda0"></a><!-- doxytag: member="vrt::BasicCommandPacket::setMessageID" ref="ad014dcaa1c5eacd8a16c17238f7cbda0" args="(int32_t val)" -->
 void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setMessageID</b> (int32_t val)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a46f3015e488b16023c7e8d9c36767fd8"></a><!-- doxytag: member="vrt::BasicCommandPacket::setNotAckOnly" ref="a46f3015e488b16023c7e8d9c36767fd8" args="(bool set)" -->
@@ -207,8 +207,8 @@ void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setTimestampControl1B
 void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setTimestampControl2Bit</b> (bool set)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a68cd42167d68b4c8ef511bdb39de6d84"></a><!-- doxytag: member="vrt::BasicCommandPacket::setTimestampControlMode" ref="a68cd42167d68b4c8ef511bdb39de6d84" args="(int8_t mode)" -->
 void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setTimestampControlMode</b> (int8_t mode)</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a13ae0eed80424511e55600020810f606"></a><!-- doxytag: member="vrt::BasicCommandPacket::setValidationAcknowledge" ref="a13ae0eed80424511e55600020810f606" args="(bool set)" -->
-void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setValidationAcknowledge</b> (bool set)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classvrt_1_1BasicCommandPacket.html#aa75b3ca1d6ad770a5e1ef645d9160c99">setValidationAcknowledge</a> (bool set=true)</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets specific type of Acknowledge Packet With no arguments, default is to set packet to Validation Acknowledge.  <a href="#aa75b3ca1d6ad770a5e1ef645d9160c99"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a62f1ddd6fee724784fa101133416b3df"></a><!-- doxytag: member="vrt::BasicCommandPacket::setWarningsGenerated" ref="a62f1ddd6fee724784fa101133416b3df" args="(bool set)" -->
 virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setWarningsGenerated</b> (bool set)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a590f3bde1218eb2e3987398b4821a135"></a><!-- doxytag: member="vrt::BasicCommandPacket::setWarningsPermitted" ref="a590f3bde1218eb2e3987398b4821a135" args="(bool set)" -->
@@ -606,6 +606,32 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setCtrlAckSet
 
 </div>
 </div>
+<a class="anchor" id="a2c8bc954ebbe0c2f75fd08b1be5daff7"></a><!-- doxytag: member="vrt::BasicCommandPacket::setExecutionAcknowledge" ref="a2c8bc954ebbe0c2f75fd08b1be5daff7" args="(bool set=true)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrt::BasicCommandPacket::setExecutionAcknowledge </td>
+          <td>(</td>
+          <td class="paramtype">bool&nbsp;</td>
+          <td class="paramname"> <em>set</em> = <code>true</code></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Sets specific type of Acknowledge Packet With no arguments, default is to set packet to Execution Acknowledge. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>set</em>&nbsp;</td><td>If true (default), set packet type to Execution Acknowledge If false, set packet type to Validation Acknowledge </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a589c0f8d89fc3a34c898ee782feb638c"></a><!-- doxytag: member="vrt::BasicCommandPacket::setPacketType" ref="a589c0f8d89fc3a34c898ee782feb638c" args="(PacketType t)" -->
 <div class="memitem">
 <div class="memproto">
@@ -639,6 +665,32 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setCtrlAckSet
 <p>Reimplemented from <a class="el" href="classvrt_1_1BasicVRTPacket.html#ae215e242805855769eb7b1f840cc0da9">vrt::BasicVRTPacket</a>.</p>
 
 <p>Reimplemented in <a class="el" href="classvrt_1_1BasicAcknowledgePacket.html#abdffe0272305a1f5ffc21aba19381fb4">vrt::BasicAcknowledgePacket</a>, <a class="el" href="classvrt_1_1BasicControlPacket.html#a68e68bccd21aa00f1a600fe882a371e4">vrt::BasicControlPacket</a>, and <a class="el" href="classvrt_1_1BasicQueryAcknowledgePacket.html#a0636d12e2adc21b28490366f8439f7a1">vrt::BasicQueryAcknowledgePacket</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aa75b3ca1d6ad770a5e1ef645d9160c99"></a><!-- doxytag: member="vrt::BasicCommandPacket::setValidationAcknowledge" ref="aa75b3ca1d6ad770a5e1ef645d9160c99" args="(bool set=true)" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void vrt::BasicCommandPacket::setValidationAcknowledge </td>
+          <td>(</td>
+          <td class="paramtype">bool&nbsp;</td>
+          <td class="paramname"> <em>set</em> = <code>true</code></td>
+          <td>&nbsp;)&nbsp;</td>
+          <td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Sets specific type of Acknowledge Packet With no arguments, default is to set packet to Validation Acknowledge. </p>
+<dl><dt><b>Parameters:</b></dt><dd>
+  <table border="0" cellspacing="2" cellpadding="0">
+    <tr><td valign="top"></td><td valign="top"><em>set</em>&nbsp;</td><td>If true (default), set packet type to Validation Acknowledge If false, set packet type to Execution Acknowledge </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -676,7 +728,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setCtrlAckSet
 <li>cpp_src/vrt/lib/<a class="el" href="BasicCommandPacket_8h_source.html">BasicCommandPacket.h</a></li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 12 Jun 2018 for VRT by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 25 Jun 2018 for VRT by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

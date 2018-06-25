@@ -262,7 +262,14 @@ namespace vrt {
     public: bool isValidationAcknowledge () const {
       return getRequestValidationAcknowledge();
     }
-    public: void setValidationAcknowledge (bool set) {
+
+    /** Sets specific type of Acknowledge Packet
+     *  With no arguments, default is to set packet to Validation Acknowledge
+     *  @param set If true (default), set packet type to Validation Acknowledge
+     *             If false, set packet type to Execution Acknowledge
+     */
+    public: void setValidationAcknowledge (bool set=true) {
+      setRequestExecutionAcknowledge(!set);
       setRequestValidationAcknowledge(set);
     }
 
@@ -273,7 +280,14 @@ namespace vrt {
     public: bool isExecutionAcknowledge () const {
       return getRequestExecutionAcknowledge();
     }
-    public: void setExecutionAcknowledge (bool set) {
+
+    /** Sets specific type of Acknowledge Packet
+     *  With no arguments, default is to set packet to Execution Acknowledge
+     *  @param set If true (default), set packet type to Execution Acknowledge
+     *             If false, set packet type to Validation Acknowledge
+     */
+    public: void setExecutionAcknowledge (bool set=true) {
+      setRequestValidationAcknowledge(!set);
       setRequestExecutionAcknowledge(set);
     }
 
