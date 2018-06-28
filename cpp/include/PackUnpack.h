@@ -28,8 +28,7 @@
 
 #include "VRTMath.h"
 #include "VRTObject.h"
-//#include "BasicVRTPacket.h" // TODO is this needed still? or just needed for PayloadFormat?
-#include "PayloadFormat.h"
+#include "BasicVRTPacket.h"
 #include <vector>
 
 using namespace std;

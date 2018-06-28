@@ -35,41 +35,43 @@ namespace vrt {
   using namespace VRTMath;
   using namespace IndicatorFields;
 
+  /** Namespace for Warning and Error definitions
+   */
   namespace WarningErrorTypes {
-    static const int32_t WEF_NULL                    = 0x00000000;
-    static const int32_t WEF_NO_WARNING_ERROR        = 0x00000000;
-    static const int32_t WEF_RESERVED_0              = 0x00000001;
-    static const int32_t WEF_USER_DEFINED_1          = 0x00000002;
-    static const int32_t WEF_USER_DEFINED_2          = 0x00000004;
-    static const int32_t WEF_USER_DEFINED_3          = 0x00000008;
-    static const int32_t WEF_USER_DEFINED_4          = 0x00000010;
-    static const int32_t WEF_USER_DEFINED_5          = 0x00000020;
-    static const int32_t WEF_USER_DEFINED_6          = 0x00000040;
-    static const int32_t WEF_USER_DEFINED_7          = 0x00000080;
-    static const int32_t WEF_USER_DEFINED_8          = 0x00000100;
-    static const int32_t WEF_USER_DEFINED_9          = 0x00000200;
-    static const int32_t WEF_USER_DEFINED_10         = 0x00000400;
-    static const int32_t WEF_USER_DEFINED_11         = 0x00000800;
-    static const int32_t WEF_USER_DEFINED_12         = 0x00001000;
-    static const int32_t WEF_USER_DEFINED_13         = 0x00002000;
-    static const int32_t WEF_USER_DEFINED_14         = 0x00004000;
-    static const int32_t WEF_USER_DEFINED_15         = 0x00008000;
-    static const int32_t WEF_USER_DEFINED_16         = 0x00010000;
-    static const int32_t WEF_USER_DEFINED_17         = 0x00020000;
-    static const int32_t WEF_USER_DEFINED_18         = 0x00040000;
-    static const int32_t WEF_USER_DEFINED_19         = 0x00080000;
-    static const int32_t WEF_USER_DEFINED_20         = 0x00100000;
-    static const int32_t WEF_USER_DEFINED_21         = 0x00200000;
-    static const int32_t WEF_USER_DEFINED_22         = 0x00400000;
-    static const int32_t WEF_USER_DEFINED_23         = 0x00800000;
-    static const int32_t WEF_RESERVED_24             = 0x01000000;
-    static const int32_t TIMESTAMP_PROBLEM           = 0x02000000;
-    static const int32_t PARAM_INVALID               = 0x04000000;
-    static const int32_t PARAM_UNSUPPORTED_PRECISION = 0x08000000;
-    static const int32_t PARAM_OUT_OF_RANGE          = 0x10000000;
-    static const int32_t ERRONEOUS_FIELD             = 0x20000000;
-    static const int32_t HARDWARE_DEVICE_FAILURE     = 0x40000000;
-    static const int32_t FIELD_NOT_EXECUTED          = 0x80000000;
+    static const int32_t WEF_NULL                     = 0x00000000; //!< NULL Warning/Error
+    static const int32_t WEF_NO_WARNING_ERROR         = 0x00000000; //!< No Warning/Error (same as NULL)
+    static const int32_t WEF_RESERVED_0               = 0x00000001; //!< Reserved
+    static const int32_t WEF_USER_DEFINED_1           = 0x00000002; //!< User Defined Warning/Error Bit 1
+    static const int32_t WEF_USER_DEFINED_2           = 0x00000004; //!< User Defined Warning/Error Bit 2
+    static const int32_t WEF_USER_DEFINED_3           = 0x00000008; //!< User Defined Warning/Error Bit 3
+    static const int32_t WEF_USER_DEFINED_4           = 0x00000010; //!< User Defined Warning/Error Bit 4
+    static const int32_t WEF_USER_DEFINED_5           = 0x00000020; //!< User Defined Warning/Error Bit 5
+    static const int32_t WEF_USER_DEFINED_6           = 0x00000040; //!< User Defined Warning/Error Bit 6
+    static const int32_t WEF_USER_DEFINED_7           = 0x00000080; //!< User Defined Warning/Error Bit 7
+    static const int32_t WEF_USER_DEFINED_8           = 0x00000100; //!< User Defined Warning/Error Bit 8
+    static const int32_t WEF_USER_DEFINED_9           = 0x00000200; //!< User Defined Warning/Error Bit 9
+    static const int32_t WEF_USER_DEFINED_10          = 0x00000400; //!< User Defined Warning/Error Bit 10
+    static const int32_t WEF_USER_DEFINED_11          = 0x00000800; //!< User Defined Warning/Error Bit 11
+    static const int32_t WEF_USER_DEFINED_12          = 0x00001000; //!< User Defined Warning/Error Bit 12
+    static const int32_t WEF_RESERVED_13              = 0x00002000; //!< Reserved Warning/Error Bit 13
+    static const int32_t WEF_RESERVED_14              = 0x00004000; //!< Reserved Warning/Error Bit 14
+    static const int32_t WEF_RESERVED_15              = 0x00008000; //!< Reserved Warning/Error Bit 15
+    static const int32_t WEF_RESERVED_16              = 0x00010000; //!< Reserved Warning/Error Bit 16
+    static const int32_t WEF_RESERVED_17              = 0x00020000; //!< Reserved Warning/Error Bit 17
+    static const int32_t WEF_RESERVED_18              = 0x00040000; //!< Reserved Warning/Error Bit 18
+    static const int32_t REGIONAL_INTERFERENCE        = 0x00080000; //!< Interference between devices in the same operational region
+    static const int32_t CO_SITE_INTERFERENCE         = 0x00100000; //!< Co-site interference between tx and rx at same location
+    static const int32_t OUT_OF_BAND_POWER_COMPLIANCE = 0x00200000; //!< Out-of-band power levels out of compliance
+    static const int32_t IN_BAND_POWER_COMPLIANCE     = 0x00400000; //!< In-band power levels out of compliance
+    static const int32_t DISTORTION                   = 0x00800000; //!< Components over driven leading to distortion
+    static const int32_t HAZARDOUS_POWER_LEVELS       = 0x01000000; //!< Transmission of hazardous power levels
+    static const int32_t TIMESTAMP_PROBLEM            = 0x02000000; //!< Controllee unable to meet tstamp requirements
+    static const int32_t FIELD_VALUE_INVALID          = 0x04000000; //!< Invalid setting not covered by other code
+    static const int32_t PARAM_UNSUPPORTED_PRECISION  = 0x08000000; //!< Level of precision beyond device capabilities
+    static const int32_t PARAM_OUT_OF_RANGE           = 0x10000000; //!< Beyond capability or operational range of device
+    static const int32_t ERRONEOUS_FIELD              = 0x20000000; //!< Device does not accept this control field
+    static const int32_t DEVICE_FAILURE               = 0x40000000; //!< Not executed properly because of device failure
+    static const int32_t FIELD_NOT_EXECUTED           = 0x80000000; //!< Not executed because of a Warning or Error
   }
   using namespace WarningErrorTypes;
 
