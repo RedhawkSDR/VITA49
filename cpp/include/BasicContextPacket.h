@@ -108,8 +108,7 @@ namespace vrt {
     public: BasicContextPacket (const void *buf, size_t len, bool readOnly=false);
 
     /** Creates a new instance that can be written to. Initially this will just be a simple context
-     *  packet with no fields set (other than the required packet length of 8 and a default stream ID
-     *  of 0).
+     *  packet with StreamID, ClassID, TSI=UTC, TSF=Real-Time, CIF0, and a packet length of 8.
      */
     public: BasicContextPacket ();
 

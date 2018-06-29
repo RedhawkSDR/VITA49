@@ -221,9 +221,10 @@ namespace vrt {
      */
     public: BasicAcknowledgePacket (const void *buf, size_t len, bool readOnly=false);
 
-    /** Creates a new instance that can be written to. Initially this will just be a simple context
-     *  packet with no fields set (other than the required packet length of 8 and a default stream ID
-     *  of 0).
+    /** Creates a new instance that can be written to. Initially this will just be a simple command
+     *  packet with StreamID, ClassID, Ack Indicator set, TSI=UTC, TSF=Real-time, CAM field, MessageID,
+     *  128-bit ControlleeID, 128-bit ControllerID, Execution Acknowledge bit set, and a packet size of
+     *  17 (no warning/error indicator fields until warning/error generated bit(s) set).
      */
     public: BasicAcknowledgePacket ();
 

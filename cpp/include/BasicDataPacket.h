@@ -85,7 +85,7 @@ namespace vrt {
     public: BasicDataPacket (const void *buf, size_t len, bool readOnly=false);
 
     /** Creates a new instance that can be written to. Initially this will just be a simple data
-     *  packet with no fields set (other than the required packet length of 4).
+     *  packet with streamID, classID, TSI=UTC, TSF=Real-Time, no trailer, and a packet length of 7.
      */
     public: BasicDataPacket ();
 

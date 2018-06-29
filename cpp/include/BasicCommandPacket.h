@@ -107,9 +107,9 @@ namespace vrt {
      */
     public: BasicCommandPacket (const void *buf, size_t len, bool readOnly=false);
 
-    /** Creates a new instance that can be written to. Initially this will just be a simple context
-     *  packet with no fields set (other than the required packet length of 8 and a default stream ID
-     *  of 0).
+    /** Creates a new instance that can be written to. Initially this will just be a simple command
+     *  packet with StreamID, ClassID, TSI=UTC, TSF=Real-time, CAM field, MessageID, 128-bit
+     *  ControlleeID, 128-bit ControllerID, CIF0, and a packet size of 18.
      */
     public: BasicCommandPacket ();
 

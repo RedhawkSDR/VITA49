@@ -70,9 +70,11 @@ namespace vrt {
      */
     public: BasicControlPacket (const void *buf, size_t len, bool readOnly=false);
 
-    /** Creates a new instance that can be written to. Initially this will just be a simple context
-     *  packet with no fields set (other than the required packet length of 8 and a default stream ID
-     *  of 0).
+    /** Creates a new instance that can be written to. Initially this will just be a simple control
+     *  packet with class ID, TSI=UTC, TSF=Real-Time (ps) fsecs, packet count=0, packet size = 18,
+     *  which is full header, full packet-specific-prologue, and +1 for CIF0.
+     *  CAM is set to have 128-bit ControlleeID and 128-bit ControllerID with the action set to
+     *  "take action". The ChangeIndicator bit is also set in CIF0.
      */
     public: BasicControlPacket ();
 
