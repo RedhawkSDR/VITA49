@@ -379,7 +379,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 <div class="memdoc">
 
 <p>Creates a new instance that can be written to. </p>
-<p>Initially this will just be a simple context packet with no fields set (other than the required packet length of 8 and a default stream ID of 0). </p>
+<p>Initially this will just be a simple context packet with StreamID, ClassID, TSI=UTC, TSF=Real-Time, CIF0, and a packet length of 8. </p>
 
 </div>
 </div>
@@ -400,7 +400,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 <div class="memdoc">
 
 <p>Creates a new instance with a default anticipated length that can be written to. </p>
-<p>Initially this will just be a simple context packet with no fields set (other than the required packet length of 8 and a default stream ID of 0), but will have the underlying buffers pre-allocated as required. </p>
+<p>Initially this will just be a simple context packet with StreamID, ClassID, TSI=UTC, TSF=Real-Time, CIF0, and a packet length of 8. The underlying buffers will be pre-allocated as required. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>bufsize</em>&nbsp;</td><td>The anticipated buffer size. </td></tr>
@@ -1316,7 +1316,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a12d281e12018c835e595893381b1f718">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>Referenced by <a class="el" href="BasicContextPacket_8h_source.html#l00494">get3DPointingVectorStructured()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00466">getCIFsArray()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00427">getContextAssocLists()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00510">getDataPayloadFormat()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00397">getEphemeris()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00389">getGeolocation()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00413">getGeoSentences()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00440">getIndexList()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00453">getSectorScanStep()</a>, and <a class="el" href="BasicContextPacket_8h_source.html#l00481">getSpectrumField()</a>.</p>
+<p>Referenced by <a class="el" href="BasicContextPacket_8h_source.html#l00493">get3DPointingVectorStructured()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00465">getCIFsArray()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00426">getContextAssocLists()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00509">getDataPayloadFormat()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00396">getEphemeris()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00388">getGeolocation()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00412">getGeoSentences()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00439">getIndexList()</a>, <a class="el" href="BasicContextPacket_8h_source.html#l00452">getSectorScanStep()</a>, and <a class="el" href="BasicContextPacket_8h_source.html#l00480">getSpectrumField()</a>.</p>
 
 </div>
 </div>
@@ -1618,7 +1618,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a244593d0daec5bd4bbe6bf7562941aa5">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>Referenced by <a class="el" href="BasicContextPacket_8h_source.html#l00510">getDataPayloadFormat()</a>.</p>
+<p>Referenced by <a class="el" href="BasicContextPacket_8h_source.html#l00509">getDataPayloadFormat()</a>.</p>
 
 </div>
 </div>
@@ -2206,7 +2206,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 <li>cpp_src/vrt/lib/<a class="el" href="BasicContextPacket_8h_source.html">BasicContextPacket.h</a></li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 28 Jun 2018 for VRT by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 29 Jun 2018 for VRT by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

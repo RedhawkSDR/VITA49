@@ -236,7 +236,7 @@ Inheritance diagram for vrt::BasicControlPacket:</div>
 <div class="memdoc">
 
 <p>Creates a new instance that can be written to. </p>
-<p>Initially this will just be a simple context packet with no fields set (other than the required packet length of 8 and a default stream ID of 0). </p>
+<p>Initially this will just be a simple control packet with class ID, TSI=UTC, TSF=Real-Time (ps) fsecs, packet count=0, packet size = 18, which is full header, full packet-specific-prologue, and +1 for CIF0. CAM is set to have 128-bit ControlleeID and 128-bit ControllerID with the action set to "take action". The ChangeIndicator bit is also set in CIF0. </p>
 
 </div>
 </div>
@@ -257,7 +257,7 @@ Inheritance diagram for vrt::BasicControlPacket:</div>
 <div class="memdoc">
 
 <p>Creates a new instance with a default anticipated length that can be written to. </p>
-<p>Initially this will just be a simple context packet with no fields set (other than the required packet length of 8 and a default stream ID of 0), but will have the underlying buffers pre-allocated as required. </p>
+<p>Initially this will just be a simple control packet with class ID, TSI=UTC, TSF=Real-Time, packet count=0, packet size = 18, which is full header, full packet-specific-prologue, and +1 for CIF0. CAM is set to have 128-bit ControlleeID and 128-bit ControllerID with the action set to "take action". The ChangeIndicator bit is also set in CIF0. The underlying buffers will be pre-allocated as required. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>bufsize</em>&nbsp;</td><td>The anticipated buffer size. </td></tr>
@@ -552,7 +552,7 @@ Inheritance diagram for vrt::BasicControlPacket:</div>
 <li>cpp_src/vrt/lib/<a class="el" href="BasicControlPacket_8h_source.html">BasicControlPacket.h</a></li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 28 Jun 2018 for VRT by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 29 Jun 2018 for VRT by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

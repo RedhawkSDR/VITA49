@@ -103,7 +103,7 @@ namespace vrt {
       VER_BLD_CODE,          ///< Bit 2   Version and Build Code                (1,0x00000004) <==> ...
       V49_COMPL,             ///< Bit 3   V49 Spec Compliance                   (1,0x00000008)
       HEALTH_STATUS,         ///< Bit 4   Health Status                         (1,0x00000010)
-      DISCRETE_IO64,         ///< Bit 5   Distrete I/O (64-bit)                 (1,0x00000020)
+      DISCRETE_IO64,         ///< Bit 5   Discrete I/O (64-bit)                 (1,0x00000020)
       DISCRETE_IO32,         ///< Bit 6   Discrete I/O (32-bit)                 (1,0x00000040)
       INDEX_LIST,            ///< Bit 7   Index List                            (1,0x00000080)
       CIF1_RESERVED_8,       ///< Bit 8   Reserved                              (1,0x00000100)
@@ -126,8 +126,8 @@ namespace vrt {
       BEAMWIDTH,             ///< Bit 25  Beamwidth                             (1,0x02000000)
       SPATIAL_REF_TYPE,      ///< Bit 26  Spatial Reference Type                (1,0x04000000)
       SPATIAL_SCAN_TYPE,     ///< Bit 27  Spatial Scan Type                     (1,0x08000000)
-      PNT_VECT_3D_ST,        ///< Bit 28  2-D Pointing Angle (structured)       (1,0x10000000)
-      PNT_VECT_3D_SI,        ///< Bit 29  2-D Pointing Angle (simple)           (1,0x20000000)
+      PNT_VECT_3D_ST,        ///< Bit 28  3-D Pointing Vector (structured)      (1,0x10000000)
+      PNT_VECT_3D_SI,        ///< Bit 29  3-D Pointing Vector (simple)          (1,0x20000000)
       POLARIZATION,          ///< Bit 30  Polarization                          (1,0x40000000)
       PHASE,                 ///< Bit 31  Phase                                 (1,0x80000000)
       

@@ -433,7 +433,7 @@ void&nbsp;</td><td class="memItemRight" valign="bottom"><b>swapPayloadBytes</b> 
 <div class="memdoc">
 
 <p>Creates a new instance that can be written to. </p>
-<p>Initially this will just be a simple data packet with no fields set (other than the required packet length of 4). </p>
+<p>Initially this will just be a simple data packet with streamID, classID, TSI=UTC, TSF=Real-Time, no trailer, and a packet length of 7. </p>
 
 </div>
 </div>
@@ -454,7 +454,7 @@ void&nbsp;</td><td class="memItemRight" valign="bottom"><b>swapPayloadBytes</b> 
 <div class="memdoc">
 
 <p>Creates a new instance with a default anticipated length that can be written to. </p>
-<p>Initially this will just be a simple data packet with no fields set (other than the required packet length of 4), but will have the underlying buffers pre-allocated as required. </p>
+<p>Initially this will just be a simple data packet with streamID, classID, TSI=UTC, TSF-Real-Time, no trailer, and a packet length of 7. The underlying buffers will be pre-allocated as required. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>bufsize</em>&nbsp;</td><td>The anticipated buffer size. </td></tr>
@@ -5034,7 +5034,7 @@ void&nbsp;</td><td class="memItemRight" valign="bottom"><b>swapPayloadBytes</b> 
 <li>cpp_src/vrt/lib/<a class="el" href="BasicDataPacket_8h_source.html">BasicDataPacket.h</a></li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 28 Jun 2018 for VRT by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 29 Jun 2018 for VRT by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>

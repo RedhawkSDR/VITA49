@@ -359,7 +359,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 <div class="memdoc">
 
 <p>Creates a new instance that can be written to. </p>
-<p>Initially this will just be a simple context packet with no fields set (other than the required packet length of 8 and a default stream ID of 0). </p>
+<p>Initially this will just be a simple command packet with StreamID, ClassID, Ack Indicator set, TSI=UTC, TSF=Real-time, CAM field, MessageID, 128-bit ControlleeID, 128-bit ControllerID, Execution Acknowledge bit set, and a packet size of 17 (no warning/error indicator fields until warning/error generated bit(s) set). </p>
 
 </div>
 </div>
@@ -380,7 +380,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 <div class="memdoc">
 
 <p>Creates a new instance with a default anticipated length that can be written to. </p>
-<p>Initially this will just be a simple context packet with no fields set (other than the required packet length of 8 and a default stream ID of 0), but will have the underlying buffers pre-allocated as required. </p>
+<p>Initially this will just be a simple command packet with StreamID, ClassID, Ack Indicator set, TSI=UTC, TSF=Real-time, CAM field, MessageID, 128-bit ControlleeID, 128-bit ControllerID, Execution Acknowledge bit set, and a packet size of 17 (no warning/error indicator fields until warning/error generated bit(s) set). The underlying buffers will be pre-allocated as required. </p>
 <dl><dt><b>Parameters:</b></dt><dd>
   <table border="0" cellspacing="2" cellpadding="0">
     <tr><td valign="top"></td><td valign="top"><em>bufsize</em>&nbsp;</td><td>The anticipated buffer size. </td></tr>
@@ -1204,7 +1204,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#a7c53b6ac2f492963d5a579294772fdfd">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>Referenced by <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00637">addError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00580">addWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00615">getError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00558">getWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00651">removeError()</a>, and <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00594">removeWarning()</a>.</p>
+<p>Referenced by <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00639">addError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00582">addWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00617">getError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00560">getWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00653">removeError()</a>, and <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00596">removeWarning()</a>.</p>
 
 </div>
 </div>
@@ -1980,7 +1980,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 
 <p>Implements <a class="el" href="classvrt_1_1IndicatorFieldProvider.html#ab5b6ffaeb60c66a20cad5ad2ad83e7a2">vrt::IndicatorFieldProvider</a>.</p>
 
-<p>Referenced by <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00637">addError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00580">addWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00651">removeError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00594">removeWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00626">setError()</a>, and <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00569">setWarning()</a>.</p>
+<p>Referenced by <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00639">addError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00582">addWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00653">removeError()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00596">removeWarning()</a>, <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00628">setError()</a>, and <a class="el" href="BasicAcknowledgePacket_8h_source.html#l00571">setWarning()</a>.</p>
 
 </div>
 </div>
@@ -2325,7 +2325,7 @@ virtual void&nbsp;</td><td class="memItemRight" valign="bottom"><b>setContextInd
 <li>cpp_src/vrt/lib/<a class="el" href="BasicAcknowledgePacket_8h_source.html">BasicAcknowledgePacket.h</a></li>
 </ul>
 </div>
-<hr size="1"/><address style="text-align: right;"><small>Generated on 28 Jun 2018 for VRT by&nbsp;
+<hr size="1"/><address style="text-align: right;"><small>Generated on 29 Jun 2018 for VRT by&nbsp;
 <a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.6.1 </small></address>
 </body>
