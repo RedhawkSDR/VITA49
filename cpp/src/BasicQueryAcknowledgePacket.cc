@@ -70,7 +70,7 @@ static inline int32_t bitCount (int32_t val) {
  */
 static inline vector<char> BasicQueryAcknowledgePacket_createDefaultPacket () {
   vector<char> buf(BasicVRTPacket::MAX_PROLOGUE_LENGTH + 4);
-  buf[0]  = 0x6C; // Ack w/ CID, not StaleTs, not Cancel
+  buf[0]  = 0x6C; // Ack w/ CID, not Cancel
   buf[1]  = 0x60; // TSI: UTC, TSF: Real-Time (ps) fractional timestamp, packet count =0
   buf[2]  = 0x00; // 
   buf[3]  = 0x12; // Packet size = 18 (full header, full psp, +1 for CIF0)
@@ -84,7 +84,6 @@ static inline vector<char> BasicQueryAcknowledgePacket_createDefaultPacket () {
 // CONSTRUCTORS
 //======================================================================
 
-// TODO constructors
 BasicQueryAcknowledgePacket::BasicQueryAcknowledgePacket (const BasicVRTPacket &p) :
   BasicVRTPacket(p)
 {
@@ -117,7 +116,13 @@ BasicQueryAcknowledgePacket::BasicQueryAcknowledgePacket () :
 BasicQueryAcknowledgePacket::BasicQueryAcknowledgePacket (int32_t bufsize) :
   BasicVRTPacket(bufsize)
 {
-  // done
+  bbuf[0]  = 0x6C; // Ack w/ CID, not Cancel
+  bbuf[1]  = 0x60; // TSI: UTC, TSF: Real-Time (ps) fractional timestamp, packet count =0
+  bbuf[2]  = 0x00; // 
+  bbuf[3]  = 0x12; // Packet size = 18 (full header, full psp, +1 for CIF0)
+  bbuf[28] = 0xF0; // Has 128-bit ControlleeID and 128-bit ControllerID
+  bbuf[29] = 0x04; // AckS/Query
+  bbuf[68] = 0x80; // ChangeIndicator bit set (default true for AckS Packets)
 }
 
 BasicQueryAcknowledgePacket::BasicQueryAcknowledgePacket (const vector<char> &buf, ssize_t start, ssize_t end, bool readOnly) :

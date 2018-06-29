@@ -71,7 +71,7 @@ static inline int32_t bitCount (int32_t val) {
  */
 static inline vector<char> BasicAcknowledgePacket_createDefaultPacket () {
   vector<char> buf(BasicVRTPacket::MAX_PROLOGUE_LENGTH);
-  buf[0]  = 0x6C; // Ack w/ CID, not StaleTs, not Cancel
+  buf[0]  = 0x6C; // Ack w/ CID, not Cancel
   buf[1]  = 0x60; // TSI: UTC, TSF: Real-Time (ps) fractional timestamp, packet count =0
   buf[2]  = 0x00; // 
   buf[3]  = 0x11; // Packet size = 17 (full header, full psp, no payload!)
@@ -117,7 +117,12 @@ BasicAcknowledgePacket::BasicAcknowledgePacket () :
 BasicAcknowledgePacket::BasicAcknowledgePacket (int32_t bufsize) :
   BasicVRTPacket(bufsize)
 {
-  // done
+  bbuf[0]  = 0x6C; // Ack w/ CID, not Cancel
+  bbuf[1]  = 0x60; // TSI: UTC, TSF: Real-Time (ps) fractional timestamp, packet count =0
+  bbuf[2]  = 0x00; // 
+  bbuf[3]  = 0x11; // Packet size = 17 (full header, full psp, no payload!)
+  bbuf[28] = 0xF0; // Has 128-bit ControlleeID and 128-bit ControllerID
+  bbuf[29] = 0x08; // AckX
 }
 
 BasicAcknowledgePacket::BasicAcknowledgePacket (const vector<char> &buf, ssize_t start, ssize_t end, bool readOnly) :

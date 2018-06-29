@@ -76,9 +76,11 @@ namespace vrt {
     public: BasicQueryAcknowledgePacket ();
 
     /** Creates a new instance with a default anticipated length that can be written to.
-     *  Initially this will just be a simple context packet with no fields set (other than
-     *  the required packet length of 8 and a default stream ID  of 0), but will have the
-     *  underlying buffers pre-allocated as required.
+     *  Initially this will just be a simple command packet with StreamID, ClassID, Ack Indicator
+     *  set, TSI=UTC, TSF=Real-time, CAM field, MessageID, 128-bit ControlleeID, 128-bit
+     *  ControllerID, Query-State Acknowledge bit set, CIF0, and a packet size of 18. The Change
+     *  Indicator bit of CIF0 is set as well. The underlying buffers will bepre-allocated as
+     *  required.
      *  @param bufsize The anticipated buffer size.
      */
     public: BasicQueryAcknowledgePacket (int32_t bufsize);

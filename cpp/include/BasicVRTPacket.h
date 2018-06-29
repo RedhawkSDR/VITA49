@@ -169,11 +169,11 @@ namespace vrt {
     public: BasicVRTPacket (const BasicVRTPacket &p);
 
     /** Creates a new instance with a default anticipated length that can be written to.
-     *  Initially this will just be a simple data packet with no fields set (other than
-     *  the required packet length of 4), but will have the underlying buffers pre-allocated
-     *  as required.
+     *  Initially this will just be a simple data packet with streamID, classID, no trailer,
+     *  TSI=UTC, TSF=Real-Time, and a packet length of 7. The underlying buffers will be
+     *  pre-allocated as required.
      *  @param bufsize The anticipated buffer size.
-     */  // TODO - length of 4?? Implementation sets pkt size to 7 (max prologue size), which is the number of 32-bit words, not bytes.
+     */
     public: BasicVRTPacket (int32_t bufsize);
 
     /** Creates a new instance accessing the given data buffer.

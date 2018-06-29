@@ -113,9 +113,9 @@ namespace vrt {
     public: BasicContextPacket ();
 
     /** Creates a new instance with a default anticipated length that can be written to.
-     *  Initially this will just be a simple context packet with no fields set (other than
-     *  the required packet length of 8 and a default stream ID  of 0), but will have the
-     *  underlying buffers pre-allocated as required.
+     *  Initially this will just be a simple context packet with StreamID, ClassID, TSI=UTC,
+     *  TSF=Real-Time, CIF0, and a packet length of 8. The underlying buffers will be pre-allocated
+     *  as required.
      *  @param bufsize The anticipated buffer size.
      */
     public: BasicContextPacket (int32_t bufsize);

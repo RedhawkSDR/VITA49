@@ -90,9 +90,9 @@ namespace vrt {
     public: BasicDataPacket ();
 
     /** Creates a new instance with a default anticipated length that can be written to.
-     *  Initially this will just be a simple data packet with no fields set (other than
-     *  the required packet length of 4), but will have the underlying buffers pre-allocated
-     *  as required.
+     *  Initially this will just be a simple data packet with streamID, classID, TSI=UTC,
+     *  TSF-Real-Time, no trailer, and a packet length of 7. The underlying buffers will be
+     *  pre-allocated as required.
      *  @param bufsize The anticipated buffer size.
      */
     public: BasicDataPacket (int32_t bufsize);

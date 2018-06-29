@@ -84,7 +84,10 @@ BasicContextPacket::BasicContextPacket (const void *buf, size_t len, bool readOn
 BasicContextPacket::BasicContextPacket (int32_t bufsize) :
   BasicVRTPacket(bufsize)
 {
-  // done
+  bbuf[0] = 0x48; // Context w/ CID, TSM=0
+  bbuf[1] = 0x60; // TSI: UTC, TSF: Real-Time (ps) fractional timestamp, packet count =0
+  bbuf[2] = 0x00; // 
+  bbuf[3] = 0x08; // Packet size = 8
 }
 
 BasicContextPacket::BasicContextPacket (const BasicVRTPacket &p, int64_t classID) :

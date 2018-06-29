@@ -71,7 +71,7 @@ static inline int32_t bitCount (int32_t val) {
  */
 static inline vector<char> BasicCommandPacket_createDefaultPacket () {
   vector<char> buf(BasicVRTPacket::MAX_PROLOGUE_LENGTH + 4);
-  buf[0]  = 0x68; // Control w/ CID, not Cancel
+  buf[0]  = 0x68; // Command w/ CID, not Cancel
   buf[1]  = 0x60; // TSI: UTC, TSF: Real-Time (ps) fractional timestamp, packet count =0
   buf[2]  = 0x00; // 
   buf[3]  = 0x12; // Packet size = 18 (full header, full psp, +1 for CIF0)
@@ -117,6 +117,11 @@ BasicCommandPacket::BasicCommandPacket (int32_t bufsize) :
   BasicVRTPacket(bufsize)
 {
   // done
+  bbuf[0]  = 0x68; // Command w/ CID, not Cancel
+  bbuf[1]  = 0x60; // TSI: UTC, TSF: Real-Time (ps) fractional timestamp, packet count =0
+  bbuf[2]  = 0x00; // 
+  bbuf[3]  = 0x12; // Packet size = 18 (full header, full psp, +1 for CIF0)
+  bbuf[28] = 0xF0; // Has 128-bit ControlleeID and 128-bit ControllerID
 }
 
 BasicCommandPacket::BasicCommandPacket (const vector<char> &buf, ssize_t start, ssize_t end, bool readOnly) :

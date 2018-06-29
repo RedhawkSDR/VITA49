@@ -79,9 +79,11 @@ namespace vrt {
     public: BasicControlPacket ();
 
     /** Creates a new instance with a default anticipated length that can be written to.
-     *  Initially this will just be a simple context packet with no fields set (other than
-     *  the required packet length of 8 and a default stream ID  of 0), but will have the
-     *  underlying buffers pre-allocated as required.
+     *  Initially this will just be a simple control packet with class ID, TSI=UTC, TSF=Real-Time,
+     *  packet count=0, packet size = 18, which is full header, full packet-specific-prologue, and
+     *  +1 for CIF0. CAM is set to have 128-bit ControlleeID and 128-bit ControllerID with the
+     *  action set to "take action". The ChangeIndicator bit is also set in CIF0. The underlying
+     *  buffers will be pre-allocated as required.
      *  @param bufsize The anticipated buffer size.
      */
     public: BasicControlPacket (int32_t bufsize);
