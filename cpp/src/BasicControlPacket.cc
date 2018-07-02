@@ -75,7 +75,7 @@ static inline vector<char> BasicControlPacket_createDefaultPacket () {
   buf[1]  = 0x60; // TSI: UTC, TSF: Real-Time (ps) fractional timestamp, packet count =0
   buf[2]  = 0x00; // 
   buf[3]  = 0x12; // Packet size = 18 (full header, full psp, +1 for CIF0)
-  buf[28] = 0xF0; // Has 128-bit ControlleeID and 128-bit ControllerID
+  buf[28] = 0xF1; // Has 128-bit ControlleeID and 128-bit ControllerID, Take Action
   buf[68] = 0x80; // ChangeIndicator bit set (default true for ControlPackets)
   return buf;
 }
@@ -121,7 +121,7 @@ BasicControlPacket::BasicControlPacket (int32_t bufsize) :
   bbuf[1]  = 0x60; // TSI: UTC, TSF: Real-Time (ps) fractional timestamp, packet count =0
   bbuf[2]  = 0x00; // 
   bbuf[3]  = 0x12; // Packet size = 18 (full header, full psp, +1 for CIF0)
-  bbuf[28] = 0xF0; // Has 128-bit ControlleeID and 128-bit ControllerID
+  bbuf[28] = 0xF1; // Has 128-bit ControlleeID and 128-bit ControllerID, Take Action
   bbuf[68] = 0x80; // ChangeIndicator bit set (default true for ControlPackets)
 }
 
