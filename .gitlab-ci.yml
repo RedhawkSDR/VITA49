@@ -5,6 +5,7 @@ variables:
 
 stages:
   - build
+  - test
   - deploy
   - trigger
 
@@ -186,6 +187,26 @@ deploy:
     - master
     - /^.*-external$/
     - /^(\d+\.)?(\d+)?(\.\d+)$/
+
+abi-check:
+  image: ${docker_registry}redhawk/buildenv:2.1-el7
+  stage: test
+  dependencies:
+    - package:el7:rh2.1
+  variables:
+    last_release: '4.0.0-2'
+  script:
+    - curl -fsSL $yum_repo_url/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$last_release/rh2.1/el7/x86_64/$namespace$CI_PROJECT_NAME-$last_release.rh2.1.el7.centos.x86_64.rpm > $namespace$CI_PROJECT_NAME-$last_release.rh2.1.el7.centos.x86_64.rpm
+    - curl -fsSL $yum_repo_url/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$last_release/rh2.1/el7/x86_64/$namespace$CI_PROJECT_NAME-debuginfo-$last_release.rh2.1.el7.centos.x86_64.rpm > $namespace$CI_PROJECT_NAME-debuginfo-$last_release.rh2.1.el7.centos.x86_64.rpm
+    - curl -fsSL $yum_repo_url/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$last_release/rh2.1/el7/x86_64/$namespace$CI_PROJECT_NAME-devel-$last_release.rh2.1.el7.centos.x86_64.rpm > $namespace$CI_PROJECT_NAME-devel-$last_release.rh2.1.el7.centos.x86_64.rpm
+    - abipkgdiff --verbose
+                 --debug-info-pkg1 $namespace$CI_PROJECT_NAME-debuginfo-$last_release.rh2.1.el7.centos.x86_64.rpm
+                 --debug-info-pkg2 output/x86_64/$namespace$CI_PROJECT_NAME-debuginfo*.rpm
+                 --devel-pkg1 $namespace$CI_PROJECT_NAME-devel-$last_release.rh2.1.el7.centos.x86_64.rpm
+                 --devel-pkg2 output/x86_64/$namespace$CI_PROJECT_NAME-devel*.rpm
+                 $namespace$CI_PROJECT_NAME-$last_release.rh2.1.el7.centos.x86_64.rpm
+                 output/x86_64/$namespace$CI_PROJECT_NAME-5*.rpm
+  allow_failure: true
 
 trigger:
   image: ${docker_registry}${trigger_repo}trigger:latest
