@@ -30,6 +30,14 @@ latest unreleased development code for the latest released version.
 To build from source, run the `build.sh` script found at the top level
 directory. To install to $SDRROOT, run `build.sh install`. Note: root privileges
 (`sudo`) may be required to install.
+
+### CMake
+You can also build with cmake:
+```bash
+cmake -DCMAKE_BUILD_TYPE="Debug|Release" -DCMAKE_INSTALL_PREFIX=/path/to/install -S . -B /tmp/build
+cmake --build /tmp/build -j
+cmake --install /tmp/build
+```
  
 ## Copyrights
 
