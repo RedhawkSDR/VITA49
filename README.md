@@ -38,6 +38,10 @@ cmake -DCMAKE_BUILD_TYPE="Debug|Release" -DCMAKE_INSTALL_PREFIX=/path/to/install
 cmake --build /tmp/build -j
 cmake --install /tmp/build
 ```
+
+## Dependencies
+Requires the following:
+* **libuuid-devel**: Install through package manager.
  
 ## Copyrights
 
