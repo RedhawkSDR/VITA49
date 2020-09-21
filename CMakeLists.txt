@@ -16,7 +16,7 @@ IF(CMAKE_BUILD_TYPE MATCHES Debug)
 ENDIF()
 
 #-------------------------
-# opmesh core
+# Source files
 file(GLOB ${PROJECT_NAME}_sources
     "${CMAKE_CURRENT_SOURCE_DIR}/cpp/src/*.cc"
 )
