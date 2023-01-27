@@ -59,7 +59,7 @@ const string     StandardContextPacket::CLASS_ID("FF-FF-FA:2011.0003");
 // PACKET TYPE CONSTRUCTORS
 //======================================================================
 StandardContextPacket::StandardContextPacket () :
-  BasicContextPacket(StandardContextPacket_createDefaultPacket(), false)
+  BasicContextPacket(StandardContextPacket_createDefaultPacket(), false), BasicVRTPacket(StandardContextPacket_createDefaultPacket(), false)
 {
  // done
 }
